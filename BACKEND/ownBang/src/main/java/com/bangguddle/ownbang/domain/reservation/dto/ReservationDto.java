@@ -1,4 +1,7 @@
-package com.bangguddle.ownbang.domain.reservation;
+package com.bangguddle.ownbang.domain.reservation.dto;
+
+import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
+import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 
 import java.time.LocalDateTime;
 
