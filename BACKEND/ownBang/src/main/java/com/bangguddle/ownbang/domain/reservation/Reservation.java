@@ -2,11 +2,12 @@ package com.bangguddle.ownbang.domain.reservation;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
+@Builder
 @Entity
 @Table(name = "reservation")
 @Getter
