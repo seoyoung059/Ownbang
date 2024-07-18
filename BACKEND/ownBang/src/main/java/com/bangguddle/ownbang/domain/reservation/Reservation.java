@@ -1,4 +1,4 @@
-package com.bangguddle.ownbang.reservation;
+package com.bangguddle.ownbang.domain.reservation;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
