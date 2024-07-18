@@ -139,8 +139,12 @@ const SignUp = () => {
           >
             회원가입 하기
           </Button>
+          {/* 아이디, 비밀번호 찾기 */}
           <Grid container justifyContent="flex-end">
             <Grid item>
+              <Link href="#" variant="body2" style={{ marginRight: 20 }}>
+                아이디 찾기
+              </Link>
               <Link href="#" variant="body2">
                 비밀번호 찾기
               </Link>
