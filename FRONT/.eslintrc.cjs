@@ -20,4 +20,12 @@ module.exports = {
     "no-unused-vars": "off",
     "react/prop-types": "off",
   },
+  env: {
+    browser: true,
+    node: true,
+    es2021: true,
+  },
+  globals: {
+    process: "readonly",
+  },
 };
