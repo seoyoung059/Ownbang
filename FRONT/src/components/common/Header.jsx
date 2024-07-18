@@ -4,51 +4,20 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-
-const headerStyle = {
-  position: "fixed",
-  left: 0,
-  top: 0,
-  margin: "0 auto",
-  width: "100%",
-  height: "80px",
-  backgroundColor: "#395886",
-  color: "white",
-};
-
-const contentsStyle = {
-  display: "flex",
-  height: "100%",
-  alignItems: "center",
-  justifyContent: "space-between",
-  margin: "0 40px",
-};
-
-const navigationStyle = {
-  color: "white",
-  "& div": {
-    display: "flex",
-    gap: "30px",
-    "& button": {
-      color: "white",
-      backgroundColor: "#395886",
-      border: "none",
-    },
-  },
-};
-
-const modalStyle = {
-  position: "absolute",
-  top: "10%",
-  right: "5%",
-  width: 400,
-  bgcolor: "background.paper",
-  borderRadius: "10px",
-  boxShadow: 24,
-  p: 4,
-};
+import { useTheme, styled } from "@mui/material";
 
 const Notification = ({ open, handleClose }) => {
+  const theme = useTheme();
+  const modalStyle = {
+    position: "absolute",
+    top: "12%",
+    right: "4%",
+    width: 400,
+    bgcolor: theme.palette.background.paper,
+    borderRadius: "10px",
+    boxShadow: 24,
+    p: 4,
+  };
   return (
     <Modal
       open={open}
@@ -69,9 +38,43 @@ const Notification = ({ open, handleClose }) => {
 };
 
 const Header = () => {
+  const theme = useTheme();
+
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const headerStyle = {
+    position: "fixed",
+    left: 0,
+    top: 0,
+    margin: "0 auto",
+    width: "100%",
+    height: "80px",
+    backgroundColor: theme.palette.primary.dark,
+    color: theme.palette.common.white,
+  };
+
+  const contentsStyle = {
+    display: "flex",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+    margin: "0 40px",
+  };
+
+  const navigationStyle = {
+    color: "white",
+    "& div": {
+      display: "flex",
+      gap: "28px",
+      "& button": {
+        color: "white",
+        backgroundColor: theme.palette.primary.dark,
+        border: "none",
+      },
+    },
+  };
 
   return (
     <>
