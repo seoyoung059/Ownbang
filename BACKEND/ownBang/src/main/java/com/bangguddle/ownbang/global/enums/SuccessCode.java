@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum SuccessCode implements ResponseCode {
-    //Auth API
+    // Auth API
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입이 성공적으로 완료되었습니다.");
 
     private final HttpStatus httpStatus;
