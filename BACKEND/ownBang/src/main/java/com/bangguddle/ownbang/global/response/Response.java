@@ -4,8 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public record Response<T>(String resultCode, T result) {
-    public static <T> ResponseEntity<Response<T>> success(T result, HttpStatus status) {
-        return new ResponseEntity<>(new Response<>("SUCCESS", result), status);
+    public static <T> ResponseEntity<Response<T>> created(T result) {
+        return new ResponseEntity<>(new Response<>("SUCCESS", result), HttpStatus.CREATED);
     }
 
     public static <T> ResponseEntity<Response<T>> success(T result) {
