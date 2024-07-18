@@ -4,10 +4,13 @@ import Button from "@mui/material/Button";
 
 import { useTheme } from "@mui/material";
 
+import Header from "./components/common/Header";
+
 function App() {
   const theme = useTheme();
   return (
     <>
+      <Header />
       <Button
         variant="contained"
         sx={{
