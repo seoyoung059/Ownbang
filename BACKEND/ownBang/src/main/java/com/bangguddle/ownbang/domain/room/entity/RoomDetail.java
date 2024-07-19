@@ -65,10 +65,10 @@ public class RoomDetail {
     @Column(name = "purpose")
     private Purpose purpose;
 
-    @Column(name = "road", length = 255)
+    @Column(name = "road")
     private String road;
 
-    @Column(name = "detail_address", length = 255)
+    @Column(name = "detail_address")
     private String detailAddress;
 
     @Builder

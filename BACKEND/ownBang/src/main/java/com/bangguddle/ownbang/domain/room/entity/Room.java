@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "room")
 @Getter
@@ -20,9 +22,9 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "agent_id", nullable = false)
-    private User agent;
+//    @ManyToOne
+//    @JoinColumn(name = "agent_id", nullable = false)
+//    private User agent;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="room_appliances_id", nullable = false)
@@ -31,6 +33,9 @@ public class Room {
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "room_detail_id", nullable = false)
     private RoomDetail roomDetail;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomImage> roomImages;
 
     @Column(name="latitude", nullable = false)
     private float latitude;
@@ -78,10 +83,11 @@ public class Room {
     private String profileImageUrl;
 
     @Builder
-    public Room(User agent, RoomAppliances roomAppliances, RoomDetail roomDetail, float latitude, float longitude, DealType dealType, RoomType roomType, Structure structure, boolean isLoft, float exclusiveArea, float supplyArea, byte roomFloor, Long deposit, Long monthlyRent, Long maintenanceFee, String parcel, String profileImageUrl) {
-        this.agent = agent;
+    public Room(/*User agent, */RoomAppliances roomAppliances, RoomDetail roomDetail, List<RoomImage> roomImages,float latitude, float longitude, DealType dealType, RoomType roomType, Structure structure, boolean isLoft, float exclusiveArea, float supplyArea, byte roomFloor, Long deposit, Long monthlyRent, Long maintenanceFee, String parcel, String profileImageUrl) {
+//        this.agent = agent;
         this.roomAppliances = roomAppliances;
         this.roomDetail = roomDetail;
+        this.roomImages = roomImages;
         this.latitude = latitude;
         this.longitude = longitude;
         this.dealType = dealType;

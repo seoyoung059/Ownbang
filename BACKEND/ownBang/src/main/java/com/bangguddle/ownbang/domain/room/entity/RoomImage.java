@@ -2,6 +2,7 @@ package com.bangguddle.ownbang.domain.room.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +23,10 @@ public class RoomImage {
 
     @Column(name="room_image_url", nullable = false, length = 255)
     private String roomImageUrl;
+
+    @Builder
+    public RoomImage(Room room, String roomImageUrl) {
+        this.room = room;
+        this.roomImageUrl = roomImageUrl;
+    }
 }
