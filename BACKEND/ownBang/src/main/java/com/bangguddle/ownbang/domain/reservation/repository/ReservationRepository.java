@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long>{
@@ -17,8 +18,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
             final Long roomId,
             final LocalDateTime time
     );
-    
+
     @Query("SELECT r FROM Reservation r WHERE r.roomId = :roomId AND r.userId= :userId And r.status<> 2") // 예약 취소가 아닌 것 중에 중복건이 있나 확인
     Optional<Reservation> findByRoomIdAndUserId(final Long roomId, final long userId);
 
+    List<Reservation> findByUserId(long userId);
 }

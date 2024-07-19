@@ -1,6 +1,7 @@
 package com.bangguddle.ownbang.domain.reservation.service.impl;
 
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationDto;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,5 +47,20 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(reservation);
 
         return new MessageResponse(SuccessCode.RESERVATION_MAKE_SUCCESS.getMessage());
+    }
+
+    public ReservationListResponse getReservationsByUserId(long userId){
+        List<Reservation> reservations = reservationRepository.findByUserId(userId);
+        List<ReservationDto> reservationDtos = reservations.stream()
+                .map(reservation -> new ReservationDto(
+                        reservation.getId(),
+                        reservation.getRoomId(),
+                        reservation.getUserId(),
+                        reservation.getTime(),
+                        reservation.getStatus()
+                ))
+                .collect(Collectors.toList());
+
+        return new ReservationListResponse(reservationDtos, "내가 신청한 예약 목록을 조회할 수 있습니다.");
     }
 }

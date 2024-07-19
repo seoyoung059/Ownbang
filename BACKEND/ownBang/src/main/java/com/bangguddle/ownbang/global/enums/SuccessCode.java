@@ -10,7 +10,8 @@ public enum SuccessCode implements ResponseCode {
     // Auth API
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입이 성공적으로 완료되었습니다."),
     //Reservation API
-    RESERVATION_MAKE_SUCCESS(HttpStatus.CREATED, "예약신청이 성공적으로 완료되었습니다.");
+    RESERVATION_MAKE_SUCCESS(HttpStatus.CREATED, "예약신청이 성공적으로 완료되었습니다."),
+    RESERVATION_CONFIRM_SUCCESS(HttpStatus.CREATED, "예약 확정이 성공적으로 완료되었습니다.");
     private final HttpStatus httpStatus;
     private final String message;
 }

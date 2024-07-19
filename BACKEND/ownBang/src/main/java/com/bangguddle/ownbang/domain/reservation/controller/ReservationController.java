@@ -1,15 +1,13 @@
 package com.bangguddle.ownbang.domain.reservation.controller;
 
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationDto;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
 import com.bangguddle.ownbang.global.response.MessageResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/reservations")
@@ -21,6 +19,13 @@ public class ReservationController {
     public ResponseEntity<Response<MessageResponse>> createReservation(@RequestBody ReservationDto reservationdto) {
         MessageResponse response = reservationService.createReservation(reservationdto);
         return Response.created(response);
+    }
+
+    @GetMapping("/list") // 쿼리스트링
+    public ResponseEntity<Response<ReservationListResponse>> getReservationsByUserId(
+            @RequestParam long userId) {
+        ReservationListResponse response = reservationService.getReservationsByUserId(userId);
+        return Response.success(response);
     }
 
 }
