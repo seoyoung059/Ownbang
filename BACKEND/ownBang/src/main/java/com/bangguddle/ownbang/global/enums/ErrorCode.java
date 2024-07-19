@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode implements ResponseCode {
     // Auth API
     EMAIL_DUPLICATED(HttpStatus.CONFLICT, "이미 가입한 회원입니다."),
-
+    // Reservation API
+    Reservation_DUPLICATED(HttpStatus.CONFLICT, " 이미 다른 사람이 신청된 예약 시간입니다. "),
+    Reservation_COMPLETED(HttpStatus.CONFLICT, " 각 매물은 한 건씩만 예약이 가능합니다. "),
     // Common Error Code
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부적 에러가 발생했습니다."),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 요청입니다."),
