@@ -83,8 +83,12 @@ const LoginForm = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 4, mb: 2, height: "50px" }}
-              style={{ backgroundColor: theme.palette.primary.light }}
+              sx={{
+                mt: 4,
+                mb: 2,
+                height: "50px",
+                backgroundColor: theme.palette.primary.main,
+              }}
             >
               로그인 하기
             </Button>
