@@ -51,20 +51,12 @@ const SignUp = () => {
       <CssBaseline />
       <Box
         sx={{
-          marginTop: 8,
+          marginTop: 4,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
         }}
       >
-        <Typography
-          style={{ fontWeight: theme.fontWeight.bold }}
-          sx={{ mt: 8 }}
-          component="h1"
-          variant="h5"
-        >
-          회원가입
-        </Typography>
         <></>
         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 8 }}>
           <Grid container spacing={4}>
@@ -80,11 +72,7 @@ const SignUp = () => {
               {/* 아이디 입력 란 하단에 위치한 안내 문구 */}
               <Typography
                 name="idNotice"
-                style={{
-                  fontSize: theme.fontSize.small,
-                  marginTop: 10,
-                  marginLeft: 10,
-                }}
+                sx={{ fontSize: theme.fontSize.small, mt: 1, ml: 1 }}
               >
                 4~ 20 자리 영어, 숫자, 특수문자
               </Typography>
@@ -101,11 +89,7 @@ const SignUp = () => {
               {/* 비밀번호 입력 란 하단에 위치한 안내 문구 */}
               <Typography
                 name="pwNotice"
-                style={{
-                  fontSize: theme.fontSize.small,
-                  marginTop: 10,
-                  marginLeft: 10,
-                }}
+                sx={{ fontSize: theme.fontSize.small, mt: 1, ml: 1 }}
               >
                 9~16자리 영문 대소문자, 숫자, 특수문자 조합
               </Typography>
@@ -134,11 +118,16 @@ const SignUp = () => {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 4, mb: 2, height: "50px" }}
-            style={{ backgroundColor: theme.palette.primary.light }}
+            sx={{
+              mt: 4,
+              mb: 2,
+              height: "50px",
+              backgroundColor: theme.palette.primary.main,
+            }}
           >
             회원가입 하기
           </Button>
+
           {/* 아이디, 비밀번호 찾기 */}
           <Grid container justifyContent="flex-end">
             <Grid item>
