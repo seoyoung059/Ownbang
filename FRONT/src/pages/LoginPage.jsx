@@ -1,9 +1,4 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
@@ -23,10 +18,9 @@ export default function LoginPage() {
         }}
       >
         <Typography
-          style={{ fontWeight: theme.fontWeight.bold }}
-          sx={{ mt: 8 }}
           component="h1"
           variant="h5"
+          sx={{ fontWeight: theme.fontWeight.bold, mt: 8 }}
         >
           로그인
         </Typography>
