@@ -1,9 +1,7 @@
 package com.bangguddle.ownbang.domain.room.controller;
 
-import com.bangguddle.ownbang.domain.room.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -11,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class RoomController {
 
-    private final RoomService roomService;
+//    private final RoomServiceImpl roomServiceImpl;
 
     // 매물 등록
 
