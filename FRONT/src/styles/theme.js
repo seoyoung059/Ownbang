@@ -77,6 +77,7 @@ const theme = createTheme({
     common: {
       black: "#000000",
       white: "#ffffff",
+      grey: "#797979",
     },
   },
 });
