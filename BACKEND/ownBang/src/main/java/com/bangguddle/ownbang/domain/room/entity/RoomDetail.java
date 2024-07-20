@@ -23,52 +23,52 @@ public class RoomDetail {
     private Long id;
 
 
-    @Column(name = "room_count", nullable = false)
+    @Column(nullable = false)
     private byte roomCount;
 
-    @Column(name = "bathroom_count", nullable = false)
+    @Column(nullable = false)
     private byte bathroomCount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "heating_type", nullable = false)
+    @Column(nullable = false)
     private HeatingType heatingType;
 
-    @Column(name = "movein_date", nullable = false)
+    @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private Date moveInDate;
 
-    @Column(name = "building_floor", nullable = false, columnDefinition = "UNSIGNED")
+    @Column(nullable = false, columnDefinition = "UNSIGNED")
     private Long buildingFloor;
 
-    @Column(name = "elevator", nullable = false)
+    @Column(nullable = false)
     private boolean elevator;
 
-    @Column(name = "total_parking", nullable = false, columnDefinition = "UNSIGNED")
+    @Column(nullable = false, columnDefinition = "UNSIGNED")
     private Long totalParking;
 
-    @Column(name = "parking", nullable = false)
+    @Column(nullable = false)
     private float parking;
 
-    @Column(name = "approval_date")
+    @Column
     @Temporal(TemporalType.DATE)
     private Date approvalDate;
 
-    @Column(name = "first_registration_date", nullable = false)
+    @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private Date firstRegistrationDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "facing", nullable = false)
+    @Column(nullable = false)
     private Facing facing;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "purpose")
+    @Column
     private Purpose purpose;
 
-    @Column(name = "road")
+    @Column
     private String road;
 
-    @Column(name = "detail_address")
+    @Column
     private String detailAddress;
 
     @Builder

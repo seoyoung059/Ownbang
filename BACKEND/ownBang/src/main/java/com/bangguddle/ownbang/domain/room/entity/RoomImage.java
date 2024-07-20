@@ -14,14 +14,14 @@ public class RoomImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="room_image_id", nullable = false, columnDefinition = "UNSIGNED")
+    @Column(nullable = false, columnDefinition = "UNSIGNED")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="room_id", nullable = false, columnDefinition = "UNSIGNED")
+    @JoinColumn(nullable = false, columnDefinition = "UNSIGNED")
     private Room room;
 
-    @Column(name="room_image_url", nullable = false, length = 255)
+    @Column(nullable = false)
     private String roomImageUrl;
 
     @Builder

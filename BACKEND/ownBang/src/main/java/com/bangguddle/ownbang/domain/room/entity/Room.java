@@ -37,49 +37,49 @@ public class Room {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomImage> roomImages;
 
-    @Column(name="latitude", nullable = false)
+    @Column(nullable = false)
     private float latitude;
 
-    @Column(name="longitude", nullable = false)
+    @Column(nullable = false)
     private float longitude;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "deal_type", nullable = false)
+    @Column(nullable = false)
     private DealType dealType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "room_type", nullable = false)
+    @Column(nullable = false)
     private RoomType roomType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="structure", nullable = false)
+    @Column(nullable = false)
     private Structure structure;
 
-    @Column(name = "is_loft", nullable = false)
+    @Column(nullable = false)
     private boolean isLoft;
 
-    @Column(name = "exclusive_area", nullable = false, columnDefinition = "FLOAT(5,2)")
+    @Column(nullable = false, columnDefinition = "FLOAT(5,2)")
     private float exclusiveArea;
 
-    @Column(name = "supply_area", nullable = false, columnDefinition = "FLOAT(5,2)")
+    @Column(nullable = false, columnDefinition = "FLOAT(5,2)")
     private float supplyArea;
 
-    @Column(name = "room_floor", nullable = false)
+    @Column(nullable = false)
     private byte roomFloor;
 
-    @Column(name = "deposit", columnDefinition = "UNSIGNED")
+    @Column( columnDefinition = "UNSIGNED")
     private Long deposit;
 
-    @Column(name = "monthly_rent", columnDefinition = "UNSIGNED")
+    @Column(columnDefinition = "UNSIGNED")
     private Long monthlyRent;
 
-    @Column(name = "maintenance_fee", nullable = false, columnDefinition = "UNSIGNED")
+    @Column( nullable = false, columnDefinition = "UNSIGNED")
     private Long maintenanceFee;
 
-    @Column(name = "percel", length = 255)
+    @Column
     private String parcel;
 
-    @Column(name="profile_image_url", nullable = false, length = 255)
+    @Column(nullable = false)
     private String profileImageUrl;
 
     @Builder

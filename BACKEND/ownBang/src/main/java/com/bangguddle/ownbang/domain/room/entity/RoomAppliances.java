@@ -17,28 +17,28 @@ public class RoomAppliances {
     @Column(name = "room_appliances_id", nullable = false, columnDefinition = "UNSIGNED")
     private Long id;
 
-    @Column(name = "refrigerator", nullable = false)
+    @Column(nullable = false)
     private boolean refrigerator;
 
-    @Column(name = "washing_machine", nullable = false)
+    @Column(nullable = false)
     private boolean washingMachine;
 
-    @Column(name = "air_conditioner", nullable = false)
+    @Column(nullable = false)
     private boolean airConditioner;
 
-    @Column(name = "bed", nullable = false)
+    @Column(nullable = false)
     private boolean bed;
 
-    @Column(name = "desk", nullable = false)
+    @Column(nullable = false)
     private boolean desk;
 
-    @Column(name = "microwave", nullable = false)
+    @Column(nullable = false)
     private boolean microwave;
 
-    @Column(name = "closet", nullable = false)
+    @Column(nullable = false)
     private boolean closet;
 
-    @Column(name = "chair", nullable = false)
+    @Column(nullable = false)
     private boolean chair;
 
     @Builder
