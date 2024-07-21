@@ -3,17 +3,17 @@ package com.bangguddle.ownbang.domain.room.dto;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomImage;
 
-public record RoomImageDto(
+public record RoomImageCreateRequest(
     Room room,
     String roomImageUrl
 ) {
 
-    public RoomImageDto of (Room room, String roomImageUrl){
-        return new RoomImageDto(room, roomImageUrl);
+    static public RoomImageCreateRequest of (Room room, String roomImageUrl){
+        return new RoomImageCreateRequest(room, roomImageUrl);
     }
 
-    public RoomImageDto from(RoomImage roomImage){
-        return new RoomImageDto(roomImage.getRoom(), roomImage.getRoomImageUrl());
+    static public RoomImageCreateRequest from(RoomImage roomImage){
+        return new RoomImageCreateRequest(roomImage.getRoom(), roomImage.getRoomImageUrl());
     }
 
 

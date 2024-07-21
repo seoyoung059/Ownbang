@@ -2,7 +2,7 @@ package com.bangguddle.ownbang.domain.room.dto;
 
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 
-public record RoomAppliancesDto(
+public record RoomAppliancesCreateRequest(
         boolean refrigerator,
         boolean washingMachine,
         boolean airConditioner,
@@ -14,7 +14,7 @@ public record RoomAppliancesDto(
 ) {
 
 
-    public RoomAppliancesDto of (
+    static public RoomAppliancesCreateRequest of (
             boolean refrigerator,
             boolean washingMachine,
             boolean airConditioner,
@@ -23,13 +23,13 @@ public record RoomAppliancesDto(
             boolean microwave,
             boolean closet,
             boolean chair) {
-        return new RoomAppliancesDto(refrigerator, washingMachine, airConditioner,
+        return new RoomAppliancesCreateRequest(refrigerator, washingMachine, airConditioner,
                 bed, desk, microwave, closet, chair);
     }
 
 
-    public RoomAppliancesDto from (RoomAppliances roomAppliances) {
-        return new RoomAppliancesDto(roomAppliances.isRefrigerator(),
+    static public RoomAppliancesCreateRequest from (RoomAppliances roomAppliances) {
+        return new RoomAppliancesCreateRequest(roomAppliances.isRefrigerator(),
                 roomAppliances.isWashingMachine(),
                 roomAppliances.isAirConditioner(),
                 roomAppliances.isBed(),

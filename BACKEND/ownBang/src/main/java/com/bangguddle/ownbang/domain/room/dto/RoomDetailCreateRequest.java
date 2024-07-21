@@ -6,7 +6,7 @@ import com.bangguddle.ownbang.domain.room.enums.HeatingType;
 import com.bangguddle.ownbang.domain.room.enums.Purpose;
 import java.util.Date;
 
-public record RoomDetailDto(
+public record RoomDetailCreateRequest(
         byte roomCount,
         byte bathroomCount,
         HeatingType heatingType,
@@ -23,7 +23,7 @@ public record RoomDetailDto(
         String detailAddress
 ) {
 
-    public RoomDetailDto of(
+    static public RoomDetailCreateRequest of(
             byte roomCount,
             byte bathroomCount,
             HeatingType heatingType,
@@ -38,13 +38,13 @@ public record RoomDetailDto(
             Purpose purpose,
             String road,
             String detailAddress){
-        return new RoomDetailDto(roomCount, bathroomCount, heatingType, moveInDate,
+        return new RoomDetailCreateRequest(roomCount, bathroomCount, heatingType, moveInDate,
                 buildingFloor, elevator, totalParking, parking, approvalDate, firstRegistrationDate,
                 facing, purpose, road, detailAddress);
     }
 
-    public RoomDetailDto from(RoomDetail roomDetail){
-        return new RoomDetailDto(
+    static public RoomDetailCreateRequest from(RoomDetail roomDetail){
+        return new RoomDetailCreateRequest(
                 roomDetail.getRoomCount(),
                 roomDetail.getBathroomCount(),
                 roomDetail.getHeatingType(),

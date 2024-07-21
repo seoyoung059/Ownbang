@@ -7,11 +7,11 @@ import com.bangguddle.ownbang.domain.room.entity.RoomImage;
 import com.bangguddle.ownbang.domain.room.enums.DealType;
 import com.bangguddle.ownbang.domain.room.enums.RoomType;
 import com.bangguddle.ownbang.domain.room.enums.Structure;
-import org.aspectj.weaver.loadtime.Agent;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public record RoomCreateRequestDto(
+public record RoomCreateRequest(
 //        User agent,
         DealType dealType,
         RoomType roomType,
@@ -25,11 +25,12 @@ public record RoomCreateRequestDto(
         Long maintenanceFee,
         String parcel,
         String profileImageUrl,
-        RoomAppliancesDto roomAppliancesDto,
-        RoomDetailDto roomDetailDto,
-        List<RoomImageDto> roomImageDtoList
+        RoomAppliancesCreateRequest roomAppliancesCreateRequest,
+        RoomDetailCreateRequest roomDetailCreateRequest,
+        List<RoomImageCreateRequest> roomImageCreateRequestList
 ) {
-    public RoomCreateRequestDto of(
+
+    static public RoomCreateRequest of(
 //            User agent,
             DealType dealType,
             RoomType roomType,
@@ -43,10 +44,10 @@ public record RoomCreateRequestDto(
             Long maintenanceFee,
             String parcel,
             String profileImageUrl,
-            RoomAppliancesDto roomAppliancesDto,
-            RoomDetailDto roomDetailDto,
-            List<RoomImageDto> roomImageDtoList) {
-        return new RoomCreateRequestDto(
+            RoomAppliancesCreateRequest roomAppliancesCreateRequest,
+            RoomDetailCreateRequest roomDetailCreateRequest,
+            List<RoomImageCreateRequest> roomImageCreateRequestList) {
+        return new RoomCreateRequest(
 //                agent,
                 dealType,
                 roomType,
@@ -60,31 +61,17 @@ public record RoomCreateRequestDto(
                 maintenanceFee,
                 parcel,
                 profileImageUrl,
-                roomAppliancesDto,
-                roomDetailDto,
-                roomImageDtoList);
+                roomAppliancesCreateRequest,
+                roomDetailCreateRequest,
+                roomImageCreateRequestList);
     }
 
-    public RoomCreateRequestDto from(Room room, Agent agent, RoomAppliancesDto roomAppliancesDto, RoomDetailDto roomDetailDto, List<RoomImageDto> roomImageDtoList) {
-        return new RoomCreateRequestDto(
-//                agent,
-                room.getDealType(),
-                room.getRoomType(),
-                room.getStructure(),
-                room.isLoft(),
-                room.getExclusiveArea(),
-                room.getSupplyArea(),
-                room.getRoomFloor(),
-                room.getDeposit(),
-                room.getMonthlyRent(),
-                room.getMaintenanceFee(),
-                room.getParcel(),
-                room.getProfileImageUrl(),
-                roomAppliancesDto,
-                roomDetailDto,
-                roomImageDtoList
-        );
+    static public RoomCreateRequest from(Room room) {
+        return new RoomCreateRequest(/*room.getAgent(),*/room.getDealType(), room.getRoomType(), room.getStructure(), room.isLoft(), room.getExclusiveArea(), room.getSupplyArea(), room.getRoomFloor(),
+                room.getDeposit(), room.getMonthlyRent(), room.getMaintenanceFee(), room.getParcel(), room.getProfileImageUrl(), RoomAppliancesCreateRequest.from(room.getRoomAppliances()),
+                RoomDetailCreateRequest.from(room.getRoomDetail()), room.getRoomImages().stream().map(RoomImageCreateRequest::from).collect(Collectors.toList()));
     }
+
 
     public Room toEntity(/*User agent, */RoomAppliances roomAppliances, RoomDetail roomDetail, List<RoomImage> roomImages) {
         return Room.builder()
