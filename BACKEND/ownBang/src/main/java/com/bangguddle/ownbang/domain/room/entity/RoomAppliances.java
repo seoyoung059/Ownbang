@@ -14,7 +14,7 @@ public class RoomAppliances {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "room_appliances_id", nullable = false, columnDefinition = "UNSIGNED")
+    @Column(name = "room_appliances_id", nullable = false, columnDefinition = "INT UNSIGNED")
     private Long id;
 
     @Column(nullable = false)

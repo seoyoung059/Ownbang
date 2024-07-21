@@ -19,7 +19,7 @@ public class RoomDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="room_detail_id", nullable = false, columnDefinition = "UNSIGNED")
+    @Column(name="room_detail_id", nullable = false, columnDefinition = "INT UNSIGNED")
     private Long id;
 
 
@@ -37,13 +37,13 @@ public class RoomDetail {
     @Temporal(TemporalType.DATE)
     private Date moveInDate;
 
-    @Column(nullable = false, columnDefinition = "UNSIGNED")
+    @Column(nullable = false, columnDefinition = "INT UNSIGNED")
     private Long buildingFloor;
 
     @Column(nullable = false)
     private boolean elevator;
 
-    @Column(nullable = false, columnDefinition = "UNSIGNED")
+    @Column(nullable = false, columnDefinition = "INT UNSIGNED")
     private Long totalParking;
 
     @Column(nullable = false)

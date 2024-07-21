@@ -14,11 +14,11 @@ public class RoomImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, columnDefinition = "UNSIGNED")
+    @Column(nullable = false, columnDefinition = "INT UNSIGNED")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false, columnDefinition = "UNSIGNED")
+    @JoinColumn(nullable = false, columnDefinition = "INT UNSIGNED")
     private Room room;
 
     @Column(nullable = false)

@@ -18,7 +18,7 @@ import java.util.List;
 public class Room {
 
     @Id
-    @Column(name = "room_id", nullable = false, columnDefinition = "UNSIGNED")
+    @Column(name = "room_id", nullable = false, columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -67,13 +67,13 @@ public class Room {
     @Column(nullable = false)
     private byte roomFloor;
 
-    @Column( columnDefinition = "UNSIGNED")
+    @Column( columnDefinition = "INT UNSIGNED")
     private Long deposit;
 
-    @Column(columnDefinition = "UNSIGNED")
+    @Column(columnDefinition = "INT UNSIGNED")
     private Long monthlyRent;
 
-    @Column( nullable = false, columnDefinition = "UNSIGNED")
+    @Column( nullable = false, columnDefinition = "INT UNSIGNED")
     private Long maintenanceFee;
 
     @Column
