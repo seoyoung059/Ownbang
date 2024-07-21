@@ -28,6 +28,7 @@ export default function UserInfoEditForm({ toggleEdit }) {
     officeNumber: "",
     licenseNumber: "",
     officeAddress: "",
+    officeDetailAddress: "",
     officeName: "",
   });
 
@@ -121,7 +122,7 @@ export default function UserInfoEditForm({ toggleEdit }) {
                   onChange={(handleInputChange, handleCallNumberChange)}
                   fullWidth
                   inputProps={{
-                    maxLength: 12, // 최대 입력 길이 설정 (예: 010-1234-5678)
+                    maxLength: 12, // 최대 입력 길이 설정 (예: 02-1234-5678)
                   }}
                   placeholder="02-1234-5678"
                 />
@@ -142,13 +143,13 @@ export default function UserInfoEditForm({ toggleEdit }) {
                 <Box
                   sx={{
                     position: "absolute",
-                    top: "50%",
+                    top: "52%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
                     width: 400,
                     height: 580,
                     bgcolor: "background.paper",
-                    border: "2px solid #000",
+                    border: `2px solid ${theme.palette.common.grey}`,
                     boxShadow: 24,
                     p: 4,
                   }}
@@ -175,6 +176,15 @@ export default function UserInfoEditForm({ toggleEdit }) {
                 }}
               >
                 <Button onClick={handleOpen}>검색</Button>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="상세 주소"
+                  name="officeDetailAddress"
+                  value={userInfo.officeDetailAddress}
+                  onChange={handleInputChange}
+                  fullWidth
+                />
               </Grid>
               <Grid item xs={12}>
                 <TextField

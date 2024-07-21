@@ -92,9 +92,14 @@ export default function UserInfoEditForm() {
               개인정보 변경
             </Typography>
             <Typography
+              variant="body2"
               sx={{
                 textAlign: "end",
                 fontSize: theme.fontSize.small,
+                color: theme.palette.primary.main,
+                "&:hover": {
+                  textDecoration: "underLine",
+                },
               }}
               onClick={() => setForAgent((prev) => !prev)}
             >

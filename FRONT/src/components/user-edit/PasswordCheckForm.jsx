@@ -94,7 +94,7 @@ export default function PasswordCheckForm({ onPasswordVerified }) {
                           onClick={handleTogglePasswordVisibility}
                           edge="end"
                         >
-                          {!showPassword ? (
+                          {showPassword ? (
                             <VisibilityOff
                               sx={{ color: theme.palette.action.disabled }}
                             />
