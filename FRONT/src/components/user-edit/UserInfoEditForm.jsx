@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import StatusChangeForm from "./StatusChangeForm";
+import PasswordChangeForm from "./PasswordChangeForm";
 
 // 더미데이터 - 데이터 연결 필요
 const user = {
@@ -28,6 +29,7 @@ export default function UserInfoEditForm() {
   const [userInfo, setUserInfo] = useState(user);
 
   const [forAgent, setForAgent] = useState(false);
+  const [forPassChange, setForPassChange] = useState(false);
 
   // 입력창에 있는 정보들을 userInfo에 반영
   const handleInputChange = (e) => {
@@ -76,7 +78,7 @@ export default function UserInfoEditForm() {
       <Container component="main" maxWidth="xs">
         <CssBaseline />
 
-        {!forAgent ? (
+        {!forAgent && !forPassChange ? (
           <Box
             sx={{
               marginTop: 8,
@@ -143,6 +145,22 @@ export default function UserInfoEditForm() {
                   />
                 </Grid>
               </Grid>
+              <Grid>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    textAlign: "end",
+                    fontSize: theme.fontSize.small,
+                    color: theme.palette.primary.main,
+                    "&:hover": {
+                      textDecoration: "underLine",
+                    },
+                  }}
+                  onClick={() => setForPassChange((prev) => !prev)}
+                >
+                  비밀번호 변경
+                </Typography>
+              </Grid>
               <Grid
                 item
                 xs={8}
@@ -179,6 +197,8 @@ export default function UserInfoEditForm() {
               </Grid>
             </Box>
           </Box>
+        ) : forPassChange ? (
+          <PasswordChangeForm toggleEdit={setForPassChange} />
         ) : (
           <StatusChangeForm toggleEdit={handleEdit} />
         )}
