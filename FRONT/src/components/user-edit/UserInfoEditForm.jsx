@@ -67,6 +67,10 @@ export default function UserInfoEditForm() {
     setForAgent(props);
   };
 
+  const handlePassChange = (props) => {
+    setForPassChange(props);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // 여기서 실제로 변경 사항을 서버에 반영하거나 다른 작업 수행
@@ -149,6 +153,7 @@ export default function UserInfoEditForm() {
                 <Typography
                   variant="body2"
                   sx={{
+                    mt: 2,
                     textAlign: "end",
                     fontSize: theme.fontSize.small,
                     color: theme.palette.primary.main,
@@ -198,7 +203,7 @@ export default function UserInfoEditForm() {
             </Box>
           </Box>
         ) : forPassChange ? (
-          <PasswordChangeForm toggleEdit={setForPassChange} />
+          <PasswordChangeForm toggleEdit={handlePassChange} />
         ) : (
           <StatusChangeForm toggleEdit={handleEdit} />
         )}
