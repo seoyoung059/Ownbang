@@ -21,6 +21,10 @@ import { useNavigate } from "react-router-dom";
 페이지 나눠야할수도 ?
 */
 
+/*
+데이터를 가져오는 부분에서 zustand에 메서드를 정의하고 여기서 가져와야할듯 ?
+*/
+
 // 더미데이터 - 데이터 연결 필요
 const user = {
   userName: "김일태",
@@ -80,7 +84,7 @@ export default function UserInfoEditForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // 여기서 실제로 변경 사항을 서버에 반영하거나 다른 작업 수행
+    // 일단 출력 - 나중엔 api post
     console.log("유저 정보:", userInfo);
   };
 

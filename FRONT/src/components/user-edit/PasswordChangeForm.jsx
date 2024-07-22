@@ -5,11 +5,8 @@ import {
   Typography,
   Box,
   Divider,
-  InputAdornment,
-  IconButton,
   Button,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTheme } from "@emotion/react";
 
 export default function PasswordChangeForm({ toggleEdit }) {
@@ -27,25 +24,16 @@ export default function PasswordChangeForm({ toggleEdit }) {
   const handlePasswordChange = (e) => {
     const value = e.target.value;
     setPassword(value);
-    setPasswordTouched(true);
-    if (value === "") {
-      setPasswordFormatError(false);
-      setPasswordError(false);
-    } else {
-      setPasswordFormatError(!passwordRegex.test(value));
-      setPasswordError(value !== passwordCheck && passwordCheck.length >= 6);
-    }
+    setPasswordTouched(false);
+    setPasswordFormatError(false);
+    setPasswordError(false);
   };
 
   const handlePasswordCheckChange = (e) => {
     const value = e.target.value;
     setPasswordCheck(value);
-    setPasswordCheckTouched(true);
-    if (value === "") {
-      setPasswordError(false);
-    } else {
-      setPasswordError(value !== password && value.length >= 6);
-    }
+    setPasswordCheckTouched(false);
+    setPasswordError(false);
   };
 
   const handlePasswordBlur = () => {
@@ -62,7 +50,7 @@ export default function PasswordChangeForm({ toggleEdit }) {
     if (passwordCheck === "") {
       setPasswordError(false);
     } else {
-      setPasswordError(password !== passwordCheck && passwordCheck.length >= 6);
+      setPasswordError(password !== passwordCheck);
     }
   };
 
@@ -70,7 +58,7 @@ export default function PasswordChangeForm({ toggleEdit }) {
     if (!passwordFormatError && !passwordError && password && passwordCheck) {
       console.log("새 비밀번호:", password);
     } else {
-      console.log("비밀번호를 확인해주세요.");
+      alert("비밀번호를 확인해주세요."); // toast로 대체
     }
   };
 
@@ -114,15 +102,9 @@ export default function PasswordChangeForm({ toggleEdit }) {
               value={passwordCheck}
               onChange={handlePasswordCheckChange}
               onBlur={handlePasswordCheckBlur}
-              error={
-                passwordCheckTouched &&
-                passwordCheck.length >= 6 &&
-                passwordError
-              }
+              error={passwordCheckTouched && passwordError}
               helperText={
-                passwordCheckTouched &&
-                passwordCheck.length >= 6 &&
-                passwordError
+                passwordCheckTouched && passwordError
                   ? "비밀번호가 일치하지 않습니다."
                   : ""
               }
@@ -133,7 +115,6 @@ export default function PasswordChangeForm({ toggleEdit }) {
             xs={12}
             sx={{ display: "flex", justifyContent: "space-around" }}
           >
-            {/* 취소 버튼 클릭 시 어느 페이지로 이동할 지 */}
             <Button
               variant="contained"
               onClick={() => toggleEdit(false)}

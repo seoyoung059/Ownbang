@@ -46,6 +46,7 @@ export default function UserInfoEditForm({ toggleEdit }) {
   };
 
   // 입력창에 있는 정보들을 userInfo에 반영
+  // input의 name 속성과 value를 엮었기에 input의 name과 유저 정보 객체 키와 연결
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUserInfo((prevUserInfo) => ({
@@ -54,11 +55,11 @@ export default function UserInfoEditForm({ toggleEdit }) {
     }));
   };
 
-  // 전화번호의 경우
+  // 전화번호
   const handleCallNumberChange = (event) => {
     let formattedPhoneNumber = event.target.value.replace(/[^\d]/g, ""); // 숫자 이외의 문자 모두 제거
 
-    // 전화번호 형식에 맞춰 '-' 기호 삽입
+    // '-' 기호 삽입
     if (formattedPhoneNumber.length > 2 && formattedPhoneNumber.length <= 6) {
       formattedPhoneNumber = formattedPhoneNumber.replace(
         /(\d{3})(\d{4})/,
