@@ -49,7 +49,7 @@ const router = createBrowserRouter([
   {
     path: "/user-edit",
     element: (
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<Loading message="내 정보를 불러오고 있어요." />}>
         <UserEditPage />
       </Suspense>
     ),
@@ -57,7 +57,7 @@ const router = createBrowserRouter([
   {
     path: "/estate",
     element: (
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<Loading message="매물을 검색하고 있어요." />}>
         <RealEstatePage />
       </Suspense>
     ),

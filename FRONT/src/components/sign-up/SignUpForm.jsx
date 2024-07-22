@@ -1,149 +1,64 @@
-// 홈페이지 자체 회원가입 폼
-// 소셜 회원가입도 소셜 연동 성공 시 기본 정보만 받아오고 이 페이지로 넘어 올 예정
+import React, { useState } from "react";
+import { Grid, TextField, Typography } from "@mui/material";
+import { useTheme } from "@emotion/react";
 
-import * as React from "react";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { useTheme } from "@mui/material/styles";
-
-// 화면 하단에 사용하는 copyright인데 맨 아래 코드를 비활성화 시켜둠.
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="theme.palette.text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        OwnBang-SSAFYA702
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
-// 회원가입 폼
-const SignUp = () => {
+export default function PasswordChangeForm() {
   const theme = useTheme();
+  const [password, setPassword] = useState("");
+  const [passwordCheck, setPasswordCheck] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+  const [passwordFormatError, setPasswordFormatError] = useState(false);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      userId: data.get("userId"),
-      password: data.get("password"),
-      userName: data.get("userName"),
-      userPhoneNumber: data.get("userPhoneNumber"),
-    });
+  const passwordRegex =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{9,16}$/;
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    setPasswordError(value !== passwordCheck);
+    setPasswordFormatError(!passwordRegex.test(value));
+  };
+
+  const handlePasswordCheckChange = (e) => {
+    const value = e.target.value;
+    setPasswordCheck(value);
+    setPasswordError(value !== password);
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 4,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <></>
-        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 8 }}>
-          <Grid container spacing={4}>
-            <Grid item xs={12}>
-              <TextField
-                label="아이디"
-                name="userId"
-                id="userId"
-                required
-                fullWidth
-                autoFocus
-              />
-              {/* 아이디 입력 란 하단에 위치한 안내 문구 */}
-              <Typography
-                name="idNotice"
-                sx={{ fontSize: theme.fontSize.small, mt: 1, ml: 1 }}
-              >
-                4~ 20 자리 영어, 숫자, 특수문자
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="비밀번호"
-                name="password"
-                type="password"
-                id="password"
-                required
-                fullWidth
-              />
-              {/* 비밀번호 입력 란 하단에 위치한 안내 문구 */}
-              <Typography
-                name="pwNotice"
-                sx={{ fontSize: theme.fontSize.small, mt: 1, ml: 1 }}
-              >
-                9~16자리 영문 대소문자, 숫자, 특수문자 조합
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="이름"
-                id="userName"
-                name="userName"
-                required
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="휴대폰번호"
-                id="userPhoneNumber"
-                name="userPhoneNumber"
-                required
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-          <></>
-          <Button
-            type="submit"
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TextField
+            label="새 비밀번호"
+            name="password"
+            type="password"
+            id="password"
             fullWidth
-            variant="contained"
-            sx={{
-              mt: 4,
-              mb: 2,
-              height: "50px",
-              backgroundColor: theme.palette.primary.main,
-            }}
-          >
-            회원가입 하기
-          </Button>
-
-          {/* 아이디, 비밀번호 찾기 */}
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link href="#" variant="body2" style={{ marginRight: 20 }}>
-                아이디 찾기
-              </Link>
-              <Link href="#" variant="body2">
-                비밀번호 찾기
-              </Link>
-            </Grid>
-          </Grid>
-        </Box>
-      </Box>
-      {/* <Copyright sx={{ mt: 5 }} /> */}
-    </Container>
+            value={password}
+            onChange={handlePasswordChange}
+            error={passwordFormatError}
+            helperText={
+              passwordFormatError
+                ? "비밀번호는 영문자, 숫자, 특수문자를 포함하여 최소 9자, 최대 16자이어야 합니다."
+                : ""
+            }
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="비밀번호 확인"
+            name="passwordConfirm"
+            type="password"
+            id="passwordConfirm"
+            fullWidth
+            value={passwordCheck}
+            onChange={handlePasswordCheckChange}
+            error={passwordError}
+            helperText={passwordError ? "비밀번호가 일치하지 않습니다." : ""}
+          />
+        </Grid>
+      </Grid>
+    </>
   );
-};
-
-export default SignUp;
+}
