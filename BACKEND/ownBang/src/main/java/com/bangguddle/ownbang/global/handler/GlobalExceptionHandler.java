@@ -1,7 +1,7 @@
 package com.bangguddle.ownbang.global.handler;
 
 import com.bangguddle.ownbang.global.enums.ErrorCode;
-import com.bangguddle.ownbang.global.response.ErrorResponse;
+import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -36,6 +36,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> makeErrorResponse(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(Response.error(new ErrorResponse(errorCode, errorCode.getMessage())));
+                .body(Response.error(errorCode, NoneResponse.NONE));
     }
 }
