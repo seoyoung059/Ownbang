@@ -26,6 +26,8 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'io.openvidu:openvidu-java-client:2.30.0'	// OpenVidu Java Client 라이브러리
+	implementation 'com.google.code.gson:gson:2.8.9'			// JSON 처리 라이브러리
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.h2database:h2'
