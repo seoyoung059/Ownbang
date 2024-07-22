@@ -6,6 +6,20 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  mvc:
+    converters:
+      preferred-json-mapper: gson
+
+
 server:
   port: ${PORT}
+  ssl:
+    enabled: false
+
+openvidu:
+  url: ${ OPENVIDU_URL }
+  secret: ${ OPENVIDU_SECRET }
 
