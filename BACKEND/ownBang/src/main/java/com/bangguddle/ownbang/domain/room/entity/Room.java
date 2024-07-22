@@ -34,9 +34,6 @@ public class Room {
     @JoinColumn(name = "room_detail_id", nullable = false)
     private RoomDetail roomDetail;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RoomImage> roomImages;
-
     @Column(nullable = false)
     private float latitude;
 
@@ -87,7 +84,7 @@ public class Room {
 //        this.agent = agent;
         this.roomAppliances = roomAppliances;
         this.roomDetail = roomDetail;
-        this.roomImages = roomImages;
+//        this.roomImages = roomImages;
         this.latitude = latitude;
         this.longitude = longitude;
         this.dealType = dealType;
