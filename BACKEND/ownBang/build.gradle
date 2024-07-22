@@ -34,12 +34,10 @@ dependencies {
 	runtimeOnly 'com.h2database:h2' // H2 데이터베이스를 runtimeOnly로 설정
 
 	// 테스트 의존성
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-	testImplementation 'org.mockito:mockito-core:5.4.0' // Mockito 최신 버전으로 설정
+	testImplementation 'org.springframework.boot:spring-boot-starter-test' // Spring Boot Starter Test (JUnit 5 포함)
+	testImplementation 'org.mockito:mockito-core:5.4.0'
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.4.0'
-	testImplementation 'org.assertj:assertj-core:3.21.0' // AssertJ 최신 버전으로 설정
+	testImplementation 'org.assertj:assertj-core:3.21.0'
 }
 
 tasks.named('test') {
