@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { useTheme, styled } from "@mui/material";
+import zIndex from "@mui/material/styles/zIndex";
 
 const Notification = ({ open, handleClose }) => {
   const theme = useTheme();
@@ -12,6 +13,7 @@ const Notification = ({ open, handleClose }) => {
     position: "absolute",
     top: "12%",
     right: "4%",
+    zIndex: "100",
     width: 400,
     bgcolor: theme.palette.background.paper,
     borderRadius: "10px",
@@ -30,7 +32,7 @@ const Notification = ({ open, handleClose }) => {
           알림
         </Typography>
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          noti -- data
+          알림 내용
         </Typography>
       </Box>
     </Modal>
@@ -49,6 +51,7 @@ const Header = () => {
     left: 0,
     top: 0,
     margin: "0 auto",
+    zIndex: "100",
     width: "100%",
     height: "80px",
     backgroundColor: theme.palette.primary.dark,
