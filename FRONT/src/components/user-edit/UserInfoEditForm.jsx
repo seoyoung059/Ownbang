@@ -14,6 +14,12 @@ import {
 import { useTheme } from "@emotion/react";
 import StatusChangeForm from "./StatusChangeForm";
 import PasswordChangeForm from "./PasswordChangeForm";
+import { useNavigate } from "react-router-dom";
+
+/*
+일단 페이지 하나에 컴퍼넌트 전환으로 바꿨는데 뒤로가기 거슬린다면
+페이지 나눠야할수도 ?
+*/
 
 // 더미데이터 - 데이터 연결 필요
 const user = {
@@ -24,6 +30,7 @@ const user = {
 };
 
 export default function UserInfoEditForm() {
+  const navigate = useNavigate();
   const theme = useTheme();
   // 유저 정보
   const [userInfo, setUserInfo] = useState(user);
@@ -75,6 +82,10 @@ export default function UserInfoEditForm() {
     e.preventDefault();
     // 여기서 실제로 변경 사항을 서버에 반영하거나 다른 작업 수행
     console.log("유저 정보:", userInfo);
+  };
+
+  const handleCancel = () => {
+    navigate("/");
   };
 
   return (
@@ -174,7 +185,7 @@ export default function UserInfoEditForm() {
                 {/* 취소 버튼 클릭 시 어느 페이지로 이동할 지 */}
                 <Button
                   variant="contained"
-                  onClick={handleSubmit}
+                  onClick={handleCancel}
                   sx={{
                     mt: 6,
                     mb: 2,

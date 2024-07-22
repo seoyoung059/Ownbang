@@ -57,7 +57,7 @@ const router = createBrowserRouter([
   {
     path: "/estate",
     element: (
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<Loading message="매물을 검색하고 있어요." />}>
         <RealEstatePage />
       </Suspense>
     ),

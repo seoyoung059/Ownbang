@@ -32,8 +32,6 @@ export default function UserInfoEditForm({ toggleEdit }) {
     officeName: "",
   });
 
-  const [address, setAddress] = useState("");
-
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -88,7 +86,7 @@ export default function UserInfoEditForm({ toggleEdit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // 여기서 실제로 변경 사항을 서버에 반영하거나 다른 작업 수행
+    // 일단 정보 출력 - 나중엔 api post
     console.log("중개인 정보:", userInfo);
   };
 
