@@ -26,19 +26,22 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
+	implementation 'mysql:mysql-connector-java:8.0.32' // MySQL Connector 버전 지정
+	compileOnly 'org.projectlombok:lombok:1.18.24' // Lombok의 안정적인 버전 지정
+	annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
+	runtimeOnly 'com.h2database:h2' // H2 데이터베이스를 runtimeOnly로 설정
+
+	// 테스트 의존성
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	implementation 'mysql:mysql-connector-java:8.0.32'
-	// 테스트 (JUnit과 Mockito 관련 의존성 추가)
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.mockito:mockito-core'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+	testImplementation 'org.mockito:mockito-core:5.4.0' // Mockito 최신 버전으로 설정
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.4.0'
+	testImplementation 'org.assertj:assertj-core:3.21.0' // AssertJ 최신 버전으로 설정
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform() // JUnit Platform 사용 설정
 }
