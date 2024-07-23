@@ -27,7 +27,8 @@ public class RoomImageServiceImpl {
     private final RoomImageRepository roomImageRepository;
 
     @Transactional
-    public SuccessResponse<NoneResponse> uploadImage(MultipartFile roomImage, Room room) {
+    public SuccessResponse<NoneResponse> uploadImage(MultipartFile roomImage, Room room) throws AppException {
+        validateImageFile(roomImage);
         //파일명: UUID + 사진 원래이름
         String fileName = UUID.randomUUID().toString().replace("-", "") + "_" + roomImage.getOriginalFilename();
 
@@ -48,4 +49,11 @@ public class RoomImageServiceImpl {
         return new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
     }
 
+
+    private void validateImageFile(MultipartFile roomImage) throws AppException {
+        String contentType = roomImage.getContentType();
+        if(contentType==null || !contentType.contains("image")) {
+            throw new AppException(ErrorCode.INVALID_IMAGE_FILE);
+        }
+    }
 }
