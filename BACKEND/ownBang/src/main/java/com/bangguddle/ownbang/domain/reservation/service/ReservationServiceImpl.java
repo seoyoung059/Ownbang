@@ -37,7 +37,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new AppException(ErrorCode.Reservation_DUPLICATED); // 이미 예약이 존재하는 경우
         }
 
-        // 이미 내가 예약한 매물이라면 ,
+        // 이미 내가 예약한 매물이라면,
         Optional<Reservation> completedReservation = reservationRepository.findByRoomIdAndUserIdAndStatusNot(roomId, userId, ReservationStatus.예약취소);
         if (completedReservation.isPresent()) {
             throw new AppException(ErrorCode.Reservation_COMPLETED); // 이미 예약이 존재하는 경우
@@ -50,11 +50,15 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(SuccessCode.RESERVATION_MAKE_SUCCESS, NoneResponse.NONE);
     }
 
+
     public SuccessResponse<ReservationListResponse> getReservationsByUserId(long userId){
         List<Reservation> reservations = reservationRepository.findByUserId(userId);
         if (reservations == null || reservations.isEmpty()) {
             // 예약이 없는 경우에 대한 처리
             return new SuccessResponse<>(SuccessCode.RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
+        }
+        if(userId<=0)  {
+            throw new AppException(ErrorCode.INVALID_ID);
         }
         ReservationListResponse reservationListResponse= new ReservationListResponse(reservations);
         return new SuccessResponse<>(SuccessCode.RESERVATION_LIST_SUCCESS,reservationListResponse );

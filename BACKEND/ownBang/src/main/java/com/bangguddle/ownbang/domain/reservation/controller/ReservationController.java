@@ -3,9 +3,12 @@ package com.bangguddle.ownbang.domain.reservation.controller;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
+import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +21,16 @@ import java.util.List;
 
 public class ReservationController {
     private final ReservationService reservationService;
+
     @PostMapping("/")
-    public ResponseEntity<Response<NoneResponse>> createReservation(@RequestBody ReservationRequest reservationRequest) {
+    public ResponseEntity<Response<NoneResponse>> createReservation(@Valid @RequestBody ReservationRequest reservationRequest) {
         SuccessResponse<NoneResponse> response = reservationService.createReservation(reservationRequest);
-        return Response.success(response); // 메시지와 데이터를 전달
+        return Response.success(response);
     }
+
     @GetMapping("/list")
-    public ResponseEntity<Response<ReservationListResponse>> getReservationsByUserId(@RequestParam(name="userId") long userId){
+    public ResponseEntity<Response<ReservationListResponse>> getReservationsByUserId(@RequestParam(name="userId") long userId) {
+
         SuccessResponse<ReservationListResponse> response = reservationService.getReservationsByUserId(userId);
         return Response.success(response);
     }

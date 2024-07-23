@@ -1,10 +1,11 @@
 package com.bangguddle.ownbang.domain.reservation.controller;
 
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -14,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -44,23 +46,77 @@ public class ReservationControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @WithMockUser
     void createReservation_Success() throws Exception {
-        ReservationRequest request = new ReservationRequest(1L, 1L, LocalDateTime.now(), ReservationStatus.예약신청);
-        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(SuccessCode.RESERVATION_MAKE_SUCCESS, NoneResponse.NONE);
+        LocalDateTime now = LocalDateTime.now();
+        ReservationRequest request = new ReservationRequest(
+                2L,
+                1L,
+                now,
+                ReservationStatus.예약신청
+        );
+
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
+                SuccessCode.RESERVATION_MAKE_SUCCESS,
+                NoneResponse.NONE
+        );
 
         when(reservationService.createReservation(any(ReservationRequest.class))).thenReturn(successResponse);
 
         mockMvc.perform(post("/api/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
                 .andExpect(jsonPath("$.code").value(SuccessCode.RESERVATION_MAKE_SUCCESS.name()))
                 .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_MAKE_SUCCESS.getMessage()))
-                .andExpect(jsonPath("$.data").value("NONE")); // 수정된 부분
+                .andExpect(jsonPath("$.data").value("NONE"));
     }
 
     @Test
+    @WithMockUser
+    void createReservation_Fail_MissingField() throws Exception {
+        String invalidRequest = "{}"; // 전체 요청이 누락된 경우
+
+        mockMvc.perform(post("/api/reservations/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRequest)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.code").value(ErrorCode.INTERNAL_SERVER_ERROR.name()))
+                .andExpect(jsonPath("$.message").value("서버 내부적 에러가 발생했습니다."))
+                .andExpect(jsonPath("$.data").value("NONE"));
+    }
+
+
+    @Test
+    @WithMockUser
+    void createReservation_Fail_InvalidField() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        ReservationRequest request = new ReservationRequest(
+                -1L,  // 잘못된 roomId
+                -1L,  // 잘못된 userId
+                now,
+                ReservationStatus.예약신청
+        );
+
+        String invalidRequest = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(post("/api/reservations/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRequest)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.code").value(ErrorCode.INVALID_ID.name()))
+                .andExpect(jsonPath("$.message").value("유효하지 않은 ID가 제공되었습니다."))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    @WithMockUser
     void getReservationsByUserId_Success() throws Exception {
         long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
@@ -103,6 +159,7 @@ public class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getReservationsByUserId_EmptyList() throws Exception {
         long userId = 1L;
         ReservationListResponse listResponse = new ReservationListResponse(List.of());
