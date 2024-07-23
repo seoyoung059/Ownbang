@@ -15,7 +15,6 @@ const Notification = ({ open, handleClose }) => {
     right: "4%",
     zIndex: "100",
     width: 400,
-    zIndex: "100",
     bgcolor: theme.palette.background.paper,
     borderRadius: "10px",
     boxShadow: 24,

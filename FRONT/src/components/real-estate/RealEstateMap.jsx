@@ -2,7 +2,7 @@ import React, { useDebugValue, useEffect, useRef, useState } from "react";
 import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
 import clusterPositionsData from "./clusterPositionsData.json";
 
-const loadKakaoMap = () => {
+const LoadKakaoMap = () => {
   const [positions, setPositions] = useState([]);
   useEffect(() => {
     setPositions(clusterPositionsData.tmpMarkers);
@@ -40,4 +40,4 @@ const loadKakaoMap = () => {
   );
 };
 
-export default loadKakaoMap;
+export default LoadKakaoMap;

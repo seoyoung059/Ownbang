@@ -61,7 +61,7 @@ function MyReservationList() {
             <TableCell>화상 채팅</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody sx={{ bgcolor: theme.palette.common.white }}>
           {reservations.map((reservation) => (
             <MyReservationItem key={reservation.id} reservation={reservation} />
           ))}
