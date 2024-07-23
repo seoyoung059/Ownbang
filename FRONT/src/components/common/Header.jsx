@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { useTheme, styled } from "@mui/material";
+import zIndex from "@mui/material/styles/zIndex";
 
 const Notification = ({ open, handleClose }) => {
   const theme = useTheme();
@@ -13,6 +14,7 @@ const Notification = ({ open, handleClose }) => {
     top: "12%",
     right: "4%",
     width: 400,
+    zIndex: "100",
     bgcolor: theme.palette.background.paper,
     borderRadius: "10px",
     boxShadow: 24,
