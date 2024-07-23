@@ -13,6 +13,7 @@ const Notification = ({ open, handleClose }) => {
     position: "absolute",
     top: "12%",
     right: "4%",
+    zIndex: "100",
     width: 400,
     zIndex: "100",
     bgcolor: theme.palette.background.paper,
@@ -32,7 +33,7 @@ const Notification = ({ open, handleClose }) => {
           알림
         </Typography>
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          noti -- data
+          알림 내용
         </Typography>
       </Box>
     </Modal>
@@ -51,6 +52,7 @@ const Header = () => {
     left: 0,
     top: 0,
     margin: "0 auto",
+    zIndex: "100",
     width: "100%",
     height: "80px",
     backgroundColor: theme.palette.primary.dark,
