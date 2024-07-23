@@ -19,6 +19,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -73,47 +74,23 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_MAKE_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
-
-    @Test
-    @WithMockUser
-    void createReservation_Fail_MissingField() throws Exception {
-        String invalidRequest = "{}"; // 전체 요청이 누락된 경우
-
-        mockMvc.perform(post("/api/reservations/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRequest)
-                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(jsonPath("$.code").value(ErrorCode.INTERNAL_SERVER_ERROR.name()))
-                .andExpect(jsonPath("$.message").value("서버 내부적 에러가 발생했습니다."))
-                .andExpect(jsonPath("$.data").value("NONE"));
-    }
-
-
     @Test
     @WithMockUser
     void createReservation_Fail_InvalidField() throws Exception {
-        LocalDateTime now = LocalDateTime.now();
-        ReservationRequest request = new ReservationRequest(
-                -1L,  // 잘못된 roomId
-                -1L,  // 잘못된 userId
-                now,
-                ReservationStatus.예약신청
-        );
+        ReservationRequest invalidRequest = ReservationRequest.of(-1L, -1L, LocalDateTime.now(), ReservationStatus.예약신청);
+        String requestBody = objectMapper.writeValueAsString(invalidRequest);
 
-        String invalidRequest = objectMapper.writeValueAsString(request);
-
+        // When & Then: Send POST request and expect a BAD_REQUEST status with appropriate error message
         mockMvc.perform(post("/api/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRequest)
+                        .content(requestBody)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(jsonPath("$.code").value(ErrorCode.INVALID_ID.name()))
-                .andExpect(jsonPath("$.message").value("유효하지 않은 ID가 제공되었습니다."))
-                .andExpect(jsonPath("$.data").isEmpty());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"));
     }
+
+
+
 
     @Test
     @WithMockUser

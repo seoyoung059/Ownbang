@@ -1,17 +1,17 @@
-package com.bangguddle.ownbang.domain.reservation.service;
+package com.bangguddle.ownbang.domain.reservation.service.impl;
 
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
+import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
 import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,9 +57,7 @@ public class ReservationServiceImpl implements ReservationService {
             // 예약이 없는 경우에 대한 처리
             return new SuccessResponse<>(SuccessCode.RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
         }
-        if(userId<=0)  {
-            throw new AppException(ErrorCode.INVALID_ID);
-        }
+
         ReservationListResponse reservationListResponse= new ReservationListResponse(reservations);
         return new SuccessResponse<>(SuccessCode.RESERVATION_LIST_SUCCESS,reservationListResponse );
     }

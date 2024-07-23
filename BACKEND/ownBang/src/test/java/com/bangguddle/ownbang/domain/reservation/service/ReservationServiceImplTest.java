@@ -5,6 +5,7 @@ import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
+import com.bangguddle.ownbang.domain.reservation.service.impl.ReservationServiceImpl;
 import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
