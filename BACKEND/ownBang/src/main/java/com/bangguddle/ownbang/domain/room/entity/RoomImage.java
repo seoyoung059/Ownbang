@@ -18,7 +18,7 @@ public class RoomImage {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false, columnDefinition = "INT UNSIGNED")
+    @JoinColumn(nullable = false)
     private Room room;
 
     @Column(nullable = false)
