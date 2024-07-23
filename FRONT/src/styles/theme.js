@@ -14,6 +14,13 @@ const theme = createTheme({
     heavy: 900,
   },
 
+  title: {
+    fontFamily: "Gugi",
+    fontSize: 32,
+    fontWeight: 400,
+    fontStyle: "normal",
+  },
+
   // 텍스트 관련 속성 정의
   typography: {
     fontSize: 14,

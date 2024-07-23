@@ -46,6 +46,8 @@ const Header = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const notificationCount = 1; // 알림 개수 설정
+
   const headerStyle = {
     position: "fixed",
     left: 0,
@@ -71,6 +73,7 @@ const Header = () => {
     "& div": {
       display: "flex",
       gap: "28px",
+      gap: isSm ? "8px" : "28px",
       "& button": {
         color: "white",
         backgroundColor: theme.palette.primary.dark,

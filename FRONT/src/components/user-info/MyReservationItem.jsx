@@ -10,7 +10,7 @@ import {
 import {
   CheckCircleOutlined,
   CancelOutlined,
-  HourglassEmptyOutlined,
+  PendingOutlined,
 } from "@mui/icons-material";
 import { useMediaQuery, useTheme } from "@mui/material";
 
@@ -25,7 +25,7 @@ export default function MyReservationItem({ reservation }) {
       case "취소":
         return <CancelOutlined style={{ color: "red" }} />;
       case "대기":
-        return <HourglassEmptyOutlined style={{ color: "orange" }} />;
+        return <PendingOutlined style={{ color: "orange" }} />;
       default:
         return null;
     }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Box, Typography, Button, Divider } from "@mui/material";
+import { Container, Box, Button, Divider } from "@mui/material";
 import { useTheme } from "@mui/material";
 import MyCheckList from "../components/user-info/MyCheckList";
 import MyBookmarkList from "../components/user-info/MyBookmarkList";
@@ -17,16 +17,12 @@ function TabPanel(props) {
       aria-labelledby={`tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
 
-function App() {
+export default function Mypage() {
   const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
   const theme = useTheme();
@@ -115,5 +111,3 @@ function App() {
     </Container>
   );
 }
-
-export default App;
