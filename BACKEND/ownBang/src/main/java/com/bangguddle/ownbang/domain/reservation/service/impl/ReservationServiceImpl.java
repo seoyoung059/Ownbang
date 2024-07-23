@@ -51,7 +51,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
 
-    public SuccessResponse<ReservationListResponse> getReservationsByUserId(long userId){
+    public SuccessResponse<ReservationListResponse> getMyReservationList (long userId){
         List<Reservation> reservations = reservationRepository.findByUserId(userId);
         if (reservations == null || reservations.isEmpty()) {
             // 예약이 없는 경우에 대한 처리

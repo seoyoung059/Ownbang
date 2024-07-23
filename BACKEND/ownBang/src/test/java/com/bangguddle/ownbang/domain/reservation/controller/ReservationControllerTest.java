@@ -115,7 +115,7 @@ public class ReservationControllerTest {
         ReservationListResponse listResponse = new ReservationListResponse(Arrays.asList(reservation1, reservation2));
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(SuccessCode.RESERVATION_LIST_SUCCESS, listResponse);
 
-        when(reservationService.getReservationsByUserId(anyLong())).thenReturn(successResponse);
+        when(reservationService.getMyReservationList(anyLong())).thenReturn(successResponse);
 
         MvcResult result = mockMvc.perform(get("/api/reservations/list")
                         .param("userId", String.valueOf(userId)))
@@ -142,7 +142,7 @@ public class ReservationControllerTest {
         ReservationListResponse listResponse = new ReservationListResponse(List.of());
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(SuccessCode.RESERVATION_LIST_EMPTY, listResponse);
 
-        when(reservationService.getReservationsByUserId(anyLong())).thenReturn(successResponse);
+        when(reservationService.getMyReservationList(anyLong())).thenReturn(successResponse);
 
         mockMvc.perform(get("/api/reservations/list")
                         .param("userId", String.valueOf(userId)))

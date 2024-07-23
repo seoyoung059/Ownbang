@@ -11,7 +11,6 @@ import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -44,9 +44,9 @@ class ReservationServiceImplTest {
 
         SuccessResponse<NoneResponse> response = reservationService.createReservation(request);
 
-        Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.successCode()).isEqualTo(SuccessCode.RESERVATION_MAKE_SUCCESS);
-        Assertions.assertThat(response.data()).isEqualTo(NoneResponse.NONE);
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(SuccessCode.RESERVATION_MAKE_SUCCESS);
+        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(reservationRepository, times(1)).save(any(Reservation.class));
     }
@@ -65,7 +65,7 @@ class ReservationServiceImplTest {
                         .build()
         ));
 
-        Assertions.assertThatThrownBy(() -> reservationService.createReservation(request))
+        assertThatThrownBy(() -> reservationService.createReservation(request))
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.Reservation_DUPLICATED);
     }
@@ -85,7 +85,7 @@ class ReservationServiceImplTest {
                         .build()
         ));
 
-        Assertions.assertThatThrownBy(() -> reservationService.createReservation(request))
+        assertThatThrownBy(() -> reservationService.createReservation(request))
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.Reservation_COMPLETED);
     }
@@ -111,15 +111,15 @@ class ReservationServiceImplTest {
 
         when(reservationRepository.findByUserId(userId)).thenReturn(Arrays.asList(reservation1, reservation2));
 
-        SuccessResponse<ReservationListResponse> response = reservationService.getReservationsByUserId(userId);
+        SuccessResponse<ReservationListResponse> response = reservationService.getMyReservationList(userId);
 
-        Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.successCode()).isEqualTo(SuccessCode.RESERVATION_LIST_SUCCESS);
-        Assertions.assertThat(response.data()).isNotNull();
-        Assertions.assertThat(response.data().reservations()).hasSize(2);
-        Assertions.assertThat(response.data().reservations().get(0).getId()).isEqualTo(1L);
-        Assertions.assertThat(response.data().reservations().get(1).getId()).isEqualTo(2L);
-        Assertions.assertThat(response.data().reservations().get(0).getStatus()).isEqualTo(ReservationStatus.예약신청);
-        Assertions.assertThat(response.data().reservations().get(1).getStatus()).isEqualTo(ReservationStatus.예약확정);
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(SuccessCode.RESERVATION_LIST_SUCCESS);
+        assertThat(response.data()).isNotNull();
+        assertThat(response.data().reservations()).hasSize(2);
+        assertThat(response.data().reservations().get(0).getId()).isEqualTo(1L);
+        assertThat(response.data().reservations().get(1).getId()).isEqualTo(2L);
+        assertThat(response.data().reservations().get(0).getStatus()).isEqualTo(ReservationStatus.예약신청);
+        assertThat(response.data().reservations().get(1).getStatus()).isEqualTo(ReservationStatus.예약확정);
     }
 }
