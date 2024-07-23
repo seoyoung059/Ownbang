@@ -2,8 +2,9 @@ package com.bangguddle.ownbang.domain.auth.controller;
 
 import com.bangguddle.ownbang.domain.auth.dto.UserSignUpRequest;
 import com.bangguddle.ownbang.domain.auth.service.AuthService;
-import com.bangguddle.ownbang.global.response.MessageResponse;
+import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
+import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,9 +19,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Response<MessageResponse>> signUp(@RequestBody UserSignUpRequest request) {
-        MessageResponse response = authService.signUp(request);
-        return Response.created(response);
+    public ResponseEntity<Response<NoneResponse>> signUp(@RequestBody UserSignUpRequest request) {
+        SuccessResponse<NoneResponse> response = authService.signUp(request);
+        return Response.success(response);
     }
 }
 

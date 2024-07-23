@@ -11,12 +11,12 @@ public record UserSignUpRequest(
         String phoneNumber,
         String nickname
 ) {
-    public User toEntity() {
+    public User toEntity(String hashedPassword) {
         return User.builder()
                 .email(email)
                 .name(name)
                 .nickname(nickname)
-                .password(password)
+                .password(hashedPassword)
                 .phoneNumber(phoneNumber)
                 .build();
     }
