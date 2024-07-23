@@ -2,18 +2,26 @@ package com.bangguddle.ownbang.domain.room.dto;
 
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomImage;
+import lombok.Builder;
 
+@Builder
 public record RoomImageCreateRequest(
     Room room,
     String roomImageUrl
 ) {
 
     static public RoomImageCreateRequest of (Room room, String roomImageUrl){
-        return new RoomImageCreateRequest(room, roomImageUrl);
+        return RoomImageCreateRequest.builder()
+                .room(room)
+                .roomImageUrl(roomImageUrl)
+                .build();
     }
 
     static public RoomImageCreateRequest from(RoomImage roomImage){
-        return new RoomImageCreateRequest(roomImage.getRoom(), roomImage.getRoomImageUrl());
+        return RoomImageCreateRequest.builder()
+                .room(roomImage.getRoom())
+                .roomImageUrl(roomImage.getRoomImageUrl())
+                .build();
     }
 
 
