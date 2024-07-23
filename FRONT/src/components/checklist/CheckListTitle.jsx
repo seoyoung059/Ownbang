@@ -7,7 +7,7 @@ const CheckListTitle = () => {
   const templateTitles = [{ title: "원룸 리스트" }];
 
   return (
-    <Stack spacing={2} sx={{ width: 500 }}>
+    <Stack spacing={2} sx={{ width: 300 }}>
       <Autocomplete
         id="templateChoice"
         options={templateTitles}

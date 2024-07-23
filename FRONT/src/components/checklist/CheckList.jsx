@@ -65,20 +65,28 @@ const CheckList = () => {
         display: "flex",
         flexDirection: "column",
         gap: "20px",
-        width: "90%",
+        width: "500px",
+        border: "1px solid lightGray",
+        borderRadius: "10px",
+        padding: "30px",
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <CheckListTitle />
       </Box>
 
-      {/* CheckList 검색/내용/항목 추가 */}
-      <CheckListList
-        checkitems={checkitems}
-        onUpdate={onUpdate}
-        onDelete={onDelete}
-      />
-      <CheckListAddInput onCreate={onCreate} />
+      {/* CheckList 항목 체크, 내용 확인, 삭제 */}
+      <Box sx={{ marginTop: "30px" }}>
+        <CheckListList
+          checkitems={checkitems}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
+        />
+      </Box>
+      {/* 새로운 항목 추가 */}
+      <Box sx={{ marginTop: "40px" }}>
+        <CheckListAddInput onCreate={onCreate} />
+      </Box>
     </Box>
   );
 };

@@ -32,7 +32,7 @@ const List = ({ checkitems, onUpdate, onDelete }) => {
       }}
     >
       {/* checkList 항목 검색란 */}
-      <Box
+      {/* <Box
         sx={{
           display: "flex",
           justifyContent: "flex-end", // Align input to the right
@@ -54,7 +54,7 @@ const List = ({ checkitems, onUpdate, onDelete }) => {
             fontSize: theme.fontSize.small,
           }}
         />
-      </Box>
+      </Box> */}
 
       {/* 아이템 각각 */}
       <Box
