@@ -62,7 +62,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("회원 가입 실패 - ")
+    @DisplayName("회원 가입 실패 - 이메일 중복")
     public void 회원_가입_실패_이메일_중복() {
         // given
         UserSignUpRequest eExistUserRequest = makeRequest("email");
