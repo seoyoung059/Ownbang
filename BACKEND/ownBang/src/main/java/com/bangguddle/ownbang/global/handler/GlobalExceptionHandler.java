@@ -15,27 +15,27 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    // custom error handler
-    @ExceptionHandler(AppException.class)
-    public ResponseEntity<?> AppExceptionHandler(AppException e) {
-        return makeErrorResponse(e.getErrorCode());
-    }
-
-    // NOT_FOUND error(404) handler
-    @Override
-    protected ResponseEntity<Object> handleNoResourceFoundException(
-            NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return makeErrorResponse(ErrorCode.NOT_FOUND);
-    }
-
-    // INTERNAL_SERVER_ERROR error(500) handler
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> commonExceptionHandler() {
-        return makeErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR);
-    }
-
-    private ResponseEntity<Object> makeErrorResponse(ErrorCode errorCode) {
-        return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(Response.error(errorCode, NoneResponse.NONE));
-    }
+//    // custom error handler
+//    @ExceptionHandler(AppException.class)
+//    public ResponseEntity<?> AppExceptionHandler(AppException e) {
+//        return makeErrorResponse(e.getErrorCode());
+//    }
+//
+//    // NOT_FOUND error(404) handler
+//    @Override
+//    protected ResponseEntity<Object> handleNoResourceFoundException(
+//            NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+//        return makeErrorResponse(ErrorCode.NOT_FOUND);
+//    }
+//
+//    // INTERNAL_SERVER_ERROR error(500) handler
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<?> commonExceptionHandler() {
+//        return makeErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR);
+//    }
+//
+//    private ResponseEntity<Object> makeErrorResponse(ErrorCode errorCode) {
+//        return ResponseEntity.status(errorCode.getHttpStatus())
+//                .body(Response.error(errorCode, NoneResponse.NONE));
+//    }
 }

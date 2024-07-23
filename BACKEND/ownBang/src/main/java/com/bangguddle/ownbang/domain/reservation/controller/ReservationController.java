@@ -24,7 +24,7 @@ public class ReservationController {
         return Response.success(response); // 메시지와 데이터를 전달
     }
     @GetMapping("/list")
-    public ResponseEntity<Response<ReservationListResponse>> getReservationsByUserId(@RequestParam long userId) {
+    public ResponseEntity<Response<ReservationListResponse>> getReservationsByUserId(@RequestParam(name="userId") long userId){
         SuccessResponse<ReservationListResponse> response = reservationService.getReservationsByUserId(userId);
         return Response.success(response);
     }
