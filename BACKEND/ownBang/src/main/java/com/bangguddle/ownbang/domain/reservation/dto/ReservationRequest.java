@@ -5,8 +5,7 @@ import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 
 import java.time.LocalDateTime;
 
-public record ReservationDto(
-        Long id,
+public record ReservationRequest(
         Long roomId,
         Long userId,
         LocalDateTime time,
@@ -15,7 +14,6 @@ public record ReservationDto(
 ) {
     public Reservation toEntity() {
         return Reservation.builder()
-                .id(id)
                 .roomId(roomId)
                 .userId(userId)
                 .time(time)

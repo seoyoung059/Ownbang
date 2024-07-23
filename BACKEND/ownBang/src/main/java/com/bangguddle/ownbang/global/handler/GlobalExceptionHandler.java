@@ -1,7 +1,7 @@
 package com.bangguddle.ownbang.global.handler;
 
 import com.bangguddle.ownbang.global.enums.ErrorCode;
-import com.bangguddle.ownbang.global.response.ErrorResponse;
+import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;

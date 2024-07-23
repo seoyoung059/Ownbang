@@ -1,15 +1,16 @@
 package com.bangguddle.ownbang.domain.reservation.controller;
 
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationDto;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
-import com.bangguddle.ownbang.global.response.MessageResponse;
+import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
+import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/reservations")
@@ -17,10 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class ReservationController {
     private final ReservationService reservationService;
-    @PostMapping("/make")
-    public ResponseEntity<Response<MessageResponse>> createReservation(@RequestBody ReservationDto reservationdto) {
-        MessageResponse response = reservationService.createReservation(reservationdto);
-        return Response.created(response);
+    @PostMapping("/")
+    public ResponseEntity<Response<NoneResponse>> createReservation(@RequestBody ReservationRequest reservationRequest) {
+        SuccessResponse<NoneResponse> response = reservationService.createReservation(reservationRequest);
+        return Response.success(response); // 메시지와 데이터를 전달
     }
-
+    @GetMapping("/list")
+    public ResponseEntity<Response<ReservationListResponse>> getReservationsByUserId(@RequestParam(name="userId") long userId){
+        SuccessResponse<ReservationListResponse> response = reservationService.getReservationsByUserId(userId);
+        return Response.success(response);
+    }
 }
+
+
