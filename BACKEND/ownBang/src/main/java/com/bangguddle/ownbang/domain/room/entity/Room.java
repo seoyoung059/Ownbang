@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,9 @@ public class Room {
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "room_detail_id", nullable = false)
     private RoomDetail roomDetail;
+
+    @OneToMany(mappedBy = "room")
+    private List<RoomImage> roomImages = new ArrayList<>();
 
     @Column(nullable = false)
     private float latitude;
@@ -84,7 +88,7 @@ public class Room {
 //        this.agent = agent;
         this.roomAppliances = roomAppliances;
         this.roomDetail = roomDetail;
-//        this.roomImages = roomImages;
+        this.roomImages = roomImages;
         this.latitude = latitude;
         this.longitude = longitude;
         this.dealType = dealType;
