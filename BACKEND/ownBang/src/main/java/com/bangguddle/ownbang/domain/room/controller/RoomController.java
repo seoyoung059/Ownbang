@@ -1,7 +1,7 @@
 package com.bangguddle.ownbang.domain.room.controller;
 
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
-import com.bangguddle.ownbang.domain.room.service.impl.RoomServiceImpl;
+import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +19,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoomController {
 
-    private final RoomServiceImpl roomServiceImpl;
+    private final RoomService roomService;
 
     @PostMapping
     public ResponseEntity<Response<NoneResponse>> addRoom(@RequestPart(value = "roomCreateRequest") RoomCreateRequest roomCreateRequest,
                                                           @RequestPart(value = "roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
-        return Response.success(roomServiceImpl.createRoom(roomCreateRequest, roomImageFiles));
+        return Response.success(roomService.createRoom(roomCreateRequest, roomImageFiles));
     }
 
     // 매물 수정

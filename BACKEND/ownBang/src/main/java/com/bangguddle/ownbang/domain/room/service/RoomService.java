@@ -6,11 +6,10 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface RoomService {
     // 매물 생성
     @Transactional
-    SuccessResponse<NoneResponse> createRoom(RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles) throws IOException;
+    SuccessResponse<NoneResponse> createRoom(RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles);
 }
