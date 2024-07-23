@@ -53,7 +53,7 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("새 매물 생성 - 성공")
-    void createRoomTest_SUCCESS() throws IOException, ParseException {
+    void createRoomTest_SUCCESS() throws ParseException {
         //given
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         RoomAppliancesCreateRequest roomAppliancesCreateRequest = new RoomAppliancesCreateRequest(true,
@@ -69,15 +69,15 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
-        // when
+        // mock
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(SuccessCode.ROOM_REGISTER_SUCCESS, NoneResponse.NONE));
         when(roomRepository.save(any(Room.class))).thenReturn(Room.builder().build()); // 추가된 부분
 
 
-        // 매물 생성
+        // when
         SuccessResponse<NoneResponse> response = roomServiceImpl.createRoom(roomCreateRequest, roomImageFiles);
 
-
+        // then
         assertThat(response).isNotNull();
         assertThat(response.successCode()).isEqualTo(SuccessCode.ROOM_REGISTER_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
@@ -110,9 +110,6 @@ class RoomServiceImplTest {
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
 
         // 매물 생성
-//        assert(AppException.class, ()->{
-//            roomServiceImpl.createRoom(roomCreateRequest, roomImageFiles);
-//        });
         assertThatThrownBy(()->{
             roomServiceImpl.createRoom(roomCreateRequest, roomImageFiles);
         }).isInstanceOf(AppException.class);

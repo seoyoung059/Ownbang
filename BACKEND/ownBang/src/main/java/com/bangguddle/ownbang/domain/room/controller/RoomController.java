@@ -4,6 +4,7 @@ import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,7 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity<Response<NoneResponse>> addRoom(@RequestPart(value = "roomCreateRequest") RoomCreateRequest roomCreateRequest,
+    public ResponseEntity<Response<NoneResponse>> addRoom(@RequestPart(value = "roomCreateRequest") @Valid RoomCreateRequest roomCreateRequest,
                                                           @RequestPart(value = "roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
         return Response.success(roomService.createRoom(roomCreateRequest, roomImageFiles));
     }
