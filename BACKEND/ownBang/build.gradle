@@ -26,20 +26,15 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'mysql:mysql-connector-java:8.0.32' // MySQL Connector 버전 지정
-	compileOnly 'org.projectlombok:lombok:1.18.24' // Lombok의 안정적인 버전 지정
-	annotationProcessor 'org.projectlombok:lombok:1.18.24'
-
+	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2' // H2 데이터베이스를 runtimeOnly로 설정
-
-	// 테스트 의존성
-	testImplementation 'org.springframework.boot:spring-boot-starter-test' // Spring Boot Starter Test (JUnit 5 포함)
-	testImplementation 'org.mockito:mockito-core:5.4.0'
-	testImplementation 'org.mockito:mockito-junit-jupiter:5.4.0'
-	testImplementation 'org.assertj:assertj-core:3.21.0'
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
-	useJUnitPlatform() // JUnit Platform 사용 설정
+	useJUnitPlatform()
 }
