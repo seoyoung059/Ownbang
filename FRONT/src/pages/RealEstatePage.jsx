@@ -12,16 +12,8 @@ const RealEstatePage = () => {
   };
 
   return (
-    <div style={{ paddingTop: "80px", position: "relative" }}>
-      <Box
-        style={{
-          position: "absolute",
-          top: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          zIndex: 10,
-        }}
-      >
+    <div style={{ paddingTop: "80px" }}>
+      <Box sx={{ marginBottom: "10px" }}>
         <RealEstateSearchBar onSearch={handleSearch} />
       </Box>
       <RealEstateMap searchTerm={searchTerm} />
