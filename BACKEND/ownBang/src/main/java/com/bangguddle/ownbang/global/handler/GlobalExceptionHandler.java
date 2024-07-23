@@ -6,6 +6,7 @@ import com.bangguddle.ownbang.global.response.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -28,7 +29,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return makeErrorResponse(ErrorCode.NOT_FOUND);
     }
 
-    
+    // INTERNAL_SERVER_ERROR error(500) handler
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> commonExceptionHandler() {
         return makeErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR);
@@ -36,6 +37,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> makeErrorResponse(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(Response.error(new ErrorResponse(errorCode, errorCode.getMessage())));
+                .body(Response.error(errorCode, NoneResponse.NONE));
     }
+
 }
