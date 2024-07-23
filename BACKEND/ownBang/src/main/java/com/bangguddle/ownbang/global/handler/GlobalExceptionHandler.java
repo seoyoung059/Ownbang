@@ -15,7 +15,6 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
     // custom error handler
     @ExceptionHandler(AppException.class)
     public ResponseEntity<?> AppExceptionHandler(AppException e) {
