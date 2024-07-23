@@ -6,7 +6,6 @@ import com.bangguddle.ownbang.global.response.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -15,6 +14,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
     // custom error handler
     @ExceptionHandler(AppException.class)
     public ResponseEntity<?> AppExceptionHandler(AppException e) {
@@ -28,6 +28,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return makeErrorResponse(ErrorCode.NOT_FOUND);
     }
 
+    // METHOD_NOT_ALLOWED error(405) handler
+    @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+            HttpRequestMethodNotSupportedException ex, HttpHeaders headers,
+            HttpStatusCode status, WebRequest request) {
+        return makeErrorResponse(ErrorCode.METHOD_NOT_ALLOWED);
+    }
+
+    // BAD_REQUEST error(400) handler
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex, HttpHeaders headers,
+            HttpStatusCode status, WebRequest request) {
+        return makeErrorResponse(ErrorCode.BAD_REQUEST);
+    }
+
     // INTERNAL_SERVER_ERROR error(500) handler
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> commonExceptionHandler() {
@@ -38,5 +54,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(Response.error(errorCode, NoneResponse.NONE));
     }
-
 }
