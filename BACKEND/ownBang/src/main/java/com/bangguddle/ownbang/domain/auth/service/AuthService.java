@@ -8,4 +8,5 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 public interface AuthService {
     SuccessResponse<NoneResponse> signUp(UserSignUpRequest request);
     SuccessResponse<DuplicateResponse> checkEmailDuplicate(String email);
+    SuccessResponse<DuplicateResponse> checkPhoneNumberDuplicate(String phoneNumber);
 }

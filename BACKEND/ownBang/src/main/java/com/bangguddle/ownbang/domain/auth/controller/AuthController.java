@@ -27,6 +27,12 @@ public class AuthController {
         SuccessResponse<DuplicateResponse> response = authService.checkEmailDuplicate(email);
         return Response.success(response);
     }
+
+    @GetMapping("/duplicates/phone")
+    public ResponseEntity<Response<DuplicateResponse>> checkPhoneNumberDuplicate(@RequestParam String phoneNumber) {
+        SuccessResponse<DuplicateResponse> response = authService.checkPhoneNumberDuplicate(phoneNumber);
+        return Response.success(response);
+    }
 }
 
 

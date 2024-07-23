@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import static com.bangguddle.ownbang.global.enums.SuccessCode.CHECK_EMAIL_DUPLICATE_SUCCESS;
-import static com.bangguddle.ownbang.global.enums.SuccessCode.SIGNUP_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,4 +34,12 @@ public class AuthServiceImpl implements AuthService {
         DuplicateResponse response = new DuplicateResponse(isDuplicated);
         return new SuccessResponse<>(CHECK_EMAIL_DUPLICATE_SUCCESS, response);
     }
+
+    @Override
+    public SuccessResponse<DuplicateResponse> checkPhoneNumberDuplicate(String phoneNumber) {
+        Boolean isDuplicated = userRepository.findByPhoneNumber(phoneNumber).isPresent();
+        DuplicateResponse response = new DuplicateResponse(isDuplicated);
+        return new SuccessResponse<>(CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS, response);
+    }
+
 }
