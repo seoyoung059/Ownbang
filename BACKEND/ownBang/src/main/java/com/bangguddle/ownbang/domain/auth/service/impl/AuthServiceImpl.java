@@ -1,11 +1,11 @@
 package com.bangguddle.ownbang.domain.auth.service.impl;
 
+import com.bangguddle.ownbang.domain.auth.dto.DuplicateResponse;
 import com.bangguddle.ownbang.domain.auth.dto.UserSignUpRequest;
 import com.bangguddle.ownbang.domain.auth.service.AuthService;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
-import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,5 +27,12 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
         return new SuccessResponse<>(SIGNUP_SUCCESS, NoneResponse.NONE);
+    }
+
+    @Override
+    public SuccessResponse<DuplicateResponse> checkEmailDuplicate(String email) {
+        Boolean isDuplicated = userRepository.findByEmail(email).isPresent();
+        DuplicateResponse response = new DuplicateResponse(isDuplicated);
+        return new SuccessResponse<>(CHECK_EMAIL_DUPLICATE_SUCCESS, response);
     }
 }
