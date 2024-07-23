@@ -7,8 +7,19 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
+    show-sql: true
+
 server:
   port: ${PORT}
+  ssl:
+    enabled: false
+
+openvidu:
+  url: ${ OPENVIDU_URL }
+  secret: ${ OPENVIDU_SECRET }
 
