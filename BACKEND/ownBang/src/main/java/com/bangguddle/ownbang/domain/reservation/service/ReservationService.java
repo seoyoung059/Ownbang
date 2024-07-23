@@ -1,14 +1,16 @@
 package com.bangguddle.ownbang.domain.reservation.service;
 
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationDto;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
-import com.bangguddle.ownbang.global.response.MessageResponse;
+import com.bangguddle.ownbang.global.enums.NoneResponse;
+import com.bangguddle.ownbang.global.response.SuccessResponse;
+import org.springframework.stereotype.Service;
 
-
+@Service
 public interface ReservationService {
 
-    MessageResponse createReservation(ReservationDto reservationdto);
+    SuccessResponse<NoneResponse> createReservation(ReservationRequest reservationRequest);
 
-    ReservationListResponse getReservationsByUserId(long userId);
+    SuccessResponse<ReservationListResponse> getReservationsByUserId(long userId);
 }
 

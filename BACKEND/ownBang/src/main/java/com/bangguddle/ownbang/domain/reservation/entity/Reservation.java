@@ -14,19 +14,20 @@ public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reservation_id")
+    @Column(name = "reservation_id", nullable = false, updatable = false, columnDefinition = "INT UNSIGNED")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "INT UNSIGNED")
     private Long roomId; // 매물 id
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "INT UNSIGNED")
     private Long userId;
 
     @Column(nullable = false)
     private LocalDateTime time;
 
     @Column(nullable = false)
-    private ReservationStatus status; //enum
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
 
 }
