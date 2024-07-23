@@ -4,8 +4,11 @@ import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.Facing;
 import com.bangguddle.ownbang.domain.room.enums.HeatingType;
 import com.bangguddle.ownbang.domain.room.enums.Purpose;
+import lombok.Builder;
+
 import java.util.Date;
 
+@Builder
 public record RoomDetailCreateRequest(
         byte roomCount,
         byte bathroomCount,
@@ -38,28 +41,41 @@ public record RoomDetailCreateRequest(
             Purpose purpose,
             String road,
             String detailAddress){
-        return new RoomDetailCreateRequest(roomCount, bathroomCount, heatingType, moveInDate,
-                buildingFloor, elevator, totalParking, parking, approvalDate, firstRegistrationDate,
-                facing, purpose, road, detailAddress);
+        return RoomDetailCreateRequest.builder()
+                .roomCount(roomCount)
+                .bathroomCount(bathroomCount)
+                .heatingType(heatingType)
+                .moveInDate(moveInDate)
+                .buildingFloor(buildingFloor)
+                .elevator(elevator)
+                .totalParking(totalParking)
+                .parking(parking)
+                .approvalDate(approvalDate)
+                .firstRegistrationDate(firstRegistrationDate)
+                .facing(facing)
+                .purpose(purpose)
+                .road(road)
+                .detailAddress(detailAddress)
+                .build();
     }
 
     static public RoomDetailCreateRequest from(RoomDetail roomDetail){
-        return new RoomDetailCreateRequest(
-                roomDetail.getRoomCount(),
-                roomDetail.getBathroomCount(),
-                roomDetail.getHeatingType(),
-                roomDetail.getMoveInDate(),
-                roomDetail.getBuildingFloor(),
-                roomDetail.isElevator(),
-                roomDetail.getTotalParking(),
-                roomDetail.getParking(),
-                roomDetail.getApprovalDate(),
-                roomDetail.getFirstRegistrationDate(),
-                roomDetail.getFacing(),
-                roomDetail.getPurpose(),
-                roomDetail.getRoad(),
-                roomDetail.getDetailAddress()
-        );
+        return RoomDetailCreateRequest.builder()
+                .roomCount(roomDetail.getRoomCount())
+                .bathroomCount(roomDetail.getBathroomCount())
+                .heatingType(roomDetail.getHeatingType())
+                .moveInDate(roomDetail.getMoveInDate())
+                .buildingFloor(roomDetail.getBuildingFloor())
+                .elevator(roomDetail.isElevator())
+                .totalParking(roomDetail.getTotalParking())
+                .parking(roomDetail.getParking())
+                .approvalDate(roomDetail.getApprovalDate())
+                .firstRegistrationDate(roomDetail.getFirstRegistrationDate())
+                .facing(roomDetail.getFacing())
+                .purpose(roomDetail.getPurpose())
+                .road(roomDetail.getRoad())
+                .detailAddress(roomDetail.getDetailAddress())
+                .build();
     }
 
     public RoomDetail toEntity() {

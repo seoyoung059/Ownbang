@@ -6,7 +6,9 @@ import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.DealType;
 import com.bangguddle.ownbang.domain.room.enums.RoomType;
 import com.bangguddle.ownbang.domain.room.enums.Structure;
+import lombok.Builder;
 
+@Builder
 public record RoomCreateRequest(
 //        User agent,
         DealType dealType,
@@ -42,32 +44,42 @@ public record RoomCreateRequest(
             RoomAppliancesCreateRequest roomAppliancesCreateRequest,
             RoomDetailCreateRequest roomDetailCreateRequest
     ) {
-        return new RoomCreateRequest(
-//                agent,
-                dealType,
-                roomType,
-                structure,
-                isLoft,
-                exclusiveArea,
-                supplyArea,
-                roomFloor,
-                deposit,
-                monthlyRent,
-                maintenanceFee,
-                parcel,
-                profileImageUrl,
-                roomAppliancesCreateRequest,
-                roomDetailCreateRequest
-        );
+        return RoomCreateRequest.builder()
+//                .agent(agent)
+                .dealType(dealType)
+                .roomType(roomType)
+                .structure(structure)
+                .isLoft(isLoft)
+                .exclusiveArea(exclusiveArea)
+                .supplyArea(supplyArea)
+                .roomFloor(roomFloor)
+                .deposit(deposit)
+                .monthlyRent(monthlyRent)
+                .maintenanceFee(maintenanceFee)
+                .parcel(parcel)
+                .profileImageUrl(profileImageUrl)
+                .roomAppliancesCreateRequest(roomAppliancesCreateRequest)
+                .roomDetailCreateRequest(roomDetailCreateRequest)
+                .build();
     }
 
     static public RoomCreateRequest from(Room room) {
-        return new RoomCreateRequest(/*room.getAgent(),*/room.getDealType(), room.getRoomType(),
-                room.getStructure(), room.isLoft(), room.getExclusiveArea(), room.getSupplyArea(), room.getRoomFloor(),
-                room.getDeposit(), room.getMonthlyRent(), room.getMaintenanceFee(), room.getParcel(),
-                room.getProfileImageUrl(),
-                RoomAppliancesCreateRequest.from(room.getRoomAppliances()),
-                RoomDetailCreateRequest.from(room.getRoomDetail()));
+        return RoomCreateRequest.builder()
+                .dealType(room.getDealType())
+                .roomType(room.getRoomType())
+                .structure(room.getStructure())
+                .isLoft(room.isLoft())
+                .exclusiveArea(room.getExclusiveArea())
+                .supplyArea(room.getSupplyArea())
+                .roomFloor(room.getRoomFloor())
+                .deposit(room.getDeposit())
+                .monthlyRent(room.getMonthlyRent())
+                .maintenanceFee(room.getMaintenanceFee())
+                .parcel(room.getParcel())
+                .profileImageUrl(room.getProfileImageUrl())
+                .roomAppliancesCreateRequest(RoomAppliancesCreateRequest.from(room.getRoomAppliances()))
+                .roomDetailCreateRequest(RoomDetailCreateRequest.from(room.getRoomDetail()))
+                .build();
     }
 
 
