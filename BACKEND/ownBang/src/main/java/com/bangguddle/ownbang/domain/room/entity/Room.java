@@ -77,7 +77,7 @@ public class Room {
     @Column( nullable = false, columnDefinition = "INT UNSIGNED")
     private Long maintenanceFee;
 
-    @Column
+    @Column(nullable = false)
     private String parcel;
 
     @Column(nullable = false)
