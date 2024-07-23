@@ -13,5 +13,17 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  mvc:
+    converters:
+      preferred-json-mapper: gson
+
+
 server:
   port: ${PORT}
+  ssl:
+    enabled: false
+
+openvidu:
+  url: ${ OPENVIDU_URL }
+  secret: ${ OPENVIDU_SECRET }
+
