@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Input, Button } from "@mui/material";
+import { useTheme } from "@emotion/react";
 
 const RealEstateSearchBar = ({ onSearch }) => {
+  const theme = useTheme();
   const [inputValue, setInputValue] = useState("");
 
   const onInputChange = (event) => {
@@ -33,14 +35,24 @@ const RealEstateSearchBar = ({ onSearch }) => {
         onChange={onInputChange}
         onKeyDown={onKeyDown}
         disableUnderline // 기본 CSS에 있는 밑줄 제거
-        style={{
+        sx={{
           marginRight: "8px",
           borderRadius: "7px", // 둥근 사각형 모양
           border: "1px solid lightgray", // 연한 회색 테두리
-          padding: "4px 8px",
+          padding: "10px 25px",
+          backgroundColor: theme.palette.common.white,
         }}
       />
-      <Button variant="contained" color="primary" onClick={onSearchInputValue}>
+      <Button
+        variant="contained"
+        onClick={onSearchInputValue}
+        sx={{
+          marginRight: "8px",
+          borderRadius: "7px", // 둥근 사각형 모양
+          padding: "13px 15px",
+          backgroundColor: theme.palette.primary.dark,
+        }}
+      >
         검색
       </Button>
     </div>
