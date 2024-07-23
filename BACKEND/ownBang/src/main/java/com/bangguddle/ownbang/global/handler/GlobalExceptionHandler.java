@@ -28,7 +28,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return makeErrorResponse(ErrorCode.NOT_FOUND);
     }
 
-    // INTERNAL_SERVER_ERROR error(500) handler
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> commonExceptionHandler() {
         return makeErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR);
