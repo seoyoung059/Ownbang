@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 public record ReservationRequest(
         @NotNull
         @Positive
-        long roomId,
+        Long roomId,
         @NotNull
         @Positive
-        long userId,
+        Long userId,
         @NotNull
         LocalDateTime time,
         @NotNull
