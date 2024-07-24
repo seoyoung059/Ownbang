@@ -19,7 +19,7 @@ public enum SuccessCode implements ResponseCode {
 
 
 
-    ROOM_IMAGE_UPLOAD_SUCCESS(HttpStatus.OK, "사진이 성공적으로 저장되었습니다.");
+    ROOM_IMAGE_UPLOAD_SUCCESS(HttpStatus.OK, "사진이 성공적으로 저장되었습니다."),
 
 
 
