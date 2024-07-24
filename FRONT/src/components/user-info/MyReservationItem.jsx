@@ -50,15 +50,13 @@ export default function MyReservationItem({ reservation }) {
       </TableCell>
       {!isMobile && (
         <TableCell>
-          <Typography variant={isMobile ? "body2" : "body1"}>
-            {reservation.agent}
-          </Typography>
+          <Typography variant={"body1"}>{reservation.agent}</Typography>
         </TableCell>
       )}
       <TableCell>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {getStatusIcon(reservation.status)}
-          <Typography sx={{ ml: 1 }} variant={isMobile ? "body2" : "body1"}>
+          <Typography sx={{ ml: 1, whiteSpace: "nowrap" }} variant={"body1"}>
             {reservation.status}
           </Typography>
         </Box>
@@ -69,7 +67,7 @@ export default function MyReservationItem({ reservation }) {
           disabled={reservation.status !== "확정"}
           size={isMobile ? "small" : "medium"}
         >
-          {reservation.button}
+          입장
         </Button>
       </TableCell>
     </TableRow>

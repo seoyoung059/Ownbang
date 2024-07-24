@@ -1,4 +1,5 @@
 import createTheme from "@mui/material/styles/createTheme";
+import "./font.css";
 
 const theme = createTheme({
   fontSize: {
@@ -25,7 +26,7 @@ const theme = createTheme({
   typography: {
     fontSize: 14,
     fontWeight: 400,
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: "GmarketSansMedium, sans-serif",
     // lineHeight
     // letterSpacing
   },

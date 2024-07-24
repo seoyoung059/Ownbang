@@ -20,7 +20,6 @@ const reservations = [
     agent: "김준영 (행복덕방)",
     status: "확정",
     statusColor: "success",
-    button: "입장하기",
   },
   {
     id: 2,
@@ -30,7 +29,6 @@ const reservations = [
     agent: "이소희 (복덩이)",
     status: "취소",
     statusColor: "error",
-    button: "입장하기",
   },
   {
     id: 3,
@@ -40,7 +38,6 @@ const reservations = [
     agent: "김서영 (서영이네)",
     status: "대기",
     statusColor: "warning",
-    button: "입장하기",
   },
 ];
 

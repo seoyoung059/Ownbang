@@ -3,8 +3,7 @@ import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
 import clusterPositionsData from "./clusterPositionsData.json";
 import { Box } from "@mui/material";
 
-// Page에서 props로 searchTerm을 받아
-const LoadKakaoMap = ({ searchTerm }) => {
+const LoadKakaoMap = ({ searchTerm, mark, size }) => {
   const [positions, setPositions] = useState([]);
   const [info, setInfo] = useState(null);
   const [map, setMap] = useState(null);
@@ -27,9 +26,19 @@ const LoadKakaoMap = ({ searchTerm }) => {
         }
 
         map.setBounds(bounds); // 검색 결과에 따라 지도 범위 재설정
+        map.panTo(new kakao.maps.LatLng(data[0].y, data[0].x)); // 첫 번째 결과를 중심으로 이동
+      } else {
+        console.error("검색 결과가 없습니다.");
       }
     });
   }, [map, searchTerm]);
+
+  useEffect(() => {
+    if (!map || !mark) return;
+
+    const center = new kakao.maps.LatLng(mark.lat, mark.lng);
+    map.panTo(center); // mark 좌표를 중심으로 지도 이동
+  }, [map, mark]);
 
   const handleMarkerClick = (pos) => {
     setInfo(info && info.lat === pos.lat && info.lng === pos.lng ? null : pos);
@@ -38,41 +47,47 @@ const LoadKakaoMap = ({ searchTerm }) => {
   return (
     <Map // 지도 표시 container
       center={{
-        // 지도 중심좌표 (현재 용산구청 부근, 나중에 나의 좌표로 변경 예정)
         lat: 37.53269592749301,
         lng: 126.99050764030287,
       }}
       style={{
-        // 지도 크기
         width: "100%",
-        height: "900px",
+        height: size,
       }}
       level={7}
       onCreate={setMap} // 지도가 생성될 때 setMap 호출
     >
-      <MarkerClusterer averageCenter={true} minLevel={3}>
-        {positions.map((pos) => (
-          <MapMarker
-            key={`${pos.lat}-${pos.lng}`}
-            position={{
-              lat: pos.lat,
-              lng: pos.lng,
-              touchAction: "pan-x pan-y",
-            }}
-            onClick={() => handleMarkerClick(pos)}
-          >
-            {info && info.lat === pos.lat && info.lng === pos.lng && (
-              <Box
-                sx={{
-                  color: "darkGray",
-                }}
-              >
-                {pos.title}
-              </Box>
-            )}
-          </MapMarker>
-        ))}
-      </MarkerClusterer>
+      {!mark ? (
+        <MarkerClusterer averageCenter={true} minLevel={3}>
+          {positions.map((pos) => (
+            <MapMarker
+              key={`${pos.lat}-${pos.lng}`}
+              position={{
+                lat: pos.lat,
+                lng: pos.lng,
+              }}
+              onClick={() => handleMarkerClick(pos)}
+            >
+              {info && info.lat === pos.lat && info.lng === pos.lng && (
+                <Box
+                  sx={{
+                    color: "darkGray",
+                  }}
+                >
+                  {pos.title}
+                </Box>
+              )}
+            </MapMarker>
+          ))}
+        </MarkerClusterer>
+      ) : (
+        <MapMarker
+          position={{
+            lat: mark.lat,
+            lng: mark.lng,
+          }}
+        />
+      )}
     </Map>
   );
 };
