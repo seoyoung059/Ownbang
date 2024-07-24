@@ -27,15 +27,15 @@ public class Room {
 //    @JoinColumn(name = "agent_id", nullable = false)
 //    private User agent;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="room_appliances_id", nullable = false)
     private RoomAppliances roomAppliances;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_detail_id", nullable = false)
     private RoomDetail roomDetail;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private final List<RoomImage> roomImages = new ArrayList<>();
 
     @Column(nullable = false)
