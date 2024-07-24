@@ -1,36 +1,13 @@
-// 체크리스트 구성 각 컴포넌트
-// Title, ListList (아래 ListItem), AddInput를
-// 합쳐서 렌더링 하는 페이지
-
 import { useState, useRef } from "react";
 import { Box } from "@mui/material";
 import CheckListTitle from "./CheckListTitle";
 import CheckListList from "./CheckListList";
 import CheckListAddInput from "./CheckListAddInput";
-
-const tmpData = [
-  {
-    id: 0,
-    isDone: false,
-    content: "벽지 곰팡이 확인",
-    date: new Date().getTime(),
-  },
-  {
-    id: 1,
-    isDone: false,
-    content: "수압 확인",
-    date: new Date().getTime(),
-  },
-  {
-    id: 2,
-    isDone: false,
-    content: "풍경 확인",
-    date: new Date().getTime(),
-  },
-];
+import tmpData from "./CheckListData.json";
 
 const CheckList = () => {
   const [checkitems, setCheckItems] = useState(tmpData);
+  const [selectedTitle, setSelectedTitle] = useState(null);
   const idRef = useRef(3);
 
   const onCreate = (content) => {
@@ -38,12 +15,10 @@ const CheckList = () => {
       id: idRef.current++,
       isDone: false,
       content: content,
-      date: new Date().getTime(),
     };
     setCheckItems([newCheckItem, ...checkitems]);
   };
 
-  // 체크박스가 표시됨에 따라 isDone 필드가 토글될 수 있도록
   const onUpdate = (targetId) => {
     setCheckItems(
       checkitems.map((checkitem) =>
@@ -54,7 +29,6 @@ const CheckList = () => {
     );
   };
 
-  // 항목 삭제
   const onDelete = (targetId) => {
     setCheckItems(checkitems.filter((checkitem) => checkitem.id !== targetId));
   };
@@ -65,28 +39,33 @@ const CheckList = () => {
         display: "flex",
         flexDirection: "column",
         gap: "20px",
-        width: "500px",
+        maxWidth: "600px",
         border: "1px solid lightGray",
         borderRadius: "10px",
         padding: "30px",
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <CheckListTitle />
+        <CheckListTitle setSelectedTitle={setSelectedTitle} />
       </Box>
 
       {/* CheckList 항목 체크, 내용 확인, 삭제 */}
-      <Box sx={{ marginTop: "30px" }}>
-        <CheckListList
-          checkitems={checkitems}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-        />
-      </Box>
+      {selectedTitle && (
+        <Box sx={{ marginTop: "30px" }}>
+          <CheckListList
+            checkitems={checkitems}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+          />
+        </Box>
+      )}
+
       {/* 새로운 항목 추가 */}
-      <Box sx={{ marginTop: "40px" }}>
-        <CheckListAddInput onCreate={onCreate} />
-      </Box>
+      {selectedTitle && (
+        <Box sx={{ marginTop: "40px" }}>
+          <CheckListAddInput onCreate={onCreate} />
+        </Box>
+      )}
     </Box>
   );
 };

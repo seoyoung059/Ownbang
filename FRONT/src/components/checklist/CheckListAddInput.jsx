@@ -34,7 +34,7 @@ const CheckListAddInput = ({ onCreate }) => {
         value={content}
         onChange={onChangeContent}
         onKeyDown={onKeyDown}
-        placeholder="새로운 항목 추가"
+        placeholder="새로운 항목을 입력하세요"
         sx={{
           fontSize: theme.fontSize.small,
           width: "350px",
@@ -73,7 +73,7 @@ const CheckListAddInput = ({ onCreate }) => {
           fontSize: theme.fontSize.small,
         }}
       >
-        추가하기
+        추가
       </Button>
     </Box>
   );

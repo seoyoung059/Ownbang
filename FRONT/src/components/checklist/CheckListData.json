@@ -1,0 +1,17 @@
+[
+  {
+    "id": 0,
+    "isDone": false,
+    "content": "벽지 곰팡이 확인"
+  },
+  {
+    "id": 1,
+    "isDone": false,
+    "content": "수압 확인"
+  },
+  {
+    "id": 2,
+    "isDone": false,
+    "content": "풍경 확인"
+  }
+]

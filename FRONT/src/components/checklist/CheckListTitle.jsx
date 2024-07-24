@@ -2,9 +2,13 @@ import * as React from "react";
 import { Stack, Autocomplete, TextField } from "@mui/material";
 import { useTheme } from "@emotion/react";
 
-const CheckListTitle = () => {
+const CheckListTitle = ({ setSelectedTitle }) => {
   const theme = useTheme();
   const templateTitles = [{ title: "원룸 리스트" }];
+
+  const handleChange = (event, value) => {
+    setSelectedTitle(value ? value.title : null);
+  };
 
   return (
     <Stack spacing={2} sx={{ width: 300 }}>
@@ -12,8 +16,8 @@ const CheckListTitle = () => {
         id="templateChoice"
         options={templateTitles}
         getOptionLabel={(option) => option.title}
+        onChange={handleChange}
         sx={{ padding: "10px" }}
-        // defaultValue={templateTitles[0]}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -23,13 +27,13 @@ const CheckListTitle = () => {
             InputProps={{
               ...params.InputProps,
               sx: {
-                padding: "10px", // Adjust padding here
+                padding: "10px",
                 fontSize: "12px",
               },
             }}
             sx={{
               "& .MuiInputBase-root": {
-                padding: "10px", // Adjust padding here
+                padding: "10px",
                 fontSize: "12px",
               },
             }}
