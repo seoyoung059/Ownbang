@@ -80,7 +80,6 @@ public class ReservationControllerTest {
         ReservationRequest invalidRequest = ReservationRequest.of(-1L, -1L, LocalDateTime.now(), ReservationStatus.예약신청);
         String requestBody = objectMapper.writeValueAsString(invalidRequest);
 
-        // When & Then: Send POST request and expect a BAD_REQUEST status with appropriate error message
         mockMvc.perform(post("/api/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
