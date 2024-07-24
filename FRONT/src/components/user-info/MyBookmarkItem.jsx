@@ -19,6 +19,7 @@ export default function MyBookmarkItem({ bookmark }) {
         display: "flex",
         mb: 2,
         width: isMobile ? "100%" : "600px",
+        heigth: isMobile && 140,
         bgcolor: theme.palette.common.white,
       }}
     >
