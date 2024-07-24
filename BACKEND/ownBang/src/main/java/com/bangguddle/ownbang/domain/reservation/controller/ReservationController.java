@@ -29,8 +29,7 @@ public class ReservationController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Response<ReservationListResponse>> getMyReservationList (@RequestParam(name="userId") long userId) {
-
+    public ResponseEntity<Response<ReservationListResponse>> getMyReservationList (@RequestParam(name="userId") Long userId) {
         SuccessResponse<ReservationListResponse> response = reservationService.getMyReservationList (userId);
         return Response.success(response);
     }
