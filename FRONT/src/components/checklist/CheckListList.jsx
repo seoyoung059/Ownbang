@@ -20,7 +20,7 @@ const List = ({ checkitems, onUpdate, onDelete }) => {
     );
   };
 
-  const filteredChechItems = getFilteredData();
+  const filteredCheckItems = getFilteredData();
 
   return (
     <Box
@@ -65,7 +65,7 @@ const List = ({ checkitems, onUpdate, onDelete }) => {
           gap: "20px",
         }}
       >
-        {filteredChechItems.map((checkitem) => (
+        {filteredCheckItems.map((checkitem) => (
           <CheckListItem
             onUpdate={onUpdate}
             onDelete={onDelete}
