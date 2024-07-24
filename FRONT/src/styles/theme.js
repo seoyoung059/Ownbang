@@ -1,8 +1,9 @@
-import { createTheme } from "@mui/material";
+import createTheme from "@mui/material/styles/createTheme";
 
 const theme = createTheme({
   fontSize: {
     small: "10px",
+    medium: "16px",
     large: "18px",
     larger: "20px",
   },
@@ -11,6 +12,13 @@ const theme = createTheme({
     medium: 500,
     bold: 700,
     heavy: 900,
+  },
+
+  title: {
+    fontFamily: "Gugi",
+    fontSize: 32,
+    fontWeight: 400,
+    fontStyle: "normal",
   },
 
   // 텍스트 관련 속성 정의
@@ -73,6 +81,7 @@ const theme = createTheme({
       disabled: "#9e9e9e", // 비활성화된 요소
       disabledBackground: "#e0e0e0", // 비활성화된 요소의 배경색
     },
+    bookmark: "#FFD233",
     // 공통 색상 정의
     common: {
       black: "#000000",
