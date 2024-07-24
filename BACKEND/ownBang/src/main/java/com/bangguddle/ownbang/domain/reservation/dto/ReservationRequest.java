@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 public record ReservationRequest(
         @NotNull
         @Positive
-        Long roomId,
+        long roomId,
         @NotNull
         @Positive
-        Long userId,
+        long userId,
         @NotNull
         LocalDateTime time,
         @NotNull
@@ -29,7 +29,7 @@ public record ReservationRequest(
                 .build();
     }
 
-    public static ReservationRequest of(Long roomId, Long userId, LocalDateTime time, ReservationStatus status) {
+    public static ReservationRequest of(long roomId, long userId, LocalDateTime time, ReservationStatus status) {
         return new ReservationRequest(roomId, userId, time, status);
     }
 
