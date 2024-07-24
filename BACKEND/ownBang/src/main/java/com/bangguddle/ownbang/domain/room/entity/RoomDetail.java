@@ -65,10 +65,10 @@ public class RoomDetail {
     @Column
     private Purpose purpose;
 
-    @Column
+    @Column(nullable = false)
     private String road;
 
-    @Column
+    @Column(nullable = false)
     private String detailAddress;
 
     @Builder
