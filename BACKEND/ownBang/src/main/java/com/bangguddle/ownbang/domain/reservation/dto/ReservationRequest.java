@@ -3,7 +3,7 @@ package com.bangguddle.ownbang.domain.reservation.dto;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import jakarta.validation.constraints.Positive;
-import org.antlr.v4.runtime.misc.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
