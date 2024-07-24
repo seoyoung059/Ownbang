@@ -35,8 +35,8 @@ public class Room {
     @JoinColumn(name = "room_detail_id", nullable = false)
     private RoomDetail roomDetail;
 
-    @OneToMany(mappedBy = "room")
-    private List<RoomImage> roomImages = new ArrayList<>();
+    @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST)
+    private final List<RoomImage> roomImages = new ArrayList<>();
 
     @Column(nullable = false)
     private float latitude;
@@ -77,18 +77,18 @@ public class Room {
     @Column( nullable = false, columnDefinition = "INT UNSIGNED")
     private Long maintenanceFee;
 
-    @Column
+    @Column(nullable = false)
     private String parcel;
 
     @Column(nullable = false)
     private String profileImageUrl;
 
     @Builder
-    public Room(/*User agent, */RoomAppliances roomAppliances, RoomDetail roomDetail, List<RoomImage> roomImages,float latitude, float longitude, DealType dealType, RoomType roomType, Structure structure, boolean isLoft, float exclusiveArea, float supplyArea, byte roomFloor, Long deposit, Long monthlyRent, Long maintenanceFee, String parcel, String profileImageUrl) {
+    public Room(/*User agent, */RoomAppliances roomAppliances, RoomDetail roomDetail, /*List<RoomImage> roomImages,*/float latitude, float longitude, DealType dealType, RoomType roomType, Structure structure, boolean isLoft, float exclusiveArea, float supplyArea, byte roomFloor, Long deposit, Long monthlyRent, Long maintenanceFee, String parcel, String profileImageUrl) {
 //        this.agent = agent;
         this.roomAppliances = roomAppliances;
         this.roomDetail = roomDetail;
-        this.roomImages = roomImages;
+//        this.roomImages.addAll(roomImages);
         this.latitude = latitude;
         this.longitude = longitude;
         this.dealType = dealType;

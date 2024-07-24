@@ -4,20 +4,26 @@ import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.Facing;
 import com.bangguddle.ownbang.domain.room.enums.HeatingType;
 import com.bangguddle.ownbang.domain.room.enums.Purpose;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Builder;
 
 import java.util.Date;
 
 @Builder
 public record RoomDetailCreateRequest(
-        byte roomCount,
-        byte bathroomCount,
+        @Positive
+        Byte roomCount,
+        @PositiveOrZero
+        Byte bathroomCount,
         HeatingType heatingType,
         Date moveInDate,
         Long buildingFloor,
-        boolean elevator,
+        Boolean elevator,
+        @PositiveOrZero
         Long totalParking,
-        float parking,
+        @PositiveOrZero
+        Float parking,
         Date approvalDate,
         Date firstRegistrationDate,
         Facing facing,

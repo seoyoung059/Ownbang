@@ -5,26 +5,26 @@ import lombok.Builder;
 
 @Builder
 public record RoomAppliancesCreateRequest(
-        boolean refrigerator,
-        boolean washingMachine,
-        boolean airConditioner,
-        boolean bed,
-        boolean desk,
-        boolean microwave,
-        boolean closet,
-        boolean chair
+        Boolean refrigerator,
+        Boolean washingMachine,
+        Boolean airConditioner,
+        Boolean bed,
+        Boolean desk,
+        Boolean microwave,
+        Boolean closet,
+        Boolean chair
 ) {
 
 
     static public RoomAppliancesCreateRequest of (
-            boolean refrigerator,
-            boolean washingMachine,
-            boolean airConditioner,
-            boolean bed,
-            boolean desk,
-            boolean microwave,
-            boolean closet,
-            boolean chair) {
+            Boolean refrigerator,
+            Boolean washingMachine,
+            Boolean airConditioner,
+            Boolean bed,
+            Boolean desk,
+            Boolean microwave,
+            Boolean closet,
+            Boolean chair) {
         return RoomAppliancesCreateRequest.builder()
                 .refrigerator(refrigerator)
                 .washingMachine(washingMachine)
