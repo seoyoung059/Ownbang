@@ -1,7 +1,9 @@
 package com.bangguddle.ownbang.domain.auth.service;
 
+import com.bangguddle.ownbang.domain.auth.dto.DuplicateResponse;
 import com.bangguddle.ownbang.domain.auth.dto.UserSignUpRequest;
 import com.bangguddle.ownbang.domain.auth.service.impl.AuthServiceImpl;
+import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -16,9 +18,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
+import static com.bangguddle.ownbang.global.enums.SuccessCode.CHECK_EMAIL_DUPLICATE_SUCCESS;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -89,5 +93,43 @@ class AuthServiceTest {
         assertThatThrownBy(() -> authService.signUp(request))
                 .isInstanceOf(AppException.class)
                 .hasMessageContaining(ErrorCode.EMAIL_DUPLICATED.getMessage());
+    }
+
+    @Test
+    @DisplayName("이메일 중복 확인 성공 - 중복됨")
+    public void 이메일_중복_확인_성공_중복됨() {
+        // given
+        String email = "isDuplicate";
+        DuplicateResponse response = new DuplicateResponse(true);
+        SuccessResponse<DuplicateResponse> success =
+                new SuccessResponse<>(CHECK_EMAIL_DUPLICATE_SUCCESS, response);
+        User user = User.builder().email(email).build();
+
+        // when
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        // then
+        assertThatCode(() -> authService.checkEmailDuplicate(email)).doesNotThrowAnyException();
+        assertThat(authService.checkEmailDuplicate(email)).isInstanceOf(SuccessResponse.class)
+                .isEqualTo(success);
+    }
+
+    @Test
+    @DisplayName("이메일 중복 확인 성공 - 중복되지 않음")
+    public void 이메일_중복_확인_성공_중복되지않음() {
+        // given
+        String email = "isNotDuplicate";
+        DuplicateResponse response = new DuplicateResponse(false);
+        SuccessResponse<DuplicateResponse> success =
+                new SuccessResponse<>(CHECK_EMAIL_DUPLICATE_SUCCESS, response);
+        User user = User.builder().email(email).build();
+
+        // when
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        // then
+        assertThatCode(() -> authService.checkEmailDuplicate(email)).doesNotThrowAnyException();
+        assertThat(authService.checkEmailDuplicate(email)).isInstanceOf(SuccessResponse.class)
+                .isEqualTo(success);
     }
 }
