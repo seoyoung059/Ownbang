@@ -29,6 +29,12 @@ public class ReservationController {
         SuccessResponse<ReservationListResponse> response = reservationService.getMyReservationList (userId);
         return Response.success(response);
     }
+    @PostMapping("/")
+    public ResponseEntity<Response<NoneResponse>> deleteReservation(@RequestParam Long id) {
+        SuccessResponse<NoneResponse> response = reservationService.deleteReservation(id);
+        return Response.success(response);
+    }
+
 }
 
 

@@ -61,4 +61,13 @@ public class ReservationServiceImpl implements ReservationService {
         ReservationListResponse reservationListResponse= new ReservationListResponse(reservations);
         return new SuccessResponse<>(SuccessCode.RESERVATION_LIST_SUCCESS,reservationListResponse );
     }
+
+    public SuccessResponse<NoneResponse> deleteReservation(Long id) {
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+        if (reservation.isPresent()) {
+            return new SuccessResponse<>(SuccessCode.RESERVATION_DELETE_SUCCESS, NoneResponse.NONE);
+        } else {
+            throw new AppException(ErrorCode.NOT_FOUND);
+        }
+    }
 }

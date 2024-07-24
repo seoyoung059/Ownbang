@@ -122,4 +122,39 @@ class ReservationServiceImplTest {
         assertThat(response.data().reservations().get(0).getStatus()).isEqualTo(ReservationStatus.예약신청);
         assertThat(response.data().reservations().get(1).getStatus()).isEqualTo(ReservationStatus.예약확정);
     }
+    @Test
+    void deleteReservation_Success() {
+        LocalDateTime now = LocalDateTime.now();
+        Reservation reservation1 = Reservation.builder()
+                .roomId(1L)
+                .userId(1L)
+                .time(now)
+                .status(ReservationStatus.예약신청)
+                .build();
+
+        // 예약이 존재하는 경우를 시뮬레이션하기 위해 findById 메서드의 반환값을 설정
+        when(reservationRepository.findById(reservation1.getId())).thenReturn(Optional.of(reservation1));
+
+        // 예약 삭제 메서드 호출
+        SuccessResponse<NoneResponse> response = reservationService.deleteReservation(reservation1.getId());
+
+        // 응답 값 검증
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(SuccessCode.RESERVATION_DELETE_SUCCESS);
+        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
+
+        // 예약 삭제가 실제로 호출되었는지 검증
+        verify(reservationRepository, times(1)).deleteById(reservation1.getId());
+    }
+
+    @Test
+    void deleteReservation_NotFound() {
+        long reservationId = 1L;
+
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> reservationService.deleteReservation(reservationId))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND);
+    }
 }

@@ -12,5 +12,7 @@ public interface ReservationService {
     SuccessResponse<NoneResponse> createReservation(ReservationRequest reservationRequest);
 
     SuccessResponse<ReservationListResponse> getMyReservationList (Long userId);
+
+    SuccessResponse<NoneResponse> deleteReservation (Long id);
 }
 
