@@ -3,6 +3,7 @@ package com.bangguddle.ownbang.domain.room.controller;
 import com.bangguddle.ownbang.domain.room.dto.RoomAppliancesCreateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomDetailCreateRequest;
+import com.bangguddle.ownbang.domain.room.dto.RoomSelectResponse;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.service.impl.RoomServiceImpl;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -28,8 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 
@@ -190,7 +190,7 @@ class RoomControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("객체 삭제 검증")
+    @DisplayName("객체 삭제 성공")
     public void deleteRoom_Success() throws Exception {
         // DTO
         Long roomId = 1L;
@@ -205,7 +205,6 @@ class RoomControllerTest {
                         .param("roomId", String.valueOf(roomId))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()
                         ))
-                .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
@@ -243,6 +242,46 @@ class RoomControllerTest {
         //then
         mockMvc.perform(
                         delete("/api/rooms")
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()
+                                ))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("객체 단건 조회 성공")
+    public void findRoom_Success() throws Exception {
+        // DTO
+        Long roomId = 1L;
+        RoomSelectResponse roomSelectResponse = RoomSelectResponse.builder().build();
+        SuccessResponse<RoomSelectResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomSelectResponse);
+
+        // when
+        when(roomServiceImpl.getRoom(anyLong())).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                        get("/api/rooms/{roomId}", String.valueOf(roomId))
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()
+                                ))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("객체 단건 조회 실패")
+    public void findRoom_Fail_InvalidId() throws Exception {
+        // DTO
+        Long roomId = -1L;
+        RoomSelectResponse roomSelectResponse = RoomSelectResponse.builder().build();
+        SuccessResponse<RoomSelectResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomSelectResponse);
+
+        // when
+        when(roomServiceImpl.getRoom(anyLong())).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                        get("/api/rooms/{roomId}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
