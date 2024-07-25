@@ -122,43 +122,5 @@ class ReservationServiceImplTest {
         assertThat(response.data().reservations().get(0).getStatus()).isEqualTo(ReservationStatus.예약신청);
         assertThat(response.data().reservations().get(1).getStatus()).isEqualTo(ReservationStatus.예약확정);
     }
-    @Test
-    void deleteReservation_Success() {
-        Long reservationId = 1L;
-        LocalDateTime now = LocalDateTime.now();
 
-        // 예약 객체 생성 (id는 자동 생성되므로 설정하지 않음)
-        Reservation reservation = Reservation.builder()
-                .roomId(1L)
-                .userId(1L)
-                .time(now)
-                .status(ReservationStatus.예약신청)
-                .build();
-
-        // 예약이 존재한다고 가정하고 findById 메서드가 예약을 반환하도록 설정
-        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
-
-        // 예약 삭제 메서드 호출
-        SuccessResponse<NoneResponse> response = reservationService.deleteReservation(reservationId);
-
-        // 응답 값 검증
-        assertThat(response).isNotNull();
-        assertThat(response.successCode()).isEqualTo(SuccessCode.RESERVATION_DELETE_SUCCESS);
-        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
-
-        // 예약 삭제가 실제로 호출되었는지 검증
-        verify(reservationRepository, times(1)).deleteById(reservationId);
-    }
-
-
-    @Test
-    void deleteReservation_NotFound() {
-        long reservationId = 1L;
-
-        when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> reservationService.deleteReservation(reservationId))
-                .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND);
-    }
 }
