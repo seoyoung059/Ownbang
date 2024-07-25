@@ -9,6 +9,7 @@ import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,8 +28,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,6 +46,7 @@ public class ReservationControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @DisplayName("예약 신청 Post 컨트롤러 성공")
     @WithMockUser
     void createReservation_Success() throws Exception {
         LocalDateTime now = LocalDateTime.now();
@@ -74,6 +75,7 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
     @Test
+    @DisplayName("Invalid Field 검증 - 조건 불만족")
     @WithMockUser
     void createReservation_Fail_InvalidField() throws Exception {
         ReservationRequest invalidRequest = ReservationRequest.of(-1L, -1L, LocalDateTime.now(), ReservationStatus.예약신청);
@@ -91,6 +93,7 @@ public class ReservationControllerTest {
 
 
     @Test
+    @DisplayName("예약 목록 조회 성공")
     @WithMockUser
     void getReservationsByUserId_Success() throws Exception {
         long userId = 1L;
@@ -134,6 +137,7 @@ public class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("예약 목록 조회 시 빈 리스트 반환")
     @WithMockUser
     void getReservationsByUserId_EmptyList() throws Exception {
         long userId = 1L;
@@ -151,6 +155,28 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_LIST_EMPTY.getMessage()))
                 .andExpect(jsonPath("$.data.reservations").isArray())
                 .andExpect(jsonPath("$.data.reservations").isEmpty());
+    }
+
+    @Test
+    @DisplayName("예약 철회 성공")
+    @WithMockUser
+    void updateStatusReservation_Success() throws Exception {
+        Long id = 1L;
+
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
+                SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS,
+                NoneResponse.NONE
+        );
+
+        when(reservationService.updateStatusReservation(anyLong())).thenReturn(successResponse);
+
+        mockMvc.perform(patch("/api/reservations/{id}", id)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.code").value(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.data").value("NONE"));
     }
 
 }
