@@ -1,7 +1,6 @@
 package com.bangguddle.ownbang.domain.room.service;
 
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomSelectResponse;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import jakarta.transaction.Transactional;
