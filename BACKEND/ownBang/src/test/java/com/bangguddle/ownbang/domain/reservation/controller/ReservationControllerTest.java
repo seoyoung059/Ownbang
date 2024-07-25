@@ -5,8 +5,10 @@ import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
+import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -27,8 +29,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -151,5 +152,45 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_LIST_EMPTY.getMessage()))
                 .andExpect(jsonPath("$.data.reservations").isArray())
                 .andExpect(jsonPath("$.data.reservations").isEmpty());
+    }
+
+    @Test
+    @WithMockUser
+    void deleteReservation_Success() throws Exception {
+        Long reservationId = 1L;
+
+        // 성공적인 삭제 응답 설정
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
+                SuccessCode.RESERVATION_DELETE_SUCCESS,
+                NoneResponse.NONE
+        );
+
+        when(reservationService.deleteReservation(anyLong())).thenReturn(successResponse);
+
+        mockMvc.perform(delete("/api/reservations/")
+                        .param("id", reservationId.toString())
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isNoContent())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.code").value(SuccessCode.RESERVATION_DELETE_SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_DELETE_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.data").value("NONE"));
+    }
+
+    @Test
+    @WithMockUser
+    void deleteReservation_Fail_NotFound() throws Exception {
+        Long reservationId = 1L;
+
+        // 예약이 존재하지 않는 경우 예외 설정
+        when(reservationService.deleteReservation(anyLong())).thenThrow(new AppException(ErrorCode.NOT_FOUND));
+
+        mockMvc.perform(delete("/api/reservations/")
+                        .param("id", reservationId.toString())
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.code").value(ErrorCode.NOT_FOUND.name()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND.getMessage()));
     }
 }

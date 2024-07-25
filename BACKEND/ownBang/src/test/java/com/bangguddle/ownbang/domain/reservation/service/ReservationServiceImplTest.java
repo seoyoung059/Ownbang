@@ -124,19 +124,22 @@ class ReservationServiceImplTest {
     }
     @Test
     void deleteReservation_Success() {
+        Long reservationId = 1L;
         LocalDateTime now = LocalDateTime.now();
-        Reservation reservation1 = Reservation.builder()
+
+        // 예약 객체 생성 (id는 자동 생성되므로 설정하지 않음)
+        Reservation reservation = Reservation.builder()
                 .roomId(1L)
                 .userId(1L)
                 .time(now)
                 .status(ReservationStatus.예약신청)
                 .build();
 
-        // 예약이 존재하는 경우를 시뮬레이션하기 위해 findById 메서드의 반환값을 설정
-        when(reservationRepository.findById(reservation1.getId())).thenReturn(Optional.of(reservation1));
+        // 예약이 존재한다고 가정하고 findById 메서드가 예약을 반환하도록 설정
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 
         // 예약 삭제 메서드 호출
-        SuccessResponse<NoneResponse> response = reservationService.deleteReservation(reservation1.getId());
+        SuccessResponse<NoneResponse> response = reservationService.deleteReservation(reservationId);
 
         // 응답 값 검증
         assertThat(response).isNotNull();
@@ -144,8 +147,9 @@ class ReservationServiceImplTest {
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         // 예약 삭제가 실제로 호출되었는지 검증
-        verify(reservationRepository, times(1)).deleteById(reservation1.getId());
+        verify(reservationRepository, times(1)).deleteById(reservationId);
     }
+
 
     @Test
     void deleteReservation_NotFound() {
