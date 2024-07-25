@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.SuccessCode.CHECK_EMAIL_DUPLICATE_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -49,8 +50,8 @@ class AuthServiceTest {
                 new SuccessResponse<>(SuccessCode.SIGNUP_SUCCESS, NoneResponse.NONE);
 
         // when
-        doNothing().when(userRepository).validateByEmail(request.email());
-        doNothing().when(userRepository).validateByPhoneNumber(request.phoneNumber());
+        doReturn(Optional.empty()).when(userRepository).findByEmail(request.email());
+        doReturn(Optional.empty()).when(userRepository).findByPhoneNumber(request.phoneNumber());
 
         // then
         assertThatCode(() -> authService.signUp(request)).doesNotThrowAnyException();
@@ -69,7 +70,7 @@ class AuthServiceTest {
 
         // when
         doThrow(new AppException(ErrorCode.PHONE_NUMBER_DUPLICATED))
-                .when(userRepository).validateByPhoneNumber(request.phoneNumber());
+                .when(userRepository).findByPhoneNumber(request.phoneNumber());
 
         // then
         assertThatThrownBy(() -> authService.signUp(request))
@@ -87,7 +88,7 @@ class AuthServiceTest {
 
         // when
         doThrow(new AppException(ErrorCode.EMAIL_DUPLICATED))
-                .when(userRepository).validateByEmail(request.email());
+                .when(userRepository).findByEmail(request.email());
 
         // then
         assertThatThrownBy(() -> authService.signUp(request))
@@ -122,14 +123,50 @@ class AuthServiceTest {
         DuplicateResponse response = new DuplicateResponse(false);
         SuccessResponse<DuplicateResponse> success =
                 new SuccessResponse<>(CHECK_EMAIL_DUPLICATE_SUCCESS, response);
-        User user = User.builder().email(email).build();
 
         // when
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         // then
         assertThatCode(() -> authService.checkEmailDuplicate(email)).doesNotThrowAnyException();
         assertThat(authService.checkEmailDuplicate(email)).isInstanceOf(SuccessResponse.class)
+                .isEqualTo(success);
+    }
+
+    @Test
+    @DisplayName("전화번호 중복 확인 성공 - 중복됨")
+    public void 전화번호_중복_확인_성공_중복됨() {
+        // given
+        String phoneNumber = "isDuplicate";
+        DuplicateResponse response = new DuplicateResponse(true);
+        SuccessResponse<DuplicateResponse> success =
+                new SuccessResponse<>(CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS, response);
+        User user = User.builder().phoneNumber(phoneNumber).build();
+
+        // when
+        when(userRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.of(user));
+
+        // then
+        assertThatCode(() -> authService.checkPhoneNumberDuplicate(phoneNumber)).doesNotThrowAnyException();
+        assertThat(authService.checkPhoneNumberDuplicate(phoneNumber)).isInstanceOf(SuccessResponse.class)
+                .isEqualTo(success);
+    }
+
+    @Test
+    @DisplayName("전화번호 중복 확인 성공 - 중복되지 않음")
+    public void 전화번호_중복_확인_성공_중복되지않음() {
+        // given
+        String phoneNumber = "isNotDuplicate";
+        DuplicateResponse response = new DuplicateResponse(false);
+        SuccessResponse<DuplicateResponse> success =
+                new SuccessResponse<>(CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS, response);
+
+        // when
+        when(userRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.empty());
+
+        // then
+        assertThatCode(() -> authService.checkPhoneNumberDuplicate(phoneNumber)).doesNotThrowAnyException();
+        assertThat(authService.checkPhoneNumberDuplicate(phoneNumber)).isInstanceOf(SuccessResponse.class)
                 .isEqualTo(success);
     }
 }
