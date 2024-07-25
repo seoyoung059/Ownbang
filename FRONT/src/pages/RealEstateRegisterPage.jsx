@@ -289,7 +289,7 @@ export default function RealEstateRegisterPage() {
               }}
             />
           </Grid>
-          <Grid item xs={12} sx={{ mb: 1 }}>
+          <Grid item xs={12} sx={{ mb: 3 }}>
             <Button variant="contained" component="label">
               부동산 매물 사진 등록
               <Input

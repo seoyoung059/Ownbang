@@ -22,6 +22,10 @@ const theme = createTheme({
     fontStyle: "normal",
   },
 
+  plus: {
+    fontFamily: "EF_YOONY",
+  },
+
   // 텍스트 관련 속성 정의
   typography: {
     fontSize: 14,
