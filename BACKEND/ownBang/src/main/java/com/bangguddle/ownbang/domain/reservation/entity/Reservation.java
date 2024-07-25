@@ -30,4 +30,14 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
+
+    public Reservation withStatus() {
+        return new Reservation(
+                this.id,
+                this.roomId,
+                this.userId,
+                this.time,
+                ReservationStatus.예약취소
+        );
+    }
 }
