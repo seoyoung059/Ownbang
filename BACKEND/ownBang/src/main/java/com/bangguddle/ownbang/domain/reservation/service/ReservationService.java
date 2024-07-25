@@ -13,6 +13,6 @@ public interface ReservationService {
 
     SuccessResponse<ReservationListResponse> getMyReservationList (Long userId);
 
-    SuccessResponse<NoneResponse> deleteReservation (Long id);
+    SuccessResponse<NoneResponse> deleteReservation(Long id) ;
 }
 

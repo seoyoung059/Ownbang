@@ -71,4 +71,5 @@ public class ReservationServiceImpl implements ReservationService {
             throw new AppException(ErrorCode.NOT_FOUND);
         }
     }
+
 }

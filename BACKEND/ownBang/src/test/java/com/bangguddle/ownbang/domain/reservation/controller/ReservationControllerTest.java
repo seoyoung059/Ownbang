@@ -88,6 +88,10 @@ public class ReservationControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"));
     }
+
+
+
+
     @Test
     @DisplayName("예약 목록 조회 성공")
     @WithMockUser

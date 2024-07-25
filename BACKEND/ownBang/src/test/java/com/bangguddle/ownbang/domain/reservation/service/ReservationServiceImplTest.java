@@ -70,7 +70,7 @@ class ReservationServiceImplTest {
 
         assertThatThrownBy(() -> reservationService.createReservation(request))
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.Reservation_DUPLICATED);
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RESERVATION_DUPLICATED);
     }
 
     @Test
@@ -165,4 +165,6 @@ class ReservationServiceImplTest {
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND);
     }
+
+
 }
