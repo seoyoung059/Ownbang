@@ -100,7 +100,7 @@ export default function UserInfoEditForm() {
         {!forAgent && !forPassChange ? (
           <Box
             sx={{
-              marginTop: 8,
+              mt: 8,
               display: "flex",
               flexDirection: "column",
             }}

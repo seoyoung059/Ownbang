@@ -1,4 +1,5 @@
 import createTheme from "@mui/material/styles/createTheme";
+import "./font.css";
 
 const theme = createTheme({
   fontSize: {
@@ -21,11 +22,15 @@ const theme = createTheme({
     fontStyle: "normal",
   },
 
+  plus: {
+    fontFamily: "EF_YOONY",
+  },
+
   // 텍스트 관련 속성 정의
   typography: {
     fontSize: 14,
     fontWeight: 400,
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: "GmarketSansMedium, sans-serif",
     // lineHeight
     // letterSpacing
   },

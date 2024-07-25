@@ -24,7 +24,11 @@ const RealEstatePage = () => {
       >
         <RealEstateSearchBar onSearch={handleSearch} />
       </Box>
-      <RealEstateMap searchTerm={searchTerm} sx={{ position: "absolute" }} />
+      <RealEstateMap
+        searchTerm={searchTerm}
+        sx={{ position: "absolute" }}
+        size="900px"
+      />
     </div>
   );
 };
