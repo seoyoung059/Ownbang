@@ -25,10 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -157,7 +154,7 @@ class RoomControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("Invalid Field 검증 - 필드가 비어 있을 때 - 아직 valid 설정 안함")
+    @DisplayName("Invalid Field 검증 - 필드가 비어 있을 때")
     public void createRoom_Fail_NullField() throws Exception {
         // DTO
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -247,5 +244,4 @@ class RoomControllerTest {
                                 ))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
-
 }
