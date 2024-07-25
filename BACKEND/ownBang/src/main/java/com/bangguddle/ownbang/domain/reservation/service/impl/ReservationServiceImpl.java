@@ -66,7 +66,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     // 예약 철회 시 사용
     public SuccessResponse<NoneResponse> updateStatusReservation(Long id) {
-        Reservation reservation = findReservationById(id);
+        Reservation reservation = vaildateReservation(id);
 
         // 이미 취소된 예약인지 확인
         if (reservation.getStatus() == ReservationStatus.CANCELED) {
@@ -87,7 +87,7 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(RESERVATION_UPDATE_STATUS_SUCCESS, NoneResponse.NONE);
     }
 
-    private Reservation findReservationById(Long id) {
+    private Reservation vaildateReservation(Long id) {
         return reservationRepository.findById(id)
                 .orElseThrow(() -> new AppException(BAD_REQUEST));
     }
