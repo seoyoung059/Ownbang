@@ -54,7 +54,7 @@ public class ReservationControllerTest {
                 2L,
                 1L,
                 now,
-                ReservationStatus.예약신청
+                ReservationStatus.APPLYED
         );
 
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
@@ -78,7 +78,7 @@ public class ReservationControllerTest {
     @DisplayName("Invalid Field 검증 - 조건 불만족")
     @WithMockUser
     void createReservation_Fail_InvalidField() throws Exception {
-        ReservationRequest invalidRequest = ReservationRequest.of(-1L, -1L, LocalDateTime.now(), ReservationStatus.예약신청);
+        ReservationRequest invalidRequest = ReservationRequest.of(-1L, -1L, LocalDateTime.now(), ReservationStatus.APPLYED);
         String requestBody = objectMapper.writeValueAsString(invalidRequest);
 
         mockMvc.perform(post("/api/reservations/")
@@ -103,14 +103,14 @@ public class ReservationControllerTest {
                 .roomId(101L)
                 .userId(userId)
                 .reservationTime(now)
-                .status(ReservationStatus.예약신청)
+                .status(ReservationStatus.APPLYED)
                 .build();
 
         Reservation reservation2 = Reservation.builder()
                 .roomId(102L)
                 .userId(userId)
                 .reservationTime(now.plusDays(1))
-                .status(ReservationStatus.예약확정)
+                .status(ReservationStatus.CONFIRMED)
                 .build();
 
         ReservationListResponse listResponse = new ReservationListResponse(Arrays.asList(reservation1, reservation2));
@@ -128,9 +128,9 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.data.reservations").isArray())
                 .andExpect(jsonPath("$.data.reservations.length()").value(2))
                 .andExpect(jsonPath("$.data.reservations[0].roomId").value(101))
-                .andExpect(jsonPath("$.data.reservations[0].status").value(ReservationStatus.예약신청.toString()))
+                .andExpect(jsonPath("$.data.reservations[0].status").value(ReservationStatus.APPLYED.toString()))
                 .andExpect(jsonPath("$.data.reservations[1].roomId").value(102))
-                .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.예약확정.toString()))
+                .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.CONFIRMED.toString()))
                 .andReturn();
 
         System.out.println("Response Body: " + result.getResponse().getContentAsString());

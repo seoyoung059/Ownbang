@@ -43,7 +43,7 @@ class ReservationServiceImplTest {
     @DisplayName("새 예약 생성 - 성공")
     void createReservation_Success() {
         LocalDateTime now = LocalDateTime.now();
-        ReservationRequest request = new ReservationRequest(1L, 1L, now, ReservationStatus.예약신청);
+        ReservationRequest request = new ReservationRequest(1L, 1L, now, ReservationStatus.APPLYED);
 
         when(reservationRepository.findByRoomIdAndTimeWithLock(any(), any())).thenReturn(Optional.empty());
         when(reservationRepository.findByRoomIdAndUserIdAndStatusNot(any(), any(), any())).thenReturn(Optional.empty());
@@ -61,14 +61,14 @@ class ReservationServiceImplTest {
     @DisplayName("중복 예약 시 예외 발생")
     void createReservation_DuplicateReservation() {
         LocalDateTime now = LocalDateTime.now();
-        ReservationRequest request = new ReservationRequest(1L, 1L, now, ReservationStatus.예약신청);
+        ReservationRequest request = new ReservationRequest(1L, 1L, now, ReservationStatus.APPLYED);
 
         when(reservationRepository.findByRoomIdAndTimeWithLock(any(), any())).thenReturn(Optional.of(
                 Reservation.builder()
                         .roomId(1L)
                         .userId(1L)
                         .reservationTime(now)
-                        .status(ReservationStatus.예약신청)
+                        .status(ReservationStatus.APPLYED)
                         .build()
         ));
 
@@ -81,7 +81,7 @@ class ReservationServiceImplTest {
     @DisplayName("사용자가 이미 예약한 경우 예외 발생")
     void createReservation_UserAlreadyReserved() {
         LocalDateTime now = LocalDateTime.now();
-        ReservationRequest request = new ReservationRequest(1L, 1L, now, ReservationStatus.예약신청);
+        ReservationRequest request = new ReservationRequest(1L, 1L, now, ReservationStatus.APPLYED);
 
         when(reservationRepository.findByRoomIdAndTimeWithLock(any(), any())).thenReturn(Optional.empty());
         when(reservationRepository.findByRoomIdAndUserIdAndStatusNot(any(), any(), any())).thenReturn(Optional.of(
@@ -89,7 +89,7 @@ class ReservationServiceImplTest {
                         .roomId(1L)
                         .userId(1L)
                         .reservationTime(now)
-                        .status(ReservationStatus.예약신청)
+                        .status(ReservationStatus.APPLYED)
                         .build()
         ));
 
@@ -108,14 +108,14 @@ class ReservationServiceImplTest {
                 .roomId(1L)
                 .userId(userId)
                 .reservationTime(now)
-                .status(ReservationStatus.예약신청)
+                .status(ReservationStatus.APPLYED)
                 .build();
         Reservation reservation2 = Reservation.builder()
                 .id(2L)
                 .roomId(2L)
                 .userId(userId)
                 .reservationTime(now.plusDays(1))
-                .status(ReservationStatus.예약확정)
+                .status(ReservationStatus.CONFIRMED)
                 .build();
 
         when(reservationRepository.findByUserId(userId)).thenReturn(Arrays.asList(reservation1, reservation2));
@@ -128,8 +128,8 @@ class ReservationServiceImplTest {
         assertThat(response.data().reservations()).hasSize(2);
         assertThat(response.data().reservations().get(0).getId()).isEqualTo(1L);
         assertThat(response.data().reservations().get(1).getId()).isEqualTo(2L);
-        assertThat(response.data().reservations().get(0).getStatus()).isEqualTo(ReservationStatus.예약신청);
-        assertThat(response.data().reservations().get(1).getStatus()).isEqualTo(ReservationStatus.예약확정);
+        assertThat(response.data().reservations().get(0).getStatus()).isEqualTo(ReservationStatus.APPLYED);
+        assertThat(response.data().reservations().get(1).getStatus()).isEqualTo(ReservationStatus.CONFIRMED);
     }
 
     @Test
@@ -141,7 +141,7 @@ class ReservationServiceImplTest {
                 .roomId(101L)
                 .userId(1L)
                 .reservationTime(LocalDateTime.now())
-                .status(ReservationStatus.예약신청)
+                .status(ReservationStatus.APPLYED)
                 .build();
 
         Reservation updatedReservation = reservation.withStatus();
@@ -158,7 +158,7 @@ class ReservationServiceImplTest {
         verify(reservationRepository).save(captor.capture());
         Reservation capturedReservation = captor.getValue();
 
-        assertEquals(ReservationStatus.예약취소, capturedReservation.getStatus());
+        assertEquals(ReservationStatus.CANCELED, capturedReservation.getStatus());
     }
 
 
@@ -184,7 +184,7 @@ class ReservationServiceImplTest {
                 .roomId(101L)
                 .userId(1L)
                 .reservationTime(LocalDateTime.now())
-                .status(ReservationStatus.예약취소)
+                .status(ReservationStatus.CANCELED)
                 .build();
 
         when(reservationRepository.findById(id)).thenReturn(Optional.of(reservation));
@@ -204,7 +204,7 @@ class ReservationServiceImplTest {
                 .roomId(101L)
                 .userId(1L)
                 .reservationTime(LocalDateTime.now())
-                .status(ReservationStatus.예약확정)
+                .status(ReservationStatus.CONFIRMED)
                 .build();
 
         when(reservationRepository.findById(id)).thenReturn(Optional.of(reservation));

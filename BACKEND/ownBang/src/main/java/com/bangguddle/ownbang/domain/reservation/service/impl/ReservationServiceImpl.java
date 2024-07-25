@@ -41,7 +41,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // 이미 내가 예약한 매물이라면,
-        Optional<Reservation> completedReservation = reservationRepository.findByRoomIdAndUserIdAndStatusNot(roomId, userId, ReservationStatus.예약취소);
+        Optional<Reservation> completedReservation = reservationRepository.findByRoomIdAndUserIdAndStatusNot(roomId, userId, ReservationStatus.CANCELED);
         if (completedReservation.isPresent()) {
             throw new AppException(RESERVATION_COMPLETED); // 이미 예약이 존재하는 경우
         }
@@ -69,12 +69,12 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = findReservationById(id);
 
         // 이미 취소된 예약인지 확인
-        if (reservation.getStatus() == ReservationStatus.예약취소) {
+        if (reservation.getStatus() == ReservationStatus.CANCELED) {
             throw new AppException(RESERVATION_CANCELED_DUPLICATED);
         }
 
         // 이미 확정된 예약인지 확인
-        if (reservation.getStatus() == ReservationStatus.예약확정) {
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
             throw new AppException(RESERVATION_CANCELED_UNAVAILABLE);
         }
 

@@ -37,7 +37,7 @@ public class Reservation {
                 this.roomId,
                 this.userId,
                 this.reservationTime,
-                ReservationStatus.예약취소
+                ReservationStatus.CANCELED
         );
     }
 }
