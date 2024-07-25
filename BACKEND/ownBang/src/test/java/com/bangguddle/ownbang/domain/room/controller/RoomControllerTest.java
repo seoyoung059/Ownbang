@@ -232,7 +232,7 @@ class RoomControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("객체 삭제 실패 - 적절하지 않은 매물 번호")
+    @DisplayName("객체 삭제 실패 - Id 누락")
     public void deleteRoom_Fail_NoId() throws Exception {
         // DTO
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
