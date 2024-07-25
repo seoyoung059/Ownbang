@@ -23,7 +23,7 @@ public class Reservation {
     @Column(nullable = false, columnDefinition = "INT UNSIGNED")
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "DATETIME(0)")
     private LocalDateTime reservationTime;
 
     @Column(nullable = false)
