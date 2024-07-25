@@ -6,9 +6,5 @@ import CheckList from "../components/checklist/CheckList.jsx";
 export default function MainPage() {
   const checkList = useBoundStore((state) => state.checklist);
   const realEstate = useBoundStore((state) => state.value);
-  return (
-    <>
-      <CheckList />
-    </>
-  );
+  return <></>;
 }

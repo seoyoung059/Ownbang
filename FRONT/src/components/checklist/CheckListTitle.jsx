@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Stack, Autocomplete, TextField } from "@mui/material";
-import { useTheme } from "@emotion/react";
+import { useTheme } from "@mui/material";
 
 const CheckListTitle = ({ setSelectedTitle }) => {
   const theme = useTheme();

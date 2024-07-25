@@ -1,11 +1,14 @@
 import * as React from "react";
 import { useState } from "react";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
-import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
+import {
+  Box,
+  Button,
+  Typography,
+  Modal,
+  IconButton,
+  Badge,
+} from "@mui/material";
+
 import { Notifications, MenuOutlined } from "@mui/icons-material";
 import { useTheme, useMediaQuery } from "@mui/material";
 

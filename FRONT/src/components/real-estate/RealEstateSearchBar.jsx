@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input, Button } from "@mui/material";
-import { useTheme } from "@emotion/react";
+import { useTheme } from "@mui/material";
 
 const RealEstateSearchBar = ({ onSearch }) => {
   const theme = useTheme();

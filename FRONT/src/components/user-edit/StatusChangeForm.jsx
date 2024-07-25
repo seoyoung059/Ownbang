@@ -11,7 +11,7 @@ import {
   Modal,
 } from "@mui/material";
 import AddressSearch from "../common/AddressSearch";
-import { useTheme } from "@emotion/react";
+import { useTheme } from "@mui/material";
 
 // 더미데이터 데이터 연결 필요
 const user = {
