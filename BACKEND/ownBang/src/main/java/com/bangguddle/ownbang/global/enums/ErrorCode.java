@@ -13,7 +13,8 @@ public enum ErrorCode implements ResponseCode {
 
     // Room API
     INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 이미지 파일입니다."),
-    
+    ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 매물을 찾을 수 없습니다."),
+
     // Reservation API
     Reservation_DUPLICATED(HttpStatus.CONFLICT, " 이미 다른 사람이 신청된 예약 시간입니다. "),
     Reservation_COMPLETED(HttpStatus.CONFLICT, " 각 매물은 한 건씩만 예약이 가능합니다. "),
