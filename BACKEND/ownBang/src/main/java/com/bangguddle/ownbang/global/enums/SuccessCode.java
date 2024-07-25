@@ -23,7 +23,6 @@ public enum SuccessCode implements ResponseCode {
 
 
 
-
     //Reservation API
     RESERVATION_MAKE_SUCCESS(HttpStatus.CREATED, "예약 신청이 성공적으로 완료되었습니다."),
     RESERVATION_UPDATE_STATUS_SUCCESS(HttpStatus.OK, "예약 철회가 성공적으로 완료되었습니다."),

@@ -160,6 +160,21 @@ class ReservationServiceImplTest {
 
         assertEquals(ReservationStatus.예약취소, capturedReservation.getStatus());
     }
+
+
+    @Test
+    @DisplayName("예약 상태 업데이트 실패 - 예약 ID가 유효하지 않음")
+    void updateStatusReservation_Fail_InvalidId() {
+        Long id = 1L;
+
+        when(reservationRepository.findById(id)).thenReturn(Optional.empty());
+
+        AppException exception = assertThrows(AppException.class, () -> reservationService.updateStatusReservation(id));
+
+        assertEquals(ErrorCode.BAD_REQUEST, exception.getErrorCode());
+        verify(reservationRepository, never()).save(any(Reservation.class));
+    }
+
     @Test
     @DisplayName("예약 상태 업데이트 실패 - 이미 취소된 예약")
     void updateStatusReservation_Fail_AlreadyCanceled() {
@@ -174,11 +189,30 @@ class ReservationServiceImplTest {
 
         when(reservationRepository.findById(id)).thenReturn(Optional.of(reservation));
 
-        AppException exception = assertThrows(AppException.class, () -> {
-            reservationService.updateStatusReservation(id);
-        });
+        AppException exception = assertThrows(AppException.class, () -> reservationService.updateStatusReservation(id));
 
         assertEquals(ErrorCode.RESERVATION_CANCELED_DUPLICATED, exception.getErrorCode());
+        verify(reservationRepository, never()).save(any(Reservation.class));
+    }
+
+    @Test
+    @DisplayName("예약 상태 업데이트 실패 - 확정된 예약")
+    void updateStatusReservation_Fail_Confirmed() {
+        Long id = 1L;
+        Reservation reservation = Reservation.builder()
+                .id(id)
+                .roomId(101L)
+                .userId(1L)
+                .time(LocalDateTime.now())
+                .status(ReservationStatus.예약확정)
+                .build();
+
+        when(reservationRepository.findById(id)).thenReturn(Optional.of(reservation));
+
+        AppException exception = assertThrows(AppException.class, () -> reservationService.updateStatusReservation(id));
+
+        assertEquals(ErrorCode.RESERVATION_CANCELED_UNAVAILABLE, exception.getErrorCode());
+        verify(reservationRepository, never()).save(any(Reservation.class));
     }
 }
 

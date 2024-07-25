@@ -68,8 +68,13 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElseThrow(() -> new AppException(ErrorCode.BAD_REQUEST));
 
         // 이미 취소된 예약인지 확인
-        if (reservation.isCanceled()) {
+        if (reservation.getStatus()==ReservationStatus.예약취소) {
             throw new AppException(ErrorCode.RESERVATION_CANCELED_DUPLICATED);
+        }
+
+        // 이미 확정된 예약인지 확인
+        if (reservation.getStatus()==ReservationStatus.예약확정) {
+            throw new AppException(ErrorCode.RESERVATION_CANCELED_UNAVAILABLE);
         }
 
         // 상태를 '예약취소'로 변경

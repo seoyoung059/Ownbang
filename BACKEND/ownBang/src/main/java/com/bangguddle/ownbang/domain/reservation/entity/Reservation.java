@@ -30,9 +30,6 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
-    public boolean isCanceled() {
-        return this.status == ReservationStatus.예약취소;
-    }
 
     public Reservation withStatus() {
         return new Reservation(
