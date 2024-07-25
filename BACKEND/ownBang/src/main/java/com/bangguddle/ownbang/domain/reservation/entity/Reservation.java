@@ -23,8 +23,8 @@ public class Reservation {
     @Column(nullable = false, columnDefinition = "INT UNSIGNED")
     private Long userId;
 
-    @Column(nullable = false)
-    private LocalDateTime time;
+    @Column(nullable = false, columnDefinition = "DATETIME(0)")
+    private LocalDateTime reservationTime;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -36,8 +36,8 @@ public class Reservation {
                 this.id,
                 this.roomId,
                 this.userId,
-                this.time,
-                ReservationStatus.예약취소
+                this.reservationTime,
+                ReservationStatus.CANCELED
         );
     }
 }
