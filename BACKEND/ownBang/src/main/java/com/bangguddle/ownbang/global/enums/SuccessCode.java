@@ -22,10 +22,9 @@ public enum SuccessCode implements ResponseCode {
     // Webrtc API
     GET_TOKEN_SUCCESS(HttpStatus.CREATED, "토큰 발급이 성공적으로 완료되었습니다."),
 
-
     //Reservation API
     RESERVATION_MAKE_SUCCESS(HttpStatus.CREATED, "예약 신청이 성공적으로 완료되었습니다."),
-    RESERVATION_DELETE_SUCCESS(HttpStatus.OK, "예약 삭제가 성공적으로 완료되었습니다."),
+    RESERVATION_UPDATE_STATUS_SUCCESS(HttpStatus.OK, "예약 철회가 성공적으로 완료되었습니다."),
     RESERVATION_CONFIRM_SUCCESS(HttpStatus.CREATED, "예약 확정이 성공적으로 완료되었습니다."),
     
     RESERVATION_LIST_SUCCESS(HttpStatus.OK ,"내가 신청한 예약 목록을 조회할 수 있습니다."),
