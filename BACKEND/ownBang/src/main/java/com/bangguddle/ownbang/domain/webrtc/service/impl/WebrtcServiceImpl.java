@@ -106,7 +106,7 @@ public class WebrtcServiceImpl implements WebrtcService {
 
     private void validateReservation(Long reservationId){
         // 예약 repo로 접근해 Reservation 을 얻어와 확인
-        reservationRepository.findById(reservationId).orElseThrow( () -> new AppException(Reservation_NOT_FOUND));
+        reservationRepository.findById(reservationId).orElseThrow( () -> new AppException(RESERVATION_NOT_FOUND));
     }
 
 }

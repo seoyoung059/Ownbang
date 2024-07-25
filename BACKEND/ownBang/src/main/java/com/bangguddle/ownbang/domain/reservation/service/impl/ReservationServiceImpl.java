@@ -34,13 +34,13 @@ public class ReservationServiceImpl implements ReservationService {
         Optional<Reservation> existingReservation = reservationRepository.findByRoomIdAndTimeWithLock(roomId, time);
 
         if (existingReservation.isPresent()) {
-            throw new AppException(ErrorCode.Reservation_DUPLICATED); // 이미 예약이 존재하는 경우
+            throw new AppException(ErrorCode.RESERVATION_DUPLICATED); // 이미 예약이 존재하는 경우
         }
 
         // 이미 내가 예약한 매물이라면,
         Optional<Reservation> completedReservation = reservationRepository.findByRoomIdAndUserIdAndStatusNot(roomId, userId, ReservationStatus.예약취소);
         if (completedReservation.isPresent()) {
-            throw new AppException(ErrorCode.Reservation_COMPLETED); // 이미 예약이 존재하는 경우
+            throw new AppException(ErrorCode.RESERVATION_COMPLETED); // 이미 예약이 존재하는 경우
         }
 
         // 새 예약 저장

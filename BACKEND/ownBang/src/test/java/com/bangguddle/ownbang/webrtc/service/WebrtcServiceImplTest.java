@@ -4,6 +4,8 @@ import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateRequest;
 import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcServiceImpl;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
+import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 
 import io.openvidu.java.client.Connection;
@@ -71,11 +73,22 @@ public class WebrtcServiceImplTest {
     @DisplayName("[실패] 유효하지 않은 예약ID로 토큰 발급")
     void 실패_유효하지_않은_예약_ID로_토큰_발급() throws Exception {
         // given
+        Long reservationId = 13l;
+        WebrtcCreateRequest request = WebrtcCreateRequest.builder()
+                .reservationId(reservationId)
+                .build();
 
-        // when
+        // mock
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty());
 
-        // then
+        // when & then
+        assertThatThrownBy(() -> webrtcService.getToken(request))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RESERVATION_NOT_FOUND);
 
+        // verify
+        verify(reservationRepository, times(1)).findById(reservationId);
+        verifyNoInteractions(openVidu);
     }
 
     @Test
