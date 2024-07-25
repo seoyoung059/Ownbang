@@ -25,7 +25,10 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -174,6 +177,7 @@ class RoomControllerTest {
         // when
         mockMvc.perform(
                         multipart("/api/rooms")
+                                .file(file0)
                                 .file(file1)
                                 .file(file2)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -181,6 +185,66 @@ class RoomControllerTest {
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 )
                 .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("객체 삭제 검증")
+    public void deleteRoom_Success() throws Exception {
+        // DTO
+        Long roomId = 1L;
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+
+        // when
+        when(roomServiceImpl.deleteRoom(anyLong())).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                    delete("/api/rooms")
+                        .param("roomId", String.valueOf(roomId))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()
+                        ))
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("객체 삭제 실패 - 적절하지 않은 매물 번호")
+    public void deleteRoom_Fail_InappropriateId() throws Exception {
+        // DTO
+        Long roomId = -1L;
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+
+        // when
+        when(roomServiceImpl.deleteRoom(anyLong())).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                        delete("/api/rooms")
+                                .param("roomId", String.valueOf(roomId))
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()
+                                ))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+
+    @Test
+    @WithMockUser
+    @DisplayName("객체 삭제 실패 - Id 누락")
+    public void deleteRoom_Fail_NoId() throws Exception {
+        // DTO
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+
+        // when
+        when(roomServiceImpl.deleteRoom(anyLong())).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                        delete("/api/rooms")
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()
+                                ))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }
