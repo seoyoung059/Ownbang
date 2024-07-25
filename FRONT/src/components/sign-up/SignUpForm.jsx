@@ -128,13 +128,6 @@ const SignUp = () => {
           >
             회원가입 하기
           </Button>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link href="#" variant="body2">
-                비밀번호 찾기
-              </Link>
-            </Grid>
-          </Grid>
         </Box>
       </Box>
       {/* <Copyright sx={{ mt: 5 }} /> */}
