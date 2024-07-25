@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Button } from "@mui/material";
+import { Input, Button, Box } from "@mui/material";
 import { useTheme } from "@mui/material";
 
 const RealEstateSearchBar = ({ onSearch }) => {
@@ -26,11 +26,15 @@ const RealEstateSearchBar = ({ onSearch }) => {
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center" }}>
+    <Box
+      sx={{
+        display: "flex",
+      }}
+    >
       <Input
         className="searchInputValue"
         type="text"
-        placeholder="검색어를 입력하세요."
+        placeholder="지역명 + 역명으로 검색하세요"
         value={inputValue}
         onChange={onInputChange}
         onKeyDown={onKeyDown}
@@ -39,8 +43,9 @@ const RealEstateSearchBar = ({ onSearch }) => {
           marginRight: "8px",
           borderRadius: "7px", // 둥근 사각형 모양
           border: "1px solid lightgray", // 연한 회색 테두리
-          padding: "10px 25px",
+          padding: "15px 25px",
           backgroundColor: theme.palette.common.white,
+          fontSize: theme.fontSize.small,
         }}
       />
       <Button
@@ -51,11 +56,12 @@ const RealEstateSearchBar = ({ onSearch }) => {
           borderRadius: "7px", // 둥근 사각형 모양
           padding: "13px 15px",
           backgroundColor: theme.palette.primary.dark,
+          fontSize: theme.fontSize.small,
         }}
       >
         검색
       </Button>
-    </div>
+    </Box>
   );
 };
 
