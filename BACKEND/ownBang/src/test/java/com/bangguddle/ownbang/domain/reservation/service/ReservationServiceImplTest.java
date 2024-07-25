@@ -67,7 +67,7 @@ class ReservationServiceImplTest {
                 Reservation.builder()
                         .roomId(1L)
                         .userId(1L)
-                        .time(now)
+                        .reservationTime(now)
                         .status(ReservationStatus.예약신청)
                         .build()
         ));
@@ -88,7 +88,7 @@ class ReservationServiceImplTest {
                 Reservation.builder()
                         .roomId(1L)
                         .userId(1L)
-                        .time(now)
+                        .reservationTime(now)
                         .status(ReservationStatus.예약신청)
                         .build()
         ));
@@ -107,14 +107,14 @@ class ReservationServiceImplTest {
                 .id(1L)
                 .roomId(1L)
                 .userId(userId)
-                .time(now)
+                .reservationTime(now)
                 .status(ReservationStatus.예약신청)
                 .build();
         Reservation reservation2 = Reservation.builder()
                 .id(2L)
                 .roomId(2L)
                 .userId(userId)
-                .time(now.plusDays(1))
+                .reservationTime(now.plusDays(1))
                 .status(ReservationStatus.예약확정)
                 .build();
 
@@ -140,7 +140,7 @@ class ReservationServiceImplTest {
                 .id(id)
                 .roomId(101L)
                 .userId(1L)
-                .time(LocalDateTime.now())
+                .reservationTime(LocalDateTime.now())
                 .status(ReservationStatus.예약신청)
                 .build();
 
@@ -183,7 +183,7 @@ class ReservationServiceImplTest {
                 .id(id)
                 .roomId(101L)
                 .userId(1L)
-                .time(LocalDateTime.now())
+                .reservationTime(LocalDateTime.now())
                 .status(ReservationStatus.예약취소)
                 .build();
 
@@ -203,7 +203,7 @@ class ReservationServiceImplTest {
                 .id(id)
                 .roomId(101L)
                 .userId(1L)
-                .time(LocalDateTime.now())
+                .reservationTime(LocalDateTime.now())
                 .status(ReservationStatus.예약확정)
                 .build();
 

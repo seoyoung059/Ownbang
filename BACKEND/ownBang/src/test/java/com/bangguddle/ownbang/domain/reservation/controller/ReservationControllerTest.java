@@ -102,14 +102,14 @@ public class ReservationControllerTest {
         Reservation reservation1 = Reservation.builder()
                 .roomId(101L)
                 .userId(userId)
-                .time(now)
+                .reservationTime(now)
                 .status(ReservationStatus.예약신청)
                 .build();
 
         Reservation reservation2 = Reservation.builder()
                 .roomId(102L)
                 .userId(userId)
-                .time(now.plusDays(1))
+                .reservationTime(now.plusDays(1))
                 .status(ReservationStatus.예약확정)
                 .build();
 

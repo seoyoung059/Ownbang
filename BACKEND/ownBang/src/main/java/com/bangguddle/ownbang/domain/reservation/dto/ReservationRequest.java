@@ -15,7 +15,7 @@ public record ReservationRequest(
         @Positive
         Long userId,
         @NotNull
-        LocalDateTime time,
+        LocalDateTime reservationTime,
         @NotNull
         ReservationStatus status
 
@@ -24,20 +24,20 @@ public record ReservationRequest(
         return Reservation.builder()
                 .roomId(roomId)
                 .userId(userId)
-                .time(time)
+                .reservationTime(reservationTime)
                 .status(status)
                 .build();
     }
 
-    public static ReservationRequest of(long roomId, long userId, LocalDateTime time, ReservationStatus status) {
-        return new ReservationRequest(roomId, userId, time, status);
+    public static ReservationRequest of(long roomId, long userId, LocalDateTime reservationTime, ReservationStatus status) {
+        return new ReservationRequest(roomId, userId, reservationTime, status);
     }
 
     public static ReservationRequest from(Reservation reservation) {
         return new ReservationRequest(
                 reservation.getRoomId(),
                 reservation.getUserId(),
-                reservation.getTime(),
+                reservation.getReservationTime(),
                 reservation.getStatus()
         );
     }
