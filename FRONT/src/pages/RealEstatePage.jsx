@@ -17,7 +17,7 @@ const RealEstatePage = () => {
     <div style={{ paddingTop: "80px", position: "relative" }}>
       <Box
         sx={{
-          position: "absolute",
+          position: "fixed",
           zIndex: "999",
           padding: "20px",
         }}
