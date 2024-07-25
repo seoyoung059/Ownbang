@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -110,7 +111,8 @@ class RoomServiceImplTest {
         // when
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
 
-        assertThatThrownBy(() -> {
+        // 매물 생성
+        assertThatThrownBy(()->{
             roomServiceImpl.createRoom(roomCreateRequest, roomImageFiles);
         }).isInstanceOf(AppException.class);
 
@@ -150,5 +152,18 @@ class RoomServiceImplTest {
         }).isInstanceOf(AppException.class);
     }
 
+    @Test
+    @DisplayName("매물 조회 성공")
+    void findRoomTest_Success() {
+        // given
+        Room room = Room.builder().build();
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
+        Long roomId = 1L;
 
+        //when
+        roomServiceImpl.getRoom(roomId);
+
+        //then
+        verify(roomRepository, times(1)).findById(anyLong());
+    }
 }
