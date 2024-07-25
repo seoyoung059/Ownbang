@@ -124,7 +124,6 @@ class RoomServiceImplTest {
     @DisplayName("매물 삭제 성공")
     void deleteRoomTest_Success() throws ParseException {
         //given
-        when(roomRepository.existsById(anyLong())).thenReturn(true);
         Long roomId = 1L;
 
         //when
@@ -142,7 +141,7 @@ class RoomServiceImplTest {
     @DisplayName("매물 삭제 실패 - 존재하지 않는 ID")
     void deleteRoomTest_Fail_NotExist() {
         //given
-        when(roomRepository.existsById(anyLong())).thenReturn(false);
+        doThrow(new AppException(ErrorCode.ROOM_NOT_FOUND)).when(roomRepository).validateById(anyLong());
         Long roomId = 1L;
 
         //when, then
