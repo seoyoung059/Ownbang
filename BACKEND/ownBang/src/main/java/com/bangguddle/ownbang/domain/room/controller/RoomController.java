@@ -5,12 +5,10 @@ import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -31,6 +29,10 @@ public class RoomController {
     // 매물 수정
 
     // 매물 삭제
+    @DeleteMapping
+    public ResponseEntity<Response<NoneResponse>> deleteRoom(@RequestParam(value = "roomId") @Positive @Valid Long roomId) {
+        return Response.success(roomService.deleteRoom(roomId));
+    }
 
     // 매물 단건 조회
 

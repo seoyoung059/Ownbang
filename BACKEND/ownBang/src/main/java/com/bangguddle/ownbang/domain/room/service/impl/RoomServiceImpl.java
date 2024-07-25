@@ -4,6 +4,9 @@ import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
+import com.bangguddle.ownbang.domain.room.repository.RoomAppliancesRepository;
+import com.bangguddle.ownbang.domain.room.repository.RoomDetailRepository;
+import com.bangguddle.ownbang.domain.room.repository.RoomImageRepository;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -22,12 +25,16 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomImageServiceImpl roomImageServiceImpl;
+    private final RoomDetailRepository roomDetailRepository;
+    private final RoomAppliancesRepository roomAppliancesRepository;
+    private final RoomImageRepository roomImageRepository;
+//    private final UserRepository userRepository;
 
     // 매물 생성
     @Override
     @Transactional
-    public SuccessResponse<NoneResponse> createRoom(RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles)  {
-//        User agent = userRepository(findById(roomCreateRequestDto.getAgent())).orElseThrow(() -> new IllegalAccessException("Invalid Agent Id"));
+    public SuccessResponse<NoneResponse> createRoom(RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles) {
+//        User agent = userRepository(findById(roomCreateRequest.getAgent())).orElseThrow(() -> new IllegalAccessException("Invalid Agent Id"));
 
         RoomDetail roomDetail = roomCreateRequest.roomDetailCreateRequest().toEntity();
         RoomAppliances roomAppliances = roomCreateRequest.roomAppliancesCreateRequest().toEntity();
@@ -40,4 +47,18 @@ public class RoomServiceImpl implements RoomService {
 
         return new SuccessResponse<NoneResponse>(SuccessCode.ROOM_REGISTER_SUCCESS, NoneResponse.NONE);
     }
+
+
+    // 매물 삭제
+    @Override
+    @Transactional
+    public SuccessResponse<NoneResponse> deleteRoom(Long roomId) {
+//        User agent = userRepository(findById(roomCreateRequestDto.getAgent())).orElseThrow(() -> new IllegalAccessException("Invalid Agent Id"));
+        roomRepository.validateById(roomId);
+        roomRepository.deleteById(roomId);
+
+        return new SuccessResponse<NoneResponse>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+    }
+
+
 }
