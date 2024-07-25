@@ -17,6 +17,7 @@ public enum ErrorCode implements ResponseCode {
     // Reservation API
     Reservation_DUPLICATED(HttpStatus.CONFLICT, " 이미 다른 사람이 신청된 예약 시간입니다. "),
     Reservation_COMPLETED(HttpStatus.CONFLICT, " 각 매물은 한 건씩만 예약이 가능합니다. "),
+    Reservation_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 예약입니다."),
 
     // Common Error Code
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부적 에러가 발생했습니다."),
