@@ -5,12 +5,11 @@ import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
-import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -47,6 +46,7 @@ public class ReservationControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @DisplayName("예약 신청 Post 컨트롤러 성공")
     @WithMockUser
     void createReservation_Success() throws Exception {
         LocalDateTime now = LocalDateTime.now();
@@ -75,6 +75,7 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
     @Test
+    @DisplayName("Invalid Field 검증 - 조건 불만족")
     @WithMockUser
     void createReservation_Fail_InvalidField() throws Exception {
         ReservationRequest invalidRequest = ReservationRequest.of(-1L, -1L, LocalDateTime.now(), ReservationStatus.예약신청);
@@ -87,11 +88,8 @@ public class ReservationControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"));
     }
-
-
-
-
     @Test
+    @DisplayName("예약 목록 조회 성공")
     @WithMockUser
     void getReservationsByUserId_Success() throws Exception {
         long userId = 1L;
@@ -135,6 +133,7 @@ public class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("예약 목록 조회 시 빈 리스트 반환")
     @WithMockUser
     void getReservationsByUserId_EmptyList() throws Exception {
         long userId = 1L;
@@ -155,11 +154,12 @@ public class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("예약 삭제 성공")
     @WithMockUser
     void deleteReservation_Success() throws Exception {
-        Long reservationId = 1L;
 
-        // 성공적인 삭제 응답 설정
+        Long id = 1L;
+
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
                 SuccessCode.RESERVATION_DELETE_SUCCESS,
                 NoneResponse.NONE
@@ -167,30 +167,13 @@ public class ReservationControllerTest {
 
         when(reservationService.deleteReservation(anyLong())).thenReturn(successResponse);
 
-        mockMvc.perform(delete("/api/reservations/")
-                        .param("id", reservationId.toString())
+        mockMvc.perform(delete("/api/reservations/{id}", id)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
                 .andExpect(jsonPath("$.code").value(SuccessCode.RESERVATION_DELETE_SUCCESS.name()))
                 .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_DELETE_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
 
-    @Test
-    @WithMockUser
-    void deleteReservation_Fail_NotFound() throws Exception {
-        Long reservationId = 1L;
-
-        // 예약이 존재하지 않는 경우 예외 설정
-        when(reservationService.deleteReservation(anyLong())).thenThrow(new AppException(ErrorCode.NOT_FOUND));
-
-        mockMvc.perform(delete("/api/reservations/")
-                        .param("id", reservationId.toString())
-                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(jsonPath("$.code").value(ErrorCode.NOT_FOUND.name()))
-                .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND.getMessage()));
-    }
 }

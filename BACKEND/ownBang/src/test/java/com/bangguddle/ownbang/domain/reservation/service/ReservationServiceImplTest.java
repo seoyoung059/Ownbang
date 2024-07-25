@@ -11,6 +11,7 @@ import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,6 +36,7 @@ class ReservationServiceImplTest {
     private ReservationServiceImpl reservationService;
 
     @Test
+    @DisplayName("새 예약 생성 - 성공")
     void createReservation_Success() {
         LocalDateTime now = LocalDateTime.now();
         ReservationRequest request = new ReservationRequest(1L, 1L, now, ReservationStatus.예약신청);
@@ -52,6 +54,7 @@ class ReservationServiceImplTest {
     }
 
     @Test
+    @DisplayName("중복 예약 시 예외 발생")
     void createReservation_DuplicateReservation() {
         LocalDateTime now = LocalDateTime.now();
         ReservationRequest request = new ReservationRequest(1L, 1L, now, ReservationStatus.예약신청);
@@ -71,6 +74,7 @@ class ReservationServiceImplTest {
     }
 
     @Test
+    @DisplayName("사용자가 이미 예약한 경우 예외 발생")
     void createReservation_UserAlreadyReserved() {
         LocalDateTime now = LocalDateTime.now();
         ReservationRequest request = new ReservationRequest(1L, 1L, now, ReservationStatus.예약신청);
@@ -87,10 +91,11 @@ class ReservationServiceImplTest {
 
         assertThatThrownBy(() -> reservationService.createReservation(request))
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.Reservation_COMPLETED);
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RESERVATION_COMPLETED);
     }
 
     @Test
+    @DisplayName("사용자의 예약 목록 조회 - 성공")
     void getReservationsByUserId_Success() {
         long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
@@ -122,7 +127,9 @@ class ReservationServiceImplTest {
         assertThat(response.data().reservations().get(0).getStatus()).isEqualTo(ReservationStatus.예약신청);
         assertThat(response.data().reservations().get(1).getStatus()).isEqualTo(ReservationStatus.예약확정);
     }
+
     @Test
+    @DisplayName("예약 삭제 - 성공")
     void deleteReservation_Success() {
         Long reservationId = 1L;
         LocalDateTime now = LocalDateTime.now();
@@ -135,23 +142,20 @@ class ReservationServiceImplTest {
                 .status(ReservationStatus.예약신청)
                 .build();
 
-        // 예약이 존재한다고 가정하고 findById 메서드가 예약을 반환하도록 설정
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 
-        // 예약 삭제 메서드 호출
         SuccessResponse<NoneResponse> response = reservationService.deleteReservation(reservationId);
 
-        // 응답 값 검증
+
         assertThat(response).isNotNull();
         assertThat(response.successCode()).isEqualTo(SuccessCode.RESERVATION_DELETE_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
-        // 예약 삭제가 실제로 호출되었는지 검증
         verify(reservationRepository, times(1)).deleteById(reservationId);
     }
 
-
     @Test
+    @DisplayName("예약 삭제 시 예약이 없는 경우 예외 발생")
     void deleteReservation_NotFound() {
         long reservationId = 1L;
 
