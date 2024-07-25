@@ -62,14 +62,22 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(SuccessCode.RESERVATION_LIST_SUCCESS,reservationListResponse );
     }
 
-    public SuccessResponse<NoneResponse> deleteReservation(Long id) {
-        Optional<Reservation> reservation = reservationRepository.findById(id);
-        if (reservation.isPresent()) {
-            reservationRepository.deleteById(id);
-            return new SuccessResponse<>(SuccessCode.RESERVATION_DELETE_SUCCESS, NoneResponse.NONE);
-        } else {
-            throw new AppException(ErrorCode.BAD_REQUEST);
-        }
-    }
+    // 예약 철회 시 사용
+    public SuccessResponse<NoneResponse> updateStatusReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.BAD_REQUEST));
 
+        // 이미 취소된 예약인지 확인
+        if (reservation.isCanceled()) {
+            throw new AppException(ErrorCode.RESERVATION_CANCELED_DUPLICATED);
+        }
+
+        // 상태를 '예약취소'로 변경
+        Reservation updatedReservation= reservation.withStatus();
+
+        // 상태 변경된 예약 저장
+        reservationRepository.save(updatedReservation);
+
+        return new SuccessResponse<>(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS, NoneResponse.NONE);
+    }
 }

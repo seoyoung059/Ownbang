@@ -158,25 +158,24 @@ public class ReservationControllerTest {
     }
 
     @Test
-    @DisplayName("예약 삭제 성공")
+    @DisplayName("예약 철회 성공")
     @WithMockUser
-    void deleteReservation_Success() throws Exception {
-
+    void updateStatusReservation_Success() throws Exception {
         Long id = 1L;
 
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
-                SuccessCode.RESERVATION_DELETE_SUCCESS,
+                SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS,
                 NoneResponse.NONE
         );
 
-        when(reservationService.deleteReservation(anyLong())).thenReturn(successResponse);
+        when(reservationService.updateStatusReservation(anyLong())).thenReturn(successResponse);
 
-        mockMvc.perform(delete("/api/reservations/{id}", id)
+        mockMvc.perform(patch("/api/reservations/{id}", id)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(jsonPath("$.code").value(SuccessCode.RESERVATION_DELETE_SUCCESS.name()))
-                .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_DELETE_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.code").value(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
 

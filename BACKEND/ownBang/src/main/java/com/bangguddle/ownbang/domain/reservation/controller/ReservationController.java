@@ -29,9 +29,9 @@ public class ReservationController {
         SuccessResponse<ReservationListResponse> response = reservationService.getMyReservationList (userId);
         return Response.success(response);
     }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Response<NoneResponse>> deleteReservation(@PathVariable(name="id") Long id) {
-        SuccessResponse<NoneResponse> response = reservationService.deleteReservation(id);
+    @PatchMapping("/{id}")
+    public ResponseEntity<Response<NoneResponse>> updateStatusReservation(@PathVariable(name="id") Long id) {
+        SuccessResponse<NoneResponse> response = reservationService.updateStatusReservation(id);
         return Response.success(response);
     }
 

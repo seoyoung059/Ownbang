@@ -1,7 +1,7 @@
 package com.bangguddle.ownbang.domain.reservation.service;
 
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
@@ -14,6 +14,7 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,7 +23,10 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -129,42 +133,52 @@ class ReservationServiceImplTest {
     }
 
     @Test
-    @DisplayName("예약 삭제 - 성공")
-    void deleteReservation_Success() {
-        Long reservationId = 1L;
-        LocalDateTime now = LocalDateTime.now();
-
-        // 예약 객체 생성 (id는 자동 생성되므로 설정하지 않음)
+    @DisplayName("예약 철회 성공 - 상태를 예약취소로 변경 후 저장")
+    void updateStatusReservation_Success() {
+        Long id = 1L;
         Reservation reservation = Reservation.builder()
-                .roomId(1L)
+                .id(id)
+                .roomId(101L)
                 .userId(1L)
-                .time(now)
+                .time(LocalDateTime.now())
                 .status(ReservationStatus.예약신청)
                 .build();
 
-        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        Reservation updatedReservation = reservation.withStatus();
 
-        SuccessResponse<NoneResponse> response = reservationService.deleteReservation(reservationId);
+        when(reservationRepository.findById(id)).thenReturn(Optional.of(reservation));
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(updatedReservation);
 
+        SuccessResponse<NoneResponse> response = reservationService.updateStatusReservation(id);
 
-        assertThat(response).isNotNull();
-        assertThat(response.successCode()).isEqualTo(SuccessCode.RESERVATION_DELETE_SUCCESS);
-        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
+        assertEquals(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS, response.successCode());
+        assertEquals(NoneResponse.NONE, response.data());
 
-        verify(reservationRepository, times(1)).deleteById(reservationId);
+        ArgumentCaptor<Reservation> captor = ArgumentCaptor.forClass(Reservation.class);
+        verify(reservationRepository).save(captor.capture());
+        Reservation capturedReservation = captor.getValue();
+
+        assertEquals(ReservationStatus.예약취소, capturedReservation.getStatus());
     }
-
     @Test
-    @DisplayName("예약 삭제 시 예약이 없는 경우 예외 발생")
-    void deleteReservation_NotFound() {
-        long reservationId = 1L;
+    @DisplayName("예약 상태 업데이트 실패 - 이미 취소된 예약")
+    void updateStatusReservation_Fail_AlreadyCanceled() {
+        Long id = 1L;
+        Reservation reservation = Reservation.builder()
+                .id(id)
+                .roomId(101L)
+                .userId(1L)
+                .time(LocalDateTime.now())
+                .status(ReservationStatus.예약취소)
+                .build();
 
-        when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty());
+        when(reservationRepository.findById(id)).thenReturn(Optional.of(reservation));
 
-        assertThatThrownBy(() -> reservationService.deleteReservation(reservationId))
-                .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.BAD_REQUEST);
+        AppException exception = assertThrows(AppException.class, () -> {
+            reservationService.updateStatusReservation(id);
+        });
+
+        assertEquals(ErrorCode.RESERVATION_CANCELED_DUPLICATED, exception.getErrorCode());
     }
-
-
 }
+
