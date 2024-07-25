@@ -163,7 +163,7 @@ class ReservationServiceImplTest {
 
         assertThatThrownBy(() -> reservationService.deleteReservation(reservationId))
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND);
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.BAD_REQUEST);
     }
 
 

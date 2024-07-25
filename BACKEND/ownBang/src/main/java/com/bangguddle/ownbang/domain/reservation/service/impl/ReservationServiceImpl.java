@@ -68,7 +68,7 @@ public class ReservationServiceImpl implements ReservationService {
             reservationRepository.deleteById(id);
             return new SuccessResponse<>(SuccessCode.RESERVATION_DELETE_SUCCESS, NoneResponse.NONE);
         } else {
-            throw new AppException(ErrorCode.NOT_FOUND);
+            throw new AppException(ErrorCode.BAD_REQUEST);
         }
     }
 
