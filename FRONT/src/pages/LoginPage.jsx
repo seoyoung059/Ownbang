@@ -1,8 +1,6 @@
 import * as React from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { useTheme } from "@mui/material/styles";
+import { Container, Box, Typography } from "@mui/material";
+import { useTheme } from "@mui/material";
 import LoginForm from "../components/login/LoginForm";
 
 export default function LoginPage() {

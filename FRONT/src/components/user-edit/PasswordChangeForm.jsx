@@ -7,7 +7,7 @@ import {
   Divider,
   Button,
 } from "@mui/material";
-import { useTheme } from "@emotion/react";
+import { useTheme } from "@mui/material";
 
 export default function PasswordChangeForm({ toggleEdit }) {
   const theme = useTheme();

@@ -11,7 +11,7 @@ import {
   Button,
   IconButton,
 } from "@mui/material";
-import { useTheme } from "@emotion/react";
+import { useTheme } from "@mui/material";
 import StatusChangeForm from "./StatusChangeForm";
 import PasswordChangeForm from "./PasswordChangeForm";
 import { useNavigate } from "react-router-dom";

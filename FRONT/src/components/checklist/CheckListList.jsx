@@ -1,7 +1,7 @@
 import { Box, Input } from "@mui/material";
 import CheckListItem from "./CheckListItem";
 import { useState } from "react";
-import { useTheme } from "@emotion/react";
+import { useTheme } from "@mui/material";
 
 const List = ({ checkitems, onUpdate, onDelete }) => {
   const theme = useTheme();

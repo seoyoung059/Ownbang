@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
 import RealEstateSearchBar from "../components/real-estate/RealEstateSearchBar";
 import { Box } from "@mui/material";
-import { useTheme } from "@emotion/react";
+import { useTheme } from "@mui/material";
 
 const RealEstatePage = () => {
   const theme = useTheme();
