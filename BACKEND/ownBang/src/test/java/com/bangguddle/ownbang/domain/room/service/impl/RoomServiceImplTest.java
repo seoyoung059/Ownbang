@@ -53,7 +53,7 @@ class RoomServiceImplTest {
     private RoomServiceImpl roomServiceImpl;
 
     @Test
-    @DisplayName("새 매물 생성 - 성공")
+    @DisplayName("매물 생성 - 성공")
     void createRoomTest_SUCCESS() throws ParseException {
         //given
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -91,7 +91,7 @@ class RoomServiceImplTest {
 
 
     @Test
-    @DisplayName("이미지 업로드 실패 시 서버 내부 에러 발생")
+    @DisplayName("매물 생성 - 실패: 이미지 업로드 실패")
     void createRoomTest_ImageFailed() throws IOException, ParseException {
         //given
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -123,7 +123,7 @@ class RoomServiceImplTest {
 
 
     @Test
-    @DisplayName("매물 삭제 성공")
+    @DisplayName("매물 삭제 - 성공")
     void deleteRoomTest_Success() throws ParseException {
         //given
         Long roomId = 1L;
@@ -140,7 +140,7 @@ class RoomServiceImplTest {
     }
 
     @Test
-    @DisplayName("매물 삭제 실패 - 존재하지 않는 ID")
+    @DisplayName("매물 삭제 - 실패: 존재하지 않는 ID")
     void deleteRoomTest_Fail_NotExist() {
         //given
         doThrow(new AppException(ErrorCode.ROOM_NOT_FOUND)).when(roomRepository).validateById(anyLong());
@@ -153,7 +153,7 @@ class RoomServiceImplTest {
     }
 
     @Test
-    @DisplayName("매물 조회 성공")
+    @DisplayName("매물 단건 조회 - 성공")
     void findRoomTest_Success() {
         // given
         Room room = Room.builder().build();
@@ -165,5 +165,21 @@ class RoomServiceImplTest {
 
         //then
         verify(roomRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("매물 단건 조회 - 실패: 존재하지 않는 Id")
+    void findRoomTest_Fail_InvalidId() {
+        // given
+        Room room = Room.builder().build();
+        doThrow(new AppException(ErrorCode.ROOM_NOT_FOUND)).when(roomRepository).findById(anyLong());
+        Long roomId = 1L;
+
+        //when
+
+        //then
+        assertThatThrownBy(() -> {
+            roomServiceImpl.getRoom(roomId);
+        }).isInstanceOf(AppException.class);
     }
 }

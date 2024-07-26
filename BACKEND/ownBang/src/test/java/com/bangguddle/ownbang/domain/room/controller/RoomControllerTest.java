@@ -20,7 +20,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -31,7 +30,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = RoomController.class)
 class RoomControllerTest {
@@ -46,7 +45,7 @@ class RoomControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("매물 Post 컨트롤러 성공")
+    @DisplayName("매물 생성 - 성공")
     @WithMockUser
     public void createRoom_Success() throws Exception {
         // DTO
@@ -81,17 +80,17 @@ class RoomControllerTest {
                 )
 
                 //then
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(SuccessCode.ROOM_REGISTER_SUCCESS.name()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("NONE"));
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.code").value(SuccessCode.ROOM_REGISTER_SUCCESS.name()))
+                .andExpect(jsonPath("$.data").value("NONE"));
     }
 
 
     @Test
     @WithMockUser
-    @DisplayName("Invalid Field 검증 - 조건 불만족")
+    @DisplayName("매물 생성 - 실패: Invalid Field - 조건 불만족")
     public void createRoom_Fail_InvalidField() throws Exception {
         // DTO
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -118,13 +117,14 @@ class RoomControllerTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"));
 
     }
 
     @Test
     @WithMockUser
-    @DisplayName("Invalid Field 검증 - 데이터가 없을 때")
+    @DisplayName("매물 생성 - 실패: Invalid Field 검증 - 필드 누락")
     public void createRoom_Fail_NoData() throws Exception {
         // DTO
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -150,14 +150,13 @@ class RoomControllerTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 )
-                .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
 
     @Test
     @WithMockUser
-    @DisplayName("Invalid Field 검증 - 필드가 비어 있을 때")
+    @DisplayName("매물 생성 - 실패: Invalid Field 검증 - null 필드")
     public void createRoom_Fail_NullField() throws Exception {
         // DTO
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -184,13 +183,13 @@ class RoomControllerTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 )
-                .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"));
     }
 
     @Test
     @WithMockUser
-    @DisplayName("객체 삭제 성공")
+    @DisplayName("매물 삭제 - 성공")
     public void deleteRoom_Success() throws Exception {
         // DTO
         Long roomId = 1L;
@@ -205,12 +204,14 @@ class RoomControllerTest {
                         .param("roomId", String.valueOf(roomId))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()
                         ))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.code").value("ROOM_DELETE_SUCCESS"));
     }
 
     @Test
     @WithMockUser
-    @DisplayName("객체 삭제 실패 - 적절하지 않은 매물 번호")
+    @DisplayName("매물 삭제 -  실패: 적절하지 않은 매물번호")
     public void deleteRoom_Fail_InappropriateId() throws Exception {
         // DTO
         Long roomId = -1L;
@@ -225,13 +226,13 @@ class RoomControllerTest {
                                 .param("roomId", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
 
     @Test
     @WithMockUser
-    @DisplayName("객체 삭제 실패 - Id 누락")
+    @DisplayName("매물 삭제 - 실패: Id 누락")
     public void deleteRoom_Fail_NoId() throws Exception {
         // DTO
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
@@ -244,12 +245,12 @@ class RoomControllerTest {
                         delete("/api/rooms")
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithMockUser
-    @DisplayName("객체 단건 조회 성공")
+    @DisplayName("매물 단건 조회 - 성공")
     public void findRoom_Success() throws Exception {
         // DTO
         Long roomId = 1L;
@@ -264,12 +265,13 @@ class RoomControllerTest {
                         get("/api/rooms/{roomId}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("ROOM_FIND_SUCCESS"));
     }
 
     @Test
     @WithMockUser
-    @DisplayName("객체 단건 조회 실패")
+    @DisplayName("매물 단건 조회 - 실패: 적절하지 않은 id")
     public void findRoom_Fail_InvalidId() throws Exception {
         // DTO
         Long roomId = -1L;
@@ -284,6 +286,8 @@ class RoomControllerTest {
                         get("/api/rooms/{roomId}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Validation failure"));
     }
 }
