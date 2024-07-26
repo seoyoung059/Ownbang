@@ -10,13 +10,14 @@ const RealEstatePage = () => {
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   console.log(searchTerm);
+
   // 검색어를 업데이트하는 함수
   const handleSearch = (term) => {
     setSearchTerm(term);
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", height: "100vh" }}>
       <Box sx={{ paddingTop: "80px", position: "relative", width: "80%" }}>
         <Box
           sx={{
@@ -39,6 +40,8 @@ const RealEstatePage = () => {
           paddingTop: "80px",
           position: "relative",
           width: "20%",
+          height: "100vh",
+          overflow: "auto", // RealEstateList에만 스크롤 적용
         }}
       >
         <RealEstateList />
@@ -46,4 +49,5 @@ const RealEstatePage = () => {
     </Box>
   );
 };
+
 export default RealEstatePage;
