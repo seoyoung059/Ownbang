@@ -8,11 +8,14 @@ import {
   IconButton,
   Box,
 } from "@mui/material";
-import { Bookmark } from "@mui/icons-material";
+import { Bookmark, BookmarkBorder } from "@mui/icons-material";
 import { useTheme } from "@mui/material";
 
-const RealEstateItem = ({ marker }) => {
+const RealEstateItem = ({ marker, toggleFavorite }) => {
   const theme = useTheme();
+  const handleClick = () => {
+    toggleFavorite();
+  };
   return (
     <Card sx={{ display: "flex", marginBottom: "20px", position: "relative" }}>
       <CardMedia
@@ -42,6 +45,7 @@ const RealEstateItem = ({ marker }) => {
       </CardContent>
       <IconButton
         aria-label="bookmark"
+        onClick={handleClick}
         sx={{
           position: "absolute",
           top: 8,
@@ -49,9 +53,10 @@ const RealEstateItem = ({ marker }) => {
           color: theme.palette.bookmark,
         }}
       >
-        <Bookmark />
+        {marker.favorite ? <Bookmark /> : <BookmarkBorder />}
       </IconButton>
     </Card>
   );
 };
+
 export default RealEstateItem;

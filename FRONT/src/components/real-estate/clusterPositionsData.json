@@ -4,61 +4,71 @@
       "lat": 37.561022215939886,
       "lng": 126.9811778682524,
       "title": "신세계백화점 본점",
-      "location": "서울시 중구"
+      "location": "서울시 중구",
+      "favorite": false
     },
     {
       "lat": 37.565058772340514,
       "lng": 126.98176542975797,
       "title": "롯데백화점 본점",
-      "location": "서울시 중구"
+      "location": "서울시 중구",
+      "favorite": false
     },
     {
       "lat": 37.5390449097665,
       "lng": 127.07121570122844,
       "title": "롯데백화점 건대스타시티점",
-      "location": "서울시 광진구"
+      "location": "서울시 광진구",
+      "favorite": false
     },
     {
       "lat": 37.51206723806791,
       "lng": 127.09860738995566,
       "title": "롯데백화점 잠실점",
-      "location": "서울시 송파구"
+      "location": "서울시 송파구",
+      "favorite": false
     },
     {
       "lat": 37.50868750461262,
       "lng": 127.05971823661459,
       "title": "현대백화점 무역센터점",
-      "location": "서울시 강남구"
+      "location": "서울시 강남구",
+      "favorite": false
     },
     {
       "lat": 37.517206354674144,
       "lng": 126.90554850011044,
       "title": "신세계백화점 타임스퀘어점",
-      "location": "서울시 영등포구"
+      "location": "서울시 영등포구",
+      "favorite": false
     },
     {
       "lat": 37.52742227154596,
       "lng": 127.02740032943166,
       "title": "현대백화점 압구정본점",
-      "location": "서울시 강남구"
+      "location": "서울시 강남구",
+      "favorite": false
     },
     {
       "lat": 37.50531474130563,
       "lng": 127.00434294929187,
       "title": "신세계백화점 강남점",
-      "location": "서울시 서초구"
+      "location": "서울시 서초구",
+      "favorite": false
     },
     {
       "lat": 37.52845477719677,
       "lng": 127.0401507466515,
       "title": "갤러리아 백화점 WEST",
-      "location": "서울시 강남구"
+      "location": "서울시 강남구",
+      "favorite": false
     },
     {
       "lat": 37.52585405099982,
       "lng": 126.92844614132294,
       "title": "더현대 서울",
-      "location": "서울시 영등포구"
+      "location": "서울시 영등포구",
+      "favorite": false
     }
   ]
 }
