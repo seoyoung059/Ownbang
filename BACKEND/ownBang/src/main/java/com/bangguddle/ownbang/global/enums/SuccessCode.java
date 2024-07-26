@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 public enum SuccessCode implements ResponseCode {
     // Auth API
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입이 성공적으로 완료되었습니다."),
-
+    CHECK_EMAIL_DUPLICATE_SUCCESS(HttpStatus.OK, "이메일 중복 조회가 성공적으로 완료되었습니다."),
+    CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS(HttpStatus.OK, "전화번호 중복 조회가 성공적으로 완료되었습니다."),
 
     // Room API
     ROOM_REGISTER_SUCCESS(HttpStatus.CREATED, "매물이 성공적으로 등록되었습니다."),
@@ -21,6 +22,7 @@ public enum SuccessCode implements ResponseCode {
 
     // Webrtc API
     GET_TOKEN_SUCCESS(HttpStatus.CREATED, "토큰 발급이 성공적으로 완료되었습니다."),
+
 
     //Reservation API
     RESERVATION_MAKE_SUCCESS(HttpStatus.CREATED, "예약 신청이 성공적으로 완료되었습니다."),
