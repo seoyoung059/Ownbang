@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
 import RealEstateSearchBar from "../components/real-estate/RealEstateSearchBar";
 import Reservation from "../components/real-estate/Reservation";
+import RealEstateList from "../components/real-estate/RealEstateList";
 import { Box } from "@mui/material";
 import { useTheme } from "@mui/material";
 
@@ -40,7 +41,7 @@ const RealEstatePage = () => {
           width: "20%",
         }}
       >
-        <Reservation />
+        <RealEstateList />
       </Box>
     </Box>
   );
