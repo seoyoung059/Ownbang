@@ -24,15 +24,17 @@ const RealEstateRegisterPage = lazy(() =>
 const VideoChat = lazy(() => import("../pages/VideoChatPage"));
 const AgentPage = lazy(() => import("../pages/AgentPage"));
 
-// 중개인일 경우 해당 페이지 이동, 아니면 메인 페이지 이동 - 추후 "중개인만 이용할 수 있습니다" 문구
+// 중개인일 경우 해당 페이지(element) 라우팅
+// 중개인이 아니면 TOAST 제공 및 메인 페이지 라우팅
 const PrivateRoute = ({ element }) => {
   const user = useBoundStore((state) => state.user);
 
   useEffect(() => {
     if (user && !user.isAgent) {
+      // 하단 좌측 위치, 2초 후 자동 닫기
       toast.info("중개인만 이용할 수 있습니다.", {
         position: "bottom-left",
-        autoClose: 3000,
+        autoClose: 2000,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
@@ -54,6 +56,7 @@ const PrivateRoute = ({ element }) => {
   return <>{element}</>;
 };
 
+// 추후 다른 로딩에도 메세지 전달하고 로딩 페이지도 디자인 수정
 const router = createBrowserRouter([
   {
     path: "/",
