@@ -11,6 +11,10 @@ public enum ErrorCode implements ResponseCode {
     EMAIL_DUPLICATED(HttpStatus.CONFLICT, "이미 가입한 이메일입니다."),
     PHONE_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "이미 가입한 전화번호 입니다."),
 
+    // User API
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원이 존재하지 않습니다."),
+
+
     // Room API
     INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 이미지 파일입니다."),
     ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 매물입니다."),
