@@ -1,15 +1,20 @@
 package com.bangguddle.ownbang.domain.auth.service.impl;
 
+import com.bangguddle.ownbang.domain.auth.dto.DuplicateResponse;
 import com.bangguddle.ownbang.domain.auth.dto.UserSignUpRequest;
 import com.bangguddle.ownbang.domain.auth.service.AuthService;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
-import com.bangguddle.ownbang.global.enums.SuccessCode;
+import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static com.bangguddle.ownbang.global.enums.ErrorCode.EMAIL_DUPLICATED;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.PHONE_NUMBER_DUPLICATED;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +23,36 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     @Override
     public SuccessResponse<NoneResponse> signUp(UserSignUpRequest request) {
-        userRepository.validateByEmail(request.email());
-        userRepository.validateByPhoneNumber(request.phoneNumber());
+        validateByEmail(request.email());
+        validateByPhoneNumber(request.phoneNumber());
         User user = request.toEntity(passwordEncoder.encode(request.password()));
 
         userRepository.save(user);
-        return new SuccessResponse<>(SuccessCode.SIGNUP_SUCCESS, NoneResponse.NONE);
+        return new SuccessResponse<>(SIGNUP_SUCCESS, NoneResponse.NONE);
+    }
+
+    @Override
+    public SuccessResponse<DuplicateResponse> checkEmailDuplicate(String email) {
+        Boolean isDuplicated = userRepository.findByEmail(email).isPresent();
+        DuplicateResponse response = new DuplicateResponse(isDuplicated);
+        return new SuccessResponse<>(CHECK_EMAIL_DUPLICATE_SUCCESS, response);
+    }
+
+    @Override
+    public SuccessResponse<DuplicateResponse> checkPhoneNumberDuplicate(String phoneNumber) {
+        Boolean isDuplicated = userRepository.findByPhoneNumber(phoneNumber).isPresent();
+        DuplicateResponse response = new DuplicateResponse(isDuplicated);
+        return new SuccessResponse<>(CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS, response);
+    }
+
+
+    private void validateByEmail(final String email) {
+        if (userRepository.findByEmail(email).isPresent())
+            throw new AppException(EMAIL_DUPLICATED);
+    }
+
+    private void validateByPhoneNumber(final String phoneNumber) {
+        if (userRepository.findByPhoneNumber(phoneNumber).isPresent())
+            throw new AppException(PHONE_NUMBER_DUPLICATED);
     }
 }
