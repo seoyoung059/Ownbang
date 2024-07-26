@@ -26,7 +26,7 @@ const AgentPage = lazy(() => import("../pages/AgentPage"));
 
 // 중개인일 경우 해당 페이지(element) 라우팅
 // 중개인이 아니면 TOAST 제공 및 메인 페이지 라우팅
-const PrivateRoute = ({ element }) => {
+const AgentRoute = ({ element }) => {
   const user = useBoundStore((state) => state.user);
 
   useEffect(() => {
@@ -49,6 +49,35 @@ const PrivateRoute = ({ element }) => {
     return (
       <>
         <Navigate to="/" />
+      </>
+    );
+  }
+
+  return <>{element}</>;
+};
+
+const UserRoute = ({ element }) => {
+  const loginStatus = useBoundStore((state) => state.isLogin);
+
+  useEffect(() => {
+    if (!loginStatus) {
+      toast.info("로그인이 필요합니다.", {
+        position: "bottom-left",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  }, [loginStatus]);
+
+  if (!loginStatus) {
+    return (
+      <>
+        <Navigate to="/login" />
       </>
     );
   }
@@ -86,7 +115,7 @@ const router = createBrowserRouter([
     path: "/mypage",
     element: (
       <Suspense fallback={<Loading />}>
-        <MyPage />
+        <UserRoute element={<MyPage />} />
       </Suspense>
     ),
   },
@@ -94,7 +123,7 @@ const router = createBrowserRouter([
     path: "/user-edit",
     element: (
       <Suspense fallback={<Loading message="내 정보를 불러오고 있어요." />}>
-        <UserEditPage />
+        <UserRoute element={<UserEditPage />} />
       </Suspense>
     ),
   },
@@ -110,7 +139,7 @@ const router = createBrowserRouter([
     path: "/estate-register",
     element: (
       <Suspense fallback={<Loading />}>
-        <PrivateRoute element={<RealEstateRegisterPage />} />
+        <AgentRoute element={<RealEstateRegisterPage />} />
       </Suspense>
     ),
   },
@@ -118,7 +147,7 @@ const router = createBrowserRouter([
     path: "/video-chat",
     element: (
       <Suspense fallback={<Loading />}>
-        <VideoChat />
+        <UserRoute element={<VideoChat />} />
       </Suspense>
     ),
   },
@@ -126,7 +155,7 @@ const router = createBrowserRouter([
     path: "/agent",
     element: (
       <Suspense fallback={<Loading />}>
-        <PrivateRoute element={<AgentPage />} />
+        <AgentRoute element={<AgentPage />} />
       </Suspense>
     ),
   },
