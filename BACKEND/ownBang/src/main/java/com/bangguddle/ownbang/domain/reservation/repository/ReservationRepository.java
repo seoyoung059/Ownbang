@@ -15,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long>{
 
+
     @Lock(LockModeType.PESSIMISTIC_WRITE) // 비관적 락을 적용
     @Query("SELECT r FROM Reservation r WHERE r.roomId = :roomId AND r.reservationTime = :reservationTime And r.status<> 'CANCELED'") // 예약 취소가 아닌 것 중에 중복건이 있나 확인
     Optional<Reservation> findByRoomIdAndTimeWithLock(

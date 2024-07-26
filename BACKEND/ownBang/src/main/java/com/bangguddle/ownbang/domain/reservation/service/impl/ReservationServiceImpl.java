@@ -91,4 +91,28 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.findById(id)
                 .orElseThrow(() -> new AppException(BAD_REQUEST));
     }
+
+    // 예약 확정 시 사용
+    public SuccessResponse<NoneResponse> confirmStatusReservation(Long id) {
+        Reservation reservation = vaildateReservation(id);
+
+        // 취소된 예약이라면 확정할 수 없다.
+        if (reservation.getStatus() == ReservationStatus.CANCELED) {
+            throw new AppException(RESERVATION_CONFIRMED_UNAVAILABLE);
+        }
+
+        // 이미 확정된 예약인지 확인
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+            throw new AppException(RESERVATION_CONFIRMED_DUPLICATED);
+        }
+
+        // 상태를 '예약취소'로 변경
+        Reservation confirmedReservation = reservation.confirmStatus();
+
+        // 상태 변경된 예약 저장
+        reservationRepository.save(confirmedReservation);
+
+        return new SuccessResponse<>(RESERVATION_CONFIRM_SUCCESS, NoneResponse.NONE);
+    }
+
 }
