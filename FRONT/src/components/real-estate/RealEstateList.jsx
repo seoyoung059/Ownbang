@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import List from "@mui/material/List";
 import RealEstateItem from "./RealEstateItem";
 import clusterPositionsData from "./clusterPositionsData.json";
 
-const RealEstateList = () => {
+const RealEstateList = ({ onSelectItem }) => {
   const [markers, setMarkers] = useState(clusterPositionsData.tmpMarkers);
 
   const toggleFavorite = (index) => {
@@ -25,6 +26,7 @@ const RealEstateList = () => {
           key={index}
           marker={marker}
           toggleFavorite={() => toggleFavorite(index)}
+          onClick={() => onSelectItem(marker)}
         />
       ))}
     </List>
