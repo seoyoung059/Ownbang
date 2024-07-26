@@ -1,7 +1,7 @@
 import { getUserInfo } from "../api/user";
 
 export const createUserSlice = (set) => ({
-  user: null,
+  user: { isAgent: false },
   fetchUser: async (token) => {
     try {
       const userData = await getUserInfo(token);
@@ -13,8 +13,8 @@ export const createUserSlice = (set) => ({
   },
   modifyUser: async (token, data) => {
     try {
-      const updatedUser = await patchUserInfo(token, data);
-      set({ user: updatedUser });
+      const response = await patchUserInfo(token, data);
+      console.log(response.result);
     } catch (error) {
       console.error(error);
     }

@@ -1,6 +1,16 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Loading from "../components/common/Loading";
+
+import { useBoundStore } from "../store/store";
 
 const MainPage = lazy(() => import("../pages/MainPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
@@ -12,6 +22,37 @@ const RealEstateRegisterPage = lazy(() =>
   import("../pages/RealEstateRegisterPage")
 );
 const VideoChat = lazy(() => import("../pages/VideoChatPage"));
+const AgentPage = lazy(() => import("../pages/AgentPage"));
+
+// 중개인일 경우 해당 페이지 이동, 아니면 메인 페이지 이동 - 추후 "중개인만 이용할 수 있습니다" 문구
+const PrivateRoute = ({ element }) => {
+  const user = useBoundStore((state) => state.user);
+
+  useEffect(() => {
+    if (user && !user.isAgent) {
+      toast.info("중개인만 이용할 수 있습니다.", {
+        position: "bottom-left",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  }, [user]);
+
+  if (user && !user.isAgent) {
+    return (
+      <>
+        <Navigate to="/" />
+      </>
+    );
+  }
+
+  return <>{element}</>;
+};
 
 const router = createBrowserRouter([
   {
@@ -66,7 +107,7 @@ const router = createBrowserRouter([
     path: "/estate-register",
     element: (
       <Suspense fallback={<Loading />}>
-        <RealEstateRegisterPage />
+        <PrivateRoute element={<RealEstateRegisterPage />} />
       </Suspense>
     ),
   },
@@ -75,6 +116,14 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <VideoChat />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/agent",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <PrivateRoute element={<AgentPage />} />
       </Suspense>
     ),
   },

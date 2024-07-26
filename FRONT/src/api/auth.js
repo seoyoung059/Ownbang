@@ -1,7 +1,7 @@
-import { authsAxiosInstance } from "./index";
+import { axiosInstance } from "./index";
 
 export const login = async (email, password) => {
-  const response = await authsAxiosInstance.post("/login", {
+  const response = await axiosInstance.post("/auth/login", {
     email,
     password,
   });
@@ -9,6 +9,6 @@ export const login = async (email, password) => {
 };
 
 export const logout = async () => {
-  const response = await authsAxiosInstance.post("/auth/logout");
+  const response = await axiosInstance.post("/auth/logout");
   return response.data;
 };
