@@ -1,5 +1,10 @@
 package com.bangguddle.ownbang.domain.room.enums;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public enum DealType {
-    월세, 전세
+    MONTHLY("월세"), Jeonse("전세");
+
+    private String value;
 }

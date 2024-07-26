@@ -60,10 +60,10 @@ class RoomServiceImplTest {
         RoomAppliancesCreateRequest roomAppliancesCreateRequest = RoomAppliancesCreateRequest.of(true,
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
-                HeatingType.지역, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.남, Purpose.공동주택,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.월세, RoomType.오피스텔, Structure.분리형,
+        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
 
@@ -98,10 +98,10 @@ class RoomServiceImplTest {
         RoomAppliancesCreateRequest roomAppliancesCreateRequest = RoomAppliancesCreateRequest.of(true,
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
-                HeatingType.지역, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.남, Purpose.공동주택,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.월세, RoomType.오피스텔, Structure.분리형,
+        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
         List<MultipartFile> roomImageFiles = new ArrayList<>();

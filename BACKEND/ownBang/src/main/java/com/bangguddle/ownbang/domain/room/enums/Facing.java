@@ -1,5 +1,11 @@
 package com.bangguddle.ownbang.domain.room.enums;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public enum Facing {
-    동, 서, 남, 북, 남동, 남서, 북서, 북동
+    EAST("동"), WEST("서"), SOUTH("남"), NORTH("북"), SOUTHEAST("남동"), SOUTHWEST("남서"), NORTHWEST("북서"), NORTHEAST("북동");
+
+    private String value;
+
 }
