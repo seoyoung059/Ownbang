@@ -6,6 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record RoomImageResponse(
+        Long id,
         String roomImageUrl
 ) {
 
@@ -17,6 +18,7 @@ public record RoomImageResponse(
 
     static public RoomImageResponse from(RoomImage roomImage){
         return RoomImageResponse.builder()
+                .id(roomImage.getId())
                 .roomImageUrl(roomImage.getRoomImageUrl())
                 .build();
     }

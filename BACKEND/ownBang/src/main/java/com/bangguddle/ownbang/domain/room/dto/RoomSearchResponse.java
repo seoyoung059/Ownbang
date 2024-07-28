@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Builder
-public record RoomSelectResponse (
+public record RoomSearchResponse(
 //        User agent,
         DealType dealType,
         RoomType roomType,
@@ -32,16 +32,14 @@ public record RoomSelectResponse (
         Long maintenanceFee,
         String parcel,
         String profileImageUrl,
-//        @Valid
-//        RoomAppliancesResponse roomAppliancesResponse,
-//        @Valid
-//        RoomDetailResponse roomDetailResponse,
+        RoomAppliancesSearchResponse roomAppliancesSearchResponse,
+        RoomDetailSearchResponse roomDetailSearchResponse,
         @Valid
         List<RoomImageResponse> roomImageResponses
 ) {
 
-    static public RoomSelectResponse from(Room room) {
-        return RoomSelectResponse.builder()
+    static public RoomSearchResponse from(Room room) {
+        return RoomSearchResponse.builder()
                 .dealType(room.getDealType())
                 .roomType(room.getRoomType())
                 .structure(room.getStructure())
@@ -54,8 +52,8 @@ public record RoomSelectResponse (
                 .maintenanceFee(room.getMaintenanceFee())
                 .parcel(room.getParcel())
                 .profileImageUrl(room.getProfileImageUrl())
-//                .roomAppliancesResponse()
-//                .roomAppliancesResponse()
+                .roomAppliancesSearchResponse(RoomAppliancesSearchResponse.from(room.getRoomAppliances()))
+                .roomDetailSearchResponse(RoomDetailSearchResponse.from(room.getRoomDetail()))
                 .roomImageResponses(room.getRoomImages().stream()
                         .map(RoomImageResponse::from)
                 .collect(Collectors.toList()))

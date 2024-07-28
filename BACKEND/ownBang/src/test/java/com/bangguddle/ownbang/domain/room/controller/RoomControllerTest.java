@@ -3,7 +3,7 @@ package com.bangguddle.ownbang.domain.room.controller;
 import com.bangguddle.ownbang.domain.room.dto.RoomAppliancesCreateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomDetailCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomSelectResponse;
+import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.service.impl.RoomServiceImpl;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -63,7 +63,7 @@ class RoomControllerTest {
         MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(roomCreateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
         MockMultipartFile file2 = new MockMultipartFile("roomImageFile", "image2.png", "image/png", "image/png".getBytes());
-        SuccessResponse success = new SuccessResponse<>(SuccessCode.ROOM_REGISTER_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_REGISTER_SUCCESS, NoneResponse.NONE);
 
         // mock
         given(roomServiceImpl.createRoom(any(RoomCreateRequest.class), any())).willReturn(success);
@@ -254,8 +254,8 @@ class RoomControllerTest {
     public void findRoom_Success() throws Exception {
         // DTO
         Long roomId = 1L;
-        RoomSelectResponse roomSelectResponse = RoomSelectResponse.builder().build();
-        SuccessResponse<RoomSelectResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomSelectResponse);
+        RoomSearchResponse roomSearchResponse = RoomSearchResponse.builder().build();
+        SuccessResponse<RoomSearchResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomSearchResponse);
 
         // when
         when(roomServiceImpl.getRoom(anyLong())).thenReturn(successResponse);
@@ -275,8 +275,8 @@ class RoomControllerTest {
     public void findRoom_Fail_InvalidId() throws Exception {
         // DTO
         Long roomId = -1L;
-        RoomSelectResponse roomSelectResponse = RoomSelectResponse.builder().build();
-        SuccessResponse<RoomSelectResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomSelectResponse);
+        RoomSearchResponse roomSearchResponse = RoomSearchResponse.builder().build();
+        SuccessResponse<RoomSearchResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomSearchResponse);
 
         // when
         when(roomServiceImpl.getRoom(anyLong())).thenReturn(successResponse);
