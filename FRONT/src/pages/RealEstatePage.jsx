@@ -36,6 +36,11 @@ const RealEstatePage = () => {
     setShowReservation(true);
   };
 
+  // 예약 카드 닫기
+  const handleCloseReservation = () => {
+    setShowReservation(false);
+  };
+
   return (
     <Box sx={{ display: "flex", height: "100vh", position: "relative" }}>
       {/* 리스트 */}
@@ -73,7 +78,7 @@ const RealEstatePage = () => {
         />
       </Box>
 
-      {/* List에서 Item을 누르면 Detail 카드 등장 */}
+      {/* List에서 Item을 누르면 Detail 카드가 뜹니다 */}
       {selectedItem && (
         <Box
           sx={{
@@ -109,7 +114,7 @@ const RealEstatePage = () => {
               sx={{
                 position: "absolute",
                 top: 8,
-                left: 8,
+                right: 8, // X 아이콘을 카드의 우측 상단으로 이동
               }}
             >
               <CloseIcon />
@@ -137,11 +142,11 @@ const RealEstatePage = () => {
               onClick={(e) => e.stopPropagation()} // 예약 창 닫기에서 제외
             >
               <IconButton
-                onClick={handleCloseDetail}
+                onClick={handleCloseReservation} // 예약 카드 닫기 핸들러
                 sx={{
                   position: "absolute",
                   top: 8,
-                  left: 8,
+                  right: 8, // X 아이콘을 카드의 우측 상단으로 이동
                 }}
               >
                 <CloseIcon />
