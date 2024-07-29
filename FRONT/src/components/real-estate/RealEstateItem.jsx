@@ -11,13 +11,17 @@ import {
 import { Bookmark, BookmarkBorder } from "@mui/icons-material";
 import { useTheme } from "@mui/material";
 
-const RealEstateItem = ({ marker, toggleFavorite }) => {
+const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
   const theme = useTheme();
   const handleClick = () => {
-    toggleFavorite();
+    onClick();
   };
+
   return (
-    <Card sx={{ display: "flex", marginBottom: "20px", position: "relative" }}>
+    <Card
+      sx={{ display: "flex", marginBottom: "20px", position: "relative" }}
+      onClick={handleClick}
+    >
       <CardMedia
         component="img"
         sx={{ width: 151 }}
@@ -45,7 +49,10 @@ const RealEstateItem = ({ marker, toggleFavorite }) => {
       </CardContent>
       <IconButton
         aria-label="bookmark"
-        onClick={handleClick}
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent click event from bubbling up to Card
+          toggleFavorite();
+        }}
         sx={{
           position: "absolute",
           top: 8,
