@@ -51,6 +51,9 @@ dependencies {
 
 	testImplementation 'org.springframework.security:spring-security-test'
 
+	// elasticsearch
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
 }
 
 tasks.named('test') {
