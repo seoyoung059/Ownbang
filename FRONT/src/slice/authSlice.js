@@ -3,6 +3,7 @@ import { setCookie, getCookie, removeCookie } from "react-cookie";
 import { login, logout } from "../api/auth";
 
 // 일단 이 정도로 구성해봤는데 통신하면서 수정-보완해야 할듯
+// 사용이 애매함 로그인 상태 검증 ?
 
 export const authSlice = (set) => ({
   isLogin: true,
