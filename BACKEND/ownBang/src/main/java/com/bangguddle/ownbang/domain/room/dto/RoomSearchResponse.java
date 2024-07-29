@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 @Builder
 public record RoomSearchResponse(
 //        User agent,
+        Float latitude,
+        Float longitude,
         DealType dealType,
         RoomType roomType,
         Structure structure,
@@ -40,6 +42,8 @@ public record RoomSearchResponse(
 
     static public RoomSearchResponse from(Room room) {
         return RoomSearchResponse.builder()
+                .latitude(room.getLatitude())
+                .longitude(room.getLongitude())
                 .dealType(room.getDealType())
                 .roomType(room.getRoomType())
                 .structure(room.getStructure())
