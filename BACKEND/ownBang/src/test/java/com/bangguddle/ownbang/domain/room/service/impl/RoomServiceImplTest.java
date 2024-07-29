@@ -4,6 +4,8 @@ import com.bangguddle.ownbang.domain.room.dto.RoomAppliancesCreateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomDetailCreateRequest;
 import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
+import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.repository.RoomAppliancesRepository;
 import com.bangguddle.ownbang.domain.room.repository.RoomDetailRepository;
@@ -63,7 +65,7 @@ class RoomServiceImplTest {
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
                 sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
 
@@ -101,7 +103,7 @@ class RoomServiceImplTest {
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
                 sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
         List<MultipartFile> roomImageFiles = new ArrayList<>();
@@ -156,7 +158,10 @@ class RoomServiceImplTest {
     @DisplayName("매물 단건 조회 - 성공")
     void findRoomTest_Success() {
         // given
-        Room room = Room.builder().build();
+        Room room = Room.builder()
+                .roomDetail(RoomDetail.builder().build())
+                .roomAppliances(RoomAppliances.builder().build())
+                .build();
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
         Long roomId = 1L;
 

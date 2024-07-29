@@ -56,7 +56,7 @@ class RoomControllerTest {
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
                 sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
 
@@ -100,7 +100,7 @@ class RoomControllerTest {
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
                 sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest invalidRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+        RoomCreateRequest invalidRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, -999999999L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
         MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(invalidRequest).getBytes(StandardCharsets.UTF_8));
@@ -134,7 +134,7 @@ class RoomControllerTest {
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
                 sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest invalidRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+        RoomCreateRequest invalidRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 999999999L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
         MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(invalidRequest).getBytes(StandardCharsets.UTF_8));
@@ -166,7 +166,7 @@ class RoomControllerTest {
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
                 sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest invalidRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+        RoomCreateRequest invalidRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 999999999L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
         MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(invalidRequest).getBytes(StandardCharsets.UTF_8));
