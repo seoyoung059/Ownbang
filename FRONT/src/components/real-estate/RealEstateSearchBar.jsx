@@ -46,6 +46,7 @@ const RealEstateSearchBar = ({ onSearch }) => {
           padding: "15px 25px",
           backgroundColor: theme.palette.common.white,
           fontSize: theme.fontSize.small,
+          boxShadow: 3,
         }}
       />
       <Button
