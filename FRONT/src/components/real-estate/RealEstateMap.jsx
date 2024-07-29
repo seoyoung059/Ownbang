@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
-import clusterPositionsData from "./clusterPositionsData.json";
 import { Box } from "@mui/material";
+import clusterPositionsData from "./clusterPositionsData.json";
 
 const LoadKakaoMap = ({ searchTerm, mark, size }) => {
   const [positions, setPositions] = useState([]);
