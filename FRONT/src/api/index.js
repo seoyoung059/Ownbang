@@ -1,12 +1,25 @@
 import axios from "axios";
+import { getCookie } from "react-cookie";
 
 // axios instance
 
-export const axiosInstance = axios.create({
+const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL + "/api",
-  timeout: 10000, // 요청 타임아웃
-  headers: {
-    "Content-Type": "application/json",
-    // 기타 필요한 헤더 설정
-  },
+  timeout: 3000,
 });
+
+// 쿠키를 가져와서 있다면 헤더에 넣음
+axiosInstance.interceptors.request.use((config) => {
+  const accessToken = getCookie("accessToken");
+  if (accessToken) {
+    config.headers["Authorization"] = "Bearer" + accessToken;
+    config.withCredentials = true;
+  }
+  return config;
+});
+
+const Axios = () => {
+  return axiosInstance;
+};
+
+export default Axios;
