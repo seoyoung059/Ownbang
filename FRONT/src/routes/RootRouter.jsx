@@ -1,6 +1,16 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Loading from "../components/common/Loading";
+
+import { useBoundStore } from "../store/store";
 
 const MainPage = lazy(() => import("../pages/MainPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
@@ -12,7 +22,70 @@ const RealEstateRegisterPage = lazy(() =>
   import("../pages/RealEstateRegisterPage")
 );
 const VideoChat = lazy(() => import("../pages/VideoChatPage"));
+const AgentPage = lazy(() => import("../pages/AgentPage"));
 
+// 중개인일 경우 해당 페이지(element) 라우팅
+// 중개인이 아니면 TOAST 제공 및 메인 페이지 라우팅
+const AgentRoute = ({ element }) => {
+  const user = useBoundStore((state) => state.user);
+
+  useEffect(() => {
+    if (user && !user.isAgent) {
+      // 하단 좌측 위치, 2초 후 자동 닫기
+      toast.info("중개인만 이용할 수 있습니다.", {
+        position: "bottom-left",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  }, [user]);
+
+  if (user && !user.isAgent) {
+    return (
+      <>
+        <Navigate to="/" />
+      </>
+    );
+  }
+
+  return <>{element}</>;
+};
+
+const UserRoute = ({ element }) => {
+  const loginStatus = useBoundStore((state) => state.isLogin);
+
+  useEffect(() => {
+    if (!loginStatus) {
+      toast.info("로그인이 필요합니다.", {
+        position: "bottom-left",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  }, [loginStatus]);
+
+  if (!loginStatus) {
+    return (
+      <>
+        <Navigate to="/login" />
+      </>
+    );
+  }
+
+  return <>{element}</>;
+};
+
+// 추후 다른 로딩에도 메세지 전달하고 로딩 페이지도 디자인 수정
 const router = createBrowserRouter([
   {
     path: "/",
@@ -42,6 +115,7 @@ const router = createBrowserRouter([
     path: "/mypage",
     element: (
       <Suspense fallback={<Loading />}>
+        {/* <UserRoute element={<MyPage />} /> */}
         <MyPage />
       </Suspense>
     ),
@@ -50,6 +124,7 @@ const router = createBrowserRouter([
     path: "/user-edit",
     element: (
       <Suspense fallback={<Loading message="내 정보를 불러오고 있어요." />}>
+        {/* <UserRoute element={<UserEditPage />} /> */}
         <UserEditPage />
       </Suspense>
     ),
@@ -66,7 +141,7 @@ const router = createBrowserRouter([
     path: "/estate-register",
     element: (
       <Suspense fallback={<Loading />}>
-        <RealEstateRegisterPage />
+        <AgentRoute element={<RealEstateRegisterPage />} />
       </Suspense>
     ),
   },
@@ -74,7 +149,15 @@ const router = createBrowserRouter([
     path: "/video-chat",
     element: (
       <Suspense fallback={<Loading />}>
-        <VideoChat />
+        <UserRoute element={<VideoChat />} />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/agent",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <AgentRoute element={<AgentPage />} />
       </Suspense>
     ),
   },
