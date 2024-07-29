@@ -1,6 +1,7 @@
 package com.bangguddle.ownbang.domain.room.controller;
 
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
+import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
@@ -35,6 +36,10 @@ public class RoomController {
     }
 
     // 매물 단건 조회
+    @GetMapping("/{roomId}")
+    public ResponseEntity<Response<RoomSearchResponse>> getRoom(@PathVariable(name = "roomId") @Positive @Valid Long roomId) {
+        return Response.success(roomService.getRoom(roomId));
+    }
 
     // 매물 이미지 업로드
 

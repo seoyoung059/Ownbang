@@ -52,7 +52,7 @@ public class RoomImageServiceImpl {
 
     private void validateImageFile(MultipartFile roomImage) throws AppException {
         String contentType = roomImage.getContentType();
-        if(contentType==null || !contentType.contains("image")) {
+        if (contentType == null || !contentType.contains("image")) {
             throw new AppException(ErrorCode.INVALID_IMAGE_FILE);
         }
     }

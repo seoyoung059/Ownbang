@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -52,17 +53,17 @@ class RoomServiceImplTest {
     private RoomServiceImpl roomServiceImpl;
 
     @Test
-    @DisplayName("새 매물 생성 - 성공")
+    @DisplayName("매물 생성 - 성공")
     void createRoomTest_SUCCESS() throws ParseException {
         //given
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         RoomAppliancesCreateRequest roomAppliancesCreateRequest = RoomAppliancesCreateRequest.of(true,
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
-                HeatingType.지역, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.남, Purpose.공동주택,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.월세, RoomType.오피스텔, Structure.분리형,
+        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
 
@@ -90,17 +91,17 @@ class RoomServiceImplTest {
 
 
     @Test
-    @DisplayName("이미지 업로드 실패 시 서버 내부 에러 발생")
+    @DisplayName("매물 생성 - 실패: 이미지 업로드 실패")
     void createRoomTest_ImageFailed() throws IOException, ParseException {
         //given
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         RoomAppliancesCreateRequest roomAppliancesCreateRequest = RoomAppliancesCreateRequest.of(true,
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
-                HeatingType.지역, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.남, Purpose.공동주택,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
                 "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.월세, RoomType.오피스텔, Structure.분리형,
+        RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
         List<MultipartFile> roomImageFiles = new ArrayList<>();
@@ -110,7 +111,8 @@ class RoomServiceImplTest {
         // when
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
 
-        assertThatThrownBy(() -> {
+        // 매물 생성
+        assertThatThrownBy(()->{
             roomServiceImpl.createRoom(roomCreateRequest, roomImageFiles);
         }).isInstanceOf(AppException.class);
 
@@ -121,7 +123,7 @@ class RoomServiceImplTest {
 
 
     @Test
-    @DisplayName("매물 삭제 성공")
+    @DisplayName("매물 삭제 - 성공")
     void deleteRoomTest_Success() throws ParseException {
         //given
         Long roomId = 1L;
@@ -138,7 +140,7 @@ class RoomServiceImplTest {
     }
 
     @Test
-    @DisplayName("매물 삭제 실패 - 존재하지 않는 ID")
+    @DisplayName("매물 삭제 - 실패: 존재하지 않는 ID")
     void deleteRoomTest_Fail_NotExist() {
         //given
         doThrow(new AppException(ErrorCode.ROOM_NOT_FOUND)).when(roomRepository).validateById(anyLong());
@@ -150,5 +152,34 @@ class RoomServiceImplTest {
         }).isInstanceOf(AppException.class);
     }
 
+    @Test
+    @DisplayName("매물 단건 조회 - 성공")
+    void findRoomTest_Success() {
+        // given
+        Room room = Room.builder().build();
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
+        Long roomId = 1L;
 
+        //when
+        roomServiceImpl.getRoom(roomId);
+
+        //then
+        verify(roomRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("매물 단건 조회 - 실패: 존재하지 않는 Id")
+    void findRoomTest_Fail_InvalidId() {
+        // given
+        Room room = Room.builder().build();
+        doThrow(new AppException(ErrorCode.ROOM_NOT_FOUND)).when(roomRepository).findById(anyLong());
+        Long roomId = 1L;
+
+        //when
+
+        //then
+        assertThatThrownBy(() -> {
+            roomServiceImpl.getRoom(roomId);
+        }).isInstanceOf(AppException.class);
+    }
 }
