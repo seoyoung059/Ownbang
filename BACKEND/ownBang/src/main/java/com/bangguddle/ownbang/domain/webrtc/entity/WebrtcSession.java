@@ -13,11 +13,11 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Webrtc {
+public class WebrtcSession {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "webrtc_id", nullable = false, updatable = false, columnDefinition = "INT UNSIGNED")
+    @Column(name = "webrtc_session_id", nullable = false, updatable = false, columnDefinition = "INT UNSIGNED")
     private Long id;
 
     @OneToOne
@@ -27,11 +27,11 @@ public class Webrtc {
     @Column(nullable = false)
     private String session;
 
-    @OneToMany(mappedBy = "webrtc")
+    @OneToMany(mappedBy = "webrtcSession")
     private List<WebrtcToken> webrtcTokens = new ArrayList<>();
 
     @Builder
-    public Webrtc(Reservation reservation, String session){
+    public WebrtcSession(Reservation reservation, String session){
         this.reservation = reservation;
         this.session = session;
     }
