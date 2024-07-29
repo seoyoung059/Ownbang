@@ -1,7 +1,7 @@
 import { getUserInfo } from "../api/user";
 
 export const createUserSlice = (set) => ({
-  user: { isAgent: false },
+  user: { isAgent: true },
   fetchUser: async (token) => {
     try {
       const userData = await getUserInfo(token);

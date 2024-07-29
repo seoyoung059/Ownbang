@@ -115,7 +115,8 @@ const router = createBrowserRouter([
     path: "/mypage",
     element: (
       <Suspense fallback={<Loading />}>
-        <UserRoute element={<MyPage />} />
+        {/* <UserRoute element={<MyPage />} /> */}
+        <MyPage />
       </Suspense>
     ),
   },
@@ -123,7 +124,8 @@ const router = createBrowserRouter([
     path: "/user-edit",
     element: (
       <Suspense fallback={<Loading message="내 정보를 불러오고 있어요." />}>
-        <UserRoute element={<UserEditPage />} />
+        {/* <UserRoute element={<UserEditPage />} /> */}
+        <UserEditPage />
       </Suspense>
     ),
   },

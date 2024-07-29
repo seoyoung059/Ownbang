@@ -5,7 +5,7 @@ import { login, logout } from "../api/auth";
 // 일단 이 정도로 구성해봤는데 통신하면서 수정-보완해야 할듯
 
 export const authSlice = (set) => ({
-  isLogin: false,
+  isLogin: true,
   email: "",
   password: "",
   doLogin: async () => {
