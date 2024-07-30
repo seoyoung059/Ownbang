@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.room.entity;
 
+import com.bangguddle.ownbang.domain.room.dto.RoomUpdateRequest;
 import com.bangguddle.ownbang.domain.room.enums.DealType;
 import com.bangguddle.ownbang.domain.room.enums.RoomType;
 import com.bangguddle.ownbang.domain.room.enums.Structure;
@@ -83,6 +84,7 @@ public class Room {
     @Column(nullable = false)
     private String profileImageUrl;
 
+
     @Builder
     public Room(/*User agent, */RoomAppliances roomAppliances, RoomDetail roomDetail, /*List<RoomImage> roomImages,*/float latitude, float longitude, DealType dealType, RoomType roomType, Structure structure, boolean isLoft, float exclusiveArea, float supplyArea, byte roomFloor, Long deposit, Long monthlyRent, Long maintenanceFee, String parcel, String profileImageUrl) {
 //        this.agent = agent;
@@ -103,5 +105,24 @@ public class Room {
         this.maintenanceFee = maintenanceFee;
         this.parcel = parcel;
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateFromDto (RoomUpdateRequest roomUpdateRequest) {
+        this.roomAppliances.updateFromDto(roomUpdateRequest.roomAppliancesUpdateRequest());
+        this.roomDetail.updateFromDto(roomUpdateRequest.roomDetailUpdateRequest());
+        this.latitude = roomUpdateRequest.latitude();
+        this.longitude = roomUpdateRequest.longitude();
+        this.dealType = roomUpdateRequest.dealType();
+        this.roomType = roomUpdateRequest.roomType();
+        this.structure = roomUpdateRequest.structure();
+        this.isLoft = roomUpdateRequest.isLoft();
+        this.exclusiveArea = roomUpdateRequest.exclusiveArea();
+        this.supplyArea = roomUpdateRequest.supplyArea();
+        this.roomFloor = roomUpdateRequest.roomFloor();
+        this.deposit = roomUpdateRequest.deposit();
+        this.monthlyRent = roomUpdateRequest.monthlyRent();
+        this.maintenanceFee = roomUpdateRequest.maintenanceFee();
+        this.parcel = roomUpdateRequest.parcel();
+        this.profileImageUrl = roomUpdateRequest.profileImageUrl();
     }
 }
