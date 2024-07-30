@@ -1,13 +1,12 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
+import com.bangguddle.ownbang.domain.room.dto.RoomImageUpdateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
+import com.bangguddle.ownbang.domain.room.dto.RoomUpdateRequest;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
-import com.bangguddle.ownbang.domain.room.repository.RoomAppliancesRepository;
-import com.bangguddle.ownbang.domain.room.repository.RoomDetailRepository;
-import com.bangguddle.ownbang.domain.room.repository.RoomImageRepository;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.ErrorCode;
@@ -49,6 +48,35 @@ public class RoomServiceImpl implements RoomService {
         return new SuccessResponse<NoneResponse>(SuccessCode.ROOM_REGISTER_SUCCESS, NoneResponse.NONE);
     }
 
+    //매물 수정
+    @Override
+    @Transactional
+    public SuccessResponse<NoneResponse> updateRoom(Long roomId, RoomUpdateRequest roomUpdateRequest, List<MultipartFile> roomImageFiles) {
+        // User
+
+        Room existingRoom = roomRepository.findById(roomId)
+                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+
+        existingRoom.updateFromDto(roomUpdateRequest);
+
+        // 삭제할 이미지 처리
+        if(roomUpdateRequest.roomImageUpdateRequestList()!=null && !roomUpdateRequest.roomImageUpdateRequestList().isEmpty()) {
+            for (RoomImageUpdateRequest roomImageUpdateRequest : roomUpdateRequest.roomImageUpdateRequestList()) {
+                if (!roomImageUpdateRequest.isDeleted()) continue;
+//                roomImageServiceImpl.deleteImage(roomImageUpdateRequest.id());
+            }
+        }
+
+        // 추가 이미지 업로드
+        if(roomImageFiles!=null && !roomImageFiles.isEmpty()) {
+            for (MultipartFile roomImageFile : roomImageFiles) {
+                roomImageServiceImpl.uploadImage(roomImageFile, existingRoom);
+            }
+        }
+
+        roomRepository.save(existingRoom);
+        return new SuccessResponse<NoneResponse>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+    }
 
     // 매물 삭제
     @Override
