@@ -1,9 +1,6 @@
 package com.bangguddle.ownbang.domain.room.controller;
 
-import com.bangguddle.ownbang.domain.room.dto.RoomAppliancesCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomDetailCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
+import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.service.impl.RoomServiceImpl;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -23,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -286,7 +285,281 @@ class RoomControllerTest {
                         get("/api/rooms/{roomId}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Validation failure"));
+    }
+
+
+    @Test
+    @DisplayName("매물 수정 - 성공")
+    @WithMockUser
+    public void updateRoom_Success() throws Exception {
+        // DTO
+        Long roomId = 1L;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
+                true, true, true, true, true, true, true);
+        RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
+                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+
+        RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
+        RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        RoomImageUpdateRequest roomImageUpdateRequest3 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        List<RoomImageUpdateRequest> roomImageUpdateRequestList = new ArrayList<>();
+        roomImageUpdateRequestList.add(roomImageUpdateRequest1);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest2);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest3);
+
+        RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+                true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
+                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+
+        MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+
+        // mock
+        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+
+        // when
+        mockMvc.perform(
+                        multipart("/api/rooms")
+                                .file(file0)
+                                .file(file1)
+                                .param("roomId", String.valueOf(roomId))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                                .with(request -> {
+                                    request.setMethod("PATCH"); // Override the method to PATCH
+                                    return request;
+                                })
+                )
+
+                //then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.code").value(SuccessCode.ROOM_UPDATE_SUCCESS.name()))
+                .andExpect(jsonPath("$.data").value("NONE"));
+    }
+
+    @Test
+    @DisplayName("매물 수정 - 실패: 유효하지 않은 매물 ID")
+    @WithMockUser
+    public void updateRoom_Fail_InvalidId() throws Exception {
+        // DTO
+        Long roomId = -1L;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
+                true, true, true, true, true, true, true);
+        RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
+                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+
+        RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
+        RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        RoomImageUpdateRequest roomImageUpdateRequest3 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        List<RoomImageUpdateRequest> roomImageUpdateRequestList = new ArrayList<>();
+        roomImageUpdateRequestList.add(roomImageUpdateRequest1);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest2);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest3);
+
+        RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+                true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
+                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+
+        MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+
+        // mock
+        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+
+        // when
+        mockMvc.perform(
+                        multipart("/api/rooms")
+                                .file(file0)
+                                .file(file1)
+                                .param("roomId", String.valueOf(roomId))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                                .with(request -> {
+                                    request.setMethod("PATCH"); // Override the method to PATCH
+                                    return request;
+                                })
+                )
+
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Validation failure"));
+    }
+
+    @Test
+    @DisplayName("매물 수정 - 실패: 유효하지 않은 매물 ID")
+    @WithMockUser
+    public void updateRoom_Fail_invalidId() throws Exception {
+        // DTO
+        Long roomId = -1L;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
+                true, true, true, true, true, true, true);
+        RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
+                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+
+        RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
+        RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        RoomImageUpdateRequest roomImageUpdateRequest3 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        List<RoomImageUpdateRequest> roomImageUpdateRequestList = new ArrayList<>();
+        roomImageUpdateRequestList.add(roomImageUpdateRequest1);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest2);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest3);
+
+        RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+                true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
+                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+
+        MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+
+        // mock
+        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+
+        // when
+        mockMvc.perform(
+                        multipart("/api/rooms")
+                                .file(file0)
+                                .file(file1)
+                                .param("roomId", String.valueOf(roomId))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                                .with(request -> {
+                                    request.setMethod("PATCH"); // Override the method to PATCH
+                                    return request;
+                                })
+                )
+
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Validation failure"));
+    }
+
+    @Test
+    @DisplayName("매물 수정 - 실패: RoomId 누락")
+    @WithMockUser
+    public void updateRoom_Fail_NoId() throws Exception {
+        // DTO
+        Long roomId = 1L;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
+                true, true, true, true, true, true, true);
+        RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
+                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+
+        RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
+        RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        RoomImageUpdateRequest roomImageUpdateRequest3 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        List<RoomImageUpdateRequest> roomImageUpdateRequestList = new ArrayList<>();
+        roomImageUpdateRequestList.add(roomImageUpdateRequest1);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest2);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest3);
+
+        RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+                true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
+                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+
+        MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+
+        // mock
+        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+
+        // when
+        mockMvc.perform(
+                        multipart("/api/rooms")
+                                .file(file0)
+                                .file(file1)
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                                .with(request -> {
+                                    request.setMethod("PATCH"); // Override the method to PATCH
+                                    return request;
+                                })
+                )
+
+                //then
                 .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Required parameter 'roomId' is not present."));
+    }
+
+
+    @Test
+    @DisplayName("매물 수정 - 실패: 유효하지 않은 필드값")
+    @WithMockUser
+    public void updateRoom_Fail_InvalidField() throws Exception {
+        // DTO
+        Long roomId = 1L;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
+                true, true, true, true, true, true, true);
+        RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
+                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+
+        RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
+        RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        RoomImageUpdateRequest roomImageUpdateRequest3 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        List<RoomImageUpdateRequest> roomImageUpdateRequestList = new ArrayList<>();
+        roomImageUpdateRequestList.add(roomImageUpdateRequest1);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest2);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest3);
+
+        RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+                true, 12.88f, 15.66f, (byte) 1, -3000L, -10L, -10L,
+                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+
+        MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+
+        // mock
+        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+
+        // when
+        mockMvc.perform(
+                        multipart("/api/rooms")
+                                .file(file0)
+                                .file(file1)
+                                .param("roomId", String.valueOf(roomId))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                                .with(request -> {
+                                    request.setMethod("PATCH"); // Override the method to PATCH
+                                    return request;
+                                })
+                )
+
+                //then
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Validation failure"));
     }
