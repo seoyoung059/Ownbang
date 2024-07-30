@@ -1,8 +1,12 @@
 package com.bangguddle.ownbang.global.service.impl;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
+import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.service.S3UploaderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +39,6 @@ public class S3UploaderServiceImpl implements S3UploaderService {
     public String uploadToS3(File uploadFile, String dirName) {
         // S3에 저장될 파일 이름
         String fileName = dirName + "/" + uploadFile.getName();
-        log.info("Uploading file to s3: {}", fileName);
         // S3에 업로드
         String uploadImageUrl = putS3(uploadFile, bucketName, fileName);
         // 기존 로컬 파일 삭제
@@ -52,7 +55,13 @@ public class S3UploaderServiceImpl implements S3UploaderService {
      */
     private String putS3(File uploadFile, String bucket, String fileName) {
         log.info("Uploading {} to {}",uploadFile.getName() , bucket);
-        PutObjectResult result = amazonS3.putObject(new PutObjectRequest(bucket, fileName, uploadFile));
+        try {
+            PutObjectResult result = amazonS3.putObject(new PutObjectRequest(bucket, fileName, uploadFile));
+        } catch (AmazonServiceException e) {
+            throw new AppException(ErrorCode.IMAGE_S3_UPLOAD_FAILED);
+        } catch (SdkClientException e) {
+            throw new AppException(ErrorCode.AWS_SDK_CLIENT_FAILED);
+        }
         log.info("Successfully uploaded {} to {}", uploadFile.getName(), bucket);
         return amazonS3.getUrl(bucket, fileName).getPath();
     }

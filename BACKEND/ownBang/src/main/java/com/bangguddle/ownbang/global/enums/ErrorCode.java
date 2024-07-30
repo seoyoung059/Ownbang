@@ -21,6 +21,10 @@ public enum ErrorCode implements ResponseCode {
     INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 이미지 파일입니다."),
     ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 매물입니다."),
 
+    // AWS API
+    IMAGE_S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 S3 업로드에 실패하였습니다."),
+    AWS_SDK_CLIENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "AWS SDK 클라이언트 설정에 실패하였습니다."),
+
 
     // Reservation API
     RESERVATION_DUPLICATED (HttpStatus.CONFLICT, " 이미 다른 사람이 신청된 예약 시간입니다. "),

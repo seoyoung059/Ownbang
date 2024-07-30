@@ -87,10 +87,11 @@ public class RoomImageServiceImpl implements RoomImageService {
                 Files.createDirectories(filePath.getParent());
             }
             Files.write(filePath, roomImage.getBytes());
-            roomImageList.add(new RoomImage(room,s3UploaderService.uploadToS3(filePath.toFile(),"roomImages")));
         } catch (IOException e) {
             throw new AppException(IMAGE_UPLOAD_FAILED);
         }
+
+        roomImageList.add(new RoomImage(room,s3UploaderService.uploadToS3(filePath.toFile(),"roomImages")));
 
         return new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
     }
