@@ -19,12 +19,25 @@ spring:
       client:
         uris: http://localhost:9200
 
+  main:
+    allow-bean-definition-overriding: true
+
+  school:
+    api: ${SCHOOL_API_KEY}
+
+  location:
+    api: ${LOCATION_API_KEY}
+
 server:
   port: ${PORT}
   ssl:
     enabled: false
 
 openvidu:
-  url: ${ OPENVIDU_URL }
-  secret: ${ OPENVIDU_SECRET }
+  url: ${OPENVIDU_URL}
+  secret: ${OPENVIDU_SECRET}
 
+elasticsearch:
+  host: ${ELASTICSEARCH_HOST}
+  username: ${ELASTICSEARCH_USERNAME}
+  password: ${ELASTICSEARCH_PASSWORD}
