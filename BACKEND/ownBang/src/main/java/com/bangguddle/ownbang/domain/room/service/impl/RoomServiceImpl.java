@@ -1,13 +1,11 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
+import com.bangguddle.ownbang.domain.room.dto.RoomListSearchResponse;
 import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
-import com.bangguddle.ownbang.domain.room.repository.RoomAppliancesRepository;
-import com.bangguddle.ownbang.domain.room.repository.RoomDetailRepository;
-import com.bangguddle.ownbang.domain.room.repository.RoomImageRepository;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.ErrorCode;
@@ -72,5 +70,17 @@ public class RoomServiceImpl implements RoomService {
         }
 
         return new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, RoomSearchResponse.from(room.get()));
+    }
+
+    // 매물 전체 조회
+    @Override
+    @Transactional
+    public SuccessResponse<List<RoomListSearchResponse>> getAllRooms() {
+        List<Room> rooms = roomRepository.findAll();
+        List<RoomListSearchResponse> roomSearchResponses = rooms.stream()
+                .map(RoomListSearchResponse::from)
+                .toList();
+
+        return new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomSearchResponses);
     }
 }

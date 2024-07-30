@@ -1,6 +1,7 @@
 package com.bangguddle.ownbang.domain.room.service;
 
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
+import com.bangguddle.ownbang.domain.room.dto.RoomListSearchResponse;
 import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -17,4 +18,7 @@ public interface RoomService {
 
     // 매물 조회
     SuccessResponse<RoomSearchResponse> getRoom(Long id);
+
+    // 매물 전체 조회
+    SuccessResponse<List<RoomListSearchResponse>> getAllRooms();
 }
