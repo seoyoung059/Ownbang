@@ -14,7 +14,13 @@ import {
   Typography,
 } from "@mui/material";
 
-import { Mic, MicOff, Videocam, VideocamOff } from "@mui/icons-material";
+import {
+  Mic,
+  MicOff,
+  Videocam,
+  VideocamOff,
+  ExitToApp,
+} from "@mui/icons-material";
 
 const APPLICATION_SERVER_URL = import.meta.env.VITE_API_URL;
 
@@ -69,6 +75,7 @@ class Video extends Component {
   }
 
   handleMainVideoStream(stream) {
+    z;
     if (this.state.mainStreamManager !== stream) {
       this.setState({
         mainStreamManager: stream,
@@ -184,6 +191,8 @@ class Video extends Component {
       mainStreamManager: undefined,
       publisher: undefined,
     });
+
+    window.location.href = "/";
   }
 
   async switchCamera() {
@@ -360,6 +369,10 @@ class Video extends Component {
             </Grid>
           </Grid>
         )}
+        <Button onClick={this.leaveSession}>
+          <ExitToApp sx={{ mr: 1 }} />
+          나가기
+        </Button>
       </Container>
     );
   }
