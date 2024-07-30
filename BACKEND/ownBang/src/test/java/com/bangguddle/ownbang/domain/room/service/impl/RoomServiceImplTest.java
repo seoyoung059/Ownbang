@@ -190,7 +190,7 @@ class RoomServiceImplTest {
     }
 
     @Test
-    @DisplayName("매물 단건 조회 - 성공")
+    @DisplayName("매물 전체 조회 - 성공")
     void findAllRoomsTest_Success() {
         // given
         Room room1 = Room.builder().build();
