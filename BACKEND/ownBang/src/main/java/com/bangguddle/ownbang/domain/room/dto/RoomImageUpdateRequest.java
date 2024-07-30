@@ -7,13 +7,15 @@ import lombok.Builder;
 @Builder
 public record RoomImageUpdateRequest(
         Long id,
+        Long roomId,
         String roomImageUrl,
         Boolean isDeleted
 ) {
 
-    static public RoomImageUpdateRequest of (Room room, String roomImageUrl, Boolean isDeleted){
+    static public RoomImageUpdateRequest of (Long roomImageId, Long roomId, String roomImageUrl, Boolean isDeleted){
         return RoomImageUpdateRequest.builder()
-                .id(room.getId())
+                .id(roomImageId)
+                .roomId(roomId)
                 .roomImageUrl(roomImageUrl)
                 .isDeleted(isDeleted)
                 .build();
@@ -22,6 +24,7 @@ public record RoomImageUpdateRequest(
     static public RoomImageUpdateRequest from(RoomImage roomImage){
         return RoomImageUpdateRequest.builder()
                 .id(roomImage.getId())
+                .roomId(roomImage.getRoom().getId())
                 .roomImageUrl(roomImage.getRoomImageUrl())
                 .isDeleted(false)
                 .build();
@@ -30,6 +33,7 @@ public record RoomImageUpdateRequest(
 
     public RoomImage toEntity(Room room) {
         return RoomImage.builder()
+                .room(room)
                 .roomImageUrl(roomImageUrl)
                 .build();
     }
