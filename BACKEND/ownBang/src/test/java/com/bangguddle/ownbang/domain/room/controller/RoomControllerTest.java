@@ -1,9 +1,6 @@
 package com.bangguddle.ownbang.domain.room.controller;
 
-import com.bangguddle.ownbang.domain.room.dto.RoomAppliancesCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomDetailCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
+import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.service.impl.RoomServiceImpl;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -23,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -290,4 +289,31 @@ class RoomControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Validation failure"));
     }
+
+    @Test
+    @WithMockUser
+    @DisplayName("매물 전체 조회 - 성공")
+    public void findAllRooms_Success() throws Exception {
+        // DTO
+        List<RoomListSearchResponse> roomList = new ArrayList<>();
+        RoomListSearchResponse roomListSearchResponse1 = RoomListSearchResponse.builder().build();
+        RoomListSearchResponse roomListSearchResponse2 = RoomListSearchResponse.builder().build();
+        RoomListSearchResponse roomListSearchResponse3 = RoomListSearchResponse.builder().build();
+        roomList.add(roomListSearchResponse1);
+        roomList.add(roomListSearchResponse2);
+        roomList.add(roomListSearchResponse3);
+        SuccessResponse<List<RoomListSearchResponse>> successResponse = new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomList);
+
+        // when
+        when(roomServiceImpl.getAllRooms()).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                        get("/api/rooms")
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()
+                                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("ROOM_FIND_SUCCESS"));
+    }
+
 }

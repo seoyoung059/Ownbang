@@ -3,6 +3,7 @@ package com.bangguddle.ownbang.domain.room.service.impl;
 import com.bangguddle.ownbang.domain.room.dto.RoomAppliancesCreateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomDetailCreateRequest;
+import com.bangguddle.ownbang.domain.room.dto.RoomListSearchResponse;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
@@ -186,5 +187,29 @@ class RoomServiceImplTest {
         assertThatThrownBy(() -> {
             roomServiceImpl.getRoom(roomId);
         }).isInstanceOf(AppException.class);
+    }
+
+    @Test
+    @DisplayName("매물 단건 조회 - 성공")
+    void findAllRoomsTest_Success() {
+        // given
+        Room room1 = Room.builder().build();
+        Room room2 = Room.builder().build();
+        Room room3 = Room.builder().build();
+        List<Room> roomList = new ArrayList<>();
+        roomList.add(room1);
+        roomList.add(room2);
+        roomList.add(room3);
+
+        when(roomRepository.findAll()).thenReturn(roomList);
+
+        //when
+        SuccessResponse<List<RoomListSearchResponse>> response = roomServiceImpl.getAllRooms();
+
+        //then
+        verify(roomRepository, times(1)).findAll();
+        assertThat(response).isNotNull();
+        assertThat(response.data().size()).isEqualTo(roomList.size());
+        assertThat(response.successCode()).isEqualTo(SuccessCode.ROOM_FIND_SUCCESS);
     }
 }
