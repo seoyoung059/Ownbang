@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import ReservationCalendar from "./ReservationCalendar";
+import React, { useState, useCallback } from "react";
 import ReservationClock from "./ReservationClock";
 import { useTheme } from "@mui/material/styles";
 import dayjs from "dayjs";
@@ -19,9 +19,18 @@ const Reservation = ({ onClose }) => {
 
   return (
     <>
-      <Typography sx={{ marginLeft: 5, marginTop: 2 }}>
-        예약을 원하는 날짜를 선택해주세요.
-      </Typography>
+      <Box
+        sx={{
+          marginLeft: 5,
+          marginTop: 3,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <Typography variant="h5">화상통화 예약하기</Typography>
+        <Typography>예약을 원하는 날짜를 선택해주세요.</Typography>
+      </Box>
       <Box
         sx={{
           display: "flex",

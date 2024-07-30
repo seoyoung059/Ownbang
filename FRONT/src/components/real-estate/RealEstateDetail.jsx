@@ -21,7 +21,7 @@ const RealEstateDetail = ({ item, onOpenReservationCard }) => {
 
   return (
     <Box sx={styles.container}>
-      <Box>
+      <Box sx={{ marginTop: 2 }}>
         <RealEstateImages />
         <Typography variant="h4" sx={styles.title}>
           {item.title}

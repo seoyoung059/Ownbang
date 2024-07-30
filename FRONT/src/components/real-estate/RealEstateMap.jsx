@@ -3,7 +3,13 @@ import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
 import { Box } from "@mui/material";
 import clusterPositionsData from "./clusterPositionsData.json";
 
-const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
+const LoadKakaoMap = ({
+  searchTerm,
+  mark,
+  size,
+  onBoundsChange,
+  onMarkerClick,
+}) => {
   const [positions, setPositions] = useState([]);
   const [info, setInfo] = useState(null);
   const [map, setMap] = useState(null);
@@ -40,8 +46,9 @@ const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
     map.panTo(center); // mark 좌표를 중심으로 지도 이동
   }, [map, mark]);
 
-  const onMarkerClick = (pos) => {
+  const onMarkerClickInternal = (pos) => {
     setInfo(info && info.lat === pos.lat && info.lng === pos.lng ? null : pos);
+    onMarkerClick(pos); // Notify parent of marker click
   };
 
   const onBoundsChange2 = () => {
@@ -82,7 +89,7 @@ const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
                 lat: pos.lat,
                 lng: pos.lng,
               }}
-              onClick={() => onMarkerClick(pos)}
+              onClick={() => onMarkerClickInternal(pos)}
             >
               {info && info.lat === pos.lat && info.lng === pos.lng && (
                 <Box

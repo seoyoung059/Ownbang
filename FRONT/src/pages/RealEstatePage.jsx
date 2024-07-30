@@ -15,41 +15,39 @@ const RealEstatePage = () => {
   const [showReservation, setShowReservation] = useState(false);
   const [visibleMarkers, setVisibleMarkers] = useState([]);
 
-  // 검색어를 업데이트하는 함수
   const onSearch = (term) => {
     setSearchTerm(term);
   };
 
-  // 매물 리스트에서 선택하는 항목
   const onSelectItem = (item) => {
     setSelectedItem(item);
     setShowReservation(false); // 새로운 아이템 선택 시 예약 창 닫기
   };
 
-  // 디테일 카드 닫기
   const onCloseDetailCard = () => {
     setSelectedItem(null);
     setShowReservation(false); // 디테일 카드 닫을 때 예약 창도 닫기
   };
 
-  // 예약하기 버튼 클릭시 Reservation 카드 오픈
   const onOpenReservationCard = () => {
     setShowReservation(true);
   };
 
-  // 예약 카드 닫기
   const onCloseReservationCard = () => {
     setShowReservation(false);
   };
 
-  // 지도 경계 변경 시 호출되는 함수
   const onBoundsChange = (markers) => {
     setVisibleMarkers(markers);
   };
 
+  const onMarkerClick = (marker) => {
+    setSelectedItem(marker);
+    setShowReservation(false); // 마커 클릭 시 예약 창 닫기
+  };
+
   return (
     <Box sx={{ display: "flex", height: "100vh", position: "relative" }}>
-      {/* 리스트 */}
       <Box
         sx={{
           marginRight: "5px",
@@ -63,9 +61,7 @@ const RealEstatePage = () => {
         <RealEstateList markers={visibleMarkers} onSelectItem={onSelectItem} />
       </Box>
 
-      {/* 지도와 검색 바 */}
       <Box sx={{ paddingTop: "80px", width: "80%" }}>
-        {/* 검색 바 오른쪽에 위치 */}
         <Box
           sx={{
             position: "fixed",
@@ -82,10 +78,10 @@ const RealEstatePage = () => {
           sx={{ position: "absolute" }}
           size="900px"
           onBoundsChange={onBoundsChange}
+          onMarkerClick={onMarkerClick} // Add this prop
         />
       </Box>
 
-      {/* List에서 Item을 누르면 Detail 카드가 뜹니다 */}
       {selectedItem && (
         <Box
           sx={{
