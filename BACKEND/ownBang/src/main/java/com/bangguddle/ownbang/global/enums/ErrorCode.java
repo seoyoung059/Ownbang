@@ -16,8 +16,11 @@ public enum ErrorCode implements ResponseCode {
 
 
     // Room API
+    IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패하였습니다."),
+    IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장에 실패하였습니다."),
     INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 이미지 파일입니다."),
     ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 매물입니다."),
+
 
     // Reservation API
     RESERVATION_DUPLICATED (HttpStatus.CONFLICT, " 이미 다른 사람이 신청된 예약 시간입니다. "),

@@ -3,6 +3,7 @@ package com.bangguddle.ownbang.domain.room.controller;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.service.impl.RoomServiceImpl;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -28,7 +29,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = RoomController.class)
@@ -62,7 +62,7 @@ class RoomControllerTest {
         MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(roomCreateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
         MockMultipartFile file2 = new MockMultipartFile("roomImageFile", "image2.png", "image/png", "image/png".getBytes());
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_REGISTER_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_CREATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         given(roomServiceImpl.createRoom(any(RoomCreateRequest.class), any())).willReturn(success);
@@ -82,7 +82,7 @@ class RoomControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(jsonPath("$.code").value(SuccessCode.ROOM_REGISTER_SUCCESS.name()))
+                .andExpect(jsonPath("$.code").value(SuccessCode.ROOM_CREATE_SUCCESS.name()))
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
 
@@ -199,8 +199,7 @@ class RoomControllerTest {
 
         //then
         mockMvc.perform(
-                    delete("/api/rooms")
-                        .param("roomId", String.valueOf(roomId))
+                        delete("/api/rooms/{roomID}", String.valueOf(roomId))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()
                         ))
                 .andExpect(status().isOk())
@@ -221,8 +220,7 @@ class RoomControllerTest {
 
         //then
         mockMvc.perform(
-                        delete("/api/rooms")
-                                .param("roomId", String.valueOf(roomId))
+                        delete("/api/rooms/{roomID}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
                 .andExpect(status().isBadRequest());
@@ -244,7 +242,8 @@ class RoomControllerTest {
                         delete("/api/rooms")
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.message").value(ErrorCode.METHOD_NOT_ALLOWED.getMessage()));
     }
 
     @Test
@@ -326,10 +325,9 @@ class RoomControllerTest {
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms")
+                        multipart("/api/rooms/{roomId}", String.valueOf(roomId))
                                 .file(file0)
                                 .file(file1)
-                                .param("roomId", String.valueOf(roomId))
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -383,10 +381,9 @@ class RoomControllerTest {
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms")
+                        multipart("/api/rooms/{roomId}", String.valueOf(roomId))
                                 .file(file0)
                                 .file(file1)
-                                .param("roomId", String.valueOf(roomId))
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -437,10 +434,9 @@ class RoomControllerTest {
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms")
+                        multipart("/api/rooms/{roomId}", String.valueOf(roomId))
                                 .file(file0)
                                 .file(file1)
-                                .param("roomId", String.valueOf(roomId))
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -504,9 +500,8 @@ class RoomControllerTest {
                 )
 
                 //then
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Required parameter 'roomId' is not present."));
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.message").value(ErrorCode.METHOD_NOT_ALLOWED.getMessage()));
     }
 
 
@@ -546,10 +541,9 @@ class RoomControllerTest {
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms")
+                        multipart("/api/rooms/{roomId}", String.valueOf(roomId))
                                 .file(file0)
                                 .file(file1)
-                                .param("roomId", String.valueOf(roomId))
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())

@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 @ExtendWith(MockitoExtension.class)
 class RoomServiceImplTest {
@@ -81,7 +82,7 @@ class RoomServiceImplTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.successCode()).isEqualTo(SuccessCode.ROOM_REGISTER_SUCCESS);
+        assertThat(response.successCode()).isEqualTo(ROOM_CREATE_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -133,7 +134,7 @@ class RoomServiceImplTest {
 
         // Then
         assertThat(response).isNotNull();
-        assertThat(response.successCode()).isEqualTo(SuccessCode.ROOM_DELETE_SUCCESS);
+        assertThat(response.successCode()).isEqualTo(ROOM_DELETE_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(roomRepository, times(1)).deleteById(roomId);
@@ -237,7 +238,7 @@ class RoomServiceImplTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.successCode()).isEqualTo(SuccessCode.ROOM_UPDATE_SUCCESS);
+        assertThat(response.successCode()).isEqualTo(ROOM_UPDATE_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -282,7 +283,7 @@ class RoomServiceImplTest {
                 .build();
 
 
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -333,7 +334,7 @@ class RoomServiceImplTest {
                 .build();
 
 
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
@@ -386,7 +387,7 @@ class RoomServiceImplTest {
                 .build();
 
 
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
