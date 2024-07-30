@@ -23,3 +23,13 @@ openvidu:
   url: ${ OPENVIDU_URL }
   secret: ${ OPENVIDU_SECRET }
 
+cloud:
+  aws:
+    credentials:
+      accessKey: ${aws_accessKey}
+      secretKey: ${aws_secretKey}
+    region:
+      static: ${aws_region}
+    s3:
+      bucket: ${aws_s3bucket}
+
