@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import List from "@mui/material/List";
 import RealEstateItem from "./RealEstateItem";
-import clusterPositionsData from "./clusterPositionsData.json";
 import { useTheme } from "@mui/material";
 
-const RealEstateList = ({ onSelectItem }) => {
+const RealEstateList = ({ markers, onSelectItem }) => {
   const theme = useTheme();
-  const [markers, setMarkers] = useState(clusterPositionsData.tmpMarkers);
+  const [displayedMarkers, setDisplayedMarkers] = useState([]);
+
+  useEffect(() => {
+    setDisplayedMarkers(markers);
+  }, [markers]);
 
   const toggleFavorite = (index) => {
-    const newMarkers = markers.map((marker, i) => {
+    const newMarkers = displayedMarkers.map((marker, i) => {
       if (i === index) {
         const updatedMarker = { ...marker, favorite: !marker.favorite };
         console.log(`${marker.title} - favorite: ${updatedMarker.favorite}`);
@@ -17,7 +20,7 @@ const RealEstateList = ({ onSelectItem }) => {
       }
       return marker;
     });
-    setMarkers(newMarkers);
+    setDisplayedMarkers(newMarkers);
   };
 
   return (
@@ -28,7 +31,7 @@ const RealEstateList = ({ onSelectItem }) => {
         bgcolor: theme.palette.background.default,
       }}
     >
-      {markers.map((marker, index) => (
+      {displayedMarkers.map((marker, index) => (
         <RealEstateItem
           key={index}
           marker={marker}
