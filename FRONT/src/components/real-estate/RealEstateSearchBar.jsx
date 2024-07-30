@@ -45,7 +45,8 @@ const RealEstateSearchBar = ({ onSearch }) => {
           border: "1px solid lightgray", // 연한 회색 테두리
           padding: "15px 25px",
           backgroundColor: theme.palette.common.white,
-          fontSize: theme.fontSize.small,
+          fontSize: theme.fontSize.medium,
+          boxShadow: 3,
         }}
       />
       <Button
@@ -56,7 +57,7 @@ const RealEstateSearchBar = ({ onSearch }) => {
           borderRadius: "7px", // 둥근 사각형 모양
           padding: "13px 15px",
           backgroundColor: theme.palette.primary.dark,
-          fontSize: theme.fontSize.small,
+          fontSize: theme.fontSize.medium,
         }}
       >
         검색
