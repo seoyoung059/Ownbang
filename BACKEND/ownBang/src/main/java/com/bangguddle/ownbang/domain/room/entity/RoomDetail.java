@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.room.entity;
 
+import com.bangguddle.ownbang.domain.room.dto.RoomDetailUpdateRequest;
 import com.bangguddle.ownbang.domain.room.enums.Facing;
 import com.bangguddle.ownbang.domain.room.enums.HeatingType;
 import com.bangguddle.ownbang.domain.room.enums.Purpose;
@@ -87,6 +88,24 @@ public class RoomDetail {
         this.purpose = purpose;
         this.road = road;
         this.detailAddress = detailAddress;
+    }
+
+
+    public void updateFromDto(RoomDetailUpdateRequest roomDetailUpdateRequest) {
+        this.roomCount = roomDetailUpdateRequest.roomCount();
+        this.bathroomCount = roomDetailUpdateRequest.bathroomCount();
+        this.heatingType = roomDetailUpdateRequest.heatingType();
+        this.moveInDate = roomDetailUpdateRequest.moveInDate();
+        this.buildingFloor = roomDetailUpdateRequest.buildingFloor();
+        this.elevator = roomDetailUpdateRequest.elevator();
+        this.totalParking = roomDetailUpdateRequest.totalParking();
+        this.parking = roomDetailUpdateRequest.parking();
+        this.approvalDate = roomDetailUpdateRequest.approvalDate();
+        this.firstRegistrationDate = roomDetailUpdateRequest.firstRegistrationDate();
+        this.facing = roomDetailUpdateRequest.facing();
+        this.purpose = roomDetailUpdateRequest.purpose();
+        this.road = roomDetailUpdateRequest.road();
+        this.detailAddress = roomDetailUpdateRequest.detailAddress();
     }
 }
 

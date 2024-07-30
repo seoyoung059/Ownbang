@@ -1,8 +1,6 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
-import com.bangguddle.ownbang.domain.room.dto.RoomAppliancesCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomDetailCreateRequest;
+import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
@@ -74,7 +72,7 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
         // mock
-        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(SuccessCode.ROOM_REGISTER_SUCCESS, NoneResponse.NONE));
+        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
         when(roomRepository.save(any(Room.class))).thenReturn(Room.builder().build()); // 추가된 부분
 
 
@@ -187,4 +185,221 @@ class RoomServiceImplTest {
             roomServiceImpl.getRoom(roomId);
         }).isInstanceOf(AppException.class);
     }
+
+
+    @Test
+    @DisplayName("매물 수정 - 성공")
+    void updateRoomTest_SUCCESS() throws ParseException {
+        // DTO
+        Long roomId = 1L;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
+                true, true, true, true, true, true, true);
+        RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
+                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+
+        RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
+        RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        RoomImageUpdateRequest roomImageUpdateRequest3 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        List<RoomImageUpdateRequest> roomImageUpdateRequestList = new ArrayList<>();
+        roomImageUpdateRequestList.add(roomImageUpdateRequest1);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest2);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest3);
+
+        RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+                true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
+                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+
+        List<MultipartFile> roomImageFiles = new ArrayList<>();
+        roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
+        roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
+
+        Room room = Room.builder()
+                .roomAppliances(RoomAppliances.builder().build())
+                .roomDetail(RoomDetail.builder().build())
+                .build();
+
+
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+
+        // mock
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
+        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
+        when(roomImageServiceImpl.deleteImage(anyLong())).thenReturn(success);
+        when(roomRepository.save(any(Room.class))).thenReturn(any(Room.class)); // 추가된 부분
+
+
+        // when
+        SuccessResponse<NoneResponse> response = roomServiceImpl.updateRoom(roomId, roomUpdateRequest, roomImageFiles);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(SuccessCode.ROOM_UPDATE_SUCCESS);
+        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
+
+        verify(roomRepository, times(1)).save(any(Room.class));
+        verify(roomImageServiceImpl, times(roomImageFiles.size())).uploadImage(any(MultipartFile.class), any(Room.class));
+        verify(roomRepository, times(1)).findById(anyLong());
+
+    }
+
+    @Test
+    @DisplayName("매물 수정 - 실패: 존재하지 않는 매물")
+    void updateRoomTest_RoomIdNotExist() throws IOException, ParseException {
+        // DTO
+        Long roomId = 1L;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
+                true, true, true, true, true, true, true);
+        RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
+                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+
+        RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
+        RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        RoomImageUpdateRequest roomImageUpdateRequest3 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        List<RoomImageUpdateRequest> roomImageUpdateRequestList = new ArrayList<>();
+        roomImageUpdateRequestList.add(roomImageUpdateRequest1);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest2);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest3);
+
+        RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+                true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
+                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+
+        List<MultipartFile> roomImageFiles = new ArrayList<>();
+        roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
+        roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
+
+        Room room = Room.builder()
+                .roomAppliances(RoomAppliances.builder().build())
+                .roomDetail(RoomDetail.builder().build())
+                .build();
+
+
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+
+        // mock
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // 매물 생성
+        assertThatThrownBy(()->{
+            roomServiceImpl.updateRoom(roomId, roomUpdateRequest, roomImageFiles);
+        }).isInstanceOf(AppException.class);
+
+
+        verify(roomRepository, never()).save(any(Room.class));
+
+    }
+
+    @Test
+    @DisplayName("매물 수정 - 실패: 이미지 업로드 실패")
+    void updateRoomTest_ImageUploadFailed() throws IOException, ParseException {
+        // DTO
+        Long roomId = 1L;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
+                true, true, true, true, true, true, true);
+        RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
+                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+
+        RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
+        RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        RoomImageUpdateRequest roomImageUpdateRequest3 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        List<RoomImageUpdateRequest> roomImageUpdateRequestList = new ArrayList<>();
+        roomImageUpdateRequestList.add(roomImageUpdateRequest1);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest2);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest3);
+
+        RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+                true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
+                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+
+        List<MultipartFile> roomImageFiles = new ArrayList<>();
+        roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
+        roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
+
+        Room room = Room.builder()
+                .roomAppliances(RoomAppliances.builder().build())
+                .roomDetail(RoomDetail.builder().build())
+                .build();
+
+
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+
+        // mock
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
+        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
+        when(roomImageServiceImpl.deleteImage(anyLong())).thenReturn(success);
+
+        // 매물 생성
+        assertThatThrownBy(()->{
+            roomServiceImpl.updateRoom(roomId, roomUpdateRequest, roomImageFiles);
+        }).isInstanceOf(AppException.class);
+
+
+        verify(roomRepository, never()).save(any(Room.class));
+
+    }
+
+    @Test
+    @DisplayName("매물 수정 - 실패: 이미지 삭제 실패")
+    void updateRoomTest_ImageDeleteFailed() throws IOException, ParseException {
+        // DTO
+        Long roomId = 1L;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
+                true, true, true, true, true, true, true);
+        RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
+                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
+                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+
+        RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
+        RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        RoomImageUpdateRequest roomImageUpdateRequest3 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
+        List<RoomImageUpdateRequest> roomImageUpdateRequestList = new ArrayList<>();
+        roomImageUpdateRequestList.add(roomImageUpdateRequest1);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest2);
+        roomImageUpdateRequestList.add(roomImageUpdateRequest3);
+
+        RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
+                true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
+                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+
+        List<MultipartFile> roomImageFiles = new ArrayList<>();
+        roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
+        roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
+
+        Room room = Room.builder()
+                .roomAppliances(RoomAppliances.builder().build())
+                .roomDetail(RoomDetail.builder().build())
+                .build();
+
+
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+
+        // mock
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
+        when(roomImageServiceImpl.deleteImage(anyLong())).thenThrow(new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
+
+        // 매물 생성
+        assertThatThrownBy(()->{
+            roomServiceImpl.updateRoom(roomId, roomUpdateRequest, roomImageFiles);
+        }).isInstanceOf(AppException.class);
+
+
+        verify(roomRepository, never()).save(any(Room.class));
+
+    }
+
 }
