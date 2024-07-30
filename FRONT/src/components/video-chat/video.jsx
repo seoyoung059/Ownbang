@@ -4,22 +4,17 @@ import React, { Component } from "react";
 import UserVideoComponent from "./UserVideoComponent";
 
 import {
-  AppBar,
-  Toolbar,
-  Typography,
   Container,
   Grid,
   Paper,
-  Button,
   IconButton,
-  Avatar,
   Box,
   TextField,
-  Divider,
+  Button,
+  Typography,
 } from "@mui/material";
-import MicIcon from "@mui/icons-material/Mic";
-import VideocamIcon from "@mui/icons-material/Videocam";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+
+import { Mic, MicOff, Videocam, VideocamOff } from "@mui/icons-material";
 
 const APPLICATION_SERVER_URL = import.meta.env.VITE_API_URL;
 
@@ -27,7 +22,6 @@ class Video extends Component {
   constructor(props) {
     super(props);
 
-    // These properties are in the state's component in order to re-render the HTML whenever their values change
     this.state = {
       mySessionId: "123",
       myUserName: "Participant" + Math.floor(Math.random() * 100),
@@ -35,11 +29,15 @@ class Video extends Component {
       mainStreamManager: undefined,
       publisher: undefined,
       subscribers: [],
+      isAudioMuted: false,
+      isVideoHidden: false,
     };
 
     this.joinSession = this.joinSession.bind(this);
     this.leaveSession = this.leaveSession.bind(this);
     this.switchCamera = this.switchCamera.bind(this);
+    this.toggleAudio = this.toggleAudio.bind(this);
+    this.toggleVideo = this.toggleVideo.bind(this);
     this.handleChangeSessionId = this.handleChangeSessionId.bind(this);
     this.handleChangeUserName = this.handleChangeUserName.bind(this);
     this.handleMainVideoStream = this.handleMainVideoStream.bind(this);
@@ -103,6 +101,14 @@ class Video extends Component {
           var subscriber = mySession.subscribe(event.stream, undefined);
           var subscribers = this.state.subscribers;
           subscribers.push(subscriber);
+
+          // 첫 번째 스트림을 메인 스트림으로 설정
+          if (!this.state.mainStreamManager) {
+            this.setState({
+              mainStreamManager: event.stream.streamManager,
+            });
+          }
+
           this.setState({ subscribers: subscribers });
         });
 
@@ -146,8 +152,8 @@ class Video extends Component {
 
               this.setState({
                 currentVideoDevice: currentVideoDevice,
-                mainStreamManager: publisher,
                 publisher: publisher,
+                mainStreamManager: this.state.mainStreamManager || publisher,
               });
             })
             .catch((error) => {
@@ -214,9 +220,36 @@ class Video extends Component {
     }
   }
 
+  toggleAudio() {
+    this.setState(
+      (prevState) => ({
+        isAudioMuted: !prevState.isAudioMuted,
+      }),
+      () => {
+        this.state.publisher.publishAudio(!this.state.isAudioMuted);
+      }
+    );
+  }
+
+  toggleVideo() {
+    this.setState(
+      (prevState) => ({
+        isVideoHidden: !prevState.isVideoHidden,
+      }),
+      () => {
+        this.state.publisher.publishVideo(!this.state.isVideoHidden);
+      }
+    );
+  }
+
   render() {
-    const { mySessionId, myUserName, mainStreamManager, subscribers } =
-      this.state;
+    const {
+      mySessionId,
+      myUserName,
+      mainStreamManager,
+      publisher,
+      subscribers,
+    } = this.state;
 
     return (
       <Container component="main" maxWidth="lg">
@@ -260,16 +293,35 @@ class Video extends Component {
             </Box>
           </Box>
         ) : (
-          <Grid container spacing={2} style={{ mt: 16 }}>
+          <Grid container spacing={2} style={{ marginTop: 16 }}>
             <Grid item xs={12}>
-              <Paper style={{ position: "relative" }}>
+              <Paper style={{ position: "relative", height: "80vh" }}>
                 {mainStreamManager && (
                   <UserVideoComponent
                     streamManager={mainStreamManager}
                     isMain={true}
                   />
                 )}
-                {subscribers[0] && (
+                {publisher !== mainStreamManager && (
+                  <Box
+                    style={{
+                      position: "absolute",
+                      bottom: 16,
+                      right: 16,
+                      width: "20%",
+                      height: "26%",
+                      borderRadius: "8px",
+                      overflow: "hidden",
+                      border: "2px solid white",
+                    }}
+                  >
+                    <UserVideoComponent
+                      streamManager={publisher}
+                      isMain={false}
+                    />
+                  </Box>
+                )}
+                {subscribers[0] && subscribers[0] !== mainStreamManager && (
                   <Box
                     style={{
                       position: "absolute",
@@ -288,6 +340,22 @@ class Video extends Component {
                     />
                   </Box>
                 )}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: 16,
+                    left: 16,
+                    display: "flex",
+                    gap: 2,
+                  }}
+                >
+                  <IconButton color="primary" onClick={this.toggleAudio}>
+                    {this.state.isAudioMuted ? <MicOff /> : <Mic />}
+                  </IconButton>
+                  <IconButton color="primary" onClick={this.toggleVideo}>
+                    {this.state.isVideoHidden ? <VideocamOff /> : <Videocam />}
+                  </IconButton>
+                </Box>
               </Paper>
             </Grid>
           </Grid>

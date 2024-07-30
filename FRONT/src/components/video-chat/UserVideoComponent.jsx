@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 
-const UserVideoComponent = ({ streamManager }) => {
+const UserVideoComponent = ({ streamManager, isMain }) => {
   if (!streamManager) return null;
 
   return (
@@ -9,8 +9,10 @@ const UserVideoComponent = ({ streamManager }) => {
       sx={{
         width: "100%",
         height: "100%",
+        position: "relative",
         borderRadius: "8px",
         overflow: "hidden",
+        background: "black",
       }}
     >
       <video
