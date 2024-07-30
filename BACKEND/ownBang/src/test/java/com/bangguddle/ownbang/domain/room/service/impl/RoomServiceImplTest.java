@@ -8,9 +8,7 @@ import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.repository.RoomAppliancesRepository;
 import com.bangguddle.ownbang.domain.room.repository.RoomDetailRepository;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
-import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -29,10 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.bangguddle.ownbang.global.enums.ErrorCode.INTERNAL_SERVER_ERROR;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.ROOM_NOT_FOUND;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-
 
 @ExtendWith(MockitoExtension.class)
 class RoomServiceImplTest {
@@ -72,7 +72,7 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
         // mock
-        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
+        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
         when(roomRepository.save(any(Room.class))).thenReturn(Room.builder().build()); // 추가된 부분
 
 
@@ -81,7 +81,7 @@ class RoomServiceImplTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.successCode()).isEqualTo(SuccessCode.ROOM_REGISTER_SUCCESS);
+        assertThat(response.successCode()).isEqualTo(ROOM_CREATE_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -109,7 +109,7 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
         // when
-        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
+        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
 
         // 매물 생성
         assertThatThrownBy(()->{
@@ -133,7 +133,7 @@ class RoomServiceImplTest {
 
         // Then
         assertThat(response).isNotNull();
-        assertThat(response.successCode()).isEqualTo(SuccessCode.ROOM_DELETE_SUCCESS);
+        assertThat(response.successCode()).isEqualTo(ROOM_DELETE_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(roomRepository, times(1)).deleteById(roomId);
@@ -143,7 +143,7 @@ class RoomServiceImplTest {
     @DisplayName("매물 삭제 - 실패: 존재하지 않는 ID")
     void deleteRoomTest_Fail_NotExist() {
         //given
-        doThrow(new AppException(ErrorCode.ROOM_NOT_FOUND)).when(roomRepository).validateById(anyLong());
+        doThrow(new AppException(ROOM_NOT_FOUND)).when(roomRepository).validateById(anyLong());
         Long roomId = 1L;
 
         //when, then
@@ -175,7 +175,7 @@ class RoomServiceImplTest {
     void findRoomTest_Fail_InvalidId() {
         // given
         Room room = Room.builder().build();
-        doThrow(new AppException(ErrorCode.ROOM_NOT_FOUND)).when(roomRepository).findById(anyLong());
+        doThrow(new AppException(ROOM_NOT_FOUND)).when(roomRepository).findById(anyLong());
         Long roomId = 1L;
 
         //when
@@ -223,11 +223,11 @@ class RoomServiceImplTest {
                 .build();
 
 
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
-        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
+        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
         when(roomImageServiceImpl.deleteImage(anyLong())).thenReturn(success);
         when(roomRepository.save(any(Room.class))).thenReturn(any(Room.class)); // 추가된 부분
 
@@ -237,7 +237,7 @@ class RoomServiceImplTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.successCode()).isEqualTo(SuccessCode.ROOM_UPDATE_SUCCESS);
+        assertThat(response.successCode()).isEqualTo(ROOM_UPDATE_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(roomRepository, times(1)).save(any(Room.class));
@@ -282,7 +282,7 @@ class RoomServiceImplTest {
                 .build();
 
 
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -333,11 +333,11 @@ class RoomServiceImplTest {
                 .build();
 
 
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
-        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
+        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
         when(roomImageServiceImpl.deleteImage(anyLong())).thenReturn(success);
 
         // 매물 생성
@@ -386,11 +386,11 @@ class RoomServiceImplTest {
                 .build();
 
 
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
-        when(roomImageServiceImpl.deleteImage(anyLong())).thenThrow(new AppException(ErrorCode.INTERNAL_SERVER_ERROR));
+        when(roomImageServiceImpl.deleteImage(anyLong())).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
 
         // 매물 생성
         assertThatThrownBy(()->{

@@ -9,9 +9,7 @@ import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
-import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import jakarta.transaction.Transactional;
@@ -22,6 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Optional;
 
+import static com.bangguddle.ownbang.global.enums.ErrorCode.ROOM_NOT_FOUND;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
+
 @Service
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
@@ -30,7 +31,12 @@ public class RoomServiceImpl implements RoomService {
     private final RoomImageServiceImpl roomImageServiceImpl;
 //    private final UserRepository userRepository;
 
-    // 매물 생성
+    /**
+     * 매물 생성 Service 메서드
+     * @param roomCreateRequest 매물 생성 DTO
+     * @param roomImageFiles 생성할 매물의 이미지 파일
+     * @return SuccessResponse
+     */
     @Override
     @Transactional
     public SuccessResponse<NoneResponse> createRoom(RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles) {
@@ -45,17 +51,23 @@ public class RoomServiceImpl implements RoomService {
         }
         roomRepository.save(room);
 
-        return new SuccessResponse<NoneResponse>(SuccessCode.ROOM_REGISTER_SUCCESS, NoneResponse.NONE);
+        return new SuccessResponse<NoneResponse>(ROOM_CREATE_SUCCESS, NoneResponse.NONE);
     }
 
-    //매물 수정
+    /**
+     * 매물 수정 서비스 메서드
+     * @param roomId 수정할 매물의 ID
+     * @param roomUpdateRequest 수정할 매물 정보
+     * @param roomImageFiles 매물에 추가할 이미지 파일
+     * @return Success Response.
+     */
     @Override
     @Transactional
     public SuccessResponse<NoneResponse> updateRoom(Long roomId, RoomUpdateRequest roomUpdateRequest, List<MultipartFile> roomImageFiles) {
         // User
 
         Room existingRoom = roomRepository.findById(roomId)
-                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
 
         existingRoom.updateFromDto(roomUpdateRequest);
 
@@ -75,10 +87,14 @@ public class RoomServiceImpl implements RoomService {
         }
 
         roomRepository.save(existingRoom);
-        return new SuccessResponse<NoneResponse>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        return new SuccessResponse<NoneResponse>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
     }
 
-    // 매물 삭제
+    /**
+     * 매물 삭제 서비스 메서드
+     * @param roomId 삭제할 매물의 ID
+     * @return Success Response
+     */
     @Override
     @Transactional
     public SuccessResponse<NoneResponse> deleteRoom(Long roomId) {
@@ -86,19 +102,23 @@ public class RoomServiceImpl implements RoomService {
         roomRepository.validateById(roomId);
         roomRepository.deleteById(roomId);
 
-        return new SuccessResponse<NoneResponse>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+        return new SuccessResponse<NoneResponse>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
     }
 
 
-    // 매물 조회
+    /**
+     * 매물 조회 서비스 메서드
+     * @param roomId 조회할 매물의 ID
+     * @return Success Response - RoomSearchResponse DTO
+     */
     @Override
     @Transactional
-    public SuccessResponse<RoomSearchResponse> getRoom(Long id) {
-        Optional<Room> room = roomRepository.findById(id);
+    public SuccessResponse<RoomSearchResponse> getRoom(Long roomId) {
+        Optional<Room> room = roomRepository.findById(roomId);
         if (room.isEmpty()) {
-            throw new AppException(ErrorCode.ROOM_NOT_FOUND);
+            throw new AppException(ROOM_NOT_FOUND);
         }
 
-        return new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, RoomSearchResponse.from(room.get()));
+        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room.get()));
     }
 }
