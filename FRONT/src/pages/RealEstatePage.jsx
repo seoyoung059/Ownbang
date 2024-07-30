@@ -13,6 +13,7 @@ const RealEstatePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
   const [showReservation, setShowReservation] = useState(false);
+  const [visibleMarkers, setVisibleMarkers] = useState([]);
 
   // 검색어를 업데이트하는 함수
   const onSearch = (term) => {
@@ -41,6 +42,11 @@ const RealEstatePage = () => {
     setShowReservation(false);
   };
 
+  // 지도 경계 변경 시 호출되는 함수
+  const onBoundsChange = (markers) => {
+    setVisibleMarkers(markers);
+  };
+
   return (
     <Box sx={{ display: "flex", height: "100vh", position: "relative" }}>
       {/* 리스트 */}
@@ -54,7 +60,7 @@ const RealEstatePage = () => {
           position: "relative",
         }}
       >
-        <RealEstateList onSelectItem={onSelectItem} />
+        <RealEstateList markers={visibleMarkers} onSelectItem={onSelectItem} />
       </Box>
 
       {/* 지도와 검색 바 */}
@@ -75,6 +81,7 @@ const RealEstatePage = () => {
           searchTerm={searchTerm}
           sx={{ position: "absolute" }}
           size="900px"
+          onBoundsChange={onBoundsChange}
         />
       </Box>
 

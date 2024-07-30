@@ -3,7 +3,7 @@ import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
 import { Box } from "@mui/material";
 import clusterPositionsData from "./clusterPositionsData.json";
 
-const LoadKakaoMap = ({ searchTerm, mark, size }) => {
+const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
   const [positions, setPositions] = useState([]);
   const [info, setInfo] = useState(null);
   const [map, setMap] = useState(null);
@@ -40,9 +40,24 @@ const LoadKakaoMap = ({ searchTerm, mark, size }) => {
     map.panTo(center); // mark 좌표를 중심으로 지도 이동
   }, [map, mark]);
 
-  const handleMarkerClick = (pos) => {
+  const onMarkerClick = (pos) => {
     setInfo(info && info.lat === pos.lat && info.lng === pos.lng ? null : pos);
   };
+
+  const onBoundsChange2 = () => {
+    if (!map) return;
+    const bounds = map.getBounds();
+    const visiblePositions = positions.filter((pos) =>
+      bounds.contain(new kakao.maps.LatLng(pos.lat, pos.lng))
+    );
+    onBoundsChange(visiblePositions);
+  };
+
+  useEffect(() => {
+    if (map) {
+      onBoundsChange2(); // 맵이 처음 생성될 때 onBoundsChange2 호출
+    }
+  }, [map, positions]);
 
   return (
     <Map // 지도 표시 container
@@ -52,13 +67,14 @@ const LoadKakaoMap = ({ searchTerm, mark, size }) => {
       }}
       style={{
         width: "100%",
-        height: size,
+        height: "900px",
       }}
       level={7}
       onCreate={setMap} // 지도가 생성될 때 setMap 호출
+      onBoundsChanged={onBoundsChange2} // 지도의 경계가 변경될 때 onBoundsChange2 호출
     >
       {!mark ? (
-        <MarkerClusterer averageCenter={true} minLevel={3}>
+        <MarkerClusterer averageCenter={true} minLevel={5}>
           {positions.map((pos) => (
             <MapMarker
               key={`${pos.lat}-${pos.lng}`}
@@ -66,7 +82,7 @@ const LoadKakaoMap = ({ searchTerm, mark, size }) => {
                 lat: pos.lat,
                 lng: pos.lng,
               }}
-              onClick={() => handleMarkerClick(pos)}
+              onClick={() => onMarkerClick(pos)}
             >
               {info && info.lat === pos.lat && info.lng === pos.lng && (
                 <Box
