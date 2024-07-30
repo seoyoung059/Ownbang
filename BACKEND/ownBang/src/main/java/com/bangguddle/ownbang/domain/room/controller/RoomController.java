@@ -30,11 +30,9 @@ public class RoomController {
 
     // 매물 수정
     @PatchMapping
-    public ResponseEntity<Response<NoneResponse>> updateRoom(@RequestParam(value = "roomId") @Valid Long roomId,
-                                                             @RequestPart(value="roomUpdateRequest") RoomUpdateRequest roomUpdateRequest,
+    public ResponseEntity<Response<NoneResponse>> updateRoom(@RequestParam(value = "roomId") @Valid @Positive Long roomId,
+                                                             @RequestPart(value="roomUpdateRequest") @Valid RoomUpdateRequest roomUpdateRequest,
                                                              @RequestPart(value="roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
-        System.out.println(roomUpdateRequest);
-
         return Response.success(roomService.updateRoom(roomId, roomUpdateRequest, roomImageFiles));
     }
 
