@@ -29,16 +29,16 @@ public class RoomController {
     }
 
     // 매물 수정
-    @PatchMapping
-    public ResponseEntity<Response<NoneResponse>> updateRoom(@RequestParam(value = "roomId") @Valid @Positive Long roomId,
+    @PatchMapping("/{roomId}")
+    public ResponseEntity<Response<NoneResponse>> updateRoom(@PathVariable(value = "roomId") @Valid @Positive Long roomId,
                                                              @RequestPart(value="roomUpdateRequest") @Valid RoomUpdateRequest roomUpdateRequest,
                                                              @RequestPart(value="roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
         return Response.success(roomService.updateRoom(roomId, roomUpdateRequest, roomImageFiles));
     }
 
     // 매물 삭제
-    @DeleteMapping
-    public ResponseEntity<Response<NoneResponse>> deleteRoom(@RequestParam(value = "roomId") @Positive @Valid Long roomId) {
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<Response<NoneResponse>> deleteRoom(@PathVariable(value = "roomId") @Positive @Valid Long roomId) {
         return Response.success(roomService.deleteRoom(roomId));
     }
 
