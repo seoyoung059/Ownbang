@@ -63,7 +63,7 @@ public class RoomServiceImpl implements RoomService {
         if(roomUpdateRequest.roomImageUpdateRequestList()!=null && !roomUpdateRequest.roomImageUpdateRequestList().isEmpty()) {
             for (RoomImageUpdateRequest roomImageUpdateRequest : roomUpdateRequest.roomImageUpdateRequestList()) {
                 if (!roomImageUpdateRequest.isDeleted()) continue;
-//                roomImageServiceImpl.deleteImage(roomImageUpdateRequest.id());
+                roomImageServiceImpl.deleteImage(roomImageUpdateRequest.id());
             }
         }
 
