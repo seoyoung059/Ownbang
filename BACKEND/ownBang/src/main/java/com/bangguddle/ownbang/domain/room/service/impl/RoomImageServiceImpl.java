@@ -49,6 +49,26 @@ public class RoomImageServiceImpl {
         return new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
     }
 
+    @Transactional
+    public SuccessResponse<NoneResponse> deleteImage(Long roomImageId) throws AppException {
+        RoomImage roomImage = roomImageRepository.findById(roomImageId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+
+        String dbFilePath = roomImage.getRoomImageUrl();
+        Path filePath = Paths.get("src/main/resources/static", dbFilePath);
+
+        try {
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            }
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
+        roomImageRepository.delete(roomImage);
+
+        return new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+    }
 
     private void validateImageFile(MultipartFile roomImage) throws AppException {
         String contentType = roomImage.getContentType();
