@@ -1,10 +1,11 @@
 package com.bangguddle.ownbang.domain.room.repository;
 
 import com.bangguddle.ownbang.domain.room.entity.Room;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import static com.bangguddle.ownbang.global.enums.ErrorCode.ROOM_NOT_FOUND;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
@@ -15,6 +16,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
      */
     default void validateById(final Long roomId) {
         if(!existsById(roomId))
-            throw new AppException(ErrorCode.ROOM_NOT_FOUND);
+            throw new AppException(ROOM_NOT_FOUND);
     }
 }

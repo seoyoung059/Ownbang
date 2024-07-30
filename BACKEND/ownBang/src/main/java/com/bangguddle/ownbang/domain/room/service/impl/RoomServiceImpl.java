@@ -9,7 +9,6 @@ import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -117,7 +116,7 @@ public class RoomServiceImpl implements RoomService {
     public SuccessResponse<RoomSearchResponse> getRoom(Long roomId) {
         Optional<Room> room = roomRepository.findById(roomId);
         if (room.isEmpty()) {
-            throw new AppException(ErrorCode.ROOM_NOT_FOUND);
+            throw new AppException(ROOM_NOT_FOUND);
         }
 
         return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room.get()));

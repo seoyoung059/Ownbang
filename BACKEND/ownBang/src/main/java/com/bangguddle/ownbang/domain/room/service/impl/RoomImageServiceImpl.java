@@ -4,9 +4,7 @@ package com.bangguddle.ownbang.domain.room.service.impl;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomImage;
 import com.bangguddle.ownbang.domain.room.repository.RoomImageRepository;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
-import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import jakarta.transaction.Transactional;
@@ -19,6 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+
+import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.ROOM_DELETE_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -49,11 +51,11 @@ public class RoomImageServiceImpl {
             }
             Files.write(filePath, roomImage.getBytes());
         } catch (IOException e) {
-            throw new AppException(ErrorCode.IMAGE_UPLOAD_FAILED);
+            throw new AppException(IMAGE_UPLOAD_FAILED);
         }
         room.getRoomImages().add(new RoomImage(room, dbFilePath));
 
-        return new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
+        return new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
     }
 
 
@@ -66,7 +68,7 @@ public class RoomImageServiceImpl {
     @Transactional
     public SuccessResponse<NoneResponse> deleteImage(Long roomImageId) throws AppException {
         RoomImage roomImage = roomImageRepository.findById(roomImageId)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
 
         String dbFilePath = roomImage.getRoomImageUrl();
         Path filePath = Paths.get("src/main/resources/static", dbFilePath);
@@ -76,12 +78,12 @@ public class RoomImageServiceImpl {
                 Files.delete(filePath);
             }
         } catch (IOException e) {
-            throw new AppException(ErrorCode.IMAGE_DELETE_FAILED);
+            throw new AppException(IMAGE_DELETE_FAILED);
         }
 
         roomImageRepository.delete(roomImage);
 
-        return new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+        return new SuccessResponse<>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
     }
 
     /**
@@ -92,7 +94,7 @@ public class RoomImageServiceImpl {
     private void validateImageFile(MultipartFile roomImage) throws AppException {
         String contentType = roomImage.getContentType();
         if (contentType == null || !contentType.contains("image")) {
-            throw new AppException(ErrorCode.INVALID_IMAGE_FILE);
+            throw new AppException(INVALID_IMAGE_FILE);
         }
     }
 }

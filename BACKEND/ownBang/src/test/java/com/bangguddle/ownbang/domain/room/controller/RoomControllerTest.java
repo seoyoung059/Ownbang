@@ -3,9 +3,7 @@ package com.bangguddle.ownbang.domain.room.controller;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.service.impl.RoomServiceImpl;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
-import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.bangguddle.ownbang.global.enums.ErrorCode.METHOD_NOT_ALLOWED;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -62,7 +62,7 @@ class RoomControllerTest {
         MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(roomCreateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
         MockMultipartFile file2 = new MockMultipartFile("roomImageFile", "image2.png", "image/png", "image/png".getBytes());
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_CREATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_CREATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         given(roomServiceImpl.createRoom(any(RoomCreateRequest.class), any())).willReturn(success);
@@ -82,7 +82,7 @@ class RoomControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(jsonPath("$.code").value(SuccessCode.ROOM_CREATE_SUCCESS.name()))
+                .andExpect(jsonPath("$.code").value(ROOM_CREATE_SUCCESS.name()))
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
 
@@ -192,7 +192,7 @@ class RoomControllerTest {
     public void deleteRoom_Success() throws Exception {
         // DTO
         Long roomId = 1L;
-        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
 
         // when
         when(roomServiceImpl.deleteRoom(anyLong())).thenReturn(successResponse);
@@ -213,7 +213,7 @@ class RoomControllerTest {
     public void deleteRoom_Fail_InappropriateId() throws Exception {
         // DTO
         Long roomId = -1L;
-        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
 
         // when
         when(roomServiceImpl.deleteRoom(anyLong())).thenReturn(successResponse);
@@ -232,7 +232,7 @@ class RoomControllerTest {
     @DisplayName("매물 삭제 - 실패: Id 누락")
     public void deleteRoom_Fail_NoId() throws Exception {
         // DTO
-        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
 
         // when
         when(roomServiceImpl.deleteRoom(anyLong())).thenReturn(successResponse);
@@ -243,7 +243,7 @@ class RoomControllerTest {
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
                 .andExpect(status().isMethodNotAllowed())
-                .andExpect(jsonPath("$.message").value(ErrorCode.METHOD_NOT_ALLOWED.getMessage()));
+                .andExpect(jsonPath("$.message").value(METHOD_NOT_ALLOWED.getMessage()));
     }
 
     @Test
@@ -253,7 +253,7 @@ class RoomControllerTest {
         // DTO
         Long roomId = 1L;
         RoomSearchResponse roomSearchResponse = RoomSearchResponse.builder().build();
-        SuccessResponse<RoomSearchResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomSearchResponse);
+        SuccessResponse<RoomSearchResponse> successResponse = new SuccessResponse<>(ROOM_FIND_SUCCESS, roomSearchResponse);
 
         // when
         when(roomServiceImpl.getRoom(anyLong())).thenReturn(successResponse);
@@ -274,7 +274,7 @@ class RoomControllerTest {
         // DTO
         Long roomId = -1L;
         RoomSearchResponse roomSearchResponse = RoomSearchResponse.builder().build();
-        SuccessResponse<RoomSearchResponse> successResponse = new SuccessResponse<>(SuccessCode.ROOM_FIND_SUCCESS, roomSearchResponse);
+        SuccessResponse<RoomSearchResponse> successResponse = new SuccessResponse<>(ROOM_FIND_SUCCESS, roomSearchResponse);
 
         // when
         when(roomServiceImpl.getRoom(anyLong())).thenReturn(successResponse);
@@ -318,7 +318,7 @@ class RoomControllerTest {
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
@@ -341,7 +341,7 @@ class RoomControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(jsonPath("$.code").value(SuccessCode.ROOM_UPDATE_SUCCESS.name()))
+                .andExpect(jsonPath("$.code").value(ROOM_UPDATE_SUCCESS.name()))
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
 
@@ -374,7 +374,7 @@ class RoomControllerTest {
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
@@ -427,7 +427,7 @@ class RoomControllerTest {
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
@@ -480,7 +480,7 @@ class RoomControllerTest {
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
@@ -501,7 +501,7 @@ class RoomControllerTest {
 
                 //then
                 .andExpect(status().isMethodNotAllowed())
-                .andExpect(jsonPath("$.message").value(ErrorCode.METHOD_NOT_ALLOWED.getMessage()));
+                .andExpect(jsonPath("$.message").value(METHOD_NOT_ALLOWED.getMessage()));
     }
 
 
@@ -534,7 +534,7 @@ class RoomControllerTest {
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(SuccessCode.ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
         given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
