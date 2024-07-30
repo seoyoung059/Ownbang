@@ -1,19 +1,47 @@
-// 리스트에 뿌려진 매물 아이템 클릭 시 보이는 매물 상세 컴퍼넌트
 import React from "react";
-import { Button, Typography, Box } from "@mui/material";
+import RealEstateImages from "./RealEstateImages";
+import RealEstateDescription from "./RealEstateDescription";
+import { Button, Typography, Box, Divider } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
-const RealEstateDetail = ({ item }) => {
+const RealEstateDetail = ({ item, onOpenReservationCard }) => {
+  const theme = useTheme();
+
+  const styles = {
+    container: { display: "flex", flexDirection: "column", gap: 3 },
+    title: { marginTop: 4 },
+    button: {
+      marginTop: "16px",
+      borderRadius: "7px",
+      padding: "13px 15px",
+      backgroundColor: theme.palette.primary.dark,
+      fontSize: theme.typography.fontSize,
+    },
+  };
+
   return (
-    <Box sx={{ padding: 2 }}>
-      <Typography variant="h4" sx={{ marginTop: 2 }}>
-        {item.title}
-      </Typography>
-      <Typography variant="subtitle1" color="text.secondary">
-        Location: {item.location}
-      </Typography>
-      <Typography variant="body1" sx={{ marginTop: 2 }}>
-        {item.description}
-      </Typography>
+    <Box sx={styles.container}>
+      <Box>
+        <RealEstateImages />
+        <Typography variant="h4" sx={styles.title}>
+          {item.title}
+          <Typography variant="subtitle1" color="text.secondary">
+            Location: {item.location}
+          </Typography>
+          <Divider variant="middle" sx={{ margin: 2 }} />
+        </Typography>
+        <RealEstateDescription />
+      </Box>
+
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Button
+          variant="contained"
+          sx={styles.button}
+          onClick={onOpenReservationCard}
+        >
+          예약하기
+        </Button>
+      </Box>
     </Box>
   );
 };

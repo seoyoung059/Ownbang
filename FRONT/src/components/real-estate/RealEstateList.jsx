@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import List from "@mui/material/List";
 import RealEstateItem from "./RealEstateItem";
 import clusterPositionsData from "./clusterPositionsData.json";
+import { useTheme } from "@mui/material";
 
 const RealEstateList = ({ onSelectItem }) => {
+  const theme = useTheme();
   const [markers, setMarkers] = useState(clusterPositionsData.tmpMarkers);
 
   const toggleFavorite = (index) => {
@@ -20,7 +21,13 @@ const RealEstateList = ({ onSelectItem }) => {
   };
 
   return (
-    <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
+    <List
+      sx={{
+        width: "100%",
+        maxWidth: 360,
+        bgcolor: theme.palette.background.default,
+      }}
+    >
       {markers.map((marker, index) => (
         <RealEstateItem
           key={index}

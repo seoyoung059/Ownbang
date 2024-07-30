@@ -9,18 +9,15 @@ import {
   Box,
 } from "@mui/material";
 import { Bookmark, BookmarkBorder } from "@mui/icons-material";
-import { useTheme } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
   const theme = useTheme();
-  const handleClick = () => {
-    onClick();
-  };
 
   return (
     <Card
       sx={{ display: "flex", marginBottom: "20px", position: "relative" }}
-      onClick={handleClick}
+      onClick={onClick}
     >
       <CardMedia
         component="img"
