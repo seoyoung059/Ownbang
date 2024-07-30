@@ -2,6 +2,7 @@ package com.bangguddle.ownbang.domain.room.controller;
 
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
 import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
+import com.bangguddle.ownbang.domain.room.dto.RoomUpdateRequest;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
@@ -28,6 +29,14 @@ public class RoomController {
     }
 
     // 매물 수정
+    @PatchMapping
+    public ResponseEntity<Response<NoneResponse>> updateRoom(@RequestParam(value = "roomId") @Valid Long roomId,
+                                                             @RequestPart(value="roomUpdateRequest") RoomUpdateRequest roomUpdateRequest,
+                                                             @RequestPart(value="roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
+        System.out.println(roomUpdateRequest);
+
+        return Response.success(roomService.updateRoom(roomId, roomUpdateRequest, roomImageFiles));
+    }
 
     // 매물 삭제
     @DeleteMapping
