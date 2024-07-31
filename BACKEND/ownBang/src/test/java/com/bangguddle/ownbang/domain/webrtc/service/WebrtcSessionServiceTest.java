@@ -324,4 +324,51 @@ public class WebrtcSessionServiceTest {
         // verify
         verify(mockSession, times(1)).createConnection(any());
     }
+
+    @Test
+    @DisplayName("토큰 조회 성공")
+    void 토큰_조회_성공() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("user-test-token");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        Optional<String> savedToken = webrtcSessionService.createToken(reservationId, USER);
+
+        // when
+        Optional<String> token = webrtcSessionService.getToken(reservationId, USER);
+
+        // then
+        assertThat(savedToken).isPresent();
+        assertThat(token).isPresent();
+        assertThat(token.get()).isEqualTo(savedToken.get());
+
+        // verify
+        verify(mockSession, times(1)).createConnection(any());
+        verify(mockConnection, times(1)).getToken();
+    }
+
+    @Test
+    @DisplayName("토큰_조회_실패 - 유효한 토큰 없음")
+    void 토큰_조회_실패__유효한_토큰_없음() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // when
+        Optional<String> token = webrtcSessionService.getToken(reservationId, USER);
+
+        // then
+        assertThat(token).isEmpty();
+
+        // verify
+        verify(mockSession, never()).createConnection(any());
+        verify(mockConnection, never()).getToken();
+    }
 }
