@@ -20,12 +20,6 @@ public record BookmarkCreateRequest(
                 .build();
     }
 
-    static public BookmarkCreateRequest from(Bookmark bookmark) {
-        return BookmarkCreateRequest.builder()
-                .roomId(bookmark.getRoom().getId())
-                .userId(bookmark.getUser().getId())
-                .build();
-    }
 
     public Bookmark toEntity(User user, Room room) {
         return Bookmark.builder()
