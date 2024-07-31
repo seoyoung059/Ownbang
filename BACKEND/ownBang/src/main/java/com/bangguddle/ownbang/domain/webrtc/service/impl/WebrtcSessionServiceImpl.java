@@ -20,13 +20,13 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     private final OpenVidu openVidu;
     private final Map<Long, Session> mapSessions;
-    private final Map<Long, Map<String, UserType>> mapSessionNamesTokens;
+    private final Map<Long, Map<UserType, String>> mapSessionReservationsTokens;
     private final Map<Long, Boolean> sessionRecordings;
 
     WebrtcSessionServiceImpl(final OpenVidu openVidu){
         this.openVidu = openVidu;
         this.mapSessions = new ConcurrentHashMap<>();
-        this.mapSessionNamesTokens = new ConcurrentHashMap<>();
+        this.mapSessionReservationsTokens = new ConcurrentHashMap<>();
         this.sessionRecordings = new ConcurrentHashMap<>();
     }
 
@@ -38,15 +38,22 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     @Override
     public Optional<Session> createSession(final Long reservationId){
+        if(this.mapSessions.containsKey(reservationId)){
+            throw new AppException(BAD_REQUEST);
+        }
+
         try{
             // 새로운 session
             Session session = this.openVidu.createSession();
             this.mapSessions.put(reservationId, session);
-            this.mapSessionNamesTokens.put(reservationId, new ConcurrentHashMap<>());
+            this.mapSessionReservationsTokens.put(reservationId, new ConcurrentHashMap<>());
 
             return Optional.ofNullable(session);
 
-        } catch (Exception e){
+        } catch (OpenViduHttpException | OpenViduJavaClientException e){
+            // 오픈 비두 장애 발생
+            throw new AppException(INTERNAL_SERVER_ERROR);
+        } catch (Exception e2){
             throw new AppException(BAD_REQUEST);
         }
     }
@@ -54,7 +61,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<Session> removeSession(final Long reservationId) {
         // session 유효 확인
-        if (this.mapSessions.get(reservationId) != null && this.mapSessionNamesTokens.get(reservationId) != null) {
+        if (this.mapSessions.containsKey(reservationId) && this.mapSessionReservationsTokens.containsKey(reservationId)) {
             Session session = this.mapSessions.get(reservationId);
 
             try {
@@ -64,8 +71,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
             }
 
             this.mapSessions.remove(reservationId);
-            this.mapSessionNamesTokens.remove(reservationId);
-            this.sessionRecordings.remove(session.getSessionId());
+            this.mapSessionReservationsTokens.remove(reservationId);
 
             return Optional.of(session);
         } else {
@@ -78,13 +84,9 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<String> getToken(final Long reservationId, final UserType userType) {
         // session 유효 확인
-        if (this.mapSessions.containsKey(reservationId) && this.mapSessionNamesTokens.containsKey(reservationId)) {
+        if (this.mapSessions.containsKey(reservationId) && this.mapSessionReservationsTokens.containsKey(reservationId)) {
             // userType과 role이 같은  token 반환
-            return this.mapSessionNamesTokens.get(reservationId)
-                    .entrySet().stream()
-                    .filter(entry -> entry.getValue().equals(userType))
-                    .map(Map.Entry::getKey)
-                    .findFirst();
+            return Optional.ofNullable(this.mapSessionReservationsTokens.get(reservationId).get(userType));
         }
         return Optional.empty();
     }
@@ -92,6 +94,13 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     @Override
     public Optional<String> createToken(final Long reservationId, final UserType userType){
+        if (!this.mapSessions.containsKey(reservationId)
+                || !this.mapSessionReservationsTokens.containsKey(reservationId)
+                || this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)
+            )
+        {
+            throw new AppException(BAD_REQUEST);
+        }
 
         // connection properties 설정
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
@@ -102,7 +111,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
         try {
             String token = this.mapSessions.get(reservationId).createConnection(connectionProperties).getToken();
-            this.mapSessionNamesTokens.get(reservationId).put(token, userType);
+            this.mapSessionReservationsTokens.get(reservationId).put(userType, token);
 
             return Optional.of(token);
 
@@ -114,7 +123,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
                 // 더이상 유효하지 않은 session
                 // 유저가 남아있을 수 있음 -> 삭제
                 this.mapSessions.remove(reservationId);
-                this.mapSessionNamesTokens.remove(reservationId);
+                this.mapSessionReservationsTokens.remove(reservationId);
             }
             throw new AppException(INTERNAL_SERVER_ERROR);
         }
@@ -124,8 +133,8 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<String> removeToken(final Long reservationId, final String token){
 
-        if (this.mapSessions.get(reservationId) != null && this.mapSessionNamesTokens.get(reservationId) != null) {
-            if (this.mapSessionNamesTokens.get(reservationId).remove(token) != null) {
+        if (this.mapSessions.containsKey(reservationId) && this.mapSessionReservationsTokens.containsKey(reservationId)) {
+            if (this.mapSessionReservationsTokens.get(reservationId).remove(token) != null) {
                 return Optional.of(token);
             }else {
                 throw new AppException(INTERNAL_SERVER_ERROR);
@@ -133,5 +142,15 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
         } else {
             throw new AppException(BAD_REQUEST);
         }
+    }
+
+    @Override
+    public Boolean startRecord() {
+        return null;
+    }
+
+    @Override
+    public Boolean stopRecord() {
+        return null;
     }
 }
