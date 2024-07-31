@@ -1,31 +1,77 @@
 package com.bangguddle.ownbang.global.config.security;
 
+import com.bangguddle.ownbang.global.config.security.filter.AppExceptionFilter;
+import com.bangguddle.ownbang.global.config.security.filter.JwtTokenFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private static final String[] REQUIRE_USER_ARRAY = {
+            /* Auth 관련 url */
+    };
+    private static final String[] REQUIRE_AGENT_ARRAY = {
+            /* 중개인 권한 필요 URL */
+    };
+    private final UserDetailsService userDetailsService;
+    private final JwtTokenFilter jwtTokenFilter;
+    private final AppExceptionFilter appExceptionFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf
-                        // post 403에러로 인해 임시적으로 모두 허용
-                        .ignoringRequestMatchers("/**")
+                .csrf(AbstractHttpConfigurer::disable
                 )
-                .securityMatcher("/**")
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/**").permitAll()
-                        .anyRequest().authenticated()
-                );
+                        .requestMatchers(REQUIRE_USER_ARRAY).hasRole("USER")
+                        .requestMatchers(REQUIRE_AGENT_ARRAY).hasRole("AGENT")
+                        .anyRequest().permitAll()
+                )
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(appExceptionFilter, JwtTokenFilter.class)
 
+        ;
+        
         return http.build();
     }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(authenticationProvider());
+        return authenticationManagerBuilder.build();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
+    }
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
