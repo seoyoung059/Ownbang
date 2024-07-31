@@ -1,15 +1,15 @@
-// RealEstateMap.jsx
 import React, { useState, useEffect } from "react";
 import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
-import { Box } from "@mui/material";
-import { useBoundStore } from "../../store/store";
 import clusterPositionsData from "./clusterPositionsData.json";
 
-const RealEstateMap = ({ mark, size, onBoundsChange, onMarkerClick }) => {
+const RealEstateMap = ({
+  searchTerm,
+  mark,
+  onBoundsChange,
+  onSelectMarker, // 선택된 마커의 정보를 부모로 전달
+}) => {
   const [positions, setPositions] = useState([]);
-  const [info, setInfo] = useState(null);
   const [map, setMap] = useState(null);
-  const searchTerm = useBoundStore((state) => state.searchTerm);
 
   useEffect(() => {
     setPositions(clusterPositionsData.tmpMarkers);
@@ -43,9 +43,8 @@ const RealEstateMap = ({ mark, size, onBoundsChange, onMarkerClick }) => {
     map.panTo(center);
   }, [map, mark]);
 
-  const onMarkerClickInternal = (pos) => {
-    setInfo(info && info.lat === pos.lat && info.lng === pos.lng ? null : pos);
-    onMarkerClick(pos);
+  const onMarkerClick = (pos) => {
+    onSelectMarker(pos); // 선택된 마커의 정보를 부모로 전달
   };
 
   const onBoundsChange2 = () => {
@@ -81,17 +80,13 @@ const RealEstateMap = ({ mark, size, onBoundsChange, onMarkerClick }) => {
         <MarkerClusterer averageCenter={true} minLevel={5}>
           {positions.map((pos) => (
             <MapMarker
-              key={`${pos.lat}-${pos.lng}`}
+              key={pos.id}
               position={{
                 lat: pos.lat,
                 lng: pos.lng,
               }}
-              onClick={() => onMarkerClickInternal(pos)}
-            >
-              {info && info.lat === pos.lat && info.lng === pos.lng && (
-                <Box sx={{ color: "darkGray" }}>{pos.title}</Box>
-              )}
-            </MapMarker>
+              onClick={() => onMarkerClick(pos)}
+            />
           ))}
         </MarkerClusterer>
       ) : (
