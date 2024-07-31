@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
 import RealEstateSearchBar from "../components/real-estate/RealEstateSearchBar";
 import RealEstateList from "../components/real-estate/RealEstateList";
@@ -7,78 +7,60 @@ import Reservation from "../components/real-estate/Reservation";
 import { Box, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material";
-import { useBoundStore } from "../store/store";
 
 const RealEstatePage = () => {
   const theme = useTheme();
-  const { searchTerm, setSearchTerm } = useBoundStore((state) => ({
-    searchTerm: state.searchTerm,
-    setSearchTerm: state.setSearchTerm,
-  }));
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showReservation, setShowReservation] = useState(false);
+  const [visibleMarkers, setVisibleMarkers] = useState([]);
 
-  const [selectedItem, setSelectedItem] = React.useState(null);
-  const [showReservation, setShowReservation] = React.useState(false);
-  const [visibleMarkers, setVisibleMarkers] = React.useState([]);
-
-  // 검색어를 업데이트하는 함수
   const onSearch = (term) => {
     setSearchTerm(term);
   };
 
-  // 매물 리스트에서 선택하는 항목
   const onSelectItem = (item) => {
     setSelectedItem(item);
-    setShowReservation(false); // 새로운 아이템 선택 시 예약 창 닫기
+    setShowReservation(false); // 새로운 아이템이 선택되었을 때 예약 페이지 닫기
   };
 
-  // 디테일 카드 닫기
   const onCloseDetailCard = () => {
     setSelectedItem(null);
-    setShowReservation(false); // 디테일 카드 닫을 때 예약 창도 닫기
+    setShowReservation(false); // 새로운 디테일 카드가 선태되었을 때 예약 페이지 닫기
   };
 
-  // 예약하기 버튼 클릭시 Reservation 카드 오픈
   const onOpenReservationCard = () => {
     setShowReservation(true);
   };
 
-  // 예약 카드 닫기
   const onCloseReservationCard = () => {
     setShowReservation(false);
   };
 
-  // 지도 경계 변경 시 호출되는 함수
   const onBoundsChange = (markers) => {
     setVisibleMarkers(markers);
   };
 
-  // 마커 클릭 시 디테일 표시
-  const onSelectMarker = (pos) => {
-    const item = visibleMarkers.find((marker) => marker.id === pos.id);
-    if (item) {
-      setSelectedItem(item);
-    }
+  const onMarkerClick = (marker) => {
+    onSelectItem(marker); // 마커를 눌러서 Detail 열기 가능
   };
 
   return (
     <Box sx={{ display: "flex", height: "100vh", position: "relative" }}>
-      {/* 리스트 */}
       <Box
         sx={{
           marginRight: "5px",
           paddingTop: "80px",
           width: "20%",
           height: "100vh",
-          overflow: "auto", // RealEstateList에만 스크롤 적용
+          overflow: "auto", // 목록만 스크롤 가능하게
           position: "relative",
         }}
       >
         <RealEstateList markers={visibleMarkers} onSelectItem={onSelectItem} />
       </Box>
 
-      {/* 지도와 검색 바 */}
       <Box sx={{ paddingTop: "80px", width: "80%" }}>
-        {/* 검색 바 오른쪽에 위치 */}
         <Box
           sx={{
             position: "fixed",
@@ -88,16 +70,15 @@ const RealEstatePage = () => {
             top: 100,
           }}
         >
-          <RealEstateSearchBar />
+          <RealEstateSearchBar onSearch={onSearch} />
         </Box>
         <RealEstateMap
           searchTerm={searchTerm}
           onBoundsChange={onBoundsChange}
-          onSelectMarker={onSelectMarker} // 마커 클릭 시 호출될 핸들러
+          onSelectMarker={onMarkerClick}
         />
       </Box>
 
-      {/* List에서 Item을 누르면 Detail 카드가 뜹니다 */}
       {selectedItem && (
         <Box
           sx={{
@@ -106,7 +87,7 @@ const RealEstatePage = () => {
             right: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0)", // 배경 색 투명
+            backgroundColor: "rgba(0, 0, 0, 0)", // 배경 투명
             zIndex: 1000,
           }}
           onClick={onCloseDetailCard}
@@ -126,14 +107,14 @@ const RealEstatePage = () => {
               overflow: "auto",
               zIndex: 50,
             }}
-            onClick={(e) => e.stopPropagation()} // 디테일 창 닫기에서 제외
+            onClick={(e) => e.stopPropagation()} // 디테일 카드 닫기에서 제외
           >
             <IconButton
               onClick={onCloseDetailCard}
               sx={{
                 position: "absolute",
                 top: 8,
-                right: 8, // X 아이콘을 카드의 우측 상단으로 이동
+                right: 8, // X 이동 시키기
               }}
             >
               <CloseIcon />
@@ -160,14 +141,14 @@ const RealEstatePage = () => {
                 overflow: "auto",
                 zIndex: 50,
               }}
-              onClick={(e) => e.stopPropagation()} // 예약 창 닫기에서 제외
+              onClick={(e) => e.stopPropagation()} // 카드 닫히기에서 제외
             >
               <IconButton
-                onClick={onCloseReservationCard} // 예약 카드 닫기 핸들러
+                onClick={onCloseReservationCard} // 카드 닫기
                 sx={{
                   position: "absolute",
                   top: 8,
-                  right: 8, // X 아이콘을 카드의 우측 상단으로 이동
+                  right: 8, // X 이동시키기
                 }}
               >
                 <CloseIcon />
