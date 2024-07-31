@@ -14,7 +14,7 @@ public record BookmarkSearchResponse(
     static public BookmarkSearchResponse from(Bookmark bookmark) {
         return BookmarkSearchResponse.builder()
                 .id(bookmark.getId())
-//                .userId(bookmark.getUser().getId())
+                .userId(bookmark.getUser().getId())
                 .roomInfoSearchResponse(RoomInfoSearchResponse.from(bookmark.getRoom()))
                 .build();
     }

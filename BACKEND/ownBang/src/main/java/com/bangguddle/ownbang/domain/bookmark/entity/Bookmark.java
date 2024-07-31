@@ -1,6 +1,7 @@
 package com.bangguddle.ownbang.domain.bookmark.entity;
 
 import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,17 +19,17 @@ public class Bookmark {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne
-//    @JoinColumn(name="user_id", nullable = false)
-//    private User user;
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable = false)
+    private User user;
 
     @ManyToOne
     @JoinColumn(name="room_id", nullable = false)
     private Room room;
 
     @Builder
-    public Bookmark(/*User user*/ Room room) {
-//        this.user = user;
+    public Bookmark(User user, Room room) {
+        this.user = user;
         this.room = room;
     }
 }
