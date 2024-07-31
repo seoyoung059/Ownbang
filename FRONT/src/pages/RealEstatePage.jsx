@@ -1,3 +1,4 @@
+// RealEstatePage.jsx
 import React, { useState } from "react";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
 import RealEstateSearchBar from "../components/real-estate/RealEstateSearchBar";
@@ -10,23 +11,18 @@ import { useTheme } from "@mui/material";
 
 const RealEstatePage = () => {
   const theme = useTheme();
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
   const [showReservation, setShowReservation] = useState(false);
   const [visibleMarkers, setVisibleMarkers] = useState([]);
 
-  const onSearch = (term) => {
-    setSearchTerm(term);
-  };
-
   const onSelectItem = (item) => {
     setSelectedItem(item);
-    setShowReservation(false); // 새로운 아이템 선택 시 예약 창 닫기
+    setShowReservation(false);
   };
 
   const onCloseDetailCard = () => {
     setSelectedItem(null);
-    setShowReservation(false); // 디테일 카드 닫을 때 예약 창도 닫기
+    setShowReservation(false);
   };
 
   const onOpenReservationCard = () => {
@@ -43,7 +39,7 @@ const RealEstatePage = () => {
 
   const onMarkerClick = (marker) => {
     setSelectedItem(marker);
-    setShowReservation(false); // 마커 클릭 시 예약 창 닫기
+    setShowReservation(false);
   };
 
   return (
@@ -54,7 +50,7 @@ const RealEstatePage = () => {
           paddingTop: "80px",
           width: "20%",
           height: "100vh",
-          overflow: "auto", // RealEstateList에만 스크롤 적용
+          overflow: "auto",
           position: "relative",
         }}
       >
@@ -71,14 +67,13 @@ const RealEstatePage = () => {
             top: 100,
           }}
         >
-          <RealEstateSearchBar onSearch={onSearch} />
+          <RealEstateSearchBar />
         </Box>
         <RealEstateMap
-          searchTerm={searchTerm}
           sx={{ position: "absolute" }}
           size="900px"
           onBoundsChange={onBoundsChange}
-          onMarkerClick={onMarkerClick} // Add this prop
+          onMarkerClick={onMarkerClick}
         />
       </Box>
 
@@ -90,7 +85,7 @@ const RealEstatePage = () => {
             right: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0)", // 배경 색 투명
+            backgroundColor: "rgba(0, 0, 0, 0)",
             zIndex: 1000,
           }}
           onClick={onCloseDetailCard}
@@ -110,14 +105,14 @@ const RealEstatePage = () => {
               overflow: "auto",
               zIndex: 50,
             }}
-            onClick={(e) => e.stopPropagation()} // 디테일 창 닫기에서 제외
+            onClick={(e) => e.stopPropagation()}
           >
             <IconButton
               onClick={onCloseDetailCard}
               sx={{
                 position: "absolute",
                 top: 8,
-                right: 8, // X 아이콘을 카드의 우측 상단으로 이동
+                right: 8,
               }}
             >
               <CloseIcon />
@@ -144,14 +139,14 @@ const RealEstatePage = () => {
                 overflow: "auto",
                 zIndex: 50,
               }}
-              onClick={(e) => e.stopPropagation()} // 예약 창 닫기에서 제외
+              onClick={(e) => e.stopPropagation()}
             >
               <IconButton
-                onClick={onCloseReservationCard} // 예약 카드 닫기 핸들러
+                onClick={onCloseReservationCard}
                 sx={{
                   position: "absolute",
                   top: 8,
-                  right: 8, // X 아이콘을 카드의 우측 상단으로 이동
+                  right: 8,
                 }}
               >
                 <CloseIcon />
