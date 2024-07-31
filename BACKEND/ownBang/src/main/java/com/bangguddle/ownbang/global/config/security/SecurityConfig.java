@@ -2,6 +2,7 @@ package com.bangguddle.ownbang.global.config.security;
 
 import com.bangguddle.ownbang.global.config.security.filter.AppExceptionFilter;
 import com.bangguddle.ownbang.global.config.security.filter.JwtTokenFilter;
+import com.bangguddle.ownbang.global.handler.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -36,6 +38,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+
                 .csrf(AbstractHttpConfigurer::disable
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -43,15 +46,15 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(REQUIRE_USER_ARRAY).hasRole("USER")
+                        .requestMatchers(REQUIRE_USER_ARRAY).authenticated()
                         .requestMatchers(REQUIRE_AGENT_ARRAY).hasRole("AGENT")
                         .anyRequest().permitAll()
                 )
+                .exceptionHandling(handler -> handler.accessDeniedHandler(accessDeniedHandler()))
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(appExceptionFilter, JwtTokenFilter.class)
-
         ;
-        
+
         return http.build();
     }
 
@@ -71,7 +74,10 @@ public class SecurityConfig {
         return authenticationProvider;
     }
 
-
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
