@@ -32,7 +32,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
     private static final String[] REQUIRE_USER_ARRAY = {
-            /* Auth 관련 url */
+            /* 임차인 권한 필요 URL */
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */

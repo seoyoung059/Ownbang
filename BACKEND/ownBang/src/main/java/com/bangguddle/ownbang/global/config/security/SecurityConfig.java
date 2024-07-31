@@ -24,7 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] REQUIRE_USER_ARRAY = {
-            /* Auth 관련 url */
+            /* 임차인 권한 필요 URL */
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
