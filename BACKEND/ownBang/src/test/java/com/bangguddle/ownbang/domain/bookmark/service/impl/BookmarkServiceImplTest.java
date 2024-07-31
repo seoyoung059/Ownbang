@@ -89,9 +89,9 @@ class BookmarkServiceImplTest {
         when(roomRepository.findById(roomId)).thenReturn(Optional.ofNullable(Room.builder().build()));
         doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(userRepository).findById(roomId);
 
-        assertThatThrownBy(() -> {
-            bookmarkService.createBookmark(bookmarkCreateRequest);
-        })
+        assertThatThrownBy(() ->
+            bookmarkService.createBookmark(bookmarkCreateRequest)
+        )
                 .isInstanceOf(AppException.class)
                 .hasMessageContaining(ErrorCode.BAD_REQUEST.getMessage());
     }
@@ -119,9 +119,9 @@ class BookmarkServiceImplTest {
         doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(bookmarkRepository).deleteById(bookmarkId);
 
         //when, then
-        assertThatThrownBy(() -> {
-            bookmarkService.deleteBookmark(bookmarkId);
-        }).isInstanceOf(AppException.class);
+        assertThatThrownBy(() ->
+            bookmarkService.deleteBookmark(bookmarkId)
+        ).isInstanceOf(AppException.class);
     }
 
     @Test
