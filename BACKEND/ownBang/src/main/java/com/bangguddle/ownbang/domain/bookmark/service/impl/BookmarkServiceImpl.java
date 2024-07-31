@@ -11,20 +11,23 @@ import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.BAD_REQUEST;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.BOOKMARK_DUPLICATED;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 
 @Service
+@RequiredArgsConstructor
 public class BookmarkServiceImpl implements BookmarkService {
 
-    private BookmarkRepository bookmarkRepository;
-    private UserRepository userRepository;
-    private RoomRepository roomRepository;
+    private final BookmarkRepository bookmarkRepository;
+    private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
 
     @Override
     public SuccessResponse<NoneResponse> createBookmark(BookmarkCreateRequest bookmarkCreateRequest) {
@@ -32,6 +35,9 @@ public class BookmarkServiceImpl implements BookmarkService {
                 .orElseThrow(() -> new AppException(BAD_REQUEST));
         User user = userRepository.findById(bookmarkCreateRequest.userId())
                         .orElseThrow(()-> new AppException(BAD_REQUEST));
+        if(bookmarkRepository.existsBookmarkByRoomIdAndUserId(room.getId(), user.getId())) {
+            throw new AppException(BOOKMARK_DUPLICATED);
+        }
         bookmarkRepository.save(bookmarkCreateRequest.toEntity(user, room));
         return new SuccessResponse<>(BOOKMARK_CREATE_SUCCESS, NoneResponse.NONE);
     }
