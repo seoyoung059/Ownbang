@@ -30,8 +30,8 @@ public class BookmarkController {
         return Response.success(bookmarkService.deleteBookmark(bookmarkId));
     }
 
-    @GetMapping
-    public ResponseEntity<Response<List<BookmarkSearchResponse>>> getAllBookmarks(@RequestParam @Positive @Valid Long userId) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<Response<List<BookmarkSearchResponse>>> getAllBookmarks(@PathVariable(name = "userId") @Positive @Valid Long userId) {
         return Response.success(bookmarkService.getBookmarks(userId));
     }
 }
