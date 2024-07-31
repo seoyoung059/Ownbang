@@ -149,7 +149,8 @@ const router = createBrowserRouter([
     path: "/video-chat",
     element: (
       <Suspense fallback={<Loading />}>
-        <UserRoute element={<VideoChat />} />
+        {/* <UserRoute element={<VideoChat />} /> */}
+        <VideoChat />
       </Suspense>
     ),
   },

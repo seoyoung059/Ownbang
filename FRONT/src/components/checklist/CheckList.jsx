@@ -38,20 +38,29 @@ const CheckList = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: "20px",
-        maxWidth: "600px",
+        justifyContent: "space-between",
         border: "1px solid lightGray",
         borderRadius: "10px",
         padding: "30px",
+        height: "82%",
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <CheckListTitle setSelectedTitle={setSelectedTitle} />
       </Box>
 
-      {/* CheckList 항목 체크, 내용 확인, 삭제 */}
       {selectedTitle && (
-        <Box sx={{ marginTop: "30px" }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            overflowY: "auto",
+            mt: "30px",
+            height: "320px",
+            "::-webkit-scrollbar": {
+              display: "none",
+            },
+          }}
+        >
           <CheckListList
             checkitems={checkitems}
             onUpdate={onUpdate}
@@ -60,9 +69,8 @@ const CheckList = () => {
         </Box>
       )}
 
-      {/* 새로운 항목 추가 */}
       {selectedTitle && (
-        <Box sx={{ marginTop: "40px" }}>
+        <Box sx={{ mt: "20px" }}>
           <CheckListAddInput onCreate={onCreate} />
         </Box>
       )}
