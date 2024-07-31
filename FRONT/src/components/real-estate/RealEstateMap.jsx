@@ -6,7 +6,7 @@ const RealEstateMap = ({
   searchTerm,
   mark,
   onBoundsChange,
-  onSelectMarker, // 선택된 마커의 정보를 부모로 전달
+  onSelectMarker,
 }) => {
   const [positions, setPositions] = useState([]);
   const [map, setMap] = useState(null);
@@ -44,7 +44,7 @@ const RealEstateMap = ({
   }, [map, mark]);
 
   const onMarkerClick = (pos) => {
-    onSelectMarker(pos); // 선택된 마커의 정보를 부모로 전달
+    onSelectMarker(pos); // 전달
   };
 
   const onBoundsChange2 = () => {

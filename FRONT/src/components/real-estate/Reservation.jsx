@@ -1,26 +1,50 @@
-import { Box, Button, Typography, Alert } from "@mui/material";
-import ReservationCalendar from "./ReservationCalendar";
 import React, { useState, useCallback } from "react";
+import { Box, Button, Typography, Alert, Snackbar } from "@mui/material";
+import ReservationCalendar from "./ReservationCalendar";
 import ReservationClock from "./ReservationClock";
 import { useTheme } from "@mui/material/styles";
-import dayjs from "dayjs";
 
 const Reservation = ({ onClose }) => {
   const theme = useTheme();
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false); // 성공 메시지 상태
 
+  // 날짜와 시간 선택 후 예약 처리
   const onDateCheck = useCallback(() => {
     if (!selectedDate || !selectedTime) {
-      setShowAlert(true);
+      setShowAlert(true); // 날짜와 시간이 선택되지 않았을 때 경고 표시
       return;
     }
+    setShowAlert(false); // 경고 숨기기
     console.log(
-      `${selectedDate.format("YYYY-MM-DD")}  ${selectedTime.format("HH:mm")}`
+      `${selectedDate.format("YYYY-MM-DD")} ${selectedTime.format("HH:mm")}`
     );
-    onClose();
-  }, [selectedDate, selectedTime, onClose]);
+    setShowSuccess(true); // 성공 메시지 표시
+    // onClose(); // 예약 완료 후 화면을 닫지 않음
+  }, [selectedDate, selectedTime]);
+
+  // 날짜 변경 핸들러
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    if (showAlert) {
+      setShowAlert(false);
+    }
+  };
+
+  // 시간 변경 핸들러
+  const handleTimeChange = (time) => {
+    setSelectedTime(time);
+    if (showAlert) {
+      setShowAlert(false);
+    }
+  };
+
+  // 성공 메시지 닫기 핸들러
+  const handleSuccessClose = () => {
+    setShowSuccess(false);
+  };
 
   return (
     <>
@@ -43,7 +67,7 @@ const Reservation = ({ onClose }) => {
           alignItems: "center",
         }}
       >
-        <ReservationCalendar value={selectedDate} onChange={setSelectedDate} />
+        <ReservationCalendar value={selectedDate} onChange={handleDateChange} />
       </Box>
 
       <Typography sx={{ marginLeft: 5 }}>
@@ -57,7 +81,7 @@ const Reservation = ({ onClose }) => {
           marginTop: 1,
         }}
       >
-        <ReservationClock value={selectedTime} onChange={setSelectedTime} />
+        <ReservationClock value={selectedTime} onChange={handleTimeChange} />
         <Typography
           sx={{
             marginTop: "20px",
@@ -73,6 +97,15 @@ const Reservation = ({ onClose }) => {
         {showAlert && (
           <Alert severity="warning" sx={{ marginBottom: 2 }}>
             날짜 및 시간 선택이 필요합니다.
+          </Alert>
+        )}
+        {showSuccess && (
+          <Alert
+            severity="success"
+            onClose={handleSuccessClose}
+            sx={{ marginBottom: 2 }}
+          >
+            예약이 완료되었습니다.
           </Alert>
         )}
         <Button
