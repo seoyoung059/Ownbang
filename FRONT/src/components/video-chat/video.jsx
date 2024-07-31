@@ -44,6 +44,7 @@ class Video extends Component {
       isVideoHidden: false,
       isLeaveDialogOpen: false,
       endSessionDialogOpen: false,
+      token: undefined,
     };
 
     this.joinSession = this.joinSession.bind(this);
@@ -142,7 +143,7 @@ class Video extends Component {
         });
 
         this.getToken().then((token) => {
-          console.log("Received token:", token);
+          this.setState({ token: token }); // 토큰 상태 저장
           mySession
             .connect(token, { clientData: this.state.myUserName })
             .then(async () => {
@@ -154,7 +155,7 @@ class Video extends Component {
                 resolution: "1280x960",
                 frameRate: 30,
                 insertMode: "APPEND",
-                mirror: true,
+                mirror: false,
               });
 
               mySession.publish(publisher);
@@ -201,11 +202,20 @@ class Video extends Component {
     }
   }
 
-  leaveSession() {
+  async leaveSession() {
     const mySession = this.state.session;
 
     if (mySession) {
       if (this.state.mainStreamManager === this.state.publisher) {
+        await axios
+          .delete(APPLICATION_SERVER_URL + "/api/webrtcs/remove-token", {
+            data: {
+              reservationId: this.state.mySessionId,
+              token: this.state.token,
+            },
+          })
+          .then((res) => console.log(res))
+          .catch((err) => console.error(err));
         mySession.streamManagers.forEach((streamManager) => {
           mySession.forceUnpublish(streamManager);
         });
@@ -258,7 +268,7 @@ class Video extends Component {
             videoSource: newVideoDevice[0].deviceId,
             publishAudio: true,
             publishVideo: true,
-            mirror: true,
+            mirror: false,
           });
 
           await this.state.session.unpublish(this.state.mainStreamManager);

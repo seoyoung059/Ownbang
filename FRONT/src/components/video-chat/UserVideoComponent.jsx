@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 
-const UserVideoComponent = ({ streamManager, isMain }) => {
+const UserVideoComponent = ({ streamManager }) => {
   if (!streamManager) return null;
 
   return (
@@ -18,7 +18,12 @@ const UserVideoComponent = ({ streamManager, isMain }) => {
       <video
         autoPlay={true}
         id={"video-" + streamManager.stream.streamId}
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          transform: "scaleX(-1)",
+        }}
         ref={(vid) => {
           if (vid) streamManager.addVideoElement(vid);
         }}
