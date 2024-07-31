@@ -61,7 +61,9 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<Session> removeSession(final Long reservationId) {
         // session 유효 확인
-        if (this.mapSessions.containsKey(reservationId) && this.mapSessionReservationsTokens.containsKey(reservationId)) {
+        if (this.mapSessions.containsKey(reservationId)
+                && this.mapSessionReservationsTokens.containsKey(reservationId)
+        ) {
             Session session = this.mapSessions.get(reservationId);
 
             try {
@@ -84,7 +86,9 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<String> getToken(final Long reservationId, final UserType userType) {
         // session 유효 확인
-        if (this.mapSessions.containsKey(reservationId) && this.mapSessionReservationsTokens.containsKey(reservationId)) {
+        if (this.mapSessions.containsKey(reservationId)
+                && this.mapSessionReservationsTokens.containsKey(reservationId)
+        ) {
             // userType과 role이 같은  token 반환
             return Optional.ofNullable(this.mapSessionReservationsTokens.get(reservationId).get(userType));
         }
@@ -97,8 +101,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
         if (!this.mapSessions.containsKey(reservationId)
                 || !this.mapSessionReservationsTokens.containsKey(reservationId)
                 || this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)
-            )
-        {
+        ) {
             throw new AppException(BAD_REQUEST);
         }
 
@@ -110,7 +113,10 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
                 .build();
 
         try {
-            String token = this.mapSessions.get(reservationId).createConnection(connectionProperties).getToken();
+            String token = this.mapSessions.get(reservationId)
+                    .createConnection(connectionProperties)
+                    .getToken();
+
             this.mapSessionReservationsTokens.get(reservationId).put(userType, token);
 
             return Optional.of(token);
@@ -131,13 +137,16 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
 
     @Override
-    public Optional<String> removeToken(final Long reservationId, final String token){
-
-        if (this.mapSessions.containsKey(reservationId) && this.mapSessionReservationsTokens.containsKey(reservationId)) {
-            if (this.mapSessionReservationsTokens.get(reservationId).remove(token) != null) {
+    public Optional<String> removeToken(final Long reservationId, final String token, final UserType userType){
+        if (this.mapSessions.containsKey(reservationId)
+                && this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)
+        ) {
+            if (this.mapSessionReservationsTokens.get(reservationId).get(userType).equals(token)
+                    && this.mapSessionReservationsTokens.get(reservationId).remove(userType) != null
+            ) {
                 return Optional.of(token);
             }else {
-                throw new AppException(INTERNAL_SERVER_ERROR);
+                throw new AppException(BAD_REQUEST);
             }
         } else {
             throw new AppException(BAD_REQUEST);

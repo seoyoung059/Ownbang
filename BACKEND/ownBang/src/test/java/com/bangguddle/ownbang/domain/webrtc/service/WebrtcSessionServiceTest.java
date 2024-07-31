@@ -371,4 +371,96 @@ public class WebrtcSessionServiceTest {
         verify(mockSession, never()).createConnection(any());
         verify(mockConnection, never()).getToken();
     }
+
+    @Test
+    @DisplayName("토큰 삭제 성공")
+    void 토큰_삭제_성공() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("user-test-token");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        Optional<String> savedToken = webrtcSessionService.createToken(reservationId, USER);
+
+        // when
+        Optional<String> removedToken = webrtcSessionService.removeToken(reservationId, savedToken.get(), USER);
+        Optional<String> emptyToken = webrtcSessionService.getToken(reservationId, USER);
+
+        // then
+        assertThat(savedToken).isPresent();
+        assertThat(removedToken).isPresent();
+        assertThat(emptyToken).isEmpty();
+        assertThat(savedToken.get()).isEqualTo(removedToken.get());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 토큰 없음")
+    void 토큰_삭제_실패__토큰_없음() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // when
+        Throwable thrown = catchThrowable(
+                () -> webrtcSessionService.removeToken(reservationId, "invalid-token", USER));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 유저 타입과 일치한 토큰 없음")
+    void 토큰_삭제_실패__유저_타입과_일치한_토큰_없음() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("user-test-token");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        webrtcSessionService.createToken(reservationId, USER);
+
+        // when
+        Throwable thrown = catchThrowable(
+                () -> webrtcSessionService.removeToken(reservationId, "user-test-token", AGENT));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 유효한 토큰 아님")
+    void 토큰_삭제_실패__유효한_토큰_아님() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("user-test-token");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        webrtcSessionService.createToken(reservationId, USER);
+
+        // when
+        Throwable thrown = catchThrowable(
+                () -> webrtcSessionService.removeToken(reservationId, "invalid-token", USER));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+    }
 }

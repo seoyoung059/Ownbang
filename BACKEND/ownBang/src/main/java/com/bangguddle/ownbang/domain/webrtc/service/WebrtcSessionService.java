@@ -13,7 +13,7 @@ public interface WebrtcSessionService {
 
     Optional<String> getToken(Long reservationId, UserType userType);
     Optional<String> createToken(Long reservationId, UserType userType);
-    Optional<String> removeToken(Long reservationId, String token);
+    Optional<String> removeToken(Long reservationId, String token, UserType userType);
 
     Boolean startRecord();
     Boolean stopRecord();
