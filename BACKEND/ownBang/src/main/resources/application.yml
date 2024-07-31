@@ -23,6 +23,8 @@ server:
   port: ${PORT}
   ssl:
     enabled: false
+  servlet:
+    context-path: /api/
 
 openvidu:
   url: ${ OPENVIDU_URL }
