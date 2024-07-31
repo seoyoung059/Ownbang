@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
-import { Box } from "@mui/material";
 import clusterPositionsData from "./clusterPositionsData.json";
 
-const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
+const RealEstateMap = ({
+  searchTerm,
+  mark,
+  onBoundsChange,
+  onSelectMarker, // 선택된 마커의 정보를 부모로 전달
+}) => {
   const [positions, setPositions] = useState([]);
-  const [info, setInfo] = useState(null);
   const [map, setMap] = useState(null);
 
   useEffect(() => {
@@ -25,8 +28,8 @@ const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
           bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
         }
 
-        map.setBounds(bounds); // 검색 결과에 따라 지도 범위 재설정
-        map.panTo(new kakao.maps.LatLng(data[0].y, data[0].x)); // 첫 번째 결과를 중심으로 이동
+        map.setBounds(bounds);
+        map.panTo(new kakao.maps.LatLng(data[0].y, data[0].x));
       } else {
         console.error("검색 결과가 없습니다.");
       }
@@ -37,11 +40,11 @@ const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
     if (!map || !mark) return;
 
     const center = new kakao.maps.LatLng(mark.lat, mark.lng);
-    map.panTo(center); // mark 좌표를 중심으로 지도 이동
+    map.panTo(center);
   }, [map, mark]);
 
   const onMarkerClick = (pos) => {
-    setInfo(info && info.lat === pos.lat && info.lng === pos.lng ? null : pos);
+    onSelectMarker(pos); // 선택된 마커의 정보를 부모로 전달
   };
 
   const onBoundsChange2 = () => {
@@ -55,12 +58,12 @@ const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
 
   useEffect(() => {
     if (map) {
-      onBoundsChange2(); // 맵이 처음 생성될 때 onBoundsChange2 호출
+      onBoundsChange2();
     }
   }, [map, positions]);
 
   return (
-    <Map // 지도 표시 container
+    <Map
       center={{
         lat: 37.53269592749301,
         lng: 126.99050764030287,
@@ -70,30 +73,20 @@ const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
         height: "900px",
       }}
       level={7}
-      onCreate={setMap} // 지도가 생성될 때 setMap 호출
-      onBoundsChanged={onBoundsChange2} // 지도의 경계가 변경될 때 onBoundsChange2 호출
+      onCreate={setMap}
+      onBoundsChanged={onBoundsChange2}
     >
       {!mark ? (
         <MarkerClusterer averageCenter={true} minLevel={5}>
           {positions.map((pos) => (
             <MapMarker
-              key={`${pos.lat}-${pos.lng}`}
+              key={pos.id}
               position={{
                 lat: pos.lat,
                 lng: pos.lng,
               }}
               onClick={() => onMarkerClick(pos)}
-            >
-              {info && info.lat === pos.lat && info.lng === pos.lng && (
-                <Box
-                  sx={{
-                    color: "darkGray",
-                  }}
-                >
-                  {pos.title}
-                </Box>
-              )}
-            </MapMarker>
+            />
           ))}
         </MarkerClusterer>
       ) : (
@@ -108,4 +101,4 @@ const LoadKakaoMap = ({ searchTerm, mark, size, onBoundsChange }) => {
   );
 };
 
-export default LoadKakaoMap;
+export default RealEstateMap;

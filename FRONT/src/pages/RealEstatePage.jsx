@@ -1,4 +1,3 @@
-// RealEstatePage.jsx
 import React from "react";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
 import RealEstateSearchBar from "../components/real-estate/RealEstateSearchBar";
@@ -53,6 +52,14 @@ const RealEstatePage = () => {
     setVisibleMarkers(markers);
   };
 
+  // 마커 클릭 시 디테일 표시
+  const onSelectMarker = (pos) => {
+    const item = visibleMarkers.find((marker) => marker.id === pos.id);
+    if (item) {
+      setSelectedItem(item);
+    }
+  };
+
   return (
     <Box sx={{ display: "flex", height: "100vh", position: "relative" }}>
       {/* 리스트 */}
@@ -85,9 +92,8 @@ const RealEstatePage = () => {
         </Box>
         <RealEstateMap
           searchTerm={searchTerm}
-          sx={{ position: "absolute" }}
-          size="900px"
           onBoundsChange={onBoundsChange}
+          onSelectMarker={onSelectMarker} // 마커 클릭 시 호출될 핸들러
         />
       </Box>
 
