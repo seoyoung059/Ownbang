@@ -8,13 +8,13 @@ import { Box } from "@mui/material";
 
 export default function ReservationClock({ value, onChange }) {
   const handleTimeChange = (newValue) => {
-    onChange(dayjs(newValue));
+    onChange(newValue ? dayjs(newValue) : null);
   };
 
   const shouldDisableTime = (value, view) => {
     const hour = value.hour();
     if (view === "hours") {
-      return hour < 9 || hour > 18; // Disable hours outside 9 AM - 6 PM
+      return hour < 9 || hour > 18; // 9 AM - 6 PM 만 보이도록 설정
     }
     return false;
   };
@@ -31,6 +31,7 @@ export default function ReservationClock({ value, onChange }) {
               shouldDisableTime={shouldDisableTime}
               timeStep={30}
               onChange={handleTimeChange}
+              value={value} // Add this line to set the value
             />
           </Box>
         </DemoItem>

@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, Alert } from "@mui/material";
 import ReservationCalendar from "./ReservationCalendar";
 import React, { useState, useCallback } from "react";
 import ReservationClock from "./ReservationClock";
@@ -7,10 +7,15 @@ import dayjs from "dayjs";
 
 const Reservation = ({ onClose }) => {
   const theme = useTheme();
-  const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedTime, setSelectedTime] = useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
 
   const onDateCheck = useCallback(() => {
+    if (!selectedDate || !selectedTime) {
+      setShowAlert(true);
+      return;
+    }
     console.log(
       `${selectedDate.format("YYYY-MM-DD")}  ${selectedTime.format("HH:mm")}`
     );
@@ -64,7 +69,12 @@ const Reservation = ({ onClose }) => {
         </Typography>
       </Box>
 
-      <Box sx={{ display: "flex", flexDirection: "column" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", marginTop: 3 }}>
+        {showAlert && (
+          <Alert severity="warning" sx={{ marginBottom: 2 }}>
+            날짜 및 시간 선택이 필요합니다.
+          </Alert>
+        )}
         <Button
           variant="contained"
           onClick={onDateCheck}
