@@ -75,8 +75,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
 
     private boolean isNonAuthenticatedUri(String uri) {
-        return !(Arrays.stream(REQUIRE_AGENT_ARRAY).anyMatch(uri::startsWith)
-                || Arrays.stream(REQUIRE_USER_ARRAY).anyMatch(uri::startsWith));
+        return !(Arrays.stream(REQUIRE_AGENT_ARRAY).anyMatch(uri::contains)
+                || Arrays.stream(REQUIRE_USER_ARRAY).anyMatch(uri::contains));
     }
 
     private void authenticate(HttpServletRequest request, long userId) {
