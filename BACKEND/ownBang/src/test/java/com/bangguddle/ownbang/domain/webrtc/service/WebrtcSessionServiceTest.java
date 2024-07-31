@@ -108,7 +108,75 @@ public class WebrtcSessionServiceTest {
         verify(openVidu, times(1)).createSession();
     }
 
+    @Test
+    @DisplayName("세션 삭제 성공")
+    void 세션_삭제_성공() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(mockSession.getSessionId()).thenReturn("session_id");
 
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // when
+        Optional<Session> removedSession = webrtcSessionService.removeSession(reservationId);
+
+        // then
+        assertThat(removedSession).isPresent();
+        assertThat(removedSession.get().getSessionId())
+                .isEqualTo(mockSession.getSessionId());
+
+        // verify
+        verify(openVidu, times(1)).createSession();
+        verify(mockSession, times(1)).close();
+        assertThat(webrtcSessionService.getSession(reservationId)).isNotPresent();
+    }
+
+    @Test
+    @DisplayName("세션 삭제 실패 - 유효하지 않은 세션")
+    void 세션_삭제_실패__유효하지_않은_세션() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+
+        // 세션 생성
+        Long invalidReservationId = 123l;
+        webrtcSessionService.createSession(invalidReservationId);
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.removeSession(reservationId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(openVidu, times(1)).createSession();
+        verify(mockSession, never()).close();
+    }
+
+    @Test
+    @DisplayName("세션 삭제 실패 - 오픈 비두 장애")
+    void 세션_삭제_실패__오픈_비두_장애() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        doThrow(OpenViduHttpException.class).when(mockSession).close();
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.removeSession(reservationId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", INTERNAL_SERVER_ERROR);
+
+        // verify
+        verify(openVidu, times(1)).createSession();
+        verify(mockSession, times(1)).close();
+    }
 
 
 }
