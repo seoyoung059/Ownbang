@@ -12,6 +12,11 @@ import {
   TextField,
   Button,
   Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 
 import {
@@ -37,6 +42,8 @@ class Video extends Component {
       subscribers: [],
       isAudioMuted: false,
       isVideoHidden: false,
+      isLeaveDialogOpen: false,
+      endSessionDialogOpen: false,
     };
 
     this.joinSession = this.joinSession.bind(this);
@@ -48,6 +55,10 @@ class Video extends Component {
     this.handleChangeUserName = this.handleChangeUserName.bind(this);
     this.handleMainVideoStream = this.handleMainVideoStream.bind(this);
     this.onbeforeunload = this.onbeforeunload.bind(this);
+    this.handleOpenLeaveDialog = this.handleOpenLeaveDialog.bind(this);
+    this.handleCloseLeaveDialog = this.handleCloseLeaveDialog.bind(this);
+    this.handleCloseEndSessionDialog =
+      this.handleCloseEndSessionDialog.bind(this);
   }
 
   componentDidMount() {
@@ -121,6 +132,9 @@ class Video extends Component {
 
         mySession.on("streamDestroyed", (event) => {
           this.deleteSubscriber(event.stream.streamManager);
+          if (event.stream.streamManager === this.state.mainStreamManager) {
+            this.endSession(); // 메인 스트림이 나가면 세션 종료
+          }
         });
 
         mySession.on("exception", (exception) => {
@@ -137,7 +151,7 @@ class Video extends Component {
                 videoSource: undefined,
                 publishAudio: true,
                 publishVideo: true,
-                resolution: "640x480",
+                resolution: "1280x960",
                 frameRate: 30,
                 insertMode: "APPEND",
                 mirror: true,
@@ -175,10 +189,27 @@ class Video extends Component {
     );
   }
 
+  handleOpenLeaveDialog() {
+    this.setState({ isLeaveDialogOpen: true });
+  }
+
+  handleCloseLeaveDialog(confirm) {
+    if (confirm) {
+      this.leaveSession();
+    } else {
+      this.setState({ isLeaveDialogOpen: false });
+    }
+  }
+
   leaveSession() {
     const mySession = this.state.session;
 
     if (mySession) {
+      if (this.state.mainStreamManager === this.state.publisher) {
+        mySession.streamManagers.forEach((streamManager) => {
+          mySession.forceUnpublish(streamManager);
+        });
+      }
       mySession.disconnect();
     }
 
@@ -190,9 +221,24 @@ class Video extends Component {
       myUserName: "Participant" + Math.floor(Math.random() * 100),
       mainStreamManager: undefined,
       publisher: undefined,
+      isLeaveDialogOpen: false,
     });
 
     window.location.href = "/";
+  }
+
+  handleOpenEndSessionDialog() {
+    this.setState({ endSessionDialogOpen: true });
+  }
+
+  handleCloseEndSessionDialog() {
+    this.setState({ endSessionDialogOpen: false });
+    window.location.href = "/"; // 메인 페이지로 이동
+  }
+
+  endSession() {
+    console.log("endSession called");
+    this.setState({ endSessionDialogOpen: true });
   }
 
   async switchCamera() {
@@ -258,6 +304,8 @@ class Video extends Component {
       mainStreamManager,
       publisher,
       subscribers,
+      isLeaveDialogOpen,
+      endSessionDialogOpen,
     } = this.state;
 
     return (
@@ -351,28 +399,75 @@ class Video extends Component {
                 )}
                 <Box
                   sx={{
-                    position: "absolute",
-                    bottom: 16,
-                    left: 16,
+                    mt: 1,
                     display: "flex",
+                    justifyContent: "space-between",
                     gap: 2,
                   }}
                 >
-                  <IconButton color="primary" onClick={this.toggleAudio}>
-                    {this.state.isAudioMuted ? <MicOff /> : <Mic />}
-                  </IconButton>
-                  <IconButton color="primary" onClick={this.toggleVideo}>
-                    {this.state.isVideoHidden ? <VideocamOff /> : <Videocam />}
-                  </IconButton>
+                  <Box>
+                    <IconButton color="primary" onClick={this.toggleAudio}>
+                      {this.state.isAudioMuted ? (
+                        <MicOff sx={{ color: "red" }} />
+                      ) : (
+                        <Mic />
+                      )}
+                    </IconButton>
+                    <IconButton color="primary" onClick={this.toggleVideo}>
+                      {this.state.isVideoHidden ? (
+                        <VideocamOff sx={{ color: "red" }} />
+                      ) : (
+                        <Videocam />
+                      )}
+                    </IconButton>
+                  </Box>
+                  <Button onClick={this.handleOpenLeaveDialog}>
+                    <ExitToApp sx={{ mr: 1 }} />
+                    나가기
+                  </Button>
                 </Box>
               </Paper>
             </Grid>
           </Grid>
         )}
-        <Button onClick={this.leaveSession}>
-          <ExitToApp sx={{ mr: 1 }} />
-          나가기
-        </Button>
+        <Dialog
+          open={isLeaveDialogOpen}
+          onClose={() => this.handleCloseLeaveDialog(false)}
+        >
+          <DialogTitle>나가기</DialogTitle>
+          <DialogContent>
+            <DialogContentText>정말 세션을 나가시겠습니까?</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => this.handleCloseLeaveDialog(false)}
+              color="primary"
+            >
+              취소
+            </Button>
+            <Button
+              onClick={() => this.handleCloseLeaveDialog(true)}
+              color="primary"
+            >
+              확인
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={endSessionDialogOpen}
+          onClose={this.handleCloseEndSessionDialog}
+        >
+          <DialogTitle>세션 종료</DialogTitle>
+          <DialogContent>
+            <DialogContentText>세션이 종료되었습니다.</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloseEndSessionDialog} color="primary">
+              확인
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     );
   }

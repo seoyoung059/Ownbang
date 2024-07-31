@@ -44,7 +44,7 @@ export default function VideoChatPage() {
   };
 
   return (
-    <Container sx={{ mt: 16 }}>
+    <Container sx={{ mt: 8 }}>
       {!user.isAgent ? (
         <Grid
           container

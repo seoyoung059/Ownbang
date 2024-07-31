@@ -42,7 +42,7 @@ const CheckList = () => {
         border: "1px solid lightGray",
         borderRadius: "10px",
         padding: "30px",
-        height: "80%",
+        height: "82%",
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "center" }}>
