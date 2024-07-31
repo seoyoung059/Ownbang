@@ -1,10 +1,7 @@
 package com.bangguddle.ownbang.global.config.security.filter;
 
-import com.bangguddle.ownbang.global.enums.ErrorCode;
-import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
-import com.bangguddle.ownbang.global.response.Response;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bangguddle.ownbang.global.utils.JsonResponseUtils;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,20 +21,11 @@ public class AppExceptionFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             doFilter(request, response, filterChain);
-        } catch (JwtException e){
-            writeHttpErrorResponse(response, TOKEN_INVALID);
+        } catch (JwtException e) {
+            JsonResponseUtils.writeHttpErrorResponse(response, TOKEN_INVALID);
         } catch (AppException e) {
-            writeHttpErrorResponse(response, e.getErrorCode());
+            JsonResponseUtils.writeHttpErrorResponse(response, e.getErrorCode());
         }
     }
 
-    public static void writeHttpErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
-        response.setStatus(errorCode.getHttpStatus().value());
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        Response<NoneResponse> errorResponse = Response.error(errorCode, NoneResponse.NONE);
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(errorResponse);
-        response.getWriter().write(json);
-    }
 }
