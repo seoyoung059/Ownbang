@@ -1,10 +1,10 @@
 package com.bangguddle.ownbang.domain.webrtc.service;
 
-import com.bangguddle.ownbang.domain.webrtc.entity.WebrtcSession;
-import com.bangguddle.ownbang.domain.webrtc.repository.WebrtcSessionRepository;
+import com.bangguddle.ownbang.domain.webrtc.enums.UserType;
 import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcSessionServiceImpl;
-import io.openvidu.java.client.OpenVidu;
-import io.openvidu.java.client.Session;
+import com.bangguddle.ownbang.global.handler.AppException;
+import io.openvidu.java.client.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
+import static com.bangguddle.ownbang.global.enums.ErrorCode.BAD_REQUEST;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.INTERNAL_SERVER_ERROR;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -29,56 +31,84 @@ public class WebrtcSessionServiceTest {
     private OpenVidu openVidu;
 
     @Mock
-    private WebrtcSessionRepository webrtcSessionRepository;
+    private Session mockSession;
+
+    @Mock
+    private Connection mockConnection;
 
     @InjectMocks
     private WebrtcSessionServiceImpl webrtcSessionService;
 
-    @Test
-    @DisplayName("새로운 세션 생성 성공")
-    void 새로운_세션_생성_성공() throws Exception {
-        // given
-        Long reservationId = 10l;
-        Session mockSession = mock(Session.class);
+    private Long reservationId;
+    private UserType USER;
+    private UserType AGENT;
 
-        when(webrtcSessionRepository.findByReservationId(reservationId)).thenReturn(Optional.empty());
+    @BeforeEach
+    void setUp() {
+        reservationId = 10L;
+        USER = UserType.USER;
+        AGENT = UserType.AGENT;
+    }
+
+    @Test
+    @DisplayName("세션 생성 성공")
+    void 세션_생성_성공() throws Exception {
+        // given
         when(openVidu.createSession()).thenReturn(mockSession);
-        when(mockSession.getSessionId()).thenReturn("newSessionId");
-        when(webrtcSessionRepository.save(any(WebrtcSession.class))).thenAnswer(i -> i.getArgument(0));
+        when(mockSession.getSessionId()).thenReturn("session_id");
 
         // when
-        Optional<WebrtcSession> session = webrtcSessionService.getSession(reservationId);
+        Optional<Session> session = webrtcSessionService.createSession(reservationId);
 
         // then
         assertThat(session).isPresent();
-        assertThat(session.get().getSession()).isEqualTo("newSessionId");
+        assertThat(session.get().getSessionId()).isEqualTo("session_id");
 
         // verify
-        verify(webrtcSessionRepository).findByReservationId(reservationId);
         verify(openVidu).createSession();
-        verify(webrtcSessionRepository).save(any(WebrtcSession.class));
     }
-    
-    @Test
-    @DisplayName("기존 세션 반환 성공")
-    void 기존_세션_반환_성공() throws Exception {
-        // given
-        Long reservationId = 10L;
-        WebrtcSession existingSession = WebrtcSession.builder().session("existingSessionId").build();
 
-        // mock
-        when(webrtcSessionRepository.findByReservationId(reservationId)).thenReturn(Optional.of(existingSession));
+    @Test
+    @DisplayName("세션 생성 실패 - 기존 세션 존재")
+    void 세션_생성_실패__기존_세션_존재() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(mockSession.getSessionId()).thenReturn("session_id");
 
         // when
-        Optional<WebrtcSession> session = webrtcSessionService.getSession(reservationId);
+        Optional<Session> session = webrtcSessionService.createSession(reservationId);
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.createSession(reservationId));
 
         // then
         assertThat(session).isPresent();
-        assertThat(session.get().getSession()).isEqualTo("existingSessionId");
+        assertThat(session.get().getSessionId()).isEqualTo("session_id");
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
 
         // verify
-        verify(webrtcSessionRepository).findByReservationId(reservationId);
-        verify(openVidu, never()).createSession();
-        
+        verify(openVidu, times(1)).createSession();
     }
+
+    @Test
+    @DisplayName("세션 생성 실패 - 오픈 비두 장애")
+    void 세션_생성_실패__오픈_비두_장애() throws Exception {
+        // given
+        when(openVidu.createSession()).thenThrow(OpenViduJavaClientException.class);
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.createSession(reservationId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", INTERNAL_SERVER_ERROR);
+
+        // verify
+        verify(openVidu, times(1)).createSession();
+    }
+
+
+
+
 }
