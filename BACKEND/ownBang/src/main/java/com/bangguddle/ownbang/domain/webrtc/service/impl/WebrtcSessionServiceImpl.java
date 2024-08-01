@@ -4,6 +4,8 @@ import com.bangguddle.ownbang.domain.webrtc.enums.UserType;
 import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
 import com.bangguddle.ownbang.global.handler.AppException;
 import io.openvidu.java.client.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -17,17 +19,20 @@ import static com.bangguddle.ownbang.global.enums.ErrorCode.INTERNAL_SERVER_ERRO
 public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     private static final OpenViduRole DEFAULT_ROLE = OpenViduRole.PUBLISHER;
+    private static final boolean hasAudio = true;
+    private static final boolean hasVideo = true;
+    private static final Recording.OutputMode outputMode = Recording.OutputMode.INDIVIDUAL;
 
     private final OpenVidu openVidu;
     private final Map<Long, Session> mapSessions;
     private final Map<Long, Map<UserType, String>> mapSessionReservationsTokens;
-    private final Map<Long, Boolean> sessionRecordings;
+    private final Map<Long, Recording> mapSessionRecordings;
 
     WebrtcSessionServiceImpl(final OpenVidu openVidu){
         this.openVidu = openVidu;
         this.mapSessions = new ConcurrentHashMap<>();
         this.mapSessionReservationsTokens = new ConcurrentHashMap<>();
-        this.sessionRecordings = new ConcurrentHashMap<>();
+        this.mapSessionRecordings = new ConcurrentHashMap<>();
     }
 
 
@@ -154,12 +159,68 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     }
 
     @Override
-    public Boolean startRecord() {
-        return null;
+    public Optional<Recording> startRecord(final Long reservationId) {
+        if(!mapSessions.containsKey(reservationId)
+                && mapSessionRecordings.containsKey(reservationId)
+        ) {
+            throw new AppException(BAD_REQUEST);
+        }
+
+        String sessionId = mapSessions.get(reservationId).getSessionId();
+
+        RecordingProperties properties = new RecordingProperties.Builder()
+                .outputMode(outputMode)
+                .hasAudio(hasAudio)
+                .hasVideo(hasVideo).build();
+
+        try {
+            Recording recording = this.openVidu.startRecording(sessionId, properties);
+            this.mapSessionRecordings.put(reservationId, recording);
+            return Optional.of(recording);
+
+        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+            throw new AppException(INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
-    public Boolean stopRecord() {
-        return null;
+    public Optional<Recording> stopRecord(final Long reservationId) {
+        if(!mapSessions.containsKey(reservationId)
+                && !mapSessionRecordings.containsKey(reservationId)
+        ) {
+            throw new AppException(BAD_REQUEST);
+        }
+
+        String recordingId = mapSessionRecordings.get(reservationId).getId();
+
+        try {
+            Recording recording = this.openVidu.stopRecording(recordingId);
+            return Optional.of(recording);
+
+        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+            throw new AppException(INTERNAL_SERVER_ERROR);
+        }
     }
+
+    @Override
+    public Optional<Recording> deleteRecord(Long reservationId) {
+        if(!mapSessions.containsKey(reservationId)
+                && !mapSessionRecordings.containsKey(reservationId)
+        ) {
+            throw new AppException(BAD_REQUEST);
+        }
+
+        String recordingId = mapSessionRecordings.get(reservationId).getId();
+
+        try {
+            this.openVidu.deleteRecording(recordingId);
+            Recording recording = this.mapSessionRecordings.remove(reservationId);
+            return Optional.of(recording);
+
+        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+            throw new AppException(INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }
