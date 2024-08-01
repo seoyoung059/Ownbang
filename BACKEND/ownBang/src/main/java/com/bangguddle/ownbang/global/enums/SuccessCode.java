@@ -11,6 +11,7 @@ public enum SuccessCode implements ResponseCode {
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입이 성공적으로 완료되었습니다."),
     CHECK_EMAIL_DUPLICATE_SUCCESS(HttpStatus.OK, "이메일 중복 조회가 성공적으로 완료되었습니다."),
     CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS(HttpStatus.OK, "전화번호 중복 조회가 성공적으로 완료되었습니다."),
+    LOGIN_SUCCESS(HttpStatus.CREATED, "로그인이 성공적으로 완료되었습니다."),
 
     // Room API
     ROOM_CREATE_SUCCESS(HttpStatus.CREATED, "매물이 성공적으로 등록되었습니다."),
@@ -18,6 +19,11 @@ public enum SuccessCode implements ResponseCode {
     ROOM_DELETE_SUCCESS(HttpStatus.OK, "매물이 성공적으로 삭제되었습니다."),
 
     ROOM_FIND_SUCCESS(HttpStatus.OK, "해당하는 ID의 매물을 찾았습니다."),
+
+    // Bookmark API
+    BOOKMARK_CREATE_SUCCESS(HttpStatus.CREATED, "북마크가 성공적으로 등록되었습니다."),
+    BOOKMARK_DELETE_SUCCESS(HttpStatus.OK, "북마크가 성공적으로 삭제되었습니다."),
+    BOOKMARK_FIND_SUCCESS(HttpStatus.OK, "북마크 목록 조회가 성공적으로 완료되었습니다."),
 
 
 
