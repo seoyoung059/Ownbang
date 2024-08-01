@@ -1,7 +1,6 @@
 package com.bangguddle.ownbang.domain.search.controller;
 
 import com.bangguddle.ownbang.domain.search.dto.SearchListResponse;
-import com.bangguddle.ownbang.domain.search.service.SchoolApiService;
 import com.bangguddle.ownbang.domain.search.service.SearchService;
 import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -17,12 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SearchController {
     private final SearchService searchService;
-    private final SchoolApiService schoolApiService;
 
-    @GetMapping("/")
-    public ResponseEntity<Response<SearchListResponse>> searchByName(@RequestParam String name) {
+    @GetMapping
+    public ResponseEntity<Response<SearchListResponse>> searchByName(@RequestParam(name="searchName") String name) {
         SuccessResponse<SearchListResponse> response = searchService.searchByName(name);
         return Response.success(response);
     }
-
 }

@@ -1,33 +1,25 @@
 {
   "analysis": {
+    "analyzer": {
+      "nori_analyzer": {
+        "type": "custom",
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "nori_posfilter",
+          "nori_readingform"
+        ]
+      }
+    },
     "tokenizer": {
-      "my_nori_tokenizer": {
+      "nori_tokenizer": {
         "type": "nori_tokenizer",
-        "decompound_mode": "mixed",
-        "discard_punctuation": "false"
+        "decompound_mode": "mixed"
       }
     },
     "filter": {
-      "my_stop_filter": {
-        "type": "stop",
-        "stopwords": [
-          " "
-        ]
-      }
-    },
-    "analyzer": {
-      "my_nori_analyzer": {
-        "type": "custom",
-        "tokenizer": "my_nori_tokenizer",
-        "filter": [
-          "lowercase",
-          "stop",
-          "my_stop_filter",
-          "nori_part_of_speech"
-        ],
-        "char_filter": [
-          "html_strip"
-        ]
+      "nori_posfilter": {
+        "type": "nori_part_of_speech",
+        "stoptags": ["E", "IC", "J", "MAG", "MAJ", "MM", "SP", "SSC", "SSO", "SC", "SE"]
       }
     }
   }

@@ -1,11 +1,10 @@
 package com.bangguddle.ownbang.domain.search.repository;
 
-import com.bangguddle.ownbang.domain.search.entity.Search;
+import com.bangguddle.ownbang.domain.search.entity.SearchDocument;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-public interface SearchDocumentRepository extends ElasticsearchRepository<Search, Long> {
-    List<Search> findBySearchNameContaining(String searchName);
-
+@Repository
+public interface SearchDocumentRepository extends ElasticsearchRepository<SearchDocument, String> {
+    <S extends SearchDocument> Iterable<S> saveAll(Iterable<S> entities);
 }

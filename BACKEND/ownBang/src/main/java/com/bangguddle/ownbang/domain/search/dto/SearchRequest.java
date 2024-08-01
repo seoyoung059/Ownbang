@@ -1,39 +1,21 @@
 package com.bangguddle.ownbang.domain.search.dto;
-import com.bangguddle.ownbang.domain.search.entity.Search;
+
 import com.bangguddle.ownbang.domain.search.entity.SearchType;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
 public class SearchRequest {
-    @NotNull
     private String searchName;
-
-    @NotNull
     private String searchAddress;
-
-    @NotNull
     private SearchType searchType;
 
-    public Search toEntity() {
-        return Search.builder()
-                .searchName(searchName)
-                .searchAddress(searchAddress)
-                .searchType(searchType)
+    public static SearchRequest from(SearchRequest doc) {
+        return SearchRequest.builder()
+                .searchName(doc.getSearchName())
+                .searchAddress(doc.getSearchAddress())
+                .searchType(doc.getSearchType())
                 .build();
-    }
-
-    public static SearchRequest of(String searchName, String searchAddress, SearchType searchType) {
-        return new SearchRequest(searchName, searchAddress, searchType);
-    }
-
-    public static SearchRequest from(Search search) {
-        return new SearchRequest(
-                search.getSearchName(),
-                search.getSearchAddress(),
-                search.getSearchType()
-        );
     }
 }

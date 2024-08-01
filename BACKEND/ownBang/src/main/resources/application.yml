@@ -16,7 +16,7 @@ spring:
 
   data:
     elasticsearch:
-      client:
+      rest:
         uris: http://localhost:9200
 
   main:
@@ -28,6 +28,12 @@ spring:
   location:
     api: ${LOCATION_API_KEY}
 
+  station:
+    api: ${STATION_API_KEY}
+
+  university:
+    api: ${STATION_API_KEY}
+
 server:
   port: ${PORT}
   ssl:
@@ -37,7 +43,3 @@ openvidu:
   url: ${OPENVIDU_URL}
   secret: ${OPENVIDU_SECRET}
 
-elasticsearch:
-  host: ${ELASTICSEARCH_HOST}
-  username: ${ELASTICSEARCH_USERNAME}
-  password: ${ELASTICSEARCH_PASSWORD}
