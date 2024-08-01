@@ -1,5 +1,7 @@
 package com.bangguddle.ownbang.domain.webrtc.service.impl;
 
+import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
+import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
@@ -43,13 +45,13 @@ public class WebrtcAgentService implements WebrtcService {
 
         // session 중복 검사 - private 전환
         webrtcSessionService.getSession(reservationId).ifPresent(
-                i -> {new AppException(WEBRTC_SESSION_DUPLICATED);});
+                i -> {throw new AppException(WEBRTC_SESSION_DUPLICATED);});
 
         // session 생성
         webrtcSessionService.createSession(reservationId);
 
         // token 생성
-        String token = webrtcSessionService.getToken(reservationId, UserType.ROLE_AGENT)
+        String token = webrtcSessionService.createToken(reservationId, UserType.ROLE_AGENT)
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
         
         // response 반환
@@ -85,8 +87,12 @@ public class WebrtcAgentService implements WebrtcService {
 
     private void validateReservation(Long reservationId){
         // 예약 repo로 접근해 Reservation 을 얻어와 확인
-        reservationRepository.findById(reservationId).orElseThrow(
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
                 () -> new AppException(RESERVATION_NOT_FOUND)
         );
+
+        if(reservation.getStatus() != ReservationStatus.CONFIRMED){
+            throw new AppException(RESERVATION_STATUS_NOT_CONFIRMED);
+        }
     }
 }
