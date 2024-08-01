@@ -65,7 +65,6 @@ const RealEstatePage = () => {
       {/* 리스트 */}
       <Box
         sx={{
-          marginRight: "5px",
           paddingTop: "80px",
           width: "20%",
           height: "100vh",
