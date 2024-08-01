@@ -18,6 +18,7 @@ public enum ErrorCode implements ResponseCode {
 
     // Webrtc API
     WEBRTC_SESSION_DUPLICATED(HttpStatus.CONFLICT, "이미 생성된 세션입니다"),
+    WEBRTC_TOKEN_DUPLICATED(HttpStatus.CONFLICT, "이미 생성된 토큰입니다."),
 
     // Room API
     IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패하였습니다."),
@@ -34,6 +35,7 @@ public enum ErrorCode implements ResponseCode {
     RESERVATION_CANCELED_DUPLICATED (HttpStatus.CONFLICT, " 이미 취소한 예약입니다. "),
     RESERVATION_CANCELED_UNAVAILABLE (HttpStatus.BAD_REQUEST, " 확정된 예약은 취소할 수 없습니다."),
     RESERVATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 예약입니다."),
+    RESERVATION_STATUS_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "확정된 예약이 아닙니다."),
 
     // Common Error Code
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부적 에러가 발생했습니다."),

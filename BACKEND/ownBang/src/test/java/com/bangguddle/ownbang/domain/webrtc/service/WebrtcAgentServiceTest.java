@@ -6,14 +6,16 @@ import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepositor
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
+import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcTokenResponse;
 import com.bangguddle.ownbang.domain.webrtc.enums.UserType;
 import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcAgentService;
 import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcSessionServiceImpl;
-import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcUserService;
 
+import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import io.openvidu.java.client.Recording;
 import io.openvidu.java.client.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,6 +55,9 @@ public class WebrtcAgentServiceTest {
 
     @Mock
     private Session mockSession;
+
+    @Mock
+    private Recording recording;
 
     @Mock
     private Reservation reservation;
@@ -207,5 +212,139 @@ public class WebrtcAgentServiceTest {
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+    }
+    
+    @Test
+    @DisplayName("토큰 삭제 성공")
+    void 토큰_삭제_성공() throws Exception {
+        // given
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+        when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.of(mockSession));
+        when(webrtcSessionService.stopRecord(reservationId)).thenReturn(Optional.of(recording));
+        when(webrtcSessionService.removeToken(reservationId, "test-token", AGENT))
+                .thenReturn(Optional.of("test-token"));
+        when(webrtcSessionService.removeSession(reservationId)).thenReturn(Optional.of(mockSession));
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        SuccessResponse<NoneResponse> response = webrtcService.removeToken(request, userId);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(REMOVE_TOKEN_SUCCESS);
+
+        // verify
+        verify(webrtcSessionService, times(1)).removeToken(any(),any(),any());
+        verify(webrtcSessionService, times(1)).removeSession(any());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 -없는 예약 번호")
+    void 토큰_삭제_실패__없는_예약_번호() throws Exception {
+        // given
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty());
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.removeToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_NOT_FOUND);
+
+        // verify
+        verify(webrtcSessionService, never()).stopRecord(any());
+        verify(webrtcSessionService, never()).removeToken(any(), any(), any());
+        verify(webrtcSessionService, never()).removeSession(any());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 확정된 예약이 아닌 경우")
+    void 토큰_삭제_실패__확정된_예약이_아닌_경우() throws Exception {
+        // given
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getStatus()).thenReturn(ReservationStatus.APPLYED);
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.removeToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_STATUS_NOT_CONFIRMED);
+
+        // verify
+        verify(webrtcSessionService, never()).stopRecord(any());
+        verify(webrtcSessionService, never()).removeToken(any(), any(), any());
+        verify(webrtcSessionService, never()).removeSession(any());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 취소된 예약인 경우")
+    void 토큰_삭제_실패__취소된_예약인_경우() throws Exception {
+        // given
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELED);
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.removeToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_STATUS_NOT_CONFIRMED);
+
+        // verify
+        verify(webrtcSessionService, never()).stopRecord(any());
+        verify(webrtcSessionService, never()).removeToken(any(), any(), any());
+        verify(webrtcSessionService, never()).removeSession(any());
+
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 없는 세션")
+    void 토큰_삭제_실패__없는_세션() throws Exception {
+        // given
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+        when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.empty());
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.removeToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(webrtcSessionService, never()).stopRecord(any());
+        verify(webrtcSessionService, never()).removeToken(any(), any(), any());
+        verify(webrtcSessionService, never()).removeSession(any());
     }
 }
