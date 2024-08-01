@@ -4,8 +4,6 @@ import com.bangguddle.ownbang.domain.webrtc.enums.UserType;
 import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
 import com.bangguddle.ownbang.global.handler.AppException;
 import io.openvidu.java.client.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

@@ -36,6 +36,9 @@ public class WebrtcSessionServiceTest {
     @Mock
     private Connection mockConnection;
 
+    @Mock
+    private Recording mockRecording;
+
     @InjectMocks
     private WebrtcSessionServiceImpl webrtcSessionService;
 
@@ -462,5 +465,129 @@ public class WebrtcSessionServiceTest {
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+    }
+    
+    @Test
+    @DisplayName("영상 녹과 시작 성공")
+    void 영상_녹화_시작_성공() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(openVidu.startRecording(eq("test-session-id"), any(RecordingProperties.class)))
+                .thenReturn(mockRecording);
+        when(mockSession.getSessionId()).thenReturn("test-session-id");
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("test-token");
+        when(mockRecording.getSessionId()).thenReturn("test-session-id");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        webrtcSessionService.createToken(reservationId, AGENT);
+        webrtcSessionService.createToken(reservationId, USER);
+
+        // when
+        Optional<Recording> recording = webrtcSessionService.startRecord(reservationId);
+        
+        // then
+        assertThat(recording).isPresent();
+        assertThat(recording.get().getSessionId()).isEqualTo(mockSession.getSessionId());
+
+        // verify
+        verify(openVidu, times(1))
+                .startRecording(eq("test-session-id"), any(RecordingProperties.class));
+    }
+
+    @Test
+    @DisplayName("영상 녹화 시작 실패 - 이미 녹화중인 세션")
+    void 영상_녹화_시작_실패__이미_녹화중인_세션() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(openVidu.startRecording(eq("test-session-id"), any(RecordingProperties.class)))
+                .thenReturn(mockRecording);
+        when(mockSession.getSessionId()).thenReturn("test-session-id");
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("test-token");
+        when(mockRecording.getSessionId()).thenReturn("test-session-id");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        webrtcSessionService.createToken(reservationId, AGENT);
+        webrtcSessionService.createToken(reservationId, USER);
+
+        // when
+        Optional<Recording> recording = webrtcSessionService.startRecord(reservationId);
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.startRecord(reservationId));
+
+        // then
+        assertThat(recording).isPresent();
+        assertThat(recording.get().getSessionId()).isEqualTo(mockSession.getSessionId());
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(openVidu, times(1))
+                .startRecording(eq("test-session-id"), any(RecordingProperties.class));
+    }
+
+    @Test
+    @DisplayName("영상 녹화 시작 실패 - 인원 부족")
+    void 영상_녹화_시작_실패__인원_부족() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("test-token");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        webrtcSessionService.createToken(reservationId, AGENT);
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.startRecord(reservationId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(openVidu, never())
+                .startRecording(eq("test-session-id"), any(RecordingProperties.class));
+    }
+
+    @Test
+    @DisplayName("영상 녹화 시작 실패 - 오픈 비두 장애")
+    void 영상_녹화_시작_실패__오픈_비두_장애() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(openVidu.startRecording(eq("test-session-id"), any(RecordingProperties.class)))
+                .thenThrow(OpenViduHttpException.class);
+        when(mockSession.getSessionId()).thenReturn("test-session-id");
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("test-token");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        webrtcSessionService.createToken(reservationId, AGENT);
+        webrtcSessionService.createToken(reservationId, USER);
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.startRecord(reservationId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", INTERNAL_SERVER_ERROR);
+
+        // verify
+        verify(openVidu, times(1))
+                .startRecording(eq("test-session-id"), any(RecordingProperties.class));
     }
 }
