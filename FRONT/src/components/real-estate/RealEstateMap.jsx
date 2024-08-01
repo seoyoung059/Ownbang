@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
-import clusterPositionsData from "./clusterPositionsData.json";
+import { useBoundStore } from "../../store/store";
 
 const RealEstateMap = ({
   searchTerm,
@@ -8,12 +8,8 @@ const RealEstateMap = ({
   onBoundsChange,
   onSelectMarker,
 }) => {
-  const [positions, setPositions] = useState([]);
+  const realEstateData = useBoundStore((state) => state.realEstateData);
   const [map, setMap] = useState(null);
-
-  useEffect(() => {
-    setPositions(clusterPositionsData.tmpMarkers);
-  }, []);
 
   useEffect(() => {
     if (!map || !searchTerm) return;
@@ -44,14 +40,14 @@ const RealEstateMap = ({
   }, [map, mark]);
 
   const onMarkerClick = (pos) => {
-    onSelectMarker(pos); // 전달
+    onSelectMarker(pos);
   };
 
   const onBoundsChange2 = () => {
     if (!map) return;
     const bounds = map.getBounds();
-    const visiblePositions = positions.filter((pos) =>
-      bounds.contain(new kakao.maps.LatLng(pos.lat, pos.lng))
+    const visiblePositions = realEstateData.data.filter((pos) =>
+      bounds.contain(new kakao.maps.LatLng(pos.latitude, pos.longitude))
     );
     onBoundsChange(visiblePositions);
   };
@@ -60,7 +56,7 @@ const RealEstateMap = ({
     if (map) {
       onBoundsChange2();
     }
-  }, [map, positions]);
+  }, [map, realEstateData]);
 
   return (
     <Map
@@ -78,12 +74,12 @@ const RealEstateMap = ({
     >
       {!mark ? (
         <MarkerClusterer averageCenter={true} minLevel={5}>
-          {positions.map((pos) => (
+          {realEstateData.data.map((pos) => (
             <MapMarker
               key={pos.id}
               position={{
-                lat: pos.lat,
-                lng: pos.lng,
+                lat: pos.latitude,
+                lng: pos.longitude,
               }}
               onClick={() => onMarkerClick(pos)}
             />

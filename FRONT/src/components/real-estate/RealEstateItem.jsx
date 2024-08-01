@@ -14,16 +14,28 @@ import { useTheme } from "@mui/material/styles";
 const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
   const theme = useTheme();
 
+  const formatCurrency = (amount) => {
+    return (amount / 10000).toLocaleString(); // 1000으로 나누고 천 단위로 포맷팅
+  };
   return (
     <Card
-      sx={{ display: "flex", marginBottom: "20px", position: "relative" }}
+      sx={{
+        display: "flex",
+        marginBottom: "20px",
+        position: "relative",
+        backgroundColor: theme.palette.background.default,
+        borderBottom: "1px solid",
+        borderColor: theme.palette.action.disabled,
+        borderRadius: 0,
+      }}
+      elevation={0}
       onClick={onClick}
     >
       <CardMedia
         component="img"
-        sx={{ width: 151 }}
-        image="https://via.placeholder.com/150" // 실제 이미지 URL로 변경
-        alt={marker.title}
+        sx={{ width: 150, height: 150 }}
+        image={marker.profileImageUrl} // 실제 이미지 URL로 변경
+        alt={marker.profileImageUrl}
       />
       <CardContent
         sx={{
@@ -34,13 +46,17 @@ const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
         }}
       >
         <Box>
-          <Typography component="div">{marker.title}</Typography>
+          <Typography component="div">
+            {/* 상가 원룸 투룸 등 */}
+            {marker.dealType} {formatCurrency(marker.deposit)}/
+            {formatCurrency(marker.monthlyRent)}
+          </Typography>
           <Typography
             variant="subtitle1"
             color="text.secondary"
             component="div"
           >
-            {marker.location}
+            {marker.parcel}
           </Typography>
         </Box>
       </CardContent>
