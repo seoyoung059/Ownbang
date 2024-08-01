@@ -9,19 +9,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.bangguddle.ownbang.global.enums.ErrorCode.BAD_REQUEST;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.METHOD_NOT_ALLOWED;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,9 +34,13 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = RoomController.class)
+@WebMvcTest(controllers = RoomController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class,
+        excludeFilters =
+                {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {OncePerRequestFilter.class})})
 class RoomControllerTest {
 
     @MockBean
@@ -65,11 +74,11 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_CREATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.createRoom(any(RoomCreateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.createRoom(any(), any(RoomCreateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms")
+                        multipart("/rooms/agents")
                                 .file(file0)
                                 .file(file1)
                                 .file(file2)
@@ -108,7 +117,7 @@ class RoomControllerTest {
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms")
+                        multipart("/rooms/agents")
                                 .file(file0)
                                 .file(file1)
                                 .file(file2)
@@ -142,7 +151,7 @@ class RoomControllerTest {
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms")
+                        multipart("/rooms/agents")
                                 .file(file1)
                                 .file(file2)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -174,7 +183,7 @@ class RoomControllerTest {
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms")
+                        multipart("/rooms/agents")
                                 .file(file0)
                                 .file(file1)
                                 .file(file2)
@@ -195,11 +204,11 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
 
         // when
-        when(roomServiceImpl.deleteRoom(anyLong())).thenReturn(successResponse);
+        when(roomServiceImpl.deleteRoom(any(), anyLong())).thenReturn(successResponse);
 
         //then
         mockMvc.perform(
-                        delete("/api/rooms/{roomID}", String.valueOf(roomId))
+                        delete("/rooms/agents/{roomID}", String.valueOf(roomId))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()
                         ))
                 .andExpect(status().isOk())
@@ -216,11 +225,11 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
 
         // when
-        when(roomServiceImpl.deleteRoom(anyLong())).thenReturn(successResponse);
+        when(roomServiceImpl.deleteRoom(anyLong(), anyLong())).thenReturn(successResponse);
 
         //then
         mockMvc.perform(
-                        delete("/api/rooms/{roomID}", String.valueOf(roomId))
+                        delete("/rooms/agents/{roomID}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
                 .andExpect(status().isBadRequest());
@@ -235,11 +244,11 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
 
         // when
-        when(roomServiceImpl.deleteRoom(anyLong())).thenReturn(successResponse);
+        when(roomServiceImpl.deleteRoom(anyLong(), anyLong())).thenReturn(successResponse);
 
         //then
         mockMvc.perform(
-                        delete("/api/rooms")
+                        delete("/rooms/agents")
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
                 .andExpect(status().isMethodNotAllowed())
@@ -260,9 +269,10 @@ class RoomControllerTest {
 
         //then
         mockMvc.perform(
-                        get("/api/rooms/{roomId}", String.valueOf(roomId))
+                        get("/rooms/{roomId}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("ROOM_FIND_SUCCESS"));
     }
@@ -281,11 +291,11 @@ class RoomControllerTest {
 
         //then
         mockMvc.perform(
-                        get("/api/rooms/{roomId}", String.valueOf(roomId))
+                        get("/rooms/{roomId}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Validation failure"));
+                .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()));
     }
 
 
@@ -321,11 +331,11 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.updateRoom(any(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms/{roomId}", String.valueOf(roomId))
+                        multipart("/rooms/agents/{roomId}", String.valueOf(roomId))
                                 .file(file0)
                                 .file(file1)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -377,11 +387,11 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms/{roomId}", String.valueOf(roomId))
+                        multipart("/rooms/agents/{roomId}", String.valueOf(roomId))
                                 .file(file0)
                                 .file(file1)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -395,7 +405,7 @@ class RoomControllerTest {
 
                 //then
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Validation failure"));
+                .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()));
     }
 
     @Test
@@ -430,11 +440,11 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms/{roomId}", String.valueOf(roomId))
+                        multipart("/rooms/agents/{roomId}", String.valueOf(roomId))
                                 .file(file0)
                                 .file(file1)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -448,7 +458,7 @@ class RoomControllerTest {
 
                 //then
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Validation failure"));
+                .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()));
     }
 
     @Test
@@ -483,11 +493,11 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms")
+                        multipart("/rooms/agents")
                                 .file(file0)
                                 .file(file1)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -537,11 +547,11 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
-                        multipart("/api/rooms/{roomId}", String.valueOf(roomId))
+                        multipart("/rooms/agents/{roomId}", String.valueOf(roomId))
                                 .file(file0)
                                 .file(file1)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -555,6 +565,6 @@ class RoomControllerTest {
 
                 //then
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Validation failure"));
+                .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()));
     }
 }

@@ -48,12 +48,16 @@ class BookmarkServiceImplTest {
     void createBookmark_Success() {
         // given
         Long roomId = 1L, userId = 1L;
-        BookmarkCreateRequest bookmarkCreateRequest = BookmarkCreateRequest.of(roomId, userId);
+        Room room = mock(Room.class);
+        User user = mock(User.class);
 
-        when(roomRepository.findById(roomId)).thenReturn(Optional.ofNullable(Room.builder().build()));
-        when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(User.builder().build()));
+        when(roomRepository.findById(roomId)).thenReturn(Optional.ofNullable(room));
+        when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        when(room.getId()).thenReturn(roomId);
+        when(user.getId()).thenReturn(userId);
+        when(bookmarkRepository.existsBookmarkByRoomIdAndUserId(anyLong(), anyLong())).thenReturn(false);
 
-        SuccessResponse<NoneResponse> response = bookmarkService.createBookmark(bookmarkCreateRequest);
+        SuccessResponse<NoneResponse> response = bookmarkService.createBookmark(userId, roomId);
 
         assertThat(response).isNotNull();
         assertThat(response.successCode()).isEqualTo(BOOKMARK_CREATE_SUCCESS);
@@ -73,7 +77,7 @@ class BookmarkServiceImplTest {
         doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(roomRepository).findById(roomId);
 
         assertThatThrownBy(() -> {
-            bookmarkService.createBookmark(bookmarkCreateRequest);
+            bookmarkService.createBookmark(userId, roomId);
         })
                 .isInstanceOf(AppException.class)
                 .hasMessageContaining(ErrorCode.BAD_REQUEST.getMessage());
@@ -90,7 +94,7 @@ class BookmarkServiceImplTest {
         doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(userRepository).findById(roomId);
 
         assertThatThrownBy(() ->
-            bookmarkService.createBookmark(bookmarkCreateRequest)
+            bookmarkService.createBookmark(userId, roomId)
         )
                 .isInstanceOf(AppException.class)
                 .hasMessageContaining(ErrorCode.BAD_REQUEST.getMessage());
@@ -99,9 +103,9 @@ class BookmarkServiceImplTest {
     @Test
     @DisplayName("북마크 삭제 - 성공")
     void deleteBookmark_Success() {
-        Long bookmarkId = 1L;
+        Long userId = 1L, bookmarkId = 1L;
 
-        SuccessResponse<NoneResponse> response = bookmarkService.deleteBookmark(bookmarkId);
+        SuccessResponse<NoneResponse> response = bookmarkService.deleteBookmark(userId, bookmarkId);
 
         assertThat(response).isNotNull();
         assertThat(response.successCode()).isEqualTo(BOOKMARK_DELETE_SUCCESS);
@@ -115,12 +119,12 @@ class BookmarkServiceImplTest {
     @DisplayName("매물 삭제 - 실패: 존재하지 않는 ID")
     void deleteBookmarkTest_Fail_NotExits() {
         //given
-        Long bookmarkId = 1L;
+        Long userId = 1L, bookmarkId = 1L;
         doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(bookmarkRepository).deleteById(bookmarkId);
 
         //when, then
         assertThatThrownBy(() ->
-            bookmarkService.deleteBookmark(bookmarkId)
+            bookmarkService.deleteBookmark(userId, bookmarkId)
         ).isInstanceOf(AppException.class);
     }
 
@@ -136,6 +140,7 @@ class BookmarkServiceImplTest {
         bookmarkList.add(Bookmark.builder().user(user).room(room2).build());
 
         when(bookmarkRepository.findByUserId(userId)).thenReturn(bookmarkList);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
 
         SuccessResponse<List<BookmarkSearchResponse>> response = bookmarkService.getBookmarks(userId);
 
