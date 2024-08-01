@@ -7,4 +7,7 @@ import java.util.List;
 public record SearchListResponse(
         List<SearchDocument> searches
 ) {
+    public List<SearchDocument> getSearches() {
+        return searches;
+    }
 }

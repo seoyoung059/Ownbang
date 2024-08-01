@@ -15,6 +15,5 @@ public interface ReservationService {
 
     SuccessResponse<NoneResponse> updateStatusReservation(Long id) ;
 
-    SuccessResponse<NoneResponse> confirmStatusReservation(Long id);
 }
 

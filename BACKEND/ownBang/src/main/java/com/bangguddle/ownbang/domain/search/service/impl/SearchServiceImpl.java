@@ -48,7 +48,7 @@ public class SearchServiceImpl implements SearchService {
     private EntityManager entityManager;
 
     @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    private final ElasticsearchOperations elasticsearchOperations;
 
 //  @PostConstruct
     public SuccessResponse<NoneResponse> syncDataFromMySQLToElasticsearch() {
@@ -87,7 +87,6 @@ public class SearchServiceImpl implements SearchService {
                 .withQuery(QueryBuilders.wildcardQuery("searchName.keyword", "*" + name + "*"))
                 .withSort(SortBuilders.fieldSort("searchName.keyword").order(SortOrder.ASC)) // 이름순으로 정렬
                 .build();
-
 
         SearchHits<SearchDocument> searchHits = elasticsearchOperations.search(searchQuery, SearchDocument.class);
 
