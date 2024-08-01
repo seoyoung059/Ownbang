@@ -13,7 +13,10 @@ import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import io.openvidu.java.client.Recording;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
@@ -72,7 +75,7 @@ public class WebrtcAgentService implements WebrtcService {
                 () -> new AppException(BAD_REQUEST));
 
         // 영상 녹화 중지
-        webrtcSessionService.stopRecord(reservationId);
+        Optional<Recording> recording =  webrtcSessionService.stopRecord(reservationId);
 
         // token 제거
         String token = request.token();
@@ -80,6 +83,10 @@ public class WebrtcAgentService implements WebrtcService {
 
         // session 제거
         webrtcSessionService.removeSession(reservationId);
+
+        // record 저장 - 추후 추가
+        
+        // record 변환 api 호출 - 추후 추가
 
         // response 반환
         return new SuccessResponse<>(REMOVE_TOKEN_SUCCESS, NoneResponse.NONE);
