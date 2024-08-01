@@ -16,6 +16,8 @@ public enum ErrorCode implements ResponseCode {
     // User API
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원이 존재하지 않습니다."),
 
+    // Webrtc API
+    WEBRTC_SESSION_DUPLICATED(HttpStatus.CONFLICT, "이미 생성된 세션입니다"),
 
     // Room API
     IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패하였습니다."),

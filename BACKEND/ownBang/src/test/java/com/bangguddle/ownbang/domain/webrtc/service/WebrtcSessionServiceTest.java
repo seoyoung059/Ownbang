@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class WebrtcSessionServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(WebrtcServiceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(WebrtcSessionServiceImpl.class);
 
     @Mock
     private OpenVidu openVidu;
