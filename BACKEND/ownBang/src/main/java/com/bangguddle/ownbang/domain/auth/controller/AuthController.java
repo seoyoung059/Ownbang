@@ -1,8 +1,10 @@
 package com.bangguddle.ownbang.domain.auth.controller;
 
 import com.bangguddle.ownbang.domain.auth.dto.DuplicateResponse;
+import com.bangguddle.ownbang.domain.auth.dto.LoginRequest;
 import com.bangguddle.ownbang.domain.auth.dto.UserSignUpRequest;
 import com.bangguddle.ownbang.domain.auth.service.AuthService;
+import com.bangguddle.ownbang.global.dto.Tokens;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -11,10 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/auths")
+@RequestMapping("auths")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+
 
     @PostMapping("/sign-up")
     public ResponseEntity<Response<NoneResponse>> signUp(@RequestBody UserSignUpRequest request) {
@@ -33,6 +36,13 @@ public class AuthController {
         SuccessResponse<DuplicateResponse> response = authService.checkPhoneNumberDuplicate(phoneNumber);
         return Response.success(response);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<Response<Tokens>> login(@RequestBody LoginRequest request) {
+        SuccessResponse<Tokens> response = authService.login(request);
+        return Response.success(response);
+    }
+
 }
 
 
