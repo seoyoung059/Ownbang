@@ -696,6 +696,110 @@ public class WebrtcSessionServiceTest {
 
         // verify
         verify(openVidu, times(1)).stopRecording(any());
+    }
+    
+    @Test
+    @DisplayName("영상 녹화 삭제 성공")
+    void 영상_녹화_삭제_성공() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(openVidu.startRecording(eq("test-session-id"), any(RecordingProperties.class)))
+                .thenReturn(mockRecording);
+        doNothing().when(openVidu).deleteRecording(any());
+        when(mockSession.getSessionId()).thenReturn("test-session-id");
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("test-token");
+        when(mockRecording.getId()).thenReturn("test-record-id");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        webrtcSessionService.createToken(reservationId, AGENT);
+        webrtcSessionService.createToken(reservationId, USER);
+
+        // 영상 녹화
+        webrtcSessionService.startRecord(reservationId);
         
+        // when
+        Optional<Recording> recording = webrtcSessionService.deleteRecord(reservationId);
+        
+        // then
+        assertThat(recording).isPresent();
+        assertThat(recording.get().getId()).isEqualTo(mockRecording.getId());
+
+        // verify
+        verify(openVidu, times(1)).deleteRecording(any());
+    }
+
+    @Test
+    @DisplayName("영상 녹화 삭제 실패 - 세션 없음")
+    void 영상_녹화_삭제_실패__세션_없음() throws Exception {
+        // given & when
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.deleteRecord(reservationId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(openVidu, never()).deleteRecording(any());
+    }
+
+    @Test
+    @DisplayName("영상 녹화 삭제 실패 - 녹화 중인 세션 아님")
+    void 영상_녹화_삭제_실패__녹화_중인_세션_아님() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.deleteRecord(reservationId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(openVidu, never()).deleteRecording(any());
+    }
+
+    @Test
+    @DisplayName("영상 녹화 삭제 실패 - 오픈 비두 장애")
+    void 영상_녹화_삭제_실패__오픈_비두_장애() throws Exception {
+        // given
+        when(openVidu.createSession()).thenReturn(mockSession);
+        when(openVidu.startRecording(eq("test-session-id"), any(RecordingProperties.class)))
+                .thenReturn(mockRecording);
+        doThrow(OpenViduHttpException.class).when(openVidu).deleteRecording(any());
+        when(mockSession.getSessionId()).thenReturn("test-session-id");
+        when(mockSession.createConnection(any())).thenReturn(mockConnection);
+        when(mockConnection.getToken()).thenReturn("test-token");
+        when(mockRecording.getId()).thenReturn("test-record-id");
+
+        // 세션 생성
+        webrtcSessionService.createSession(reservationId);
+
+        // 토큰 생성
+        webrtcSessionService.createToken(reservationId, AGENT);
+        webrtcSessionService.createToken(reservationId, USER);
+
+        // 영상 녹화
+        webrtcSessionService.startRecord(reservationId);
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcSessionService.deleteRecord(reservationId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", INTERNAL_SERVER_ERROR);
+
+        // verify
+        verify(openVidu, times(1)).deleteRecording(any());
     }
 }
