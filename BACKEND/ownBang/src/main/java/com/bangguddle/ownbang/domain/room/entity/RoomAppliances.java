@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.room.entity;
 
+import com.bangguddle.ownbang.domain.room.dto.RoomAppliancesUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -51,5 +52,16 @@ public class RoomAppliances {
         this.microwave = microwave;
         this.closet = closet;
         this.chair = chair;
+    }
+
+    public void updateFromDto(RoomAppliancesUpdateRequest roomAppliancesUpdateRequest) {
+        this.refrigerator = roomAppliancesUpdateRequest.refrigerator();
+        this.washingMachine = roomAppliancesUpdateRequest.washingMachine();
+        this.airConditioner = roomAppliancesUpdateRequest.airConditioner();
+        this.bed = roomAppliancesUpdateRequest.bed();
+        this.desk = roomAppliancesUpdateRequest.desk();
+        this.microwave = roomAppliancesUpdateRequest.microwave();
+        this.closet = roomAppliancesUpdateRequest.closet();
+        this.chair = roomAppliancesUpdateRequest.chair();
     }
 }

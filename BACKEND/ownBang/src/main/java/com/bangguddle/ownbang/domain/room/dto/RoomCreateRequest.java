@@ -14,6 +14,8 @@ import lombok.Builder;
 @Builder
 public record RoomCreateRequest(
 //        User agent,
+        Float latitude,
+        Float longitude,
         DealType dealType,
         RoomType roomType,
         Structure structure,
@@ -39,6 +41,8 @@ public record RoomCreateRequest(
 
     static public RoomCreateRequest of(
 //            User agent,
+            Float latitude,
+            Float longitude,
             DealType dealType,
             RoomType roomType,
             Structure structure,
@@ -56,6 +60,8 @@ public record RoomCreateRequest(
     ) {
         return RoomCreateRequest.builder()
 //                .agent(agent)
+                .latitude(latitude)
+                .longitude(longitude)
                 .dealType(dealType)
                 .roomType(roomType)
                 .structure(structure)
@@ -75,6 +81,8 @@ public record RoomCreateRequest(
 
     static public RoomCreateRequest from(Room room) {
         return RoomCreateRequest.builder()
+                .latitude(room.getLatitude())
+                .longitude(room.getLongitude())
                 .dealType(room.getDealType())
                 .roomType(room.getRoomType())
                 .structure(room.getStructure())
@@ -96,6 +104,8 @@ public record RoomCreateRequest(
     public Room toEntity(/*User agent, */RoomAppliances roomAppliances, RoomDetail roomDetail) {
         return Room.builder()
                 /*.agent(agent)*/
+                .latitude(latitude)
+                .longitude(longitude)
                 .dealType(dealType)
                 .roomType(roomType)
                 .structure(structure)
