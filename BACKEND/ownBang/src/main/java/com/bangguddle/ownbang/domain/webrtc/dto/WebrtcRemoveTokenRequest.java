@@ -5,8 +5,11 @@ import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 
 @Builder
-public record WebrtcCreateRequest (
+public record WebrtcRemoveTokenRequest(
         @NotNull
         @Positive
-        Long reservationId
-) { }
+        Long reservationId,
+
+        @NotNull
+        String token
+){ }
