@@ -32,4 +32,4 @@ openvidu:
 
 
 key:
-  secret : ${SECRET_KEY}
+  secret : ${JWT_SECRET_KEY}
