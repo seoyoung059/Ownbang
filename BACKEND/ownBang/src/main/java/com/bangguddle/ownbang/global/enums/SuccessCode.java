@@ -33,6 +33,7 @@ public enum SuccessCode implements ResponseCode {
 
     // Webrtc API
     GET_TOKEN_SUCCESS(HttpStatus.CREATED, "토큰 발급이 성공적으로 완료되었습니다."),
+    REMOVE_TOKEN_SUCCESS(HttpStatus.OK, "토큰 삭제가 성공적으로 완료되었습니다."),
 
 
     //Reservation API
