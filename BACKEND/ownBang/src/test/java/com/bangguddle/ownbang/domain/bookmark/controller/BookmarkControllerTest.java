@@ -4,7 +4,6 @@ import com.bangguddle.ownbang.domain.bookmark.dto.BookmarkSearchResponse;
 import com.bangguddle.ownbang.domain.bookmark.service.BookmarkService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +39,6 @@ class BookmarkControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     @WithMockUser

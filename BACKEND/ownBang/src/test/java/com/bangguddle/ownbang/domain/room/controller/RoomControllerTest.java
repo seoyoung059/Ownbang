@@ -145,7 +145,6 @@ class RoomControllerTest {
         RoomCreateRequest invalidRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 999999999L, 10L, 10L,
                 "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
-        MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(invalidRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
         MockMultipartFile file2 = new MockMultipartFile("roomImageFile", "image2.png", "image/png", "image/png".getBytes());
 

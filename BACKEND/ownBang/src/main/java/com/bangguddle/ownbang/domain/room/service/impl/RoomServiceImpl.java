@@ -53,7 +53,7 @@ public class RoomServiceImpl implements RoomService {
         }
         roomRepository.save(room);
 
-        return new SuccessResponse<NoneResponse>(ROOM_CREATE_SUCCESS, NoneResponse.NONE);
+        return new SuccessResponse<>(ROOM_CREATE_SUCCESS, NoneResponse.NONE);
     }
 
     /**
@@ -90,7 +90,7 @@ public class RoomServiceImpl implements RoomService {
         }
 
         roomRepository.save(existingRoom);
-        return new SuccessResponse<NoneResponse>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
+        return new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
     }
 
     /**
@@ -104,7 +104,7 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
         validateAgent(userId, room);
         roomRepository.deleteById(roomId);
-        return new SuccessResponse<NoneResponse>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
+        return new SuccessResponse<>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
     }
 
 

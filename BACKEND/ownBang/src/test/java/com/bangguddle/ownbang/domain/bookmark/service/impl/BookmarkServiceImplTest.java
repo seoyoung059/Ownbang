@@ -1,6 +1,5 @@
 package com.bangguddle.ownbang.domain.bookmark.service.impl;
 
-import com.bangguddle.ownbang.domain.bookmark.dto.BookmarkCreateRequest;
 import com.bangguddle.ownbang.domain.bookmark.dto.BookmarkSearchResponse;
 import com.bangguddle.ownbang.domain.bookmark.entity.Bookmark;
 import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
@@ -72,13 +71,12 @@ class BookmarkServiceImplTest {
     void createBookmark_Failed_NoRoomId() {
         // given
         Long roomId = 1L, userId = 1L;
-        BookmarkCreateRequest bookmarkCreateRequest = BookmarkCreateRequest.of(roomId, userId);
 
         doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(roomRepository).findById(roomId);
 
-        assertThatThrownBy(() -> {
-            bookmarkService.createBookmark(userId, roomId);
-        })
+        assertThatThrownBy(() ->
+            bookmarkService.createBookmark(userId, roomId)
+        )
                 .isInstanceOf(AppException.class)
                 .hasMessageContaining(ErrorCode.BAD_REQUEST.getMessage());
     }
@@ -88,7 +86,6 @@ class BookmarkServiceImplTest {
     void createBookmark_Failed_NoUserId() {
         // given
         Long roomId = 1L, userId = 1L;
-        BookmarkCreateRequest bookmarkCreateRequest = BookmarkCreateRequest.of(roomId, userId);
 
         when(roomRepository.findById(roomId)).thenReturn(Optional.ofNullable(Room.builder().build()));
         doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(userRepository).findById(roomId);
