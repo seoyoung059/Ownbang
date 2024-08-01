@@ -9,6 +9,8 @@ import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
+import com.bangguddle.ownbang.domain.user.entity.User;
+import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -18,8 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
+import static com.bangguddle.ownbang.global.enums.ErrorCode.ACCESS_DENIED;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.ROOM_NOT_FOUND;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
@@ -29,7 +31,7 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomImageServiceImpl roomImageServiceImpl;
-//    private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
     /**
      * 매물 생성 Service 메서드
@@ -39,12 +41,12 @@ public class RoomServiceImpl implements RoomService {
      */
     @Override
     @Transactional
-    public SuccessResponse<NoneResponse> createRoom(RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles) {
-//        User agent = userRepository(findById(roomCreateRequest.getAgent())).orElseThrow(() -> new IllegalAccessException("Invalid Agent Id"));
+    public SuccessResponse<NoneResponse> createRoom(Long userId, RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles) {
+        User agent = userRepository.getById(userId);
 
         RoomDetail roomDetail = roomCreateRequest.roomDetailCreateRequest().toEntity();
         RoomAppliances roomAppliances = roomCreateRequest.roomAppliancesCreateRequest().toEntity();
-        Room room = roomCreateRequest.toEntity(roomAppliances, roomDetail);
+        Room room = roomCreateRequest.toEntity(agent, roomAppliances, roomDetail);
 
         for (MultipartFile roomImageFile : roomImageFiles) {
             roomImageServiceImpl.uploadImage(roomImageFile, room);
@@ -63,11 +65,12 @@ public class RoomServiceImpl implements RoomService {
      */
     @Override
     @Transactional
-    public SuccessResponse<NoneResponse> updateRoom(Long roomId, RoomUpdateRequest roomUpdateRequest, List<MultipartFile> roomImageFiles) {
-        // User
-
+    public SuccessResponse<NoneResponse> updateRoom(Long userId, Long roomId, RoomUpdateRequest roomUpdateRequest, List<MultipartFile> roomImageFiles) {
+        System.out.println("roomId = " + roomId);
         Room existingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
+        System.out.println("ROOM EXISTS = " + existingRoom);
+        validateAgent(userId, existingRoom);
 
         existingRoom.updateFromDto(roomUpdateRequest);
 
@@ -75,7 +78,7 @@ public class RoomServiceImpl implements RoomService {
         if(roomUpdateRequest.roomImageUpdateRequestList()!=null && !roomUpdateRequest.roomImageUpdateRequestList().isEmpty()) {
             for (RoomImageUpdateRequest roomImageUpdateRequest : roomUpdateRequest.roomImageUpdateRequestList()) {
                 if (!roomImageUpdateRequest.isDeleted()) continue;
-                roomImageServiceImpl.deleteImage(roomImageUpdateRequest.id());
+                roomImageServiceImpl.deleteImage(roomId, roomImageUpdateRequest.id());
             }
         }
 
@@ -97,11 +100,10 @@ public class RoomServiceImpl implements RoomService {
      */
     @Override
     @Transactional
-    public SuccessResponse<NoneResponse> deleteRoom(Long roomId) {
-//        User agent = userRepository(findById(roomCreateRequestDto.getAgent())).orElseThrow(() -> new IllegalAccessException("Invalid Agent Id"));
-        roomRepository.validateById(roomId);
+    public SuccessResponse<NoneResponse> deleteRoom(Long userId, Long roomId) {
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
+        validateAgent(userId, room);
         roomRepository.deleteById(roomId);
-
         return new SuccessResponse<NoneResponse>(ROOM_DELETE_SUCCESS, NoneResponse.NONE);
     }
 
@@ -114,11 +116,15 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public SuccessResponse<RoomSearchResponse> getRoom(Long roomId) {
-        Optional<Room> room = roomRepository.findById(roomId);
-        if (room.isEmpty()) {
-            throw new AppException(ROOM_NOT_FOUND);
-        }
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
+        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room));
+    }
 
-        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room.get()));
+    private void validateAgent(Long userId, Room existingRoom) {
+        System.out.println("ValidateAgent");
+        User agent = userRepository.getById(userId);
+        if(agent != existingRoom.getAgent())
+            throw new AppException(ACCESS_DENIED);
+        System.out.println("finfin");
     }
 }

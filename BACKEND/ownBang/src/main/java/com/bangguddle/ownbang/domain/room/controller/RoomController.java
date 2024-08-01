@@ -10,13 +10,14 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("api/rooms")
+@RequestMapping("rooms")
 @RequiredArgsConstructor
 public class RoomController {
 
@@ -28,10 +29,11 @@ public class RoomController {
      * @param roomImageFiles 매물 관련 이미지 파일
      * @return Success Response, 실패 시 AppException Throw
      */
-    @PostMapping
-    public ResponseEntity<Response<NoneResponse>> addRoom(@RequestPart(value = "roomCreateRequest") @Valid RoomCreateRequest roomCreateRequest,
+    @PostMapping("/agents")
+    public ResponseEntity<Response<NoneResponse>> addRoom(@AuthenticationPrincipal Long userId,
+                                                          @RequestPart(value = "roomCreateRequest") @Valid RoomCreateRequest roomCreateRequest,
                                                           @RequestPart(value = "roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
-        return Response.success(roomService.createRoom(roomCreateRequest, roomImageFiles));
+        return Response.success(roomService.createRoom(userId, roomCreateRequest, roomImageFiles));
     }
 
     /**
@@ -41,11 +43,12 @@ public class RoomController {
      * @param roomImageFiles 매물 관련 새로 업로드할 이미지 파일
      * @return Success Response, 실패 시 AppException Throw
      */
-    @PatchMapping("/{roomId}")
-    public ResponseEntity<Response<NoneResponse>> updateRoom(@PathVariable(value = "roomId") @Valid @Positive Long roomId,
+    @PatchMapping("agents/{roomId}")
+    public ResponseEntity<Response<NoneResponse>> updateRoom(@AuthenticationPrincipal Long userId,
+                                                             @PathVariable(value = "roomId") @Valid @Positive Long roomId,
                                                              @RequestPart(value="roomUpdateRequest") @Valid RoomUpdateRequest roomUpdateRequest,
                                                              @RequestPart(value="roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
-        return Response.success(roomService.updateRoom(roomId, roomUpdateRequest, roomImageFiles));
+        return Response.success(roomService.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles));
     }
 
     /**
@@ -53,9 +56,10 @@ public class RoomController {
      * @param roomId 삭제할 매물의 ID
      * @return Success Response, 실패 시 AppException Throw
      */
-    @DeleteMapping("/{roomId}")
-    public ResponseEntity<Response<NoneResponse>> deleteRoom(@PathVariable(value = "roomId") @Positive @Valid Long roomId) {
-        return Response.success(roomService.deleteRoom(roomId));
+    @DeleteMapping("agents/{roomId}")
+    public ResponseEntity<Response<NoneResponse>> deleteRoom(@AuthenticationPrincipal Long userId,
+                                                             @PathVariable(value = "roomId") @Positive @Valid Long roomId) {
+        return Response.success(roomService.deleteRoom(userId, roomId));
     }
 
     /**
