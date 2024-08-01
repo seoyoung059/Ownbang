@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import List from "@mui/material/List";
-import RealEstateItem from "./RealEstateItem";
+import { List, Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
+import { SearchOff } from "@mui/icons-material";
+import RealEstateItem from "./RealEstateItem";
 
 const RealEstateList = ({ markers, onSelectItem }) => {
   const theme = useTheme();
@@ -39,6 +40,28 @@ const RealEstateList = ({ markers, onSelectItem }) => {
           onClick={() => onSelectItem(marker)}
         />
       ))}
+      {!displayedMarkers.length && (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            mt: 12,
+            height: "100vh",
+            textAlign: "center",
+            p: 3,
+          }}
+        >
+          <SearchOff sx={{ fontSize: 60, color: "gray", mb: 2 }} />
+          <Typography variant="h5" component="div" gutterBottom>
+            찾는 매물이 없습니다.
+          </Typography>
+          <Typography variant="body1" component="div" gutterBottom>
+            현재 지역에 매물이 없습니다. <br />
+            다른 지역을 찾아보세요.
+          </Typography>
+        </Box>
+      )}
     </List>
   );
 };

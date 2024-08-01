@@ -1,5 +1,5 @@
-import * as React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -87,6 +87,10 @@ const Header = () => {
     },
   };
 
+  const handleLogin = () => {
+    window.location.href = "/login";
+  };
+
   return (
     <>
       <Box sx={headerStyle}>
@@ -103,7 +107,7 @@ const Header = () => {
           </a>
           <Box sx={navigationStyle}>
             <div>
-              <Button>로그인</Button>
+              <Button onClick={handleLogin}>로그인</Button>
               <IconButton color="inherit" onClick={handleOpen}>
                 <Badge badgeContent={notificationCount} color="error">
                   <Notifications />
