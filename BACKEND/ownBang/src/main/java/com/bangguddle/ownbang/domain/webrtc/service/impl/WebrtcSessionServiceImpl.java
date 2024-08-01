@@ -161,6 +161,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<Recording> startRecord(final Long reservationId) {
         if(!mapSessions.containsKey(reservationId)
+                || mapSessionReservationsTokens.get(reservationId).size() != 2
                 || mapSessionRecordings.containsKey(reservationId)
         ) {
             throw new AppException(BAD_REQUEST);
