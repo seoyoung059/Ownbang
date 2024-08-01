@@ -128,7 +128,7 @@ class BookmarkServiceImplTest {
     @Test
     @DisplayName("유저 북마크 조회 - 성공")
     void getBookmarks_Success() {
-        Long userId = 1L;
+        long userId = 1L;
         User user = User.builder().build();
         Room room1 = Room.builder().build();
         Room room2 = Room.builder().build();

@@ -277,11 +277,6 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
-        Room room = Room.builder()
-                .roomAppliances(RoomAppliances.builder().build())
-                .roomDetail(RoomDetail.builder().build())
-                .build();
-
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
 

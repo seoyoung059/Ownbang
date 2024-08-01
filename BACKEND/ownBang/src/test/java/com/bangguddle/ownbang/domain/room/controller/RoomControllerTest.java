@@ -135,16 +135,6 @@ class RoomControllerTest {
     @DisplayName("매물 생성 - 실패: Invalid Field 검증 - 필드 누락")
     public void createRoom_Fail_NoData() throws Exception {
         // DTO
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        RoomAppliancesCreateRequest roomAppliancesCreateRequest = RoomAppliancesCreateRequest.of(null,
-                true, true, true, true, true, true, true);
-        RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
-                HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
-        RoomCreateRequest invalidRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
-                true, 12.88f, 15.66f, (byte) 1, 999999999L, 10L, 10L,
-                "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
         MockMultipartFile file2 = new MockMultipartFile("roomImageFile", "image2.png", "image/png", "image/png".getBytes());
 
