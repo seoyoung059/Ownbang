@@ -31,8 +31,8 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     public SuccessResponse<NoneResponse> createBookmark(Long userId, Long roomId) {
-        Room room = validateRoom(roomId);
-        User user = validateUser(userId);
+        Room room = roomRepository.getById(roomId);
+        User user = userRepository.getById(userId);
         validateBookmark(room, user);
         bookmarkRepository.save(Bookmark.builder().room(room).user(user).build());
         return new SuccessResponse<>(BOOKMARK_CREATE_SUCCESS, NoneResponse.NONE);
@@ -40,6 +40,9 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     public SuccessResponse<NoneResponse> deleteBookmark(Long userId, Long bookmarkId) {
+        userRepository.getById(userId);
+        Bookmark bookmark = bookmarkRepository.findById(bookmarkId).orElseThrow(() -> new AppException(BAD_REQUEST));
+        if(!bookmark.getUser().getId().equals(userId)) throw new AppException(BAD_REQUEST);
         bookmarkRepository.deleteById(bookmarkId);
         return new SuccessResponse<>(BOOKMARK_DELETE_SUCCESS, NoneResponse.NONE);
     }
