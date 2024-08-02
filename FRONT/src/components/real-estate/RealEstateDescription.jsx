@@ -7,7 +7,7 @@ import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import LaptopChromebookIcon from "@mui/icons-material/LaptopChromebook";
 import { useTheme } from "@mui/material";
 
-const InfoItem = ({ icon: Icon, text }) => (
+const InfoItem = ({ icon: Icon, text, item }) => (
   <Box
     sx={{
       display: "flex",
@@ -21,14 +21,27 @@ const InfoItem = ({ icon: Icon, text }) => (
   </Box>
 );
 
-const RealEstateDescription = () => {
+const RealEstateDescription = ({ item }) => {
   const theme = useTheme();
 
   const infoItems = [
-    { icon: CropIcon, text: "전용 면적" },
-    { icon: MeetingRoomIcon, text: "오픈형 원룸" },
-    { icon: DomainIcon, text: "2층/10층" },
-    { icon: DirectionsCarIcon, text: "주차 가능" },
+    {
+      icon: CropIcon,
+      text: item.exclusiveArea ? `${item.exclusiveArea}㎡` : "정보 없음",
+    },
+    {
+      icon: MeetingRoomIcon,
+      text: item.structure ? item.structure : "정보 없음",
+    },
+    {
+      icon: DomainIcon,
+      // text:
+      //   item.roomFloor && item.totalFloors
+      //     ? `${item.roomFloor}층/${item.totalFloors}층`
+      //     : "정보 없음",
+      text: item.roomFloor ? `${item.roomFloor}층` : "정보 없음",
+    },
+    { icon: DirectionsCarIcon, text: item.parking ? "주차 가능" : "주차 불가" },
     { icon: LaptopChromebookIcon, text: "화상통화 즉시 예약 가능" },
   ];
 
