@@ -72,7 +72,7 @@ public class ReservationControllerTest {
 
         when(reservationService.createReservation(any(ReservationRequest.class))).thenReturn(successResponse);
 
-        mockMvc.perform(post("/api/reservations/")
+        mockMvc.perform(post("/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
@@ -89,7 +89,7 @@ public class ReservationControllerTest {
         ReservationRequest invalidRequest = ReservationRequest.of(-1L, -1L, LocalDateTime.now(), ReservationStatus.APPLYED);
         String requestBody = objectMapper.writeValueAsString(invalidRequest);
 
-        mockMvc.perform(post("/api/reservations/")
+        mockMvc.perform(post("/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
@@ -123,7 +123,7 @@ public class ReservationControllerTest {
 
         when(reservationService.getMyReservationList(anyLong())).thenReturn(successResponse);
 
-        MvcResult result = mockMvc.perform(get("/api/reservations/list")
+        MvcResult result = mockMvc.perform(get("/reservations/list")
                         .param("userId", String.valueOf(userId)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -151,7 +151,7 @@ public class ReservationControllerTest {
 
         when(reservationService.getMyReservationList(anyLong())).thenReturn(successResponse);
 
-        mockMvc.perform(get("/api/reservations/list")
+        mockMvc.perform(get("/reservations/list")
                         .param("userId", String.valueOf(userId)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -175,7 +175,7 @@ public class ReservationControllerTest {
 
         when(reservationService.updateStatusReservation(anyLong())).thenReturn(successResponse);
 
-        mockMvc.perform(patch("/api/reservations/{id}", id)
+        mockMvc.perform(patch("/reservations/{id}", id)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
