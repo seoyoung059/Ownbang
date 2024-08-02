@@ -11,10 +11,10 @@ import java.util.List;
 
 public interface RoomService {
     // 매물 생성
-    SuccessResponse<NoneResponse> createRoom(Long userId, RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles);
+    SuccessResponse<NoneResponse> createRoom(Long userId, RoomCreateRequest request, List<MultipartFile> roomImageFiles);
 
     // 매물 수정
-    SuccessResponse<NoneResponse> updateRoom(Long userId, Long roomId, RoomUpdateRequest roomUpdateRequest, List<MultipartFile> roomImageFiles) ;
+    SuccessResponse<NoneResponse> updateRoom(Long userId, Long roomId, RoomUpdateRequest request, List<MultipartFile> roomImageFiles) ;
 
 
         // 매물 삭제

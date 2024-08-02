@@ -25,30 +25,30 @@ public class RoomController {
 
     /**
      * 매물 생성
-     * @param roomCreateRequest 매물 정보 JSON
+     * @param request 매물 정보 JSON
      * @param roomImageFiles 매물 관련 이미지 파일
      * @return Success Response, 실패 시 AppException Throw
      */
     @PostMapping("/agents")
     public ResponseEntity<Response<NoneResponse>> addRoom(@AuthenticationPrincipal Long userId,
-                                                          @RequestPart(value = "roomCreateRequest") @Valid RoomCreateRequest roomCreateRequest,
+                                                          @RequestPart(value = "roomCreateRequest") @Valid RoomCreateRequest request,
                                                           @RequestPart(value = "roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
-        return Response.success(roomService.createRoom(userId, roomCreateRequest, roomImageFiles));
+        return Response.success(roomService.createRoom(userId, request, roomImageFiles));
     }
 
     /**
      * 매물 정보 수정
      * @param roomId 수정할 매물의 ID
-     * @param roomUpdateRequest 수정할 매물의 정보 JSON
+     * @param request 수정할 매물의 정보 JSON
      * @param roomImageFiles 매물 관련 새로 업로드할 이미지 파일
      * @return Success Response, 실패 시 AppException Throw
      */
     @PatchMapping("agents/{roomId}")
     public ResponseEntity<Response<NoneResponse>> updateRoom(@AuthenticationPrincipal Long userId,
                                                              @PathVariable(value = "roomId") @Valid @Positive Long roomId,
-                                                             @RequestPart(value="roomUpdateRequest") @Valid RoomUpdateRequest roomUpdateRequest,
+                                                             @RequestPart(value="roomUpdateRequest") @Valid RoomUpdateRequest request,
                                                              @RequestPart(value="roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
-        return Response.success(roomService.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles));
+        return Response.success(roomService.updateRoom(userId, roomId, request, roomImageFiles));
     }
 
     /**

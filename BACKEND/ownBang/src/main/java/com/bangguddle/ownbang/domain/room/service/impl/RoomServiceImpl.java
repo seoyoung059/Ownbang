@@ -35,18 +35,18 @@ public class RoomServiceImpl implements RoomService {
 
     /**
      * 매물 생성 Service 메서드
-     * @param roomCreateRequest 매물 생성 DTO
+     * @param request 매물 생성 DTO
      * @param roomImageFiles 생성할 매물의 이미지 파일
      * @return SuccessResponse
      */
     @Override
     @Transactional
-    public SuccessResponse<NoneResponse> createRoom(Long userId, RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles) {
+    public SuccessResponse<NoneResponse> createRoom(Long userId, RoomCreateRequest request, List<MultipartFile> roomImageFiles) {
         User agent = userRepository.getById(userId);
 
-        RoomDetail roomDetail = roomCreateRequest.roomDetailCreateRequest().toEntity();
-        RoomAppliances roomAppliances = roomCreateRequest.roomAppliancesCreateRequest().toEntity();
-        Room room = roomCreateRequest.toEntity(agent, roomAppliances, roomDetail);
+        RoomDetail roomDetail = request.roomDetailCreateRequest().toEntity();
+        RoomAppliances roomAppliances = request.roomAppliancesCreateRequest().toEntity();
+        Room room = request.toEntity(agent, roomAppliances, roomDetail);
 
         for (MultipartFile roomImageFile : roomImageFiles) {
             roomImageServiceImpl.uploadImage(roomImageFile, room);
@@ -59,26 +59,26 @@ public class RoomServiceImpl implements RoomService {
     /**
      * 매물 수정 서비스 메서드
      * @param roomId 수정할 매물의 ID
-     * @param roomUpdateRequest 수정할 매물 정보
+     * @param request 수정할 매물 정보
      * @param roomImageFiles 매물에 추가할 이미지 파일
      * @return Success Response.
      */
     @Override
     @Transactional
-    public SuccessResponse<NoneResponse> updateRoom(Long userId, Long roomId, RoomUpdateRequest roomUpdateRequest, List<MultipartFile> roomImageFiles) {
+    public SuccessResponse<NoneResponse> updateRoom(Long userId, Long roomId, RoomUpdateRequest request, List<MultipartFile> roomImageFiles) {
         System.out.println("roomId = " + roomId);
         Room existingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
         System.out.println("ROOM EXISTS = " + existingRoom);
         validateAgent(userId, existingRoom);
 
-        existingRoom.updateFromDto(roomUpdateRequest);
+        existingRoom.updateFromDto(request);
 
         // 삭제할 이미지 처리
-        if(roomUpdateRequest.roomImageUpdateRequestList()!=null && !roomUpdateRequest.roomImageUpdateRequestList().isEmpty()) {
-            for (RoomImageUpdateRequest roomImageUpdateRequest : roomUpdateRequest.roomImageUpdateRequestList()) {
-                if (!roomImageUpdateRequest.isDeleted()) continue;
-                roomImageServiceImpl.deleteImage(roomId, roomImageUpdateRequest.id());
+        if(request.roomImageUpdateRequestList()!=null && !request.roomImageUpdateRequestList().isEmpty()) {
+            for (RoomImageUpdateRequest imageRequest : request.roomImageUpdateRequestList()) {
+                if (!imageRequest.isDeleted()) continue;
+                roomImageServiceImpl.deleteImage(roomId, imageRequest.id());
             }
         }
 
