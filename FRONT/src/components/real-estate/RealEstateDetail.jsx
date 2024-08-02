@@ -1,6 +1,7 @@
 import React from "react";
 import RealEstateImages from "./RealEstateImages";
 import RealEstateDescription from "./RealEstateDescription";
+import AgentInfo from "./AgentInfo";
 import { Button, Typography, Box, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
@@ -35,6 +36,10 @@ const RealEstateDetail = ({ item, onOpenReservationCard }) => {
           <Divider variant="middle" sx={{ margin: 2 }} />
         </Typography>
         <RealEstateDescription item={item} />
+      </Box>
+
+      <Box>
+        <AgentInfo />
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column" }}>
