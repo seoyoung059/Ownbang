@@ -11,15 +11,15 @@ import java.util.List;
 
 public interface RoomService {
     // 매물 생성
-    SuccessResponse<NoneResponse> createRoom(RoomCreateRequest roomCreateRequest, List<MultipartFile> roomImageFiles);
+    SuccessResponse<NoneResponse> createRoom(Long userId, RoomCreateRequest request, List<MultipartFile> roomImageFiles);
 
     // 매물 수정
-    public SuccessResponse<NoneResponse> updateRoom(Long roomId, RoomUpdateRequest roomUpdateRequest, List<MultipartFile> roomImageFiles) ;
+    SuccessResponse<NoneResponse> updateRoom(Long userId, Long roomId, RoomUpdateRequest request, List<MultipartFile> roomImageFiles) ;
 
 
         // 매물 삭제
-    SuccessResponse<NoneResponse> deleteRoom(Long roomId);
+    SuccessResponse<NoneResponse> deleteRoom(Long userId, Long roomId);
 
     // 매물 조회
-    SuccessResponse<RoomSearchResponse> getRoom(Long id);
+    SuccessResponse<RoomSearchResponse> getRoom(Long roomId);
 }

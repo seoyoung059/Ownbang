@@ -12,14 +12,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -33,7 +37,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ReservationController.class)
+@WebMvcTest(controllers = ReservationController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class,
+        excludeFilters =
+                {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {OncePerRequestFilter.class})})
+
 public class ReservationControllerTest {
 
     @Autowired
@@ -64,7 +72,7 @@ public class ReservationControllerTest {
 
         when(reservationService.createReservation(any(ReservationRequest.class))).thenReturn(successResponse);
 
-        mockMvc.perform(post("/api/reservations/")
+        mockMvc.perform(post("/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
@@ -81,16 +89,13 @@ public class ReservationControllerTest {
         ReservationRequest invalidRequest = ReservationRequest.of(-1L, -1L, LocalDateTime.now(), ReservationStatus.APPLYED);
         String requestBody = objectMapper.writeValueAsString(invalidRequest);
 
-        mockMvc.perform(post("/api/reservations/")
+        mockMvc.perform(post("/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"));
     }
-
-
-
 
     @Test
     @DisplayName("예약 목록 조회 성공")
@@ -118,7 +123,7 @@ public class ReservationControllerTest {
 
         when(reservationService.getMyReservationList(anyLong())).thenReturn(successResponse);
 
-        MvcResult result = mockMvc.perform(get("/api/reservations/list")
+        MvcResult result = mockMvc.perform(get("/reservations/list")
                         .param("userId", String.valueOf(userId)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -146,7 +151,7 @@ public class ReservationControllerTest {
 
         when(reservationService.getMyReservationList(anyLong())).thenReturn(successResponse);
 
-        mockMvc.perform(get("/api/reservations/list")
+        mockMvc.perform(get("/reservations/list")
                         .param("userId", String.valueOf(userId)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -170,7 +175,7 @@ public class ReservationControllerTest {
 
         when(reservationService.updateStatusReservation(anyLong())).thenReturn(successResponse);
 
-        mockMvc.perform(patch("/api/reservations/{id}", id)
+        mockMvc.perform(patch("/reservations/{id}", id)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
