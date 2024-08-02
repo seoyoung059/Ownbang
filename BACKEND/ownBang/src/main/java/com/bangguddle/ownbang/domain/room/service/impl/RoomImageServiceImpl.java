@@ -61,14 +61,19 @@ public class RoomImageServiceImpl {
 
     /**
      * 매물 이미지 삭제 서비스 메서드
+     * @param roomId 유효성 확인을 위한 매물 ID
      * @param roomImageId 삭제할 매물 이미지 ID
      * @return SuccessResponse
      * @throws AppException 매물 이미지 삭제 실패 시 IMAGE_DELETE_FAILED 발생
      */
     @Transactional
-    public SuccessResponse<NoneResponse> deleteImage(Long roomImageId) throws AppException {
+    public SuccessResponse<NoneResponse> deleteImage(Long roomId, Long roomImageId) throws AppException {
         RoomImage roomImage = roomImageRepository.findById(roomImageId)
-                .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
+                .orElseThrow(() -> new AppException(INVALID_IMAGE_FILE));
+        if(!roomImage.getRoom().getId().equals(roomId)) {
+            throw new AppException(INVALID_IMAGE_FILE);
+        }
+
 
         String dbFilePath = roomImage.getRoomImageUrl();
         Path filePath = Paths.get("src/main/resources/static", dbFilePath);
