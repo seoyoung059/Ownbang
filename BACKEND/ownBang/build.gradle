@@ -69,7 +69,7 @@ dependencies {
 
 	implementation "org.springframework.data:spring-data-elasticsearch:4.0.0.RELEASE"
 	implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.6.2'
-
+	testImplementation "org.testcontainers:elasticsearch:1.15.3"
 }
 ext {
 	set('elasticsearchVersion', "7.6.2")
