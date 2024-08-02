@@ -1,76 +1,73 @@
 package com.bangguddle.ownbang.domain.webrtc.controller;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateRequest;
+import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
+import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
+import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcTokenResponse;
 import com.bangguddle.ownbang.domain.webrtc.service.WebrtcService;
-import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcServiceImpl;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
-import com.bangguddle.ownbang.global.enums.SuccessCode;
-import com.bangguddle.ownbang.global.handler.AppException;
+import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcAgentService;
+import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcUserService;
+import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.bind.annotation.*;
 
-import io.openvidu.java.client.ConnectionProperties;
-import io.openvidu.java.client.ConnectionType;
-import io.openvidu.java.client.OpenVidu;
-import io.openvidu.java.client.OpenViduHttpException;
-import io.openvidu.java.client.OpenViduJavaClientException;
-import io.openvidu.java.client.OpenViduRole;
-import io.openvidu.java.client.Recording;
-import io.openvidu.java.client.RecordingProperties;
-import io.openvidu.java.client.Session;
 
 @RestController
-@RequestMapping("/api/webrtcs")
+@RequestMapping("/webrtcs")
 @RequiredArgsConstructor
 public class WebrtcController {
 
-    private final WebrtcService webrtcService;
-
-    /*******************/
-    /*** Session API ***/
-    /*******************/
+    private final WebrtcUserService webrtcUserService;
+    private final WebrtcAgentService webrtcAgentService;
 
     /**
-     * SessionName을 통해 session과 connection을 생성하고<br/>
-     * 이를 연결할 수 있는 token을 반환합니다.
+     * reservationId를 통해 session과 connection을 생성하고<br/>
+     * 이를 연결할 수 있는 token을 반환합니다.<br/><br/>
+     *
+     * agent 권한을 갖는 유저만 session을 생성할 수 있습니다.
      * @param request
-     * @return ResponseEntity
+     * @return Response WebrtcTokenResponse
      */
     @RequestMapping(value = "/get-token", method = RequestMethod.POST)
-    public ResponseEntity<Response<String>> getToken(@RequestBody @Valid WebrtcCreateRequest request) {
-        SuccessResponse<String> successResponse = webrtcService.getToken(request);
-        return Response.success(successResponse);
+    public ResponseEntity<Response<WebrtcTokenResponse>> getToken(@RequestBody @Valid WebrtcCreateTokenRequest request,
+                                                                  @AuthenticationPrincipal Long userId,
+                                                                  Authentication authentication
+    ) {
+        Boolean isAgent = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_AGENT"));
+
+        SuccessResponse<WebrtcTokenResponse> response = isAgent
+                ? webrtcAgentService.getToken(request, userId)
+                : webrtcUserService.getToken(request, userId);
+
+        return Response.success(response);
     }
 
 
-    @RequestMapping(value = "/remove-user", method = RequestMethod.POST)
-    public ResponseEntity<Response<String>> removeUser(@RequestBody Map<String, Object> sessionNameToken){
-        System.out.println("Removing user | {sessionName, token}=" + sessionNameToken);
-        
-        // session 및 token 확인
-        String sessionName = (String) sessionNameToken.get("sessionName");
-        String token = (String) sessionNameToken.get("token");
+    /**
+     * session과 연결된 connection을 제거합니다.<br/>
+     * agent 권한을 갖는 유저가 connection을 제거한 경우, 해당 session은 종료됩니다.
+     * @param request
+     * @param userId
+     * @param authentication
+     * @return Response NoneResponse
+     */
+    @RequestMapping(value = "/remove-token", method = RequestMethod.DELETE)
+    public ResponseEntity<Response<NoneResponse>> removeToken(@RequestBody @Valid WebrtcRemoveTokenRequest request,
+                                                              @AuthenticationPrincipal Long userId,
+                                                              Authentication authentication
+    ){
+        Boolean isAgent = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_AGENT"));
 
-        // session 및 token 유효성 확인
-        // reservationService.isValidSessionName...
+        SuccessResponse<NoneResponse> response = isAgent
+                ? webrtcAgentService.removeToken(request, userId)
+                : webrtcUserService.removeToken(request, userId);
 
-//        SuccessResponse<String> successResponse = webrtcService.removeUser(sessionName, token);
-        
-        return null;
+        return Response.success(response);
     }
 }
