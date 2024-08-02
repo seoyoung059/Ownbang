@@ -6,6 +6,7 @@ import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.DealType;
 import com.bangguddle.ownbang.domain.room.enums.RoomType;
 import com.bangguddle.ownbang.domain.room.enums.Structure;
+import com.bangguddle.ownbang.domain.user.entity.User;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -13,7 +14,6 @@ import lombok.Builder;
 
 @Builder
 public record RoomCreateRequest(
-//        User agent,
         Float latitude,
         Float longitude,
         DealType dealType,
@@ -40,7 +40,6 @@ public record RoomCreateRequest(
 ) {
 
     static public RoomCreateRequest of(
-//            User agent,
             Float latitude,
             Float longitude,
             DealType dealType,
@@ -59,7 +58,6 @@ public record RoomCreateRequest(
             RoomDetailCreateRequest roomDetailCreateRequest
     ) {
         return RoomCreateRequest.builder()
-//                .agent(agent)
                 .latitude(latitude)
                 .longitude(longitude)
                 .dealType(dealType)
@@ -79,31 +77,9 @@ public record RoomCreateRequest(
                 .build();
     }
 
-    static public RoomCreateRequest from(Room room) {
-        return RoomCreateRequest.builder()
-                .latitude(room.getLatitude())
-                .longitude(room.getLongitude())
-                .dealType(room.getDealType())
-                .roomType(room.getRoomType())
-                .structure(room.getStructure())
-                .isLoft(room.isLoft())
-                .exclusiveArea(room.getExclusiveArea())
-                .supplyArea(room.getSupplyArea())
-                .roomFloor(room.getRoomFloor())
-                .deposit(room.getDeposit())
-                .monthlyRent(room.getMonthlyRent())
-                .maintenanceFee(room.getMaintenanceFee())
-                .parcel(room.getParcel())
-                .profileImageUrl(room.getProfileImageUrl())
-                .roomAppliancesCreateRequest(RoomAppliancesCreateRequest.from(room.getRoomAppliances()))
-                .roomDetailCreateRequest(RoomDetailCreateRequest.from(room.getRoomDetail()))
-                .build();
-    }
-
-
-    public Room toEntity(/*User agent, */RoomAppliances roomAppliances, RoomDetail roomDetail) {
+    public Room toEntity(User agent, RoomAppliances roomAppliances, RoomDetail roomDetail) {
         return Room.builder()
-                /*.agent(agent)*/
+                .agent(agent)
                 .latitude(latitude)
                 .longitude(longitude)
                 .dealType(dealType)
