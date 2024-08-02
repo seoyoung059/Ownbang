@@ -1,15 +1,5 @@
 // 중개인 정보가 담긴 컴퍼넌트
-import {
-  Button,
-  Typography,
-  Box,
-  Divider,
-  Stack,
-  ImageListItem,
-  Icon,
-} from "@mui/material";
-import StarIcon from "@mui/icons-material/Star";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
+import { Rating, Typography, Box, Divider, ImageListItem } from "@mui/material";
 import { useTheme } from "@mui/material";
 
 const defaultProfileImage = "https://via.placeholder.com/150"; // 실제 이미지 URL 예시
@@ -18,6 +8,7 @@ const AgentStarRate = 4;
 const AgentInfo = () => {
   const profileImage = defaultProfileImage;
   const theme = useTheme();
+
   return (
     <>
       <Divider variant="middle" sx={{ margin: 2 }} />
@@ -64,16 +55,13 @@ const AgentInfo = () => {
 
             <Box sx={{ display: "flex", flexDirection: "column" }}>
               <Typography>김준영의 행복덕방</Typography>
-              <Box>
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Icon key={index}>
-                    {index < AgentStarRate ? (
-                      <StarIcon sx={{ color: theme.palette.bookmark }} />
-                    ) : (
-                      <StarBorderIcon sx={{ color: theme.palette.bookmark }} />
-                    )}
-                  </Icon>
-                ))}
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Rating
+                  name="read-only-rating"
+                  value={AgentStarRate}
+                  readOnly
+                  sx={{ color: theme.palette.bookmark }}
+                />
               </Box>
             </Box>
           </Box>
