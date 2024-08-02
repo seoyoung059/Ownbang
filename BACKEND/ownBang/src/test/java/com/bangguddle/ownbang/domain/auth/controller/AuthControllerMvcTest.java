@@ -20,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -304,7 +305,7 @@ public class AuthControllerMvcTest {
                 .password(password)
                 .build();
 
-        doThrow(new AppException(BAD_CREDENTIAL))
+        doThrow(BadCredentialsException.class)
                 .when(authService).login(inValidRequest);
 
         // when

@@ -1,14 +1,18 @@
 package com.bangguddle.ownbang.domain.auth.service;
 
 import com.bangguddle.ownbang.domain.auth.dto.DuplicateResponse;
+import com.bangguddle.ownbang.domain.auth.dto.LoginRequest;
 import com.bangguddle.ownbang.domain.auth.dto.UserSignUpRequest;
 import com.bangguddle.ownbang.domain.auth.service.impl.AuthServiceImpl;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
+import com.bangguddle.ownbang.global.config.security.JwtProvider;
+import com.bangguddle.ownbang.global.dto.Tokens;
 import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
+import com.bangguddle.ownbang.global.repository.RedisRepository;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,12 +20,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static com.bangguddle.ownbang.global.enums.SuccessCode.CHECK_EMAIL_DUPLICATE_SUCCESS;
-import static com.bangguddle.ownbang.global.enums.SuccessCode.CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.EMAIL_DUPLICATED;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.PHONE_NUMBER_DUPLICATED;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,6 +40,14 @@ class AuthServiceTest {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private AuthenticationManager authenticationManager;
+    @Mock
+    private JwtProvider jwtProvider;
+    @Mock
+    private RedisRepository redisRepository;
+    @Mock
+    private User mockUser;
 
     @Test
     @DisplayName("회원 가입 성공")
@@ -47,7 +62,7 @@ class AuthServiceTest {
                 .build();
 
         SuccessResponse<NoneResponse> expected =
-                new SuccessResponse<>(SuccessCode.SIGNUP_SUCCESS, NoneResponse.NONE);
+                new SuccessResponse<>(SIGNUP_SUCCESS, NoneResponse.NONE);
 
         // when
         doReturn(Optional.empty()).when(userRepository).findByEmail(request.email());
@@ -69,13 +84,13 @@ class AuthServiceTest {
                 .build();
 
         // when
-        doThrow(new AppException(ErrorCode.PHONE_NUMBER_DUPLICATED))
+        doThrow(new AppException(PHONE_NUMBER_DUPLICATED))
                 .when(userRepository).findByPhoneNumber(request.phoneNumber());
 
         // then
         assertThatThrownBy(() -> authService.signUp(request))
                 .isInstanceOf(AppException.class)
-                .hasMessageContaining(ErrorCode.PHONE_NUMBER_DUPLICATED.getMessage());
+                .hasMessageContaining(PHONE_NUMBER_DUPLICATED.getMessage());
     }
 
     @Test
@@ -87,13 +102,13 @@ class AuthServiceTest {
                 .build();
 
         // when
-        doThrow(new AppException(ErrorCode.EMAIL_DUPLICATED))
+        doThrow(new AppException(EMAIL_DUPLICATED))
                 .when(userRepository).findByEmail(request.email());
 
         // then
         assertThatThrownBy(() -> authService.signUp(request))
                 .isInstanceOf(AppException.class)
-                .hasMessageContaining(ErrorCode.EMAIL_DUPLICATED.getMessage());
+                .hasMessageContaining(EMAIL_DUPLICATED.getMessage());
     }
 
     @Test
@@ -169,4 +184,60 @@ class AuthServiceTest {
         assertThat(authService.checkPhoneNumberDuplicate(phoneNumber)).isInstanceOf(SuccessResponse.class)
                 .isEqualTo(success);
     }
+
+    @Test
+    @DisplayName("로그인 성공")
+    public void 로그인_성공() {
+        // given
+        String email = "email", password = "password";
+        String accessToken = "access", refreshToken = "refresh";
+        Long userId = 1L;
+        LoginRequest request = LoginRequest.builder()
+                .email(email)
+                .password(password)
+                .build();
+        Tokens tokens = Tokens.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        SuccessResponse<Tokens> expected =
+                new SuccessResponse<>(LOGIN_SUCCESS, tokens);
+
+
+        // when
+        when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(mockUser));
+        when(mockUser.getId()).thenReturn(userId);
+        when(jwtProvider.generateTokens(userId)).thenReturn(tokens);
+        doNothing().when(redisRepository).save(tokens);
+        doNothing().when(redisRepository).saveValidTokens(tokens, userId);
+
+
+        // then
+        assertThatCode(() -> authService.login(request)).doesNotThrowAnyException();
+        assertThat(authService.login(request)).isInstanceOf(SuccessResponse.class)
+                .isEqualTo(expected);
+
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 아이디또는 비밀번호가 유효하지 않음")
+    public void 로그인_실패_아이디또는_비밀번호가_유효하지_않음() {
+        // given
+        String email = "invalid", password = "invalid";
+
+        LoginRequest request = LoginRequest.builder()
+                .email(email)
+                .password(password)
+                .build();
+
+        // when
+        doThrow(BadCredentialsException.class)
+                .when(authenticationManager).authenticate(any());
+
+        // then
+        assertThatThrownBy(() -> authService.login(request))
+                .isInstanceOf(BadCredentialsException.class);
+    }
+
 }
