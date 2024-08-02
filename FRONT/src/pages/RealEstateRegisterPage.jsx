@@ -20,6 +20,7 @@ import AddressSearch from "../components/common/AddressSearch";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
 
 export default function RealEstateRegisterPage() {
+  const [visibleMarkers, setVisibleMarkers] = useState([]);
   const theme = useTheme();
   const [address, setAddress] = useState("");
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
@@ -84,6 +85,10 @@ export default function RealEstateRegisterPage() {
       ...roomDetails,
       [name]: type === "checkbox" ? checked : value,
     });
+  };
+
+  const onBoundsChange = (markers) => {
+    setVisibleMarkers(markers);
   };
 
   useEffect(() => {
@@ -185,6 +190,7 @@ export default function RealEstateRegisterPage() {
                   <RealEstateMap
                     searchTerm={address}
                     mark={coordinates}
+                    onBoundsChange={onBoundsChange}
                     style={{ height: "100%" }}
                     size="100%"
                   />

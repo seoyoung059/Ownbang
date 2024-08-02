@@ -141,7 +141,8 @@ const router = createBrowserRouter([
     path: "/estate-register",
     element: (
       <Suspense fallback={<Loading />}>
-        <AgentRoute element={<RealEstateRegisterPage />} />
+        {/* <AgentRoute element={<RealEstateRegisterPage />} /> */}
+        <RealEstateRegisterPage />
       </Suspense>
     ),
   },

@@ -1,30 +1,18 @@
-import { setCookie, getCookie, removeCookie } from "react-cookie";
+import { checkEmail } from "../api/auth";
 
-import { login, logout } from "../api/auth";
+/*
+우선 이메일 중복처리만 구현했는데 위에 api 요청 함수를 가져왔고
+그걸 duplicateCheckEmail 함수에 썼어 아까랑 똑같이 여기엔 email이 없자너 결국 데이터가 입력받는 곳에 있으니까
+또 다시 인자를 열어서 checkEmail에 연결해주면 됭
+그 다음 isDuplicatedEmail을 갱신해주면 될거야 result.isDuplicate라고 쓴 건 api 명세 보면 알듯
+이제 이걸 직접 쓴 SignUpForm으로 ㄱㄱ
+*/
 
-// 일단 이 정도로 구성해봤는데 통신하면서 수정-보완해야 할듯
-// 사용이 애매함 로그인 상태 검증 ?
-
-export const authSlice = (set) => ({
+export const createAuthSlice = (set) => ({
   isLogin: true,
-  email: "",
-  password: "",
-  doLogin: async () => {
-    const jwt = await login(email, password);
-    await setCookie("jwt", jwt, { path: "/" });
-    await set({ isLogin: true });
-  },
-  doLogout: async () => {
-    await logout();
-    await removeCookie("jwt", { path: "/" });
-    await set({ isLogin: false });
-  },
-  checkLogin: () => {
-    const jwt = getCookie("jwt");
-    if (jwt) {
-      set({ isLogin: true });
-    } else {
-      set({ isLogin: false });
-    }
+  isDuplicatedEmail: false,
+  duplicateCheckEmail: async (email) => {
+    const result = await checkEmail(email);
+    set({ isDuplicatedEmail: result.isDuplicate });
   },
 });
