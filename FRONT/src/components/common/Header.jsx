@@ -7,42 +7,13 @@ import {
   Modal,
   IconButton,
   Badge,
+  Backdrop,
 } from "@mui/material";
 
 import { Notifications, MenuOutlined } from "@mui/icons-material";
 import { useTheme, useMediaQuery } from "@mui/material";
 
-const Notification = ({ open, handleClose }) => {
-  const theme = useTheme();
-  const modalStyle = {
-    position: "absolute",
-    top: "12%",
-    right: "4%",
-    zIndex: "100",
-    width: 400,
-    bgcolor: theme.palette.background.paper,
-    borderRadius: "10px",
-    boxShadow: 24,
-    p: 4,
-  };
-  return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={modalStyle}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          알림
-        </Typography>
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          알림 내용
-        </Typography>
-      </Box>
-    </Modal>
-  );
-};
+import Notification from "./Notification";
 
 const Header = () => {
   const theme = useTheme();
@@ -59,7 +30,7 @@ const Header = () => {
     left: 0,
     top: 0,
     margin: "0 auto",
-    zIndex: "100",
+    zIndex: "1200",
     width: "100%",
     height: "80px",
     backgroundColor: theme.palette.primary.dark,

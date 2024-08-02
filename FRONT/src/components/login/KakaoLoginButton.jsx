@@ -23,12 +23,12 @@ export default function KakaoLoginButton() {
       }}
     >
       <svg
-        width="24" // 아이콘의 너비와 높이를 설정
+        width="24"
         height="24"
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ marginRight: "4px", marginBottom: "8px" }} // 아이콘과 텍스트 사이의 간격 설정
+        style={{ marginRight: "4px", marginBottom: "8px" }}
       >
         <path
           clip-rule="evenodd"
