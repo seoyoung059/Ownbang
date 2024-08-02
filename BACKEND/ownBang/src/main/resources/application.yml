@@ -33,3 +33,12 @@ openvidu:
 
 key:
   secret : ${JWT_SECRET_KEY}
+
+ffmpeg:
+  path: ${FFMPEG_PATH}
+ffprobe:
+  path: ${FFPROBE_PATH}
+
+video:
+  recordings:
+    path: ${VIDEO_RECORDINGS_PATH}
