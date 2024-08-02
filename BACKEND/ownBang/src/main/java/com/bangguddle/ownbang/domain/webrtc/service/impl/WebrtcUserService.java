@@ -56,7 +56,7 @@ public class WebrtcUserService implements WebrtcService {
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
 
         // 영상 녹화 중지
-        Optional<Recording> recording = webrtcSessionService.stopRecord(reservationId);
+        Optional<Recording> recording = webrtcSessionService.startRecord(reservationId);
 
         // record 저장 - 추후 추가
 
