@@ -1,5 +1,7 @@
 package com.bangguddle.ownbang.domain.reservation.entity;
 
+import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,11 +19,13 @@ public class Reservation {
     @Column(name = "reservation_id", nullable = false, updatable = false, columnDefinition = "INT UNSIGNED")
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "INT UNSIGNED")
-    private Long roomId; // 매물 id
+    @ManyToOne
+    @Column(name ="room_id",nullable = false, columnDefinition = "INT UNSIGNED")
+    private Room room;
 
-    @Column(nullable = false, columnDefinition = "INT UNSIGNED")
-    private Long userId;
+    @ManyToOne
+    @Column(name ="user_id" ,nullable = false, columnDefinition = "INT UNSIGNED")
+    private User user;
 
     @Column(nullable = false, columnDefinition = "DATETIME(0)")
     private LocalDateTime reservationTime;
@@ -34,18 +38,18 @@ public class Reservation {
     public Reservation withStatus() {
         return new Reservation(
                 this.id,
-                this.roomId,
-                this.userId,
+                this.room,
+                this.user,
                 this.reservationTime,
-                ReservationStatus.CANCELED
+                ReservationStatus.CANCELLED
         );
     }
 
     public Reservation confirmStatus() {
         return new Reservation(
                 this.id,
-                this.roomId,
-                this.userId,
+                this.room,
+                this.user,
                 this.reservationTime,
                 ReservationStatus.CONFIRMED
         );

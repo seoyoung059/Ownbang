@@ -29,8 +29,8 @@ public enum ErrorCode implements ResponseCode {
     // Reservation API
     RESERVATION_DUPLICATED (HttpStatus.CONFLICT, " 이미 다른 사람이 신청된 예약 시간입니다. "),
     RESERVATION_COMPLETED(HttpStatus.CONFLICT, " 각 매물은 한 건씩만 예약이 가능합니다. "),
-    RESERVATION_CANCELED_DUPLICATED (HttpStatus.CONFLICT, " 이미 취소한 예약입니다. "),
-    RESERVATION_CANCELED_UNAVAILABLE (HttpStatus.BAD_REQUEST, " 확정된 예약은 취소할 수 없습니다."),
+    RESERVATION_CANCELLED_DUPLICATED (HttpStatus.CONFLICT, " 이미 취소한 예약입니다. "),
+    RESERVATION_CANCELLED_UNAVAILABLE (HttpStatus.BAD_REQUEST, " 확정된 예약은 취소할 수 없습니다."),
     RESERVATION_CONFIRMED_DUPLICATED(HttpStatus.CONFLICT, " 이미 확정된 예약 입니다. "),
     RESERVATION_CONFIRMED_UNAVAILABLE(HttpStatus.BAD_REQUEST, " 취소된 예약은 확정할 수 없습니다. "),
 

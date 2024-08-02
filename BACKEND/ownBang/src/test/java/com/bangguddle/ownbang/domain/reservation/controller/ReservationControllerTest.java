@@ -5,6 +5,10 @@ import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
+import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
+import com.bangguddle.ownbang.domain.user.entity.User;
+import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -28,9 +32,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -41,7 +47,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         excludeAutoConfiguration = SecurityAutoConfiguration.class,
         excludeFilters =
                 {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {OncePerRequestFilter.class})})
-
 public class ReservationControllerTest {
 
     @Autowired
@@ -49,6 +54,12 @@ public class ReservationControllerTest {
 
     @MockBean
     private ReservationService reservationService;
+
+    @MockBean
+    private RoomRepository roomRepository;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -64,6 +75,12 @@ public class ReservationControllerTest {
                 now,
                 ReservationStatus.APPLYED
         );
+
+        Room room = mock(Room.class);
+        User user = mock(User.class);
+
+        when(roomRepository.findById(request.roomId())).thenReturn(Optional.of(room));
+        when(userRepository.findById(request.userId())).thenReturn(Optional.of(user));
 
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
                 SuccessCode.RESERVATION_MAKE_SUCCESS,
@@ -82,6 +99,7 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_MAKE_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
+
     @Test
     @DisplayName("Invalid Field 검증 - 조건 불만족")
     @WithMockUser
@@ -104,16 +122,20 @@ public class ReservationControllerTest {
         long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
 
+        Room room1 = mock(Room.class);
+        Room room2 = mock(Room.class);
+        User user = mock(User.class);
+
         Reservation reservation1 = Reservation.builder()
-                .roomId(101L)
-                .userId(userId)
+                .room(room1)
+                .user(user)
                 .reservationTime(now)
                 .status(ReservationStatus.APPLYED)
                 .build();
 
         Reservation reservation2 = Reservation.builder()
-                .roomId(102L)
-                .userId(userId)
+                .room(room2)
+                .user(user)
                 .reservationTime(now.plusDays(1))
                 .status(ReservationStatus.CONFIRMED)
                 .build();
@@ -132,9 +154,9 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_LIST_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data.reservations").isArray())
                 .andExpect(jsonPath("$.data.reservations.length()").value(2))
-                .andExpect(jsonPath("$.data.reservations[0].roomId").value(101))
+                .andExpect(jsonPath("$.data.reservations[0].room.id").value(room1.getId()))
                 .andExpect(jsonPath("$.data.reservations[0].status").value(ReservationStatus.APPLYED.toString()))
-                .andExpect(jsonPath("$.data.reservations[1].roomId").value(102))
+                .andExpect(jsonPath("$.data.reservations[1].room.id").value(room2.getId()))
                 .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.CONFIRMED.toString()))
                 .andReturn();
 
@@ -183,5 +205,4 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
-
 }
