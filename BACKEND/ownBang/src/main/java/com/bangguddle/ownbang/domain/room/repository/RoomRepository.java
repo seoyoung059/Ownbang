@@ -14,8 +14,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
      * 해당 ID의 매물이 존재하는지 확인
      * @param roomId 유효성 검사를 수행할 RoomId
      */
-    default void validateById(final Long roomId) {
-        if(!existsById(roomId))
-            throw new AppException(ROOM_NOT_FOUND);
+    default Room getById(final Long roomId) {
+        return findById(roomId).orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
     }
 }

@@ -33,10 +33,11 @@ import java.util.Collection;
 public class JwtTokenFilter extends OncePerRequestFilter {
     private static final String[] REQUIRE_USER_ARRAY = {
             /* 임차인 권한 필요 URL */
-            "/get-token", "/remove-token"
+            "/rooms", "/bookmarks", "/get-token", "/remove-token"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
+            "/rooms/agents"
     };
     private static final String HEADER_PREFIX = "Bearer ";
     private static final int TOKEN_SPLIT_INDEX = 7;

@@ -5,9 +5,9 @@ import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.*;
-import com.bangguddle.ownbang.domain.room.repository.RoomAppliancesRepository;
-import com.bangguddle.ownbang.domain.room.repository.RoomDetailRepository;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
+import com.bangguddle.ownbang.domain.user.entity.User;
+import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,10 +40,7 @@ class RoomServiceImplTest {
     private RoomRepository roomRepository;
 
     @Mock
-    private RoomDetailRepository roomDetailRepository;
-
-    @Mock
-    private RoomAppliancesRepository roomAppliancesRepository;
+    private UserRepository userRepository;
 
     @Mock
     private RoomImageServiceImpl roomImageServiceImpl;
@@ -57,6 +53,7 @@ class RoomServiceImplTest {
     void createRoomTest_SUCCESS() throws ParseException {
         //given
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        User agent = User.builder().build();
         RoomAppliancesCreateRequest roomAppliancesCreateRequest = RoomAppliancesCreateRequest.of(true,
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
@@ -72,12 +69,13 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
         // mock
+        when(userRepository.getById(anyLong())).thenReturn(agent);
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
         when(roomRepository.save(any(Room.class))).thenReturn(Room.builder().build()); // 추가된 부분
 
 
         // when
-        SuccessResponse<NoneResponse> response = roomServiceImpl.createRoom(roomCreateRequest, roomImageFiles);
+        SuccessResponse<NoneResponse> response = roomServiceImpl.createRoom(1L, roomCreateRequest, roomImageFiles);
 
         // then
         assertThat(response).isNotNull();
@@ -92,8 +90,9 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 생성 - 실패: 이미지 업로드 실패")
-    void createRoomTest_ImageFailed() throws IOException, ParseException {
+    void createRoomTest_ImageFailed() throws ParseException {
         //given
+        Long userId = 1L;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         RoomAppliancesCreateRequest roomAppliancesCreateRequest = RoomAppliancesCreateRequest.of(true,
                 true, true, true, true, true, true, true);
@@ -112,9 +111,9 @@ class RoomServiceImplTest {
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
 
         // 매물 생성
-        assertThatThrownBy(()->{
-            roomServiceImpl.createRoom(roomCreateRequest, roomImageFiles);
-        }).isInstanceOf(AppException.class);
+        assertThatThrownBy(()->
+            roomServiceImpl.createRoom(userId, roomCreateRequest, roomImageFiles)
+        ).isInstanceOf(AppException.class);
 
 
         verify(roomRepository, never()).save(any(Room.class));
@@ -124,12 +123,15 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 삭제 - 성공")
-    void deleteRoomTest_Success() throws ParseException {
+    void deleteRoomTest_Success() {
         //given
-        Long roomId = 1L;
+        Long userId = 1L, roomId = 1L;
+
+        //mock
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(Room.builder().build()));
 
         //when
-        SuccessResponse<NoneResponse> response = roomServiceImpl.deleteRoom(roomId);
+        SuccessResponse<NoneResponse> response = roomServiceImpl.deleteRoom(userId, roomId);
 
         // Then
         assertThat(response).isNotNull();
@@ -143,13 +145,13 @@ class RoomServiceImplTest {
     @DisplayName("매물 삭제 - 실패: 존재하지 않는 ID")
     void deleteRoomTest_Fail_NotExist() {
         //given
-        doThrow(new AppException(ROOM_NOT_FOUND)).when(roomRepository).validateById(anyLong());
-        Long roomId = 1L;
+        doThrow(new AppException(ROOM_NOT_FOUND)).when(roomRepository).findById(anyLong());
+        Long userId = 1L, roomId = 1L;
 
         //when, then
-        assertThatThrownBy(() -> {
-            roomServiceImpl.deleteRoom(roomId);
-        }).isInstanceOf(AppException.class);
+        assertThatThrownBy(() ->
+            roomServiceImpl.deleteRoom(userId, roomId)
+        ).isInstanceOf(AppException.class);
     }
 
     @Test
@@ -174,16 +176,15 @@ class RoomServiceImplTest {
     @DisplayName("매물 단건 조회 - 실패: 존재하지 않는 Id")
     void findRoomTest_Fail_InvalidId() {
         // given
-        Room room = Room.builder().build();
         doThrow(new AppException(ROOM_NOT_FOUND)).when(roomRepository).findById(anyLong());
         Long roomId = 1L;
 
         //when
 
         //then
-        assertThatThrownBy(() -> {
-            roomServiceImpl.getRoom(roomId);
-        }).isInstanceOf(AppException.class);
+        assertThatThrownBy(() ->
+            roomServiceImpl.getRoom(roomId)
+        ).isInstanceOf(AppException.class);
     }
 
 
@@ -191,7 +192,7 @@ class RoomServiceImplTest {
     @DisplayName("매물 수정 - 성공")
     void updateRoomTest_SUCCESS() throws ParseException {
         // DTO
-        Long roomId = 1L;
+        Long userId = 1L, roomId = 1L;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
@@ -228,12 +229,12 @@ class RoomServiceImplTest {
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
-        when(roomImageServiceImpl.deleteImage(anyLong())).thenReturn(success);
+        when(roomImageServiceImpl.deleteImage(anyLong(), anyLong())).thenReturn(success);
         when(roomRepository.save(any(Room.class))).thenReturn(any(Room.class)); // 추가된 부분
 
 
         // when
-        SuccessResponse<NoneResponse> response = roomServiceImpl.updateRoom(roomId, roomUpdateRequest, roomImageFiles);
+        SuccessResponse<NoneResponse> response = roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles);
 
         // then
         assertThat(response).isNotNull();
@@ -248,9 +249,9 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 실패: 존재하지 않는 매물")
-    void updateRoomTest_RoomIdNotExist() throws IOException, ParseException {
+    void updateRoomTest_RoomIdNotExist() throws ParseException {
         // DTO
-        Long roomId = 1L;
+        Long userId = 1L, roomId = 1L;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
@@ -276,21 +277,13 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
-        Room room = Room.builder()
-                .roomAppliances(RoomAppliances.builder().build())
-                .roomDetail(RoomDetail.builder().build())
-                .build();
-
-
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
-
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // 매물 생성
-        assertThatThrownBy(()->{
-            roomServiceImpl.updateRoom(roomId, roomUpdateRequest, roomImageFiles);
-        }).isInstanceOf(AppException.class);
+        assertThatThrownBy(()->
+            roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
+        ).isInstanceOf(AppException.class);
 
 
         verify(roomRepository, never()).save(any(Room.class));
@@ -299,9 +292,9 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 실패: 이미지 업로드 실패")
-    void updateRoomTest_ImageUploadFailed() throws IOException, ParseException {
+    void updateRoomTest_ImageUploadFailed() throws ParseException {
         // DTO
-        Long roomId = 1L;
+        Long userId = 1L, roomId = 1L;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
@@ -338,12 +331,12 @@ class RoomServiceImplTest {
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
-        when(roomImageServiceImpl.deleteImage(anyLong())).thenReturn(success);
+        when(roomImageServiceImpl.deleteImage(anyLong(), anyLong())).thenReturn(success);
 
         // 매물 생성
-        assertThatThrownBy(()->{
-            roomServiceImpl.updateRoom(roomId, roomUpdateRequest, roomImageFiles);
-        }).isInstanceOf(AppException.class);
+        assertThatThrownBy(()->
+            roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
+        ).isInstanceOf(AppException.class);
 
 
         verify(roomRepository, never()).save(any(Room.class));
@@ -352,9 +345,9 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 실패: 이미지 삭제 실패")
-    void updateRoomTest_ImageDeleteFailed() throws IOException, ParseException {
+    void updateRoomTest_ImageDeleteFailed() throws ParseException {
         // DTO
-        Long roomId = 1L;
+        Long userId = 1L, roomId = 1L;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         RoomAppliancesUpdateRequest roomAppliancesUpdateRequest = RoomAppliancesUpdateRequest.of(1L, true,
@@ -385,17 +378,14 @@ class RoomServiceImplTest {
                 .roomDetail(RoomDetail.builder().build())
                 .build();
 
-
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
-
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
-        when(roomImageServiceImpl.deleteImage(anyLong())).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
+        when(roomImageServiceImpl.deleteImage(anyLong(), anyLong())).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
 
         // 매물 생성
-        assertThatThrownBy(()->{
-            roomServiceImpl.updateRoom(roomId, roomUpdateRequest, roomImageFiles);
-        }).isInstanceOf(AppException.class);
+        assertThatThrownBy(()->
+            roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
+        ).isInstanceOf(AppException.class);
 
 
         verify(roomRepository, never()).save(any(Room.class));

@@ -19,6 +19,25 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
+    elasticsearch:
+      rest:
+        uris: http://localhost:9200
+
+  main:
+    allow-bean-definition-overriding: true
+
+  school:
+    api: ${SCHOOL_API_KEY}
+
+  location:
+    api: ${LOCATION_API_KEY}
+
+  station:
+    api: ${STATION_API_KEY}
+
+  university:
+    api: ${STATION_API_KEY}
+
 server:
   port: ${PORT}
   ssl:
@@ -27,9 +46,19 @@ server:
     context-path: /api/
 
 openvidu:
-  url: ${ OPENVIDU_URL }
-  secret: ${ OPENVIDU_SECRET }
+  url: ${OPENVIDU_URL}
+  secret: ${OPENVIDU_SECRET}
 
 
 key:
   secret : ${JWT_SECRET_KEY}
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /api-docs
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8

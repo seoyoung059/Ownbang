@@ -1,7 +1,7 @@
 package com.bangguddle.ownbang.domain.bookmark.service.impl;
 
-import com.bangguddle.ownbang.domain.bookmark.dto.BookmarkCreateRequest;
 import com.bangguddle.ownbang.domain.bookmark.dto.BookmarkSearchResponse;
+import com.bangguddle.ownbang.domain.bookmark.entity.Bookmark;
 import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
 import com.bangguddle.ownbang.domain.bookmark.service.BookmarkService;
 import com.bangguddle.ownbang.domain.room.entity.Room;
@@ -30,16 +30,19 @@ public class BookmarkServiceImpl implements BookmarkService {
     private final RoomRepository roomRepository;
 
     @Override
-    public SuccessResponse<NoneResponse> createBookmark(BookmarkCreateRequest bookmarkCreateRequest) {
-        Room room = validateRoom(bookmarkCreateRequest.roomId());
-        User user = validateUser(bookmarkCreateRequest.userId());
+    public SuccessResponse<NoneResponse> createBookmark(Long userId, Long roomId) {
+        Room room = roomRepository.getById(roomId);
+        User user = userRepository.getById(userId);
         validateBookmark(room, user);
-        bookmarkRepository.save(bookmarkCreateRequest.toEntity(user, room));
+        bookmarkRepository.save(Bookmark.builder().room(room).user(user).build());
         return new SuccessResponse<>(BOOKMARK_CREATE_SUCCESS, NoneResponse.NONE);
     }
 
     @Override
-    public SuccessResponse<NoneResponse> deleteBookmark(Long bookmarkId) {
+    public SuccessResponse<NoneResponse> deleteBookmark(Long userId, Long bookmarkId) {
+        userRepository.getById(userId);
+        Bookmark bookmark = bookmarkRepository.findById(bookmarkId).orElseThrow(() -> new AppException(BAD_REQUEST));
+        if(!bookmark.getUser().getId().equals(userId)) throw new AppException(BAD_REQUEST);
         bookmarkRepository.deleteById(bookmarkId);
         return new SuccessResponse<>(BOOKMARK_DELETE_SUCCESS, NoneResponse.NONE);
     }
