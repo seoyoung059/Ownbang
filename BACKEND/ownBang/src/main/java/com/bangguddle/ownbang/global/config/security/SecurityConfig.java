@@ -27,6 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private static final String[] REQUIRE_USER_ARRAY = {
             /* 임차인 권한 필요 URL */
+            "/get-token", "/remove-token"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
