@@ -29,7 +29,7 @@ const RealEstateSearchBar = ({ onSearch, isMain }) => {
   };
 
   return (
-    <Box sx={{ display: "flex", width: isMain ? "100%" : "auto" }}>
+    <Box sx={{ display: "flex", width: isMain ? "80%" : "auto" }}>
       <Input
         type="text"
         placeholder={

@@ -1,5 +1,6 @@
 // 로그인 폼
 import * as React from "react";
+import KakaoLoginButton from "./KakaoLoginButton";
 
 import {
   CssBaseline,
@@ -94,8 +95,9 @@ const LoginForm = () => {
                 backgroundColor: theme.palette.primary.main,
               }}
             >
-              로그인 하기
+              로그인
             </Button>
+            <KakaoLoginButton />
 
             {/* 로그인 하기 버튼 하단에 위치한 부가 기능 */}
             <Grid container>
