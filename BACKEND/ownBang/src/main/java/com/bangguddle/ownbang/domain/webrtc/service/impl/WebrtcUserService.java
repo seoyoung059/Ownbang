@@ -55,7 +55,7 @@ public class WebrtcUserService implements WebrtcService {
         String token = webrtcSessionService.createToken(reservationId, UserType.ROLE_USER)
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
 
-        // 영상 녹화 중지
+        // 영상 녹화 시작
         Optional<Recording> recording = webrtcSessionService.startRecord(reservationId);
 
         // record 저장 - 추후 추가
@@ -65,7 +65,7 @@ public class WebrtcUserService implements WebrtcService {
     }
 
     @Override
-    public SuccessResponse<NoneResponse> removeToken(WebrtcRemoveTokenRequest request, final Long userId) {
+    public SuccessResponse<NoneResponse> removeToken(final WebrtcRemoveTokenRequest request, final Long userId) {
         // userId 유효성 검사
         userRepository.getById(userId);
 
@@ -86,7 +86,7 @@ public class WebrtcUserService implements WebrtcService {
     }
 
 
-    private void validateReservation(Long reservationId){
+    private void validateReservation(final Long reservationId){
         // 예약 repo로 접근해 Reservation 을 얻어와 확인
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
                 () -> new AppException(RESERVATION_NOT_FOUND)

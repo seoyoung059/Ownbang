@@ -201,7 +201,8 @@ public class WebrtcAgentServiceTest {
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.empty());
         when(webrtcSessionService.createSession(reservationId)).thenReturn(Optional.of(mockSession));
-        when(webrtcSessionService.createToken(reservationId,AGENT)).thenThrow(new AppException(BAD_REQUEST));
+        when(webrtcSessionService.createToken(reservationId,AGENT))
+                .thenThrow(new AppException(WEBRTC_TOKEN_DUPLICATED));
 
         WebrtcCreateTokenRequest request = WebrtcCreateTokenRequest.builder().reservationId(reservationId).build();
 
@@ -211,7 +212,7 @@ public class WebrtcAgentServiceTest {
         // then
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+                .hasFieldOrPropertyWithValue("errorCode", WEBRTC_TOKEN_DUPLICATED);
     }
     
     @Test

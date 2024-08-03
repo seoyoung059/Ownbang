@@ -10,8 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.bangguddle.ownbang.global.enums.ErrorCode.BAD_REQUEST;
-import static com.bangguddle.ownbang.global.enums.ErrorCode.INTERNAL_SERVER_ERROR;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 
 @Service
 public class WebrtcSessionServiceImpl implements WebrtcSessionService {
@@ -103,9 +102,10 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     public Optional<String> createToken(final Long reservationId, final UserType userType){
         if (!this.mapSessions.containsKey(reservationId)
                 || !this.mapSessionReservationsTokens.containsKey(reservationId)
-                || this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)
         ) {
             throw new AppException(BAD_REQUEST);
+        } else if(this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)){
+            throw new AppException(WEBRTC_TOKEN_DUPLICATED);
         }
 
         // connection properties 설정
@@ -177,8 +177,11 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
             this.mapSessionRecordings.put(reservationId, recording);
             return Optional.of(recording);
 
-        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+        } catch (OpenViduHttpException e) {
+            throw new AppException(WEBRTC_NO_PUBLISHER);
+        } catch (OpenViduJavaClientException e2){
             throw new AppException(INTERNAL_SERVER_ERROR);
+
         }
     }
 
@@ -202,7 +205,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     }
 
     @Override
-    public Optional<Recording> deleteRecord(Long reservationId) {
+    public Optional<Recording> deleteRecord(final Long reservationId) {
         if(!mapSessions.containsKey(reservationId)
                 || !mapSessionRecordings.containsKey(reservationId)
         ) {
