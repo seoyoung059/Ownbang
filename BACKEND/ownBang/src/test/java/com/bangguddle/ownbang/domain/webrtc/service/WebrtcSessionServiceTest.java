@@ -16,8 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-import static com.bangguddle.ownbang.global.enums.ErrorCode.BAD_REQUEST;
-import static com.bangguddle.ownbang.global.enums.ErrorCode.INTERNAL_SERVER_ERROR;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -296,7 +295,7 @@ public class WebrtcSessionServiceTest {
         // then
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+                .hasFieldOrPropertyWithValue("errorCode", WEBRTC_TOKEN_DUPLICATED);
 
         // verify
         verify(mockSession, times(1)).createConnection(any());
@@ -322,7 +321,7 @@ public class WebrtcSessionServiceTest {
         // then
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+                .hasFieldOrPropertyWithValue("errorCode", WEBRTC_TOKEN_DUPLICATED);
 
         // verify
         verify(mockSession, times(1)).createConnection(any());
@@ -468,7 +467,7 @@ public class WebrtcSessionServiceTest {
     }
     
     @Test
-    @DisplayName("영상 녹과 시작 성공")
+    @DisplayName("영상 녹화 시작 성공")
     void 영상_녹화_시작_성공() throws Exception {
         // given
         when(openVidu.createSession()).thenReturn(mockSession);
@@ -584,7 +583,7 @@ public class WebrtcSessionServiceTest {
         // then
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", INTERNAL_SERVER_ERROR);
+                .hasFieldOrPropertyWithValue("errorCode", WEBRTC_NO_PUBLISHER);
 
         // verify
         verify(openVidu, times(1))
