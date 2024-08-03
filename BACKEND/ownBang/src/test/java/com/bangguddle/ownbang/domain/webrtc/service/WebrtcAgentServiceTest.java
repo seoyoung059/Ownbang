@@ -245,7 +245,7 @@ public class WebrtcAgentServiceTest {
     }
 
     @Test
-    @DisplayName("토큰 삭제 실패 -없는 예약 번호")
+    @DisplayName("토큰 삭제 실패 - 없는 예약 번호")
     void 토큰_삭제_실패__없는_예약_번호() throws Exception {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty());
