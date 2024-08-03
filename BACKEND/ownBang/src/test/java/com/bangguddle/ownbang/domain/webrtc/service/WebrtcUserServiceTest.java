@@ -7,10 +7,12 @@ import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepositor
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
+import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcTokenResponse;
 import com.bangguddle.ownbang.domain.webrtc.enums.UserType;
 import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcSessionServiceImpl;
 import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcUserService;
+import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import io.openvidu.java.client.Recording;
@@ -28,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
-import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +40,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class WebrtcUserServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(WebrtcAgentServiceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(WebrtcUserServiceTest.class);
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -102,6 +104,28 @@ class WebrtcUserServiceTest {
 
         // verify
         verify(webrtcSessionService, times(1)).createToken(any(), any());
+    }
+    
+    @Test
+    @DisplayName("토큰 발급 실패 - 없는 세션")
+    void 토큰_발급_실패__없는_세션() throws Exception {
+        // given
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+        when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.empty());
+
+        WebrtcCreateTokenRequest request = WebrtcCreateTokenRequest.builder().reservationId(reservationId).build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.getToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(webrtcSessionService, never()).createToken(any(), any());
     }
 
     @Test
@@ -212,5 +236,123 @@ class WebrtcUserServiceTest {
         verify(webrtcSessionService, times(1)).createToken(any(), any());
     }
 
+    @Test
+    @DisplayName("토큰 삭제 성공")
+    void 토큰_삭제_성공() throws Exception {
+        // given
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+        when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.of(mockSession));
+        when(webrtcSessionService.removeToken(reservationId, "test-token", USER))
+                .thenReturn(Optional.of("test-token"));
 
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        SuccessResponse<NoneResponse> response = webrtcService.removeToken(request, userId);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(REMOVE_TOKEN_SUCCESS);
+
+        // verify
+        verify(webrtcSessionService, times(1)).removeToken(any(),any(),any());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 없는 예약 번호")
+    void 토큰_삭제_실패__없는_예약_번호() throws Exception {
+        // given
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty());
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.removeToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_NOT_FOUND);
+
+        // verify
+        verify(webrtcSessionService, never()).createToken(any(), any());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 확정된 예약이 아닌 경우")
+    void 토큰_삭제_실패__확정된_예약이_아닌_경우() throws Exception {
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getStatus()).thenReturn(ReservationStatus.APPLYED);
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.removeToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_STATUS_NOT_CONFIRMED);
+
+        // verify
+        verify(webrtcSessionService, never()).createToken(any(), any());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 취소된 예약인 경우")
+    void 토큰_삭제_실패__취소된_예약인_경우() throws Exception {
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELED);
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.removeToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_STATUS_NOT_CONFIRMED);
+
+        // verify
+        verify(webrtcSessionService, never()).createToken(any(), any());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 없는 세션")
+    void 토큰_삭제_실패__없는_세션() throws Exception {
+        // given
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+        when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.empty());
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() ->webrtcService.removeToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(webrtcSessionService, never()).removeToken(any(), any(), any());
+    }
 }
