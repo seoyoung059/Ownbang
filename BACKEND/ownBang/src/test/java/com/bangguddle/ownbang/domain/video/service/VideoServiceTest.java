@@ -198,6 +198,7 @@ public class VideoServiceTest {
     @DisplayName("영상 단건 조회 성공")
     void 영상_단건_조회_성공() throws Exception {
         // given
+        Long userId = 123L;
         Long videoId = 1L;
         Long reservationId = 10L;
         String videoUrl = "VIDEO_TEST_URL";
@@ -212,9 +213,10 @@ public class VideoServiceTest {
         when(video.getReservation()).thenReturn(reservation);
         when(video.getVideoUrl()).thenReturn(videoUrl);
         when(reservation.getId()).thenReturn(reservationId);
+        when(reservation.getUserId()).thenReturn(userId);
 
         // then
-        SuccessResponse response = videoService.getVideo(videoId);
+        SuccessResponse response = videoService.getVideo(userId, videoId);
 
         assertThat(response)
                 .isNotInstanceOf(AppException.class)
@@ -229,13 +231,14 @@ public class VideoServiceTest {
     @DisplayName("영상 단건 조회 실패 - 유효하지 않은 ID")
     void 영상_단건_조회_실패__유효하지_않은_ID() throws Exception {
         // given
+        Long userId = 123L;
         Long invalidVideoId = 1L;
 
         // when
         when(videoRepository.findById(invalidVideoId)).thenReturn(Optional.empty());
 
         // then
-        Throwable thrown = catchThrowable(() -> videoService.getVideo(invalidVideoId));
+        Throwable thrown = catchThrowable(() -> videoService.getVideo(userId, invalidVideoId));
 
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
@@ -246,6 +249,7 @@ public class VideoServiceTest {
     @DisplayName("영상 단건 조회 실패 - 녹화 중인 영상")
     void 영상_단건_조회_실패__녹화_중인_영상() throws Exception {
         // given
+        Long userId = 123L;
         Long invalidVideoId = 1L;
 
         // when
@@ -253,11 +257,34 @@ public class VideoServiceTest {
         when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDING);
 
         // then
-        Throwable thrown = catchThrowable(() -> videoService.getVideo(invalidVideoId));
+        Throwable thrown = catchThrowable(() -> videoService.getVideo(userId, invalidVideoId));
 
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", VIDEO_IS_BEING_RECORDED);
+    }
+
+    @Test
+    @DisplayName("영상 단건 조회 실패 - 권한이 없는 영상")
+    void 영상_단건_조회_실패__권한이_없는_영상() throws Exception {
+        // given
+        Long invalidUserId = 123L;
+        Long videoId = 1L;
+        Long reservationId = 10L;
+        String videoUrl = "VIDEO_TEST_URL";
+
+        // when
+        when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+        when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDED);
+        when(video.getReservation()).thenReturn(reservation);
+        when(reservation.getUserId()).thenReturn(1L);
+
+        // then
+        Throwable thrown = catchThrowable(() -> videoService.getVideo(invalidUserId, videoId));
+
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ACCESS_DENIED);
     }
 
     @Test
