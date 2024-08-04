@@ -1,4 +1,4 @@
-import { checkEmail } from "../api/auth";
+import { checkEmail, checkPhoneNumber, signUp } from "../api/auth";
 
 /*
 우선 이메일 중복처리만 구현했는데 위에 api 요청 함수를 가져왔고
@@ -10,9 +10,22 @@ import { checkEmail } from "../api/auth";
 
 export const createAuthSlice = (set) => ({
   isLogin: true,
+  // 중복 확인 BOOLEAN
   isDuplicatedEmail: false,
+  isDuplicatedPhoneNumber: false,
+
   duplicateCheckEmail: async (email) => {
     const result = await checkEmail(email);
-    set({ isDuplicatedEmail: result.isDuplicate });
+    set({ isDuplicatedEmail: result.data.isDuplicate });
+  },
+
+  duplicateCheckPhoneNumber: async (phoneNumber) => {
+    const result = await checkPhoneNumber(phoneNumber);
+    set({ isDuplicatedPhoneNumber: result.data.isDuplicate });
+  },
+
+  makeUser: async (userData) => {
+    const result = await signUp(userData);
+    return result.resultCode;
   },
 });

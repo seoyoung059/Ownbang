@@ -18,8 +18,22 @@ axios는 원래 쓰던 메서드랑 이름이 겹칠 수 있으니 그냥 Axios�
 `${}` 이건 알지 백틱에 데이터 넣어서 문자열에 넣는거
 그 다음에 이 응답을 그냥 return 하면 대 그 다음에 이제 zustand authSlice로 가봥
 */
+
+// 이메일 중복 확인 API 요청
 export const checkEmail = async (email) => {
   const response = await Axios.get(`/auths/duplicates/email?email=${email}`);
-  console.log(response);
+  return response.data;
+};
+
+// 전화번호 중복 확인 API 요청
+export const checkPhoneNumber = async (phoneNumber) => {
+  const response = await Axios.get(
+    `/auths/duplicates/phone?phoneNumber=${phoneNumber}`
+  );
+  return response.data;
+};
+
+export const signUp = async (userData) => {
+  const response = await Axios.post("/auths/sign-up", userData);
   return response.data;
 };
