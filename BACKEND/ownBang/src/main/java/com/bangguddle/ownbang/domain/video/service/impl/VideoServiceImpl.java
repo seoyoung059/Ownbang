@@ -36,11 +36,13 @@ public class VideoServiceImpl implements VideoService {
      */
     @Override
     @Transactional(readOnly = true)
-    public SuccessResponse<VideoSearchResponse> getVideo(final Long videoId) {
-        // 영상 유효성 검사
+    public SuccessResponse<VideoSearchResponse> getVideo(final Long userId, final Long videoId) {
+        // 영상 및 유저 유효성 검사
         Video video = validateVideo(videoId);
         if(video.getVideoStatus() == VideoStatus.RECORDING){
             throw new AppException(VIDEO_IS_BEING_RECORDED);
+        }else if(video.getReservation().getUserId() != userId){
+            throw new AppException(ACCESS_DENIED);
         }
 
         return new SuccessResponse<>(VIDEO_FIND_SUCCESS, VideoSearchResponse.from(video));
@@ -131,5 +133,6 @@ public class VideoServiceImpl implements VideoService {
     private Video validateVideo(final Long videoId){
         return videoRepository.findById(videoId)
                 .orElseThrow(() -> new AppException(BAD_REQUEST));
+
     }
 }

@@ -10,7 +10,7 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 public interface VideoService {
 
     // 단건 조회 -> API 주 기능
-    SuccessResponse<VideoSearchResponse> getVideo(Long videoId);
+    SuccessResponse<VideoSearchResponse> getVideo(Long userId, Long videoId);
 
     // 단건 저장 -> Webrtc에서 호출 예정
     SuccessResponse<NoneResponse> registerVideo(VideoRecordRequest request);
