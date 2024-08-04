@@ -17,7 +17,7 @@ public class VideoController {
 
     private final VideoServiceImpl videoService;
 
-    @GetMapping(value = "/get-token/{videoId}")
+    @GetMapping(value = "/{videoId}")
     public ResponseEntity<Response<VideoSearchResponse>> getVideo(@AuthenticationPrincipal Long userId,
                                                                   @PathVariable(name = "videoId") @Positive @Valid Long videoId){
         return Response.success(videoService.getVideo(userId, videoId));
