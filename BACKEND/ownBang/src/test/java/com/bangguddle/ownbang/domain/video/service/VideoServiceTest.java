@@ -5,6 +5,7 @@ import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.video.dto.VideoRecordRequest;
 import com.bangguddle.ownbang.domain.video.dto.VideoSearchResponse;
+import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
 import com.bangguddle.ownbang.domain.video.entity.Video;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
@@ -53,6 +54,13 @@ public class VideoServiceTest {
         return VideoSearchResponse.builder()
                 .videoId(videoId)
                 .reservationId(reservationId)
+                .videoUrl(videoUrl)
+                .videoStatus(videoStatus)
+                .build();
+    }
+
+    private VideoUpdateRequest makeUpdateRequest(String videoUrl, VideoStatus videoStatus){
+        return VideoUpdateRequest.builder()
                 .videoUrl(videoUrl)
                 .videoStatus(videoStatus)
                 .build();
@@ -250,5 +258,137 @@ public class VideoServiceTest {
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", VIDEO_IS_BEING_RECORDED);
+    }
+
+    @Test
+    @DisplayName("영상 수정 성공")
+    void 영상_수정_성공() throws Exception {
+        // given
+        Long videoId = 1L;
+        String newVideoUrl = "VIDEO_TEST_URL";
+        VideoStatus newVideoStatus = VideoStatus.RECORDED;
+
+        VideoUpdateRequest request = makeUpdateRequest(newVideoUrl, newVideoStatus);
+        SuccessResponse success = new SuccessResponse<>(VIDEO_UPDATE_SUCCESS,NoneResponse.NONE);
+
+        // when
+        when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+        when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDING);
+
+        // then
+        SuccessResponse response = videoService.modifyVideo(request, videoId);
+
+        assertThat(response)
+                .isNotNull()
+                .isNotInstanceOf(AppException.class)
+                .isInstanceOf(SuccessResponse.class)
+                .isEqualTo(success);
+
+        // verify
+        verify(videoRepository, times(1)).findById(any());
+        verify(videoRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("영상 수정 실패 - 유효하지 않은 ID")
+    void 영상_수정_실패__유효하지_않은_ID() throws Exception {
+        // given
+        Long invalidVideoId = 1L;
+        String newVideoUrl = "VIDEO_TEST_URL";
+        VideoStatus newVideoStatus = VideoStatus.RECORDED;
+
+        VideoUpdateRequest eRequest = makeUpdateRequest(newVideoUrl, newVideoStatus);
+
+        // when
+        when(videoRepository.findById(invalidVideoId)).thenReturn(Optional.empty());
+
+        // then
+        Throwable thrown = catchThrowable(() -> videoService.modifyVideo(eRequest, invalidVideoId));
+
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(videoRepository, times(1)).findById(any());
+        verify(videoRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("영상 수정 실패 - 이미 저장된 영상")
+    void 영상_수정_실패__이미_저장된_영상() throws Exception {
+        // given
+        Long invalidVideoId = 1L;
+        String newVideoUrl = "VIDEO_TEST_URL";
+        VideoStatus newVideoStatus = VideoStatus.RECORDED;
+
+        VideoUpdateRequest eRequest = makeUpdateRequest(newVideoUrl, newVideoStatus);
+
+        // when
+        when(videoRepository.findById(invalidVideoId)).thenReturn(Optional.of(video));
+        when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDED);
+
+        // then
+        Throwable thrown = catchThrowable(() -> videoService.modifyVideo(eRequest, invalidVideoId));
+
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", VIDEO_DUPLICATE);
+
+        // verify
+        verify(videoRepository, times(1)).findById(any());
+        verify(videoRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("영상 수정 실패 - 유효하지 않은 URL")
+    void 영상_수정_실패__유효하지_않은_URL() throws Exception {
+        // given
+        Long videoId = 1L;
+        String invalidVideoUrl = "";
+        VideoStatus newVideoStatus = VideoStatus.RECORDED;
+
+        VideoUpdateRequest eRequest = makeUpdateRequest(invalidVideoUrl, newVideoStatus);
+
+        // when
+        when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+        when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDING);
+
+        // then
+        Throwable thrown = catchThrowable(() -> videoService.modifyVideo(eRequest, videoId));
+
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(videoRepository, times(1)).findById(any());
+        verify(videoRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("영상 수정 실패 - 유효하지 않은 영상 상태")
+    void 영상_수정_실패__유효하지_않은_영상_상태() throws Exception {
+        // given
+        Long videoId = 1L;
+        String newVideoUrl = "VIDEO_TEST_URL";
+        VideoStatus newVideoStatus = VideoStatus.RECORDING;
+
+        VideoUpdateRequest eRequest = makeUpdateRequest(newVideoUrl, newVideoStatus);
+
+        // when
+        when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+        when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDING);
+
+        // then
+        Throwable thrown = catchThrowable(() -> videoService.modifyVideo(eRequest, videoId));
+
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(videoRepository, times(1)).findById(any());
+        verify(videoRepository, never()).save(any());
     }
 }
