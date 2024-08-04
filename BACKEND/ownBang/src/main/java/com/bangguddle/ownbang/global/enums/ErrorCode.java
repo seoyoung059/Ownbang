@@ -21,6 +21,9 @@ public enum ErrorCode implements ResponseCode {
     WEBRTC_TOKEN_DUPLICATED(HttpStatus.CONFLICT, "이미 생성된 토큰입니다."),
     WEBRTC_NO_PUBLISHER(HttpStatus.BAD_REQUEST, "해당 세션에 연결된 사용자가 없습니다."),
 
+    // Video API
+    VIDEO_DUPLICATE(HttpStatus.CONFLICT, "이미 저장된 녹화입니다."),
+
     // Room API
     IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패하였습니다."),
     IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장에 실패하였습니다."),
