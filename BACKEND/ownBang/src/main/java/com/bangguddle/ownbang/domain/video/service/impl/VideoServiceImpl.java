@@ -15,12 +15,14 @@ import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class VideoServiceImpl implements VideoService {
 
     private ReservationRepository reservationRepository;
@@ -33,6 +35,7 @@ public class VideoServiceImpl implements VideoService {
      * @return VideoSearchResponse
      */
     @Override
+    @Transactional(readOnly = true)
     public SuccessResponse<VideoSearchResponse> getVideo(final Long videoId) {
         // 영상 유효성 검사
         Video video = validateVideo(videoId);
