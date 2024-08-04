@@ -47,9 +47,8 @@ public class WebrtcUserService implements WebrtcService {
         Long reservationId = request.reservationId();
         validateReservation(reservationId);
 
-        // session 유효성 검사 - private 전환
-        webrtcSessionService.getSession(reservationId).orElseThrow(
-                () -> new AppException(BAD_REQUEST));
+        // session 유효성 검사
+        validateSession(reservationId);
 
         // token 생성
         String token = webrtcSessionService.createToken(reservationId, UserType.ROLE_USER)
@@ -73,9 +72,8 @@ public class WebrtcUserService implements WebrtcService {
         Long reservationId = request.reservationId();
         validateReservation(reservationId);
 
-        // session 유효성 검사 - private 전환
-        webrtcSessionService.getSession(reservationId).orElseThrow(
-                () -> new AppException(BAD_REQUEST));
+        // session 유효성 검사
+        validateSession(reservationId);
 
         // token 제거
         String token = request.token();
@@ -95,5 +93,10 @@ public class WebrtcUserService implements WebrtcService {
         if(reservation.getStatus() != ReservationStatus.CONFIRMED){
             throw new AppException(RESERVATION_STATUS_NOT_CONFIRMED);
         }
+    }
+
+    private void validateSession(final Long reservationId){
+        webrtcSessionService.getSession(reservationId).orElseThrow(
+                () -> new AppException(BAD_REQUEST));
     }
 }
