@@ -25,7 +25,7 @@ public class AskContent {
     private Ask ask;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name="sender_id", nullable = false)
     private User sender;
 
     @Column(name="content",nullable = false, columnDefinition = "TEXT")
@@ -34,15 +34,15 @@ public class AskContent {
     @Column(name="sent_time", nullable = false)
     private LocalDateTime sentTime;
 
-    @Column(name="read", nullable = false)
-    private Boolean read;
+    @Column(name="is_read", nullable = false)
+    private Boolean isRead;
 
     @Builder
-    public AskContent(User sender, Ask ask, String content, LocalDateTime sentTime, Boolean read) {
+    public AskContent(User sender, Ask ask, String content, LocalDateTime sentTime, Boolean isRead) {
         this.sender = sender;
         this.ask = ask;
         this.content = content;
         this.sentTime = sentTime;
-        this.read = read;
+        this.isRead = isRead;
     }
 }

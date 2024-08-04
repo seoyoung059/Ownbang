@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="ask")
@@ -29,6 +31,9 @@ public class Ask {
     @JoinColumn(name="room_id", nullable = false)
     private Room room;
 
+    @OneToMany(mappedBy = "ask", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<AskContent> askContentList;
+
     @Column(name="last_sent_time")
     private LocalDateTime lastSentTime;
 
@@ -36,6 +41,7 @@ public class Ask {
     public Ask(User user, Room room, LocalDateTime lastSentTime) {
         this.user = user;
         this.room = room;
+        this.askContentList = new ArrayList<>();
         this.lastSentTime = lastSentTime;
     }
 }
