@@ -25,8 +25,8 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 @Transactional
 public class VideoServiceImpl implements VideoService {
 
-    private ReservationRepository reservationRepository;
-    private VideoRepository videoRepository;
+    private final ReservationRepository reservationRepository;
+    private final VideoRepository videoRepository;
 
     /**
      * 녹화된 영상을 조회하는 메소드.<br/>
