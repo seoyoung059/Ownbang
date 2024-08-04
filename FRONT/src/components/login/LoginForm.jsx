@@ -1,6 +1,10 @@
 // 로그인 폼
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import KakaoLoginButton from "./KakaoLoginButton";
+
+import { useBoundStore } from "../../store/store";
 
 import {
   CssBaseline,
@@ -36,13 +40,36 @@ function Copyright(props) {
 
 // 여기부터 화면에 보이는 로그인 폼 입니다.
 const LoginForm = () => {
+  const { loginUser } = useBoundStore((state) => ({
+    loginUser: state.loginUser,
+  }));
   const theme = useTheme();
+  const navigate = useNavigate();
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
-      userId: data.get("userId"),
+      email: data.get("userId"),
       password: data.get("password"),
+    });
+    loginUser({
+      email: data.get("userId"),
+      password: data.get("password"),
+    }).then((res) => {
+      // 로그인 성공 시 TOAST 실패 시 다른 처리 추가해야댐
+      if (res.resultCode === "SUCCESS") {
+        toast.success(res.message, {
+          position: "bottom-left",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        navigate("/");
+      }
     });
   };
 

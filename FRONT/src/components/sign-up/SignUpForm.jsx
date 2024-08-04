@@ -89,7 +89,7 @@ const SignUp = () => {
     }
   };
 
-  // 상태 변경 감지
+  // 중복 확인 변경 감지
   useEffect(() => {
     if (emailChecked) {
       if (isDuplicatedEmail) {
@@ -144,6 +144,7 @@ const SignUp = () => {
     }));
   };
 
+  // 회원가입 성공 시 TOAST 에러 처리 추가해야댐
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -155,7 +156,7 @@ const SignUp = () => {
       phoneNumber: data.get("userPhoneNumber").split("-").join(""),
     }).then((res) => {
       if (res === "SUCCESS") {
-        toast.info("회원가입에 성공했습니다.", {
+        toast.success("회원가입에 성공했습니다.", {
           position: "bottom-left",
           autoClose: 2000,
           hideProgressBar: true,

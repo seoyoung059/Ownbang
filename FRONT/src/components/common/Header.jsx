@@ -1,21 +1,16 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Typography,
-  Modal,
-  IconButton,
-  Badge,
-  Backdrop,
-} from "@mui/material";
-
+import { useBoundStore } from "../../store/store";
+import { Box, Button, Typography, IconButton, Badge } from "@mui/material";
 import { Notifications, MenuOutlined } from "@mui/icons-material";
 import { useTheme, useMediaQuery } from "@mui/material";
 
 import Notification from "./Notification";
 
 const Header = () => {
+  const { isAuthenticated, logout } = useBoundStore((state) => ({
+    isAuthenticated: state.isAuthenticated,
+    logout: state.logout,
+  }));
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -78,7 +73,12 @@ const Header = () => {
           </a>
           <Box sx={navigationStyle}>
             <div>
-              <Button onClick={handleLogin}>로그인</Button>
+              {isAuthenticated ? (
+                <Button onClick={logout}>로그아웃</Button>
+              ) : (
+                <Button onClick={handleLogin}>로그인</Button>
+              )}
+
               <IconButton color="inherit" onClick={handleOpen}>
                 <Badge badgeContent={notificationCount} color="error">
                   <Notifications />

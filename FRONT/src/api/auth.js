@@ -33,7 +33,14 @@ export const checkPhoneNumber = async (phoneNumber) => {
   return response.data;
 };
 
+// 회원가입 API 요청
 export const signUp = async (userData) => {
   const response = await Axios.post("/auths/sign-up", userData);
+  return response.data;
+};
+
+// 로그인 API 요청
+export const login = async (loginData) => {
+  const response = await Axios.post("/auths/login", loginData);
   return response.data;
 };
