@@ -26,11 +26,13 @@ public enum SuccessCode implements ResponseCode {
     BOOKMARK_FIND_SUCCESS(HttpStatus.OK, "북마크 목록 조회가 성공적으로 완료되었습니다."),
 
 
-
+    // Room Image API
     ROOM_IMAGE_UPLOAD_SUCCESS(HttpStatus.OK, "사진이 성공적으로 저장되었습니다."),
     ROOM_IMAGE_DELETE_SUCCESS(HttpStatus.OK, "사진이 성공적으로 삭제되었습니다."),
 
-
+    // Ask API
+    ASK_CREATE_SUCCESS(HttpStatus.CREATED, "문의가 성공적으로 생성되었습니다."),
+    ASK_CONTENT_CREATE_SUCCESS(HttpStatus.CREATED, "문의 내용이 성공적으로 등록되었습니다"),
 
 
     //Reservation API
