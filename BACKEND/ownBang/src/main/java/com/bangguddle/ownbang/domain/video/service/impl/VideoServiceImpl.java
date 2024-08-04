@@ -7,6 +7,7 @@ import com.bangguddle.ownbang.domain.video.dto.VideoRecordRequest;
 import com.bangguddle.ownbang.domain.video.dto.VideoSearchResponse;
 import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
 import com.bangguddle.ownbang.domain.video.entity.Video;
+import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
 import com.bangguddle.ownbang.domain.video.service.VideoService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -29,7 +30,14 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public SuccessResponse<VideoSearchResponse> getVideo(Long videoId) {
-        return null;
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new AppException(BAD_REQUEST));
+
+        if(video.getVideoStatus() == VideoStatus.RECORDING){
+            throw new AppException(VIDEO_IS_BEING_RECORDED);
+        }
+
+        return new SuccessResponse<>(VIDEO_FIND_SUCCESS, VideoSearchResponse.from(video));
     }
 
     @Override

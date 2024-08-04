@@ -37,6 +37,7 @@ public enum SuccessCode implements ResponseCode {
 
     // Video
     VIDEO_RECORD_SUCCESS(HttpStatus.CREATED, "영상 녹화가 성공적으로 시작되었습니다."),
+    VIDEO_FIND_SUCCESS(HttpStatus.OK, "영상 녹화 단건 조회가 성공적으로 완료되었습니다."),
 
     //Reservation API
     RESERVATION_MAKE_SUCCESS(HttpStatus.CREATED, "예약 신청이 성공적으로 완료되었습니다."),

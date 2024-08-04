@@ -23,6 +23,7 @@ public enum ErrorCode implements ResponseCode {
 
     // Video API
     VIDEO_DUPLICATE(HttpStatus.CONFLICT, "이미 저장된 녹화입니다."),
+    VIDEO_IS_BEING_RECORDED(HttpStatus.BAD_REQUEST, "영상이 녹화 중입니다."),
 
     // Room API
     IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패하였습니다."),

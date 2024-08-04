@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder
 public record VideoSearchResponse(Long videoId, Long reservationId, String videoUrl, VideoStatus videoStatus) {
 
-    public VideoSearchResponse from(Video video) {
+    static public VideoSearchResponse from(Video video) {
         return VideoSearchResponse.builder()
                 .videoId(video.getId())
                 .reservationId(video.getReservation().getId())
