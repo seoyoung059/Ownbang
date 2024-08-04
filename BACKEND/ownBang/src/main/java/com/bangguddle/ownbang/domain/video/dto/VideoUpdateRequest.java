@@ -6,13 +6,4 @@ import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import lombok.Builder;
 
 @Builder
-public record VideoUpdateRequest(Long reservationId, String videoUrl, VideoStatus videoStatus) {
-
-    public Video toEntity(Reservation reservation){
-        return Video.builder()
-                .reservation(reservation)
-                .videoUrl(this.videoUrl)
-                .videoStatus(this.videoStatus)
-                .build();
-    }
-}
+public record VideoUpdateRequest(String videoUrl, VideoStatus videoStatus) { }

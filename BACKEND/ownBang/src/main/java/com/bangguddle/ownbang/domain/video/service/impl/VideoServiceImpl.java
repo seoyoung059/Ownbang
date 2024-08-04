@@ -16,8 +16,6 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
@@ -59,8 +57,28 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public SuccessResponse<NoneResponse> modifyVideo(VideoUpdateRequest request) {
-        return null;
+    public SuccessResponse<NoneResponse> modifyVideo(VideoUpdateRequest request, Long videoId) {
+        // 영상 유효성 검사
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new AppException(BAD_REQUEST));
+
+        if(video.getVideoStatus() != VideoStatus.RECORDING){
+            throw new AppException(VIDEO_DUPLICATE);
+        }
+
+        // request 유효성 검사
+        if(request.videoUrl() == null
+                || request.videoUrl().equals("")
+                || request.videoStatus() == VideoStatus.RECORDING
+        ){
+            throw new AppException(BAD_REQUEST);
+        }
+
+        // 업데이트
+        video.update(request.videoUrl(), request.videoStatus());
+        videoRepository.save(video);
+
+        return new SuccessResponse<>(VIDEO_UPDATE_SUCCESS,NoneResponse.NONE);
     }
 
     private Reservation validateReservation(Long reservationId){

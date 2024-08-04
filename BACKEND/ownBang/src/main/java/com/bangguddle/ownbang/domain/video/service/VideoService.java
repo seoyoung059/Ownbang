@@ -16,6 +16,6 @@ public interface VideoService {
     SuccessResponse<NoneResponse> registerVideo(VideoRecordRequest request);
 
     // 단건 수정 -> API 주 기능
-    SuccessResponse<NoneResponse> modifyVideo(VideoUpdateRequest request);
+    SuccessResponse<NoneResponse> modifyVideo(VideoUpdateRequest request, Long videoId);
 
 }

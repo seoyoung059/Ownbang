@@ -34,4 +34,9 @@ public class Video {
         this.videoUrl = videoUrl;
         this.videoStatus = videoStatus;
     }
+
+    public void update(String videoUrl, VideoStatus videoStatus){
+        this.videoUrl = videoUrl;
+        this.videoStatus = videoStatus;
+    }
 }
