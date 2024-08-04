@@ -4,6 +4,7 @@ import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.video.dto.VideoRecordRequest;
+import com.bangguddle.ownbang.domain.video.dto.VideoSearchResponse;
 import com.bangguddle.ownbang.domain.video.entity.Video;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
@@ -34,12 +35,23 @@ public class VideoServiceTest {
     private ReservationRepository reservationRepository;
     @Mock
     private Reservation reservation;
+    @Mock
+    private Video video;
 
     @InjectMocks
     private VideoServiceImpl videoService;
 
     private VideoRecordRequest makeRecordRequest(Long reservationId, String videoUrl, VideoStatus videoStatus){
         return VideoRecordRequest.builder()
+                .reservationId(reservationId)
+                .videoUrl(videoUrl)
+                .videoStatus(videoStatus)
+                .build();
+    }
+
+    private VideoSearchResponse makeSearchResponse(Long videoId, Long reservationId, String videoUrl, VideoStatus videoStatus){
+        return VideoSearchResponse.builder()
+                .videoId(videoId)
                 .reservationId(reservationId)
                 .videoUrl(videoUrl)
                 .videoStatus(videoStatus)
@@ -59,7 +71,6 @@ public class VideoServiceTest {
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(videoRepository.findByReservationId(reservationId)).thenReturn(Optional.empty());
-
 
         // then
         SuccessResponse response = videoService.registerVideo(request);
@@ -173,5 +184,71 @@ public class VideoServiceTest {
         verify(reservationRepository, times(1)).findById(any());
         verify(videoRepository, times(1)).findByReservationId(any());
         verify(videoRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("영상 단건 조회 성공")
+    void 영상_단건_조회_성공() throws Exception {
+        // given
+        Long videoId = 1L;
+        Long reservationId = 10L;
+        String videoUrl = "VIDEO_TEST_URL";
+
+        VideoSearchResponse result = makeSearchResponse(videoId, reservationId, videoUrl, VideoStatus.RECORDED);
+        SuccessResponse success = new SuccessResponse<>(VIDEO_FIND_SUCCESS, result);
+
+        // when
+        when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+        when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDED);
+        when(video.getId()).thenReturn(videoId);
+        when(video.getReservation()).thenReturn(reservation);
+        when(video.getVideoUrl()).thenReturn(videoUrl);
+        when(reservation.getId()).thenReturn(reservationId);
+
+        // then
+        SuccessResponse response = videoService.getVideo(videoId);
+
+        assertThat(response)
+                .isNotInstanceOf(AppException.class)
+                .isInstanceOf(SuccessResponse.class)
+                .isEqualTo(success);
+
+        // verify
+        verify(videoRepository, times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("영상 단건 조회 실패 - 유효하지 않은 ID")
+    void 영상_단건_조회_실패__유효하지_않은_ID() throws Exception {
+        // given
+        Long invalidVideoId = 1L;
+
+        // when
+        when(videoRepository.findById(invalidVideoId)).thenReturn(Optional.empty());
+
+        // then
+        Throwable thrown = catchThrowable(() -> videoService.getVideo(invalidVideoId));
+
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+    }
+
+    @Test
+    @DisplayName("영상 단건 조회 실패 - 녹화 중인 영상")
+    void 영상_단건_조회_실패__녹화_중인_영상() throws Exception {
+        // given
+        Long invalidVideoId = 1L;
+
+        // when
+        when(videoRepository.findById(invalidVideoId)).thenReturn(Optional.of(video));
+        when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDING);
+
+        // then
+        Throwable thrown = catchThrowable(() -> videoService.getVideo(invalidVideoId));
+
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", VIDEO_IS_BEING_RECORDED);
     }
 }
