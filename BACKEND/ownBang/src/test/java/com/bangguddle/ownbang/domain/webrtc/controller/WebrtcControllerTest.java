@@ -181,4 +181,121 @@ public class WebrtcControllerTest {
         verify(webrtcAgentService, atLeast(1)).getToken(any(), any());
         verify(webrtcUserService, never()).getToken(any(), any());
     }
+
+    @Test
+    @DisplayName("임차인 토큰 생성 성공")
+    void 임차인_토큰_생성_성공() throws Exception {
+        // given
+        WebrtcCreateTokenRequest createRequest = makeCreateRequest(10L);
+        WebrtcTokenResponse response = WebrtcTokenResponse.builder().token(token).build();
+        SuccessResponse success =
+                new SuccessResponse<>(GET_TOKEN_SUCCESS, response);
+
+        // when
+        when(grantedAuthority.contains(new SimpleGrantedAuthority("ROLE_AGENT")))
+                .thenReturn(false);
+        when(webrtcUserService.getToken(createRequest, userId))
+                .thenReturn(success);
+
+        // then
+        assertThatCode(() ->webrtcController.getToken(createRequest, userId, authentication))
+                .doesNotThrowAnyException();
+        assertThat(webrtcController.getToken(createRequest, userId, authentication).getStatusCode())
+                .isEqualTo(GET_TOKEN_SUCCESS.getHttpStatus());
+        assertThat(webrtcController.getToken(createRequest, userId, authentication))
+                .isInstanceOf(ResponseEntity.class)
+                .isEqualTo(Response.success(success));
+
+        // verify
+        verify(webrtcAgentService, never()).getToken(any(), any());
+        verify(webrtcUserService, atLeast(1)).getToken(any(), any());
+    }
+
+    @Test
+    @DisplayName("임차인 토큰 생성 실패 - 유효하지 않은 예약")
+    void 임차인_토큰_생성_실패__유효하지_않은_예약() throws Exception {
+        // given
+        WebrtcCreateTokenRequest eInvalidRequest = makeCreateRequest(100L);
+
+        // when
+        when(grantedAuthority.contains(new SimpleGrantedAuthority("ROLE_AGENT")))
+                .thenReturn(false);
+        when(webrtcUserService.getToken(eInvalidRequest, userId))
+                .thenThrow(new AppException(RESERVATION_NOT_FOUND));
+
+        // then
+        assertThatThrownBy(() -> webrtcController.getToken(eInvalidRequest, userId, authentication))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_NOT_FOUND);
+
+        // verify
+        verify(webrtcAgentService, never()).getToken(any(), any());
+        verify(webrtcUserService, atLeast(1)).getToken(any(), any());
+    }
+
+    @Test
+    @DisplayName("임차인 토큰 생성 실패 - 확정된 예약이 아닌 경우")
+    void 임차인_토큰_생성_실패__확정된_예약이_아닌_경우() throws Exception {
+        // given
+        WebrtcCreateTokenRequest eInvalidRequest = makeCreateRequest(100L);
+
+        // when
+        when(grantedAuthority.contains(new SimpleGrantedAuthority("ROLE_AGENT")))
+                .thenReturn(false);
+        when(webrtcUserService.getToken(eInvalidRequest, userId))
+                .thenThrow(new AppException(RESERVATION_STATUS_NOT_CONFIRMED));
+
+        // then
+        assertThatThrownBy(() -> webrtcController.getToken(eInvalidRequest, userId, authentication))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_STATUS_NOT_CONFIRMED);
+
+        // verify
+        verify(webrtcAgentService, never()).getToken(any(), any());
+        verify(webrtcUserService, atLeast(1)).getToken(any(), any());
+    }
+
+    @Test
+    @DisplayName("임차인 토큰 생성 실패 - 없는 세션")
+    void 임차인_토큰_생성_실패__없는_세션() throws Exception {
+        // given
+        WebrtcCreateTokenRequest eInvalidRequest = makeCreateRequest(100L);
+
+        // when
+        when(grantedAuthority.contains(new SimpleGrantedAuthority("ROLE_AGENT")))
+                .thenReturn(false);
+        when(webrtcUserService.getToken(eInvalidRequest, userId))
+                .thenThrow(new AppException(BAD_REQUEST));
+
+        // then
+        assertThatThrownBy(() -> webrtcController.getToken(eInvalidRequest, userId, authentication))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+
+        // verify
+        verify(webrtcAgentService, never()).getToken(any(), any());
+        verify(webrtcUserService, atLeast(1)).getToken(any(), any());
+    }
+
+    @Test
+    @DisplayName("임차인 토큰 생성 실패 - 오픈 비두 장애")
+    void 임차인_토큰_생성_실패__오픈_비두_장애() throws Exception {
+        // given
+        WebrtcCreateTokenRequest createRequest = makeCreateRequest(100L);
+
+        // when
+        when(grantedAuthority.contains(new SimpleGrantedAuthority("ROLE_AGENT")))
+                .thenReturn(false);
+        when(webrtcUserService.getToken(createRequest, userId))
+                .thenThrow(new AppException(INTERNAL_SERVER_ERROR));
+
+        // then
+        assertThatThrownBy(() -> webrtcController.getToken(createRequest, userId, authentication))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", INTERNAL_SERVER_ERROR);
+
+        // verify
+        verify(webrtcAgentService, never()).getToken(any(), any());
+        verify(webrtcUserService, atLeast(1)).getToken(any(), any());
+    }
 }
