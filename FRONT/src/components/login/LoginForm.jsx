@@ -38,7 +38,6 @@ function Copyright(props) {
   );
 }
 
-// 여기부터 화면에 보이는 로그인 폼 입니다.
 const LoginForm = () => {
   const { loginUser } = useBoundStore((state) => ({
     loginUser: state.loginUser,
@@ -56,7 +55,7 @@ const LoginForm = () => {
       email: data.get("userId"),
       password: data.get("password"),
     }).then((res) => {
-      // 로그인 성공 시 TOAST 실패 시 다른 처리 추가해야댐
+      // 로그인 성공 시 TOAST 실패 시 다른 처리 추가
       if (res.resultCode === "SUCCESS") {
         toast.success(res.message, {
           position: "bottom-left",

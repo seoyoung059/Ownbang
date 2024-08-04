@@ -144,7 +144,7 @@ const SignUp = () => {
     }));
   };
 
-  // 회원가입 성공 시 TOAST 에러 처리 추가해야댐
+  // 회원가입 성공 시 TOAST,  에러 처리 추가해야댐
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
