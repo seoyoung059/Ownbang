@@ -36,6 +36,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             /* 임차인 권한 필요 URL */
             "/bookmarks",
             "/agents/auths",
+            "/logout",
             "/get-token", "/remove-token",
             "/auths/password-check",
             "/videos"
