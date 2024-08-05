@@ -176,11 +176,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     @Override
     public Optional<Recording> stopRecord(final Long reservationId) {
-        if(!mapSessions.containsKey(reservationId)
-                || !mapSessionRecordings.containsKey(reservationId)
-        ) {
-            throw new AppException(BAD_REQUEST);
-        }
+        validateSessionAndRecord(reservationId);
 
         String recordingId = mapSessionRecordings.get(reservationId).getId();
 
@@ -195,11 +191,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     @Override
     public Optional<Recording> deleteRecord(final Long reservationId) {
-        if(!mapSessions.containsKey(reservationId)
-                || !mapSessionRecordings.containsKey(reservationId)
-        ) {
-            throw new AppException(BAD_REQUEST);
-        }
+        validateSessionAndRecord(reservationId);
 
         String recordingId = mapSessionRecordings.get(reservationId).getId();
 
@@ -220,5 +212,13 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     private Boolean existTokenUserType(Long reservationId, UserType userType){
         return this.mapSessionReservationsTokens.get(reservationId).containsKey(userType);
+    }
+
+    private void validateSessionAndRecord(Long reservationId){
+        if(!mapSessions.containsKey(reservationId)
+                || !mapSessionRecordings.containsKey(reservationId)
+        ) {
+            throw new AppException(BAD_REQUEST);
+        }
     }
 }
