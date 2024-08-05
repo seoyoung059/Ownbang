@@ -1,7 +1,7 @@
 package com.bangguddle.ownbang.domain.video.controller;
 
 import com.bangguddle.ownbang.domain.video.dto.VideoSearchResponse;
-import com.bangguddle.ownbang.domain.video.service.impl.VideoServiceImpl;
+import com.bangguddle.ownbang.domain.video.service.VideoService;
 import com.bangguddle.ownbang.global.response.Response;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class VideoController {
 
-    private final VideoServiceImpl videoService;
+    private final VideoService videoService;
 
     @GetMapping("/{videoId}")
     public ResponseEntity<Response<VideoSearchResponse>> getVideo(@AuthenticationPrincipal Long userId,
