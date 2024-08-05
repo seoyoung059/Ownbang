@@ -1,4 +1,6 @@
 package com.bangguddle.ownbang.domain.auth.dto;
 
-public record PasswordCheckRequest(String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record PasswordCheckRequest(@NotBlank String password) {
 }
