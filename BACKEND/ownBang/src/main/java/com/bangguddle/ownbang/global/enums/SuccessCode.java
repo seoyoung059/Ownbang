@@ -19,6 +19,7 @@ public enum SuccessCode implements ResponseCode {
 
     // My Page API
     GET_MY_PAGE_SUCCESS(HttpStatus.OK, "내 정보 조회가 성공적으로 완료되었습니다."),
+    UPDATE_MY_PAGE_SUCCESS(HttpStatus.OK, "내 정보 수정이 성공적으로 완료되었습니다."),
 
 
     // Room API
