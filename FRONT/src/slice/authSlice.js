@@ -1,9 +1,11 @@
+import { Upgrade } from "@mui/icons-material";
 import {
   checkEmail,
   checkPhoneNumber,
   signUp,
   login,
   checkPassword,
+  toAgent,
 } from "../api/auth";
 import { Cookies } from "react-cookie";
 import { toast } from "react-toastify";
@@ -60,5 +62,10 @@ export const createAuthSlice = (set) => ({
   confirmPassword: async (password) => {
     const result = await checkPassword(password);
     return result.data.isCorrect;
+  },
+
+  upgradeAgent: async (agentData) => {
+    const result = await toAgent(agentData);
+    return result;
   },
 });
