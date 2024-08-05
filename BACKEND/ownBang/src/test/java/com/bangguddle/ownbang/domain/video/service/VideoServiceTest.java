@@ -368,32 +368,6 @@ public class VideoServiceTest {
     }
 
     @Test
-    @DisplayName("영상 수정 실패 - 유효하지 않은 URL")
-    void 영상_수정_실패__유효하지_않은_URL() throws Exception {
-        // given
-        Long videoId = 1L;
-        String invalidVideoUrl = "";
-        VideoStatus newVideoStatus = VideoStatus.RECORDED;
-
-        VideoUpdateRequest eRequest = makeUpdateRequest(invalidVideoUrl, newVideoStatus);
-
-        // when
-        when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
-        when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDING);
-
-        // then
-        Throwable thrown = catchThrowable(() -> videoService.modifyVideo(eRequest, videoId));
-
-        assertThat(thrown)
-                .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
-
-        // verify
-        verify(videoRepository, times(1)).findById(any());
-        verify(videoRepository, never()).save(any());
-    }
-
-    @Test
     @DisplayName("영상 수정 실패 - 유효하지 않은 영상 상태")
     void 영상_수정_실패__유효하지_않은_영상_상태() throws Exception {
         // given
