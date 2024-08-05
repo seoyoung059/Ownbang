@@ -25,3 +25,10 @@ export const login = async (loginData) => {
   const response = await Axios.post("/auths/login", loginData);
   return response.data;
 };
+
+export const checkPassword = async (password) => {
+  const response = await Axios.post("/auths/password-check", {
+    password: password,
+  });
+  return response.data;
+};

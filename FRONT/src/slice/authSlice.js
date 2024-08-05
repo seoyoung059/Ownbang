@@ -1,11 +1,17 @@
-import { checkEmail, checkPhoneNumber, signUp, login } from "../api/auth";
+import {
+  checkEmail,
+  checkPhoneNumber,
+  signUp,
+  login,
+  checkPassword,
+} from "../api/auth";
 import { Cookies } from "react-cookie";
 import { toast } from "react-toastify";
 
 const cookies = new Cookies();
 
 export const createAuthSlice = (set) => ({
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem("accessToken"),
   isDuplicatedEmail: false,
   isDuplicatedPhoneNumber: false,
 
@@ -49,5 +55,10 @@ export const createAuthSlice = (set) => ({
       progress: undefined,
       theme: "light",
     });
+  },
+
+  confirmPassword: async (password) => {
+    const result = await checkPassword(password);
+    return result.data.isCorrect;
   },
 });
