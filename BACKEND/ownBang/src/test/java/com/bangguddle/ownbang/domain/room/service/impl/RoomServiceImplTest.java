@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
+import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
@@ -43,6 +44,9 @@ class RoomServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
+    private AgentRepository agentRepository;
+
+    @Mock
     private RoomImageServiceImpl roomImageServiceImpl;
 
     @InjectMocks
@@ -69,7 +73,6 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
         // mock
-        when(userRepository.getById(anyLong())).thenReturn(agent);
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
         when(roomRepository.save(any(Room.class))).thenReturn(Room.builder().build()); // 추가된 부분
 
