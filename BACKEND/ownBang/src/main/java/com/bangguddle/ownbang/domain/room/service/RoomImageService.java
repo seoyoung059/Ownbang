@@ -11,6 +11,5 @@ public interface RoomImageService {
 
     SuccessResponse<NoneResponse> uploadImageToS3(MultipartFile roomImage, Room room) throws AppException;
 
-    SuccessResponse<NoneResponse> deleteImage(Long roomImageId) throws AppException;
-
+    SuccessResponse<NoneResponse> deleteImage(Long roomId, Long roomImageId) throws AppException;
 }

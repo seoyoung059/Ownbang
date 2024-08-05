@@ -11,6 +11,7 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 import com.bangguddle.ownbang.global.service.S3UploaderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +33,9 @@ public class RoomImageServiceImpl implements RoomImageService {
     private final RoomImageRepository roomImageRepository;
     private final S3UploaderService s3UploaderService;
 
+    @Value("${s3.room-image.path}")
+    private String s3RoomImagePath;
+
     /**
      * 매물 이미지를 로컬에 업로드하기 위한 서비스 메서드
      * @param roomImage MultipartFile 이미지 파일
@@ -43,24 +47,25 @@ public class RoomImageServiceImpl implements RoomImageService {
     @Transactional
     public SuccessResponse<NoneResponse> uploadImage(MultipartFile roomImage, Room room) throws AppException {
         validateImageFile(roomImage);
-        //파일명: UUID + 사진 원래이름
-        String fileName = UUID.randomUUID().toString().replace("-", "") + "_" + roomImage.getOriginalFilename();
-
-        //실제 저장 경로
-        String dbFilePath = "/upload/roomImages/" + fileName;
-        Path filePath = Paths.get("src/main/resources/static", dbFilePath);
 
         try {
+            //파일명: UUID + 사진 원래이름
+            String fileName = UUID.randomUUID().toString().replace("-", "") + "_" + roomImage.getOriginalFilename();
+
+            //실제 저장 경로
+            String dbFilePath = "/upload/roomImages/" + fileName;
+            Path filePath = Paths.get("src/main/resources/static", dbFilePath);
+
             if (!Files.exists(filePath)) {
                 Files.createDirectories(filePath.getParent());
             }
             Files.write(filePath, roomImage.getBytes());
+            room.getRoomImages().add(new RoomImage(room, dbFilePath));
+
+            return new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
         } catch (IOException e) {
             throw new AppException(IMAGE_UPLOAD_FAILED);
         }
-        room.getRoomImages().add(new RoomImage(room, dbFilePath));
-
-        return new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
     }
 
     /**
@@ -73,32 +78,27 @@ public class RoomImageServiceImpl implements RoomImageService {
     @Override
     @Transactional
     public SuccessResponse<NoneResponse> uploadImageToS3(MultipartFile roomImage, Room room) throws AppException {
+
         validateImageFile(roomImage);
-        //파일명: UUID + 사진 원래이름
-        String fileName = UUID.randomUUID().toString().replace("-", "") + "_" + roomImage.getOriginalFilename();
-
-        //실제 저장 경로
-        String dbFilePath = "/upload/roomImages/" + fileName;
-        Path filePath = Paths.get("src/main/resources/static", dbFilePath);
-        List<RoomImage> roomImageList = room.getRoomImages();
-
         try {
-            if (!Files.exists(filePath)) {
-                Files.createDirectories(filePath.getParent());
-            }
-            Files.write(filePath, roomImage.getBytes());
-        } catch (IOException e) {
+            //파일명: UUID + 사진 원래이름
+            String fileName = UUID.randomUUID().toString().replace("-", "") + "_" + roomImage.getOriginalFilename();
+
+            List<RoomImage> roomImageList = room.getRoomImages();
+
+            String uploadedFileUrl = s3UploaderService.uploadMultipartFileToS3(fileName, roomImage,s3RoomImagePath);
+            roomImageList.add(new RoomImage(room, uploadedFileUrl));
+
+            return new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
+        } catch (Exception e) {
             throw new AppException(IMAGE_UPLOAD_FAILED);
         }
 
-        roomImageList.add(new RoomImage(room,s3UploaderService.uploadToS3(filePath.toFile(),"roomImages")));
-
-        return new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
     }
 
 
     /**
-     * 매물 이미지 삭제 서비스 메서드
+     * 로컬의 매물 이미지 삭제 서비스 메서드
      * @param roomId 유효성 확인을 위한 매물 ID
      * @param roomImageId 삭제할 매물 이미지 ID
      * @return SuccessResponse

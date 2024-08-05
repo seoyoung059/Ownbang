@@ -47,6 +47,9 @@ cloud:
     s3:
       bucket: ${aws_s3bucket}
 
+s3:
+  room-image:
+    path: ${S3_ROOMIMAGE_PATH}
 
 key:
   secret : ${JWT_SECRET_KEY}
