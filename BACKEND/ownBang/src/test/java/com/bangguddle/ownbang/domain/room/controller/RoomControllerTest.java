@@ -29,10 +29,9 @@ import java.util.List;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.BAD_REQUEST;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.METHOD_NOT_ALLOWED;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -555,5 +554,56 @@ class RoomControllerTest {
                 //then
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("중개인 매물 목록 조회 - 성공")
+    public void getAgentRooms_Success() throws Exception {
+        // DTO
+        Long roomId = 1L;
+        List<RoomInfoSearchResponse> roomInfos = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            roomInfos.add(mock(RoomInfoSearchResponse.class));
+        }
+        SuccessResponse<List<RoomInfoSearchResponse>> successResponse = new SuccessResponse<>(ROOM_FIND_SUCCESS, roomInfos);
+
+        // when
+        when(roomServiceImpl.getAgentRooms(any(), anyInt(), anyInt())).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                        get("/rooms/agents")
+                                .param("page", "0")
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()
+                                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("ROOM_FIND_SUCCESS"));
+    }
+
+
+    @Test
+    @WithMockUser
+    @DisplayName("중개인 매물 목록 조회 - 성공: page defaultValue 0")
+    public void getAgentRooms_Success_pageDefault() throws Exception {
+        // DTO
+        Long roomId = 1L;
+        List<RoomInfoSearchResponse> roomInfos = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            roomInfos.add(mock(RoomInfoSearchResponse.class));
+        }
+        SuccessResponse<List<RoomInfoSearchResponse>> successResponse = new SuccessResponse<>(ROOM_FIND_SUCCESS, roomInfos);
+
+        // when
+        when(roomServiceImpl.getAgentRooms(any(), anyInt(), anyInt())).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                        get("/rooms/agents")
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()
+                                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("ROOM_FIND_SUCCESS"));
+
     }
 }

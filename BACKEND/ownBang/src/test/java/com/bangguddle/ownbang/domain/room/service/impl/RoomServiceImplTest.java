@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
@@ -8,6 +9,7 @@ import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -390,6 +393,45 @@ class RoomServiceImplTest {
 
         verify(roomRepository, never()).save(any(Room.class));
 
+    }
+
+    @Test
+    @DisplayName("중개인 매물 목록 조회 - 성공")
+    void getAgentRooms_Success() {
+        Long userId = 1L, agentId = 1L; int page = 0, size = 10, dataSize = 8;
+        Agent agent = mock(Agent.class);
+        List<Room> rooms = new ArrayList<>();
+        for (int i = 0; i < dataSize; i++) {
+            rooms.add(Room.builder().agent(agent).build());
+        }
+
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+        when(roomRepository.getByAgentId(anyLong(), any(Pageable.class))).thenReturn(rooms);
+
+
+        SuccessResponse<List<RoomInfoSearchResponse>> response = roomServiceImpl.getAgentRooms(userId, page, size);
+
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(ROOM_FIND_SUCCESS);
+        assertThat(response.data()).size().isEqualTo(dataSize);
+
+        verify(roomRepository, times(1)).getByAgentId(anyLong(), any(Pageable.class));
+    }
+
+
+    @Test
+    @DisplayName("중개인 매물 목록 조회 - 실패: 중개인이 아님(근데 이거 필터에서 걸러지기는 하는데 해야하나?)")
+    void getAgentRooms_Fail() {
+
+        Long userId = 1L; int page = 0, size = 10;
+
+        doThrow(new AppException(ErrorCode.ACCESS_DENIED)).when(agentRepository).getByUserId(userId);
+
+        // 매물 생성
+        assertThatThrownBy(()->
+                roomServiceImpl.getAgentRooms(userId, page, size)
+        ).isInstanceOf(AppException.class);
     }
 
 }
