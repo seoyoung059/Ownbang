@@ -1,4 +1,4 @@
-package com.bangguddle.ownbang.domain.agent.auth.repository;
+package com.bangguddle.ownbang.domain.agent.repository;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import org.springframework.data.jpa.repository.JpaRepository;
