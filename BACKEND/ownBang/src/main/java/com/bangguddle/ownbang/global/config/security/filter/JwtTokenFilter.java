@@ -33,7 +33,7 @@ import java.util.Collection;
 public class JwtTokenFilter extends OncePerRequestFilter {
     private static final String[] REQUIRE_USER_ARRAY = {
             /* 임차인 권한 필요 URL */
-            "/rooms", "/bookmarks",
+            "/bookmarks",
             "/agents/auths",
             "/get-token", "/remove-token",
             "/auths/password-check",
