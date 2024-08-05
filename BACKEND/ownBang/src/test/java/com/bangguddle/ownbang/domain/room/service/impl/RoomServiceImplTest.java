@@ -8,7 +8,6 @@ import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
-import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -40,8 +39,6 @@ class RoomServiceImplTest {
     @Mock
     private RoomRepository roomRepository;
 
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private AgentRepository agentRepository;
