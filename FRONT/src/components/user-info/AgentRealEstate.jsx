@@ -6,6 +6,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Avatar,
 } from "@mui/material";
 import { useTheme } from "@mui/material";
 
@@ -50,39 +51,46 @@ const MyRealEstate = ({ myRealEstate }) => {
                 {row.profileImageUrl ? (
                   <img
                     src={row.profileImageUrl}
-                    alt="Profile"
-                    style={{ width: 50, height: 50 }}
+                    width="150px"
+                    height="100px"
+                    style={{ borderRadius: "5px" }}
                   />
                 ) : (
                   "No Image"
                 )}
               </TableCell>
               <TableCell align="right">
-                {row.parcel ? row.parcel : "N/A"}
+                {row.parcel ? row.parcel : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
-                {row.roomType ? row.roomType : "N/A"}
+                {row.roomType ? row.roomType : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
-                {row.structure ? row.structure : "N/A"}
+                {row.structure ? row.structure : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
-                {row.dealType ? row.dealType : "N/A"}
+                {row.dealType ? row.dealType : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
-                {row.exclusiveArea ? row.exclusiveArea : "N/A"}
+                {row.exclusiveArea
+                  ? row.exclusiveArea
+                  : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
-                {row.supplyArea ? row.supplyArea : "N/A"}
+                {row.supplyArea ? row.supplyArea : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
-                {row.roomFloor ? row.roomFloor : "N/A"}
+                {row.roomFloor ? row.roomFloor : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
-                {row.deposit ? formatCurrency(row.deposit) : "N/A"}
+                {row.deposit
+                  ? formatCurrency(row.deposit)
+                  : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
-                {row.monthlyRent ? formatCurrency(row.monthlyRent) : "N/A"}
+                {row.monthlyRent
+                  ? formatCurrency(row.monthlyRent)
+                  : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
                 {row.maintenanceFee
