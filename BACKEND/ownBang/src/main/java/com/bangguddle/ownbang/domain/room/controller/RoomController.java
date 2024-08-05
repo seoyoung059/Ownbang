@@ -7,6 +7,7 @@ import com.bangguddle.ownbang.domain.room.dto.RoomUpdateRequest;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
+import com.bangguddle.ownbang.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -27,7 +28,8 @@ public class RoomController {
 
     /**
      * 매물 생성
-     * @param request 매물 정보 JSON
+     *
+     * @param request        매물 정보 JSON
      * @param roomImageFiles 매물 관련 이미지 파일
      * @return Success Response, 실패 시 AppException Throw
      */
@@ -40,21 +42,23 @@ public class RoomController {
 
     /**
      * 매물 정보 수정
-     * @param roomId 수정할 매물의 ID
-     * @param request 수정할 매물의 정보 JSON
+     *
+     * @param roomId         수정할 매물의 ID
+     * @param request        수정할 매물의 정보 JSON
      * @param roomImageFiles 매물 관련 새로 업로드할 이미지 파일
      * @return Success Response, 실패 시 AppException Throw
      */
     @PatchMapping("agents/{roomId}")
     public ResponseEntity<Response<NoneResponse>> modifyRoom(@AuthenticationPrincipal Long userId,
                                                              @PathVariable(value = "roomId") @Valid @Positive Long roomId,
-                                                             @RequestPart(value="roomUpdateRequest") @Valid RoomUpdateRequest request,
-                                                             @RequestPart(value="roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
+                                                             @RequestPart(value = "roomUpdateRequest") @Valid RoomUpdateRequest request,
+                                                             @RequestPart(value = "roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
         return Response.success(roomService.modifyRoom(userId, roomId, request, roomImageFiles));
     }
 
     /**
      * 매물 삭제
+     *
      * @param roomId 삭제할 매물의 ID
      * @return Success Response, 실패 시 AppException Throw
      */
@@ -66,6 +70,7 @@ public class RoomController {
 
     /**
      * 매물 단건 조회
+     *
      * @param roomId 조회할 매물의 ID
      * @return Success Response. RoomSearchResponse - 조회한 매물 정보 JSON DTO
      */
@@ -76,12 +81,19 @@ public class RoomController {
 
     /**
      * 중개인이 올린 매물 목록 조회
+     *
      * @param userId
      * @return
      */
     @GetMapping("/agents")
     public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getAgentRooms(@AuthenticationPrincipal Long userId,
-                                                                           @RequestParam(defaultValue = "0") @PositiveOrZero @Valid int page) {
+                                                                                @RequestParam(defaultValue = "0") @PositiveOrZero @Valid int page) {
         return Response.success(roomService.getAgentRooms(userId, page, 10));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getRooms() {
+        SuccessResponse<List<RoomInfoSearchResponse>> response = roomService.search();
+        return Response.success(response);
     }
 }
