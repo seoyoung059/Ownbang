@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.checklist.service.impl;
 
+import com.bangguddle.ownbang.domain.checklist.dto.ChecklistUpdateRequest;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchResponse;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistTemplateCreateRequest;
 import com.bangguddle.ownbang.domain.checklist.entity.Checklist;
@@ -51,5 +52,27 @@ public class ChecklistServiceImpl implements ChecklistService {
         // 반환
         ChecklistSearchResponse response = ChecklistSearchResponse.from(checklist);
         return new SuccessResponse<>(CHECKLIST_FIND_SUCCESS, response);
+    }
+
+    @Override
+    public SuccessResponse<NoneResponse> modifyChecklistTemplate(Long userId, Long checklistId,
+                                                                 ChecklistUpdateRequest request) {
+        // userid 유효성 검사
+        userRepository.getById(userId);
+
+        // checklistId 유효성 검사
+        Checklist checklist = checklistRepository.findChecklistByIdAndIsTemplate(checklistId, true)
+                .orElseThrow(() -> new AppException(BAD_REQUEST));
+
+        // title 중복 검사
+        if(checklistRepository.existsChecklistByUserIdAndTitleAndIsTemplate(userId, request.title(), true)){
+            throw new AppException(CHECKLIST_DUPLICATED);
+        }
+
+        // update
+        checklist.update(request.title(), request.getContentsToString());
+        checklistRepository.save(checklist);
+
+        return new SuccessResponse<>(CHECKLIST_UPDATE_SUCCESS, NoneResponse.NONE);
     }
 }

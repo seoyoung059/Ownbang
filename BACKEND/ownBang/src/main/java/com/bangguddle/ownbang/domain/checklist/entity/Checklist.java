@@ -43,4 +43,9 @@ public class Checklist {
         this.contents = contents;
         this.isTemplate = isTemplate;
     }
+
+    public void update(String title, String contents){
+        this.title = title;
+        this.contents = contents;
+    }
 }

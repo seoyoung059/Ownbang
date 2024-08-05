@@ -2,6 +2,7 @@ package com.bangguddle.ownbang.domain.checklist.controller;
 
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchResponse;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistTemplateCreateRequest;
+import com.bangguddle.ownbang.domain.checklist.dto.ChecklistUpdateRequest;
 import com.bangguddle.ownbang.domain.checklist.service.ChecklistService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
@@ -33,6 +34,15 @@ public class ChecklistController {
             @AuthenticationPrincipal Long userId,
             @PathVariable @Positive @Valid Long checklistId) {
         SuccessResponse<ChecklistSearchResponse> response = checklistService.getChecklist(userId, checklistId);
+        return Response.success(response);
+    }
+
+    @PatchMapping("/{checklistId}")
+    public ResponseEntity<Response<NoneResponse>> modifyChecklistTemplate(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable @Positive @Valid Long checklistId,
+            @RequestBody ChecklistUpdateRequest request) {
+        SuccessResponse<NoneResponse> response = checklistService.modifyChecklistTemplate(userId, checklistId, request);
         return Response.success(response);
     }
 }

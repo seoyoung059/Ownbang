@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
     Boolean existsChecklistByUserIdAndTitleAndIsTemplate(Long userId, String title, Boolean isTemplate);
     Optional<Checklist> findChecklistByIdAndUserId(Long checklistId, Long userId);
+    Optional<Checklist> findChecklistByIdAndIsTemplate(Long userId, Boolean isTemplate);
 }
