@@ -80,8 +80,8 @@ public class RoomController {
      * @return
      */
     @GetMapping("/agents")
-    public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getRooms(@AuthenticationPrincipal Long userId,
-                                                                           @RequestParam @PositiveOrZero @Valid int page) {
+    public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getAgentRooms(@AuthenticationPrincipal Long userId,
+                                                                           @RequestParam(defaultValue = "0") @PositiveOrZero @Valid int page) {
         return Response.success(roomService.getAgentRooms(userId, page, 10));
     }
 }
