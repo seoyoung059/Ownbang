@@ -20,8 +20,8 @@ const myRealEstate = [
     deposit: 20000000,
     monthlyRent: 670000,
     maintenanceFee: 99999,
-    parcel: "변경된지번주소",
-    profileImageUrl: "changedURL",
+    // parcel: "변경된지번주소",
+    profileImageUrl: "https://via.placeholder.com/150",
   },
   {
     id: 1,
@@ -38,7 +38,7 @@ const myRealEstate = [
     monthlyRent: 500000,
     maintenanceFee: 1000000,
     parcel: "서울시 중구",
-    profileImageUrl: "신세계백화점 본점",
+    profileImageUrl: "https://via.placeholder.com/150",
   },
 ];
 
