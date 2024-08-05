@@ -1,10 +1,10 @@
 package com.bangguddle.ownbang.domain.room.entity;
 
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.room.dto.RoomUpdateRequest;
 import com.bangguddle.ownbang.domain.room.enums.DealType;
 import com.bangguddle.ownbang.domain.room.enums.RoomType;
 import com.bangguddle.ownbang.domain.room.enums.Structure;
-import com.bangguddle.ownbang.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,7 +27,7 @@ public class Room {
 
     @ManyToOne
     @JoinColumn(name = "agent_id", nullable = false)
-    private User agent;
+    private Agent agent;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="room_appliances_id", nullable = false)
@@ -87,7 +87,7 @@ public class Room {
 
 
     @Builder
-    public Room(User agent, RoomAppliances roomAppliances, RoomDetail roomDetail, /*List<RoomImage> roomImages,*/float latitude, float longitude, DealType dealType, RoomType roomType, Structure structure, boolean isLoft, float exclusiveArea, float supplyArea, byte roomFloor, Long deposit, Long monthlyRent, Long maintenanceFee, String parcel, String profileImageUrl) {
+    public Room(Agent agent, RoomAppliances roomAppliances, RoomDetail roomDetail, /*List<RoomImage> roomImages,*/float latitude, float longitude, DealType dealType, RoomType roomType, Structure structure, boolean isLoft, float exclusiveArea, float supplyArea, byte roomFloor, Long deposit, Long monthlyRent, Long maintenanceFee, String parcel, String profileImageUrl) {
         this.agent = agent;
         this.roomAppliances = roomAppliances;
         this.roomDetail = roomDetail;
