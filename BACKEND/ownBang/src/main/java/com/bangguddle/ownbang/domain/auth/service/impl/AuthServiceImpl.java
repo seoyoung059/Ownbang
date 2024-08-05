@@ -1,9 +1,7 @@
 package com.bangguddle.ownbang.domain.auth.service.impl;
 
-import com.bangguddle.ownbang.domain.auth.dto.DuplicateResponse;
-import com.bangguddle.ownbang.domain.auth.dto.LoginRequest;
+import com.bangguddle.ownbang.domain.auth.dto.*;
 import com.bangguddle.ownbang.global.dto.Tokens;
-import com.bangguddle.ownbang.domain.auth.dto.UserSignUpRequest;
 import com.bangguddle.ownbang.domain.auth.service.AuthService;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
@@ -65,6 +63,14 @@ public class AuthServiceImpl implements AuthService {
         redisRepository.save(tokens);
         redisRepository.saveValidTokens(tokens, userId);
         return new SuccessResponse<>(LOGIN_SUCCESS, tokens);
+    }
+
+    @Override
+    public SuccessResponse<PasswordCheckResponse> passwordCheck(Long id, PasswordCheckRequest request) {
+        User user = userRepository.getById(id);
+        boolean isCorrect = passwordEncoder.matches(request.password(), user.getPassword());
+        PasswordCheckResponse response = new PasswordCheckResponse(isCorrect);
+        return new SuccessResponse<>(PASSWORD_CHECK_SUCCESS, response);
     }
 
 

@@ -56,4 +56,8 @@ public class User {
         this.oauthNaver = false;
         this.isAgent = false;
     }
+
+    public void updateIsAgent(boolean isAgent) {
+        this.isAgent = isAgent;
+    }
 }
