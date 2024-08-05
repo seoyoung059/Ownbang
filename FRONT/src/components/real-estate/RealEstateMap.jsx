@@ -47,9 +47,11 @@ const RealEstateMap = ({
   const onBoundsChange2 = () => {
     if (!map) return;
     const bounds = map.getBounds();
-    const visiblePositions = realEstateData.data.filter((pos) =>
-      bounds.contain(new kakao.maps.LatLng(pos.latitude, pos.longitude))
-    );
+    const visiblePositions =
+      realEstateData.data &&
+      realEstateData.data.filter((pos) =>
+        bounds.contain(new kakao.maps.LatLng(pos.latitude, pos.longitude))
+      );
     onBoundsChange(visiblePositions);
   };
 
@@ -75,16 +77,17 @@ const RealEstateMap = ({
     >
       {!mark ? (
         <MarkerClusterer averageCenter={true} minLevel={5}>
-          {realEstateData.data.map((pos) => (
-            <MapMarker
-              key={pos.id}
-              position={{
-                lat: pos.latitude,
-                lng: pos.longitude,
-              }}
-              onClick={() => onMarkerClick(pos)}
-            />
-          ))}
+          {realEstateData.data &&
+            realEstateData.data.map((pos) => (
+              <MapMarker
+                key={pos.id}
+                position={{
+                  lat: pos.latitude,
+                  lng: pos.longitude,
+                }}
+                onClick={() => onMarkerClick(pos)}
+              />
+            ))}
         </MarkerClusterer>
       ) : (
         <MapMarker

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
 import RealEstateSearchBar from "../components/real-estate/RealEstateSearchBar";
 import RealEstateList from "../components/real-estate/RealEstateList";
@@ -11,22 +11,27 @@ import { useBoundStore } from "../store/store";
 
 const RealEstatePage = () => {
   const theme = useTheme();
-  const { searchTerm, setSearchTerm } = useBoundStore((state) => ({
-    searchTerm: state.searchTerm,
-    setSearchTerm: state.setSearchTerm,
-  }));
+  const { searchTerm, setSearchTerm, room, getRoom } = useBoundStore(
+    (state) => ({
+      searchTerm: state.searchTerm,
+      setSearchTerm: state.setSearchTerm,
+      room: state.room,
+      getRoom: state.getRoom,
+    })
+  );
 
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showReservation, setShowReservation] = React.useState(false);
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
 
-  // 검색어를 업데이트하는 함수
-  const onSearch = (term) => {
-    setSearchTerm(term);
-  };
+  useEffect(() => {
+    if (selectedItem) {
+      getRoom(selectedItem.id);
+    }
+  }, [selectedItem, getRoom]);
 
   // 매물 리스트에서 선택하는 항목
-  const onSelectItem = (item) => {
+  const onSelectItem = async (item) => {
     setSelectedItem(item);
     setShowReservation(false); // 새로운 아이템 선택 시 예약 창 닫기
   };
@@ -138,7 +143,7 @@ const RealEstatePage = () => {
               <CloseIcon />
             </IconButton>
             <RealEstateDetail
-              item={selectedItem}
+              item={room}
               onOpenReservationCard={onOpenReservationCard}
             />
           </Box>

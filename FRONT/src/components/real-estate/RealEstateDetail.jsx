@@ -19,17 +19,16 @@ const RealEstateDetail = ({ item, onOpenReservationCard }) => {
       fontSize: theme.typography.fontSize,
     },
   };
-  const formatCurrency = (amount) => {
-    return (amount / 10000).toLocaleString(); // 1000으로 나누고 천 단위로 포맷팅
-  };
+  // const formatCurrency = (amount) => {
+  //   return (amount / 10000).toLocaleString(); // 1000으로 나누고 천 단위로 포맷팅
+  // };
 
   return (
     <Box sx={styles.container}>
       <Box sx={{ marginTop: 2 }}>
         <RealEstateImages />
         <Typography variant="h4" sx={styles.title}>
-          {item.dealType} {formatCurrency(item.deposit)}/
-          {formatCurrency(item.monthlyRent)}
+          {item.dealType} {item.deposit}/{item.monthlyRent}
           <Typography variant="subtitle1" color="text.secondary">
             Location: {item.parcel}
           </Typography>
