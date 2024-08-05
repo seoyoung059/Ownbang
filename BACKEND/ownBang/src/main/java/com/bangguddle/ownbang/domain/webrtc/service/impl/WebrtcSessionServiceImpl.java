@@ -58,9 +58,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<Session> removeSession(final Long reservationId) {
         // session 유효 확인
-        if (this.mapSessions.containsKey(reservationId)
-                && this.mapSessionReservationsTokens.containsKey(reservationId)
-        ) {
+        if (validateSessionAndToken(reservationId)) {
             Session session = this.mapSessions.get(reservationId);
 
             try {
@@ -83,9 +81,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<String> getToken(final Long reservationId, final UserType userType) {
         // session 유효 확인
-        if (this.mapSessions.containsKey(reservationId)
-                && this.mapSessionReservationsTokens.containsKey(reservationId)
-        ) {
+        if (validateSessionAndToken(reservationId)) {
             // userType과 role이 같은  token 반환
             return Optional.ofNullable(this.mapSessionReservationsTokens.get(reservationId).get(userType));
         }
@@ -95,9 +91,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     @Override
     public Optional<String> createToken(final Long reservationId, final UserType userType){
-        if (!this.mapSessions.containsKey(reservationId)
-                || !this.mapSessionReservationsTokens.containsKey(reservationId)
-        ) {
+        if (!validateSessionAndToken(reservationId)) {
             throw new AppException(BAD_REQUEST);
         } else if(this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)){
             throw new AppException(WEBRTC_TOKEN_DUPLICATED);
@@ -219,5 +213,12 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
         }
     }
 
-
+    private Boolean validateSessionAndToken(final Long reservationId){
+        if(this.mapSessions.containsKey(reservationId)
+                && this.mapSessionReservationsTokens.containsKey(reservationId)
+        ) {
+            return true;
+        }else
+            return false;
+    }
 }
