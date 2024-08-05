@@ -5,6 +5,8 @@ import com.bangguddle.ownbang.domain.asks.dto.AskContentCreateRequest;
 import com.bangguddle.ownbang.domain.asks.service.AskService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,14 +20,14 @@ public class AskController {
     private final AskService askService;
 
     @PostMapping("/{roomId}")
-    public ResponseEntity<Response<NoneResponse>> createAgentAsk(@AuthenticationPrincipal Long userId,
-                                                                   @PathVariable Long roomId) {
+    public ResponseEntity<Response<NoneResponse>> createAsk(@AuthenticationPrincipal Long userId,
+                                                            @PathVariable @Positive @Valid Long roomId) {
         return Response.success(askService.createAsk(userId, roomId));
     }
 
     @PostMapping
     public ResponseEntity<Response<NoneResponse>> createAskContent(@AuthenticationPrincipal Long userId,
-                                                                          @RequestBody AskContentCreateRequest request) {
+                                                                          @RequestBody @Valid AskContentCreateRequest request) {
         return Response.success(askService.createAskContent(userId, request));
     }
 
