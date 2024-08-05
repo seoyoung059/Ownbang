@@ -6,6 +6,7 @@ import com.bangguddle.ownbang.domain.video.dto.VideoSearchResponse;
 import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import jakarta.validation.Valid;
 
 public interface VideoService {
 
@@ -13,9 +14,9 @@ public interface VideoService {
     SuccessResponse<VideoSearchResponse> getVideo(Long userId, Long videoId);
 
     // 단건 저장 -> Webrtc에서 호출 예정
-    SuccessResponse<NoneResponse> registerVideo(VideoRecordRequest request);
+    SuccessResponse<NoneResponse> registerVideo(@Valid VideoRecordRequest request);
 
     // 단건 수정 -> API 주 기능
-    SuccessResponse<NoneResponse> modifyVideo(VideoUpdateRequest request, Long videoId);
+    SuccessResponse<NoneResponse> modifyVideo(@Valid VideoUpdateRequest request, Long videoId);
 
 }
