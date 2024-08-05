@@ -83,7 +83,7 @@ const RealEstatePage = () => {
             position: "fixed",
             zIndex: "999",
             padding: "20px",
-            right: 0,
+            right: 48,
             top: 100,
           }}
         >
