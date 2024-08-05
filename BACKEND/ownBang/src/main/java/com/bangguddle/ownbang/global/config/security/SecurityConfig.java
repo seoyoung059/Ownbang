@@ -37,6 +37,7 @@ public class SecurityConfig {
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
             "/rooms/agents/**",
+            "/agents/mypage",
     };
     private final UserDetailsService userDetailsService;
     private final JwtTokenFilter jwtTokenFilter;
