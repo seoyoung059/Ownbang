@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.checklist.service.impl;
 
+import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchAllResponse;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistUpdateRequest;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchResponse;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistTemplateCreateRequest;
@@ -13,6 +14,8 @@ import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
@@ -52,6 +55,19 @@ public class ChecklistServiceImpl implements ChecklistService {
         // 반환
         ChecklistSearchResponse response = ChecklistSearchResponse.from(checklist);
         return new SuccessResponse<>(CHECKLIST_FIND_SUCCESS, response);
+    }
+
+    @Override
+    public SuccessResponse<ChecklistSearchAllResponse> getChecklistTemplates(Long userId) {
+        // userid 유효성 검사
+        userRepository.getById(userId);
+
+        // checklists 조회
+        List<Checklist> checklists = checklistRepository.findByUserIdAndIsTemplateTrue(userId);
+
+        // 반환
+        ChecklistSearchAllResponse response = ChecklistSearchAllResponse.from(checklists);
+        return new SuccessResponse<>(CHECKLIST_TEMPLATE_FIND_ALL_SUCCESS, response);
     }
 
     @Override

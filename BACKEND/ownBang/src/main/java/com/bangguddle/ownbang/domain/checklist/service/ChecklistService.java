@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.checklist.service;
 
+import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchAllResponse;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchResponse;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistTemplateCreateRequest;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistUpdateRequest;
@@ -9,6 +10,7 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 public interface ChecklistService {
     SuccessResponse<NoneResponse> registerChecklistTemplate(Long userId, ChecklistTemplateCreateRequest request);
     SuccessResponse<ChecklistSearchResponse> getChecklist(Long userId, Long checklistId);
+    SuccessResponse<ChecklistSearchAllResponse> getChecklistTemplates(Long userId);
     SuccessResponse<NoneResponse> modifyChecklistTemplate(Long userId, Long checklistId,
                                                           ChecklistUpdateRequest request);
     SuccessResponse<NoneResponse> removeChecklistTemplate(Long userId, Long checklistId);

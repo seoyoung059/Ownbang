@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.checklist.controller;
 
+import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchAllResponse;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchResponse;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistTemplateCreateRequest;
 import com.bangguddle.ownbang.domain.checklist.dto.ChecklistUpdateRequest;
@@ -34,6 +35,13 @@ public class ChecklistController {
             @AuthenticationPrincipal Long userId,
             @PathVariable @Positive @Valid Long checklistId) {
         SuccessResponse<ChecklistSearchResponse> response = checklistService.getChecklist(userId, checklistId);
+        return Response.success(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<Response<ChecklistSearchAllResponse>> getChecklistTemplates(
+            @AuthenticationPrincipal Long userId) {
+        SuccessResponse<ChecklistSearchAllResponse> response = checklistService.getChecklistTemplates(userId);
         return Response.success(response);
     }
 
