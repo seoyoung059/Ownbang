@@ -39,7 +39,7 @@ public class WebrtcAgentService implements WebrtcService {
         Long reservationId = request.reservationId();
         validateReservation(reservationId);
 
-        // session 중복 검사 - private 전환
+        // session 중복 검사
         webrtcSessionService.getSession(reservationId).ifPresent(
                 i -> {throw new AppException(WEBRTC_SESSION_DUPLICATED);});
 
@@ -63,7 +63,7 @@ public class WebrtcAgentService implements WebrtcService {
         Long reservationId = request.reservationId();
         validateReservation(reservationId);
 
-        // session 유효성 검사 - private 전환
+        // session 유효성 검사
         webrtcSessionService.getSession(reservationId).orElseThrow(
                 () -> new AppException(BAD_REQUEST));
 
