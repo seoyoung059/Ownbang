@@ -120,6 +120,13 @@ public class RoomServiceImpl implements RoomService {
         return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room));
     }
 
+    /**
+     * 특정 중개인이 올린 Room 검색 메서드
+     * @param userId
+     * @param page
+     * @param size
+     * @return
+     */
     @Override
     public SuccessResponse<List<RoomInfoSearchResponse>> getAgentRooms(Long userId, int page, int size) {
         Agent agent = agentRepository.getByUserId(userId);
