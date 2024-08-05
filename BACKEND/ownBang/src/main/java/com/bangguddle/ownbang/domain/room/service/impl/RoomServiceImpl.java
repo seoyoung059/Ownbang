@@ -67,7 +67,7 @@ public class RoomServiceImpl implements RoomService {
      */
     @Override
     @Transactional
-    public SuccessResponse<NoneResponse> updateRoom(Long userId, Long roomId, RoomUpdateRequest request, List<MultipartFile> roomImageFiles) {
+    public SuccessResponse<NoneResponse> modifyRoom(Long userId, Long roomId, RoomUpdateRequest request, List<MultipartFile> roomImageFiles) {
         Room existingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
         validateAgent(userId, existingRoom);

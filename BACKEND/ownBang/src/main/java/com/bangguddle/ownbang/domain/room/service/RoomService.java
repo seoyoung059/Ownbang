@@ -15,7 +15,7 @@ public interface RoomService {
     SuccessResponse<NoneResponse> createRoom(Long userId, RoomCreateRequest request, List<MultipartFile> roomImageFiles);
 
     // 매물 수정
-    SuccessResponse<NoneResponse> updateRoom(Long userId, Long roomId, RoomUpdateRequest request, List<MultipartFile> roomImageFiles) ;
+    SuccessResponse<NoneResponse> modifyRoom(Long userId, Long roomId, RoomUpdateRequest request, List<MultipartFile> roomImageFiles) ;
 
 
     // 매물 삭제

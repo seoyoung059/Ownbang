@@ -192,7 +192,7 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 성공")
-    void updateRoomTest_SUCCESS() throws ParseException {
+    void modifyRoomTest_SUCCESS() throws ParseException {
         // DTO
         Long userId = 1L, roomId = 1L;
 
@@ -236,7 +236,7 @@ class RoomServiceImplTest {
 
 
         // when
-        SuccessResponse<NoneResponse> response = roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles);
+        SuccessResponse<NoneResponse> response = roomServiceImpl.modifyRoom(userId, roomId, roomUpdateRequest, roomImageFiles);
 
         // then
         assertThat(response).isNotNull();
@@ -251,7 +251,7 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 실패: 존재하지 않는 매물")
-    void updateRoomTest_RoomIdNotExist() throws ParseException {
+    void modifyRoomTest_RoomIdNotExist() throws ParseException {
         // DTO
         Long userId = 1L, roomId = 1L;
 
@@ -284,7 +284,7 @@ class RoomServiceImplTest {
 
         // 매물 생성
         assertThatThrownBy(()->
-            roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
+            roomServiceImpl.modifyRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
         ).isInstanceOf(AppException.class);
 
 
@@ -294,7 +294,7 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 실패: 이미지 업로드 실패")
-    void updateRoomTest_ImageUploadFailed() throws ParseException {
+    void modifyRoomTest_ImageUploadFailed() throws ParseException {
         // DTO
         Long userId = 1L, roomId = 1L;
 
@@ -337,7 +337,7 @@ class RoomServiceImplTest {
 
         // 매물 생성
         assertThatThrownBy(()->
-            roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
+            roomServiceImpl.modifyRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
         ).isInstanceOf(AppException.class);
 
 
@@ -347,7 +347,7 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 실패: 이미지 삭제 실패")
-    void updateRoomTest_ImageDeleteFailed() throws ParseException {
+    void modifyRoomTest_ImageDeleteFailed() throws ParseException {
         // DTO
         Long userId = 1L, roomId = 1L;
 
@@ -386,7 +386,7 @@ class RoomServiceImplTest {
 
         // 매물 생성
         assertThatThrownBy(()->
-            roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
+            roomServiceImpl.modifyRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
         ).isInstanceOf(AppException.class);
 
 

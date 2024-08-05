@@ -46,11 +46,11 @@ public class RoomController {
      * @return Success Response, 실패 시 AppException Throw
      */
     @PatchMapping("agents/{roomId}")
-    public ResponseEntity<Response<NoneResponse>> updateRoom(@AuthenticationPrincipal Long userId,
+    public ResponseEntity<Response<NoneResponse>> modifyRoom(@AuthenticationPrincipal Long userId,
                                                              @PathVariable(value = "roomId") @Valid @Positive Long roomId,
                                                              @RequestPart(value="roomUpdateRequest") @Valid RoomUpdateRequest request,
                                                              @RequestPart(value="roomImageFiles", required = false) List<MultipartFile> roomImageFiles) {
-        return Response.success(roomService.updateRoom(userId, roomId, request, roomImageFiles));
+        return Response.success(roomService.modifyRoom(userId, roomId, request, roomImageFiles));
     }
 
     /**

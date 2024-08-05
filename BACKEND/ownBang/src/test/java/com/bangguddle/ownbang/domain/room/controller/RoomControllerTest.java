@@ -290,7 +290,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 성공")
     @WithMockUser
-    public void updateRoom_Success() throws Exception {
+    public void modifyRoom_Success() throws Exception {
         // DTO
         Long roomId = 1L;
 
@@ -319,7 +319,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(any(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(any(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
@@ -346,7 +346,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 실패: 유효하지 않은 매물 ID")
     @WithMockUser
-    public void updateRoom_Fail_InvalidId() throws Exception {
+    public void modifyRoom_Fail_InvalidId() throws Exception {
         // DTO
         Long roomId = -1L;
 
@@ -375,7 +375,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
@@ -399,7 +399,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 실패: 유효하지 않은 매물 ID")
     @WithMockUser
-    public void updateRoom_Fail_invalidId() throws Exception {
+    public void modifyRoom_Fail_invalidId() throws Exception {
         // DTO
         Long roomId = -1L;
 
@@ -428,7 +428,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
@@ -452,7 +452,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 실패: RoomId 누락")
     @WithMockUser
-    public void updateRoom_Fail_NoId() throws Exception {
+    public void modifyRoom_Fail_NoId() throws Exception {
         // DTO
         Long roomId = 1L;
 
@@ -481,7 +481,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
@@ -506,7 +506,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 실패: 유효하지 않은 필드값")
     @WithMockUser
-    public void updateRoom_Fail_InvalidField() throws Exception {
+    public void modifyRoom_Fail_InvalidField() throws Exception {
         // DTO
         Long roomId = 1L;
 
@@ -535,7 +535,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
