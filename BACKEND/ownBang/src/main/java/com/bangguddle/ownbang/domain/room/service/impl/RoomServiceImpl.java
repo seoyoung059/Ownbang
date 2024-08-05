@@ -48,10 +48,12 @@ public class RoomServiceImpl implements RoomService {
         RoomAppliances roomAppliances = request.roomAppliancesCreateRequest().toEntity();
         Room room = request.toEntity(agent, roomAppliances, roomDetail);
 
-        for (MultipartFile roomImageFile : roomImageFiles) {
-            // TODO: S3 업로드 시 변경하기!!!!
+        if(roomImageFiles!=null && !roomImageFiles.isEmpty()) {
+            for (MultipartFile roomImageFile : roomImageFiles) {
+                // TODO: S3 업로드 시 변경하기!!!!
 //            roomImageServiceImpl.uploadImageToS3(roomImageFile, room);
-            roomImageServiceImpl.uploadImage(roomImageFile, room);
+                roomImageServiceImpl.uploadImage(roomImageFile, room);
+            }
         }
         roomRepository.save(room);
 
