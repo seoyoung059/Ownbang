@@ -11,4 +11,5 @@ public interface ChecklistService {
     SuccessResponse<ChecklistSearchResponse> getChecklist(Long userId, Long checklistId);
     SuccessResponse<NoneResponse> modifyChecklistTemplate(Long userId, Long checklistId,
                                                           ChecklistUpdateRequest request);
+    SuccessResponse<NoneResponse> removeChecklistTemplate(Long userId, Long checklistId);
 }

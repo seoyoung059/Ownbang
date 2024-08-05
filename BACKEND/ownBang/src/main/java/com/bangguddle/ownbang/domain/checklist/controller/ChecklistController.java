@@ -45,4 +45,12 @@ public class ChecklistController {
         SuccessResponse<NoneResponse> response = checklistService.modifyChecklistTemplate(userId, checklistId, request);
         return Response.success(response);
     }
+
+    @DeleteMapping("/{checklistId}")
+    public ResponseEntity<Response<NoneResponse>> removeChecklistTemplate(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable @Positive @Valid Long checklistId) {
+        SuccessResponse<NoneResponse> response = checklistService.removeChecklistTemplate(userId, checklistId);
+        return Response.success(response);
+    }
 }

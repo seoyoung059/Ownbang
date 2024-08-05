@@ -75,4 +75,19 @@ public class ChecklistServiceImpl implements ChecklistService {
 
         return new SuccessResponse<>(CHECKLIST_UPDATE_SUCCESS, NoneResponse.NONE);
     }
+
+    @Override
+    public SuccessResponse<NoneResponse> removeChecklistTemplate(Long userId, Long checklistId) {
+        // userid 유효성 검사
+        userRepository.getById(userId);
+
+        // checklistId 유효성 검사
+        Checklist checklist = checklistRepository.findChecklistByIdAndIsTemplate(checklistId, true)
+                .orElseThrow(() -> new AppException(BAD_REQUEST));
+
+        // remove
+        checklistRepository.delete(checklist);
+
+        return new SuccessResponse<>(CHECKLIST_REMOVE_SUCCESS, NoneResponse.NONE);
+    }
 }
