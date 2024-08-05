@@ -3,6 +3,7 @@ package com.bangguddle.ownbang.domain.webrtc.service.impl;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
+import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
@@ -33,12 +34,9 @@ public class WebrtcUserService implements WebrtcService {
 
     @Override
     public SuccessResponse<WebrtcTokenResponse> getToken(final WebrtcCreateTokenRequest request, final Long userId) {
-        // userId 유효성 검사
-        userRepository.getById(userId);
-
-        // reservationId 유효성 검사
+        // userId & reservationId 유효성 검사
         Long reservationId = request.reservationId();
-        validateReservation(reservationId);
+        validateUserAndReservation(userId, reservationId);
 
         // session 유효성 검사
         validateSession(reservationId);
@@ -58,12 +56,9 @@ public class WebrtcUserService implements WebrtcService {
 
     @Override
     public SuccessResponse<NoneResponse> removeToken(final WebrtcRemoveTokenRequest request, final Long userId) {
-        // userId 유효성 검사
-        userRepository.getById(userId);
-
-        // reservationId 유효성 검사
+        // userId & reservationId 유효성 검사
         Long reservationId = request.reservationId();
-        validateReservation(reservationId);
+        validateUserAndReservation(userId, reservationId);
 
         // session 유효성 검사
         validateSession(reservationId);
@@ -77,7 +72,10 @@ public class WebrtcUserService implements WebrtcService {
     }
 
 
-    private void validateReservation(final Long reservationId){
+    private void validateUserAndReservation(final Long userId, final Long reservationId){
+        // userId 유효성 검사
+        userRepository.getById(userId);
+
         // 예약 repo로 접근해 Reservation 을 얻어와 확인
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
                 () -> new AppException(RESERVATION_NOT_FOUND)
@@ -85,6 +83,10 @@ public class WebrtcUserService implements WebrtcService {
 
         if(reservation.getStatus() != ReservationStatus.CONFIRMED){
             throw new AppException(RESERVATION_STATUS_NOT_CONFIRMED);
+        }
+
+        if(reservation.getUserId() != userId){
+            throw new AppException(ACCESS_DENIED);
         }
     }
 
