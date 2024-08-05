@@ -33,7 +33,7 @@ public class WebrtcController {
      * @param request
      * @return Response WebrtcTokenResponse
      */
-    @RequestMapping(value = "/get-token", method = RequestMethod.POST)
+    @PostMapping(value = "/get-token")
     public ResponseEntity<Response<WebrtcTokenResponse>> getToken(@RequestBody @Valid WebrtcCreateTokenRequest request,
                                                                   @AuthenticationPrincipal Long userId,
                                                                   Authentication authentication
@@ -56,7 +56,7 @@ public class WebrtcController {
      * @param authentication
      * @return Response NoneResponse
      */
-    @RequestMapping(value = "/remove-token", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/remove-token")
     public ResponseEntity<Response<NoneResponse>> removeToken(@RequestBody @Valid WebrtcRemoveTokenRequest request,
                                                               @AuthenticationPrincipal Long userId,
                                                               Authentication authentication

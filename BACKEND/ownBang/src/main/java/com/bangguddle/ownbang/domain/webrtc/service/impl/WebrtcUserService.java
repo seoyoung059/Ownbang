@@ -3,6 +3,7 @@ package com.bangguddle.ownbang.domain.webrtc.service.impl;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
+import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
@@ -14,6 +15,7 @@ import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import io.openvidu.java.client.Recording;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,33 +25,21 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCESS;
 
 @Service
+@RequiredArgsConstructor
 public class WebrtcUserService implements WebrtcService {
 
     private final WebrtcSessionService webrtcSessionService;
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
 
-    public WebrtcUserService(final WebrtcSessionService webrtcSessionService,
-                             final ReservationRepository reservationRepository,
-                             final UserRepository userRepository
-    ){
-        this.webrtcSessionService = webrtcSessionService;
-        this.reservationRepository = reservationRepository;
-        this.userRepository = userRepository;
-    }
-
     @Override
     public SuccessResponse<WebrtcTokenResponse> getToken(final WebrtcCreateTokenRequest request, final Long userId) {
-        // userId 유효성 검사
-        userRepository.getById(userId);
-
-        // reservationId 유효성 검사
+        // userId & reservationId 유효성 검사
         Long reservationId = request.reservationId();
-        validateReservation(reservationId);
+        validateUserAndReservation(userId, reservationId);
 
-        // session 유효성 검사 - private 전환
-        webrtcSessionService.getSession(reservationId).orElseThrow(
-                () -> new AppException(BAD_REQUEST));
+        // session 유효성 검사
+        validateSession(reservationId);
 
         // token 생성
         String token = webrtcSessionService.createToken(reservationId, UserType.ROLE_USER)
@@ -66,16 +56,12 @@ public class WebrtcUserService implements WebrtcService {
 
     @Override
     public SuccessResponse<NoneResponse> removeToken(final WebrtcRemoveTokenRequest request, final Long userId) {
-        // userId 유효성 검사
-        userRepository.getById(userId);
-
-        // reservationId 유효성 검사
+        // userId & reservationId 유효성 검사
         Long reservationId = request.reservationId();
-        validateReservation(reservationId);
+        validateUserAndReservation(userId, reservationId);
 
-        // session 유효성 검사 - private 전환
-        webrtcSessionService.getSession(reservationId).orElseThrow(
-                () -> new AppException(BAD_REQUEST));
+        // session 유효성 검사
+        validateSession(reservationId);
 
         // token 제거
         String token = request.token();
@@ -86,7 +72,10 @@ public class WebrtcUserService implements WebrtcService {
     }
 
 
-    private void validateReservation(final Long reservationId){
+    private void validateUserAndReservation(final Long userId, final Long reservationId){
+        // userId 유효성 검사
+        userRepository.getById(userId);
+
         // 예약 repo로 접근해 Reservation 을 얻어와 확인
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
                 () -> new AppException(RESERVATION_NOT_FOUND)
@@ -95,5 +84,14 @@ public class WebrtcUserService implements WebrtcService {
         if(reservation.getStatus() != ReservationStatus.CONFIRMED){
             throw new AppException(RESERVATION_STATUS_NOT_CONFIRMED);
         }
+
+        if(reservation.getUserId() != userId){
+            throw new AppException(ACCESS_DENIED);
+        }
+    }
+
+    private void validateSession(final Long reservationId){
+        webrtcSessionService.getSession(reservationId).orElseThrow(
+                () -> new AppException(BAD_REQUEST));
     }
 }

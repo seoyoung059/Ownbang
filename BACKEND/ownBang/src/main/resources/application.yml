@@ -26,18 +26,6 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
-  school:
-    api: ${SCHOOL_API_KEY}
-
-  location:
-    api: ${LOCATION_API_KEY}
-
-  station:
-    api: ${STATION_API_KEY}
-
-  university:
-    api: ${STATION_API_KEY}
-
 server:
   port: ${PORT}
   ssl:

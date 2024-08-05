@@ -4,6 +4,7 @@ import com.bangguddle.ownbang.domain.webrtc.enums.UserType;
 import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
 import com.bangguddle.ownbang.global.handler.AppException;
 import io.openvidu.java.client.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 
 @Service
+@RequiredArgsConstructor
 public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     private static final OpenViduRole DEFAULT_ROLE = OpenViduRole.PUBLISHER;
@@ -21,16 +23,9 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     private static final Recording.OutputMode outputMode = Recording.OutputMode.INDIVIDUAL;
 
     private final OpenVidu openVidu;
-    private final Map<Long, Session> mapSessions;
-    private final Map<Long, Map<UserType, String>> mapSessionReservationsTokens;
-    private final Map<Long, Recording> mapSessionRecordings;
-
-    WebrtcSessionServiceImpl(final OpenVidu openVidu){
-        this.openVidu = openVidu;
-        this.mapSessions = new ConcurrentHashMap<>();
-        this.mapSessionReservationsTokens = new ConcurrentHashMap<>();
-        this.mapSessionRecordings = new ConcurrentHashMap<>();
-    }
+    private final Map<Long, Session> mapSessions = new ConcurrentHashMap<>();
+    private final Map<Long, Map<UserType, String>> mapSessionReservationsTokens = new ConcurrentHashMap<>();
+    private final Map<Long, Recording> mapSessionRecordings = new ConcurrentHashMap<>();
 
 
     @Override
@@ -63,9 +58,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<Session> removeSession(final Long reservationId) {
         // session 유효 확인
-        if (this.mapSessions.containsKey(reservationId)
-                && this.mapSessionReservationsTokens.containsKey(reservationId)
-        ) {
+        if (validateSessionAndToken(reservationId)) {
             Session session = this.mapSessions.get(reservationId);
 
             try {
@@ -88,9 +81,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<String> getToken(final Long reservationId, final UserType userType) {
         // session 유효 확인
-        if (this.mapSessions.containsKey(reservationId)
-                && this.mapSessionReservationsTokens.containsKey(reservationId)
-        ) {
+        if (validateSessionAndToken(reservationId)) {
             // userType과 role이 같은  token 반환
             return Optional.ofNullable(this.mapSessionReservationsTokens.get(reservationId).get(userType));
         }
@@ -100,11 +91,9 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     @Override
     public Optional<String> createToken(final Long reservationId, final UserType userType){
-        if (!this.mapSessions.containsKey(reservationId)
-                || !this.mapSessionReservationsTokens.containsKey(reservationId)
-        ) {
+        if (!validateSessionAndToken(reservationId)) {
             throw new AppException(BAD_REQUEST);
-        } else if(this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)){
+        } else if(existTokenUserType(reservationId,userType)){
             throw new AppException(WEBRTC_TOKEN_DUPLICATED);
         }
 
@@ -142,7 +131,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<String> removeToken(final Long reservationId, final String token, final UserType userType){
         if (this.mapSessions.containsKey(reservationId)
-                && this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)
+                && existTokenUserType(reservationId,userType)
         ) {
             if (this.mapSessionReservationsTokens.get(reservationId).get(userType).equals(token)
                     && this.mapSessionReservationsTokens.get(reservationId).remove(userType) != null
@@ -187,11 +176,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     @Override
     public Optional<Recording> stopRecord(final Long reservationId) {
-        if(!mapSessions.containsKey(reservationId)
-                || !mapSessionRecordings.containsKey(reservationId)
-        ) {
-            throw new AppException(BAD_REQUEST);
-        }
+        validateSessionAndRecord(reservationId);
 
         String recordingId = mapSessionRecordings.get(reservationId).getId();
 
@@ -206,11 +191,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     @Override
     public Optional<Recording> deleteRecord(final Long reservationId) {
-        if(!mapSessions.containsKey(reservationId)
-                || !mapSessionRecordings.containsKey(reservationId)
-        ) {
-            throw new AppException(BAD_REQUEST);
-        }
+        validateSessionAndRecord(reservationId);
 
         String recordingId = mapSessionRecordings.get(reservationId).getId();
 
@@ -224,5 +205,20 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
         }
     }
 
+    private Boolean validateSessionAndToken(final Long reservationId){
+        return this.mapSessions.containsKey(reservationId)
+                && this.mapSessionReservationsTokens.containsKey(reservationId);
+    }
 
+    private Boolean existTokenUserType(Long reservationId, UserType userType){
+        return this.mapSessionReservationsTokens.get(reservationId).containsKey(userType);
+    }
+
+    private void validateSessionAndRecord(Long reservationId){
+        if(!mapSessions.containsKey(reservationId)
+                || !mapSessionRecordings.containsKey(reservationId)
+        ) {
+            throw new AppException(BAD_REQUEST);
+        }
+    }
 }

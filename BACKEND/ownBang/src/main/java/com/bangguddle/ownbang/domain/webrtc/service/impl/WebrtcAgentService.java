@@ -14,6 +14,7 @@ import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import io.openvidu.java.client.Recording;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -22,20 +23,12 @@ import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 @Service
+@RequiredArgsConstructor
 public class WebrtcAgentService implements WebrtcService {
 
     private final WebrtcSessionService webrtcSessionService;
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
-
-    WebrtcAgentService(final WebrtcSessionService webrtcSessionService,
-                       final ReservationRepository reservationRepository,
-                       final UserRepository userRepository
-    ){
-        this.webrtcSessionService = webrtcSessionService;
-        this.reservationRepository = reservationRepository;
-        this.userRepository = userRepository;
-    }
 
     @Override
     public SuccessResponse<WebrtcTokenResponse> getToken(WebrtcCreateTokenRequest request, final Long userId) {
@@ -46,7 +39,7 @@ public class WebrtcAgentService implements WebrtcService {
         Long reservationId = request.reservationId();
         validateReservation(reservationId);
 
-        // session 중복 검사 - private 전환
+        // session 중복 검사
         webrtcSessionService.getSession(reservationId).ifPresent(
                 i -> {throw new AppException(WEBRTC_SESSION_DUPLICATED);});
 
@@ -70,7 +63,7 @@ public class WebrtcAgentService implements WebrtcService {
         Long reservationId = request.reservationId();
         validateReservation(reservationId);
 
-        // session 유효성 검사 - private 전환
+        // session 유효성 검사
         webrtcSessionService.getSession(reservationId).orElseThrow(
                 () -> new AppException(BAD_REQUEST));
 

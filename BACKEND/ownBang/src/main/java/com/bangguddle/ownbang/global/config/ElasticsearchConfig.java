@@ -1,4 +1,4 @@
-package com.bangguddle.ownbang.global.config.security;
+package com.bangguddle.ownbang.global.config;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.context.annotation.Bean;
