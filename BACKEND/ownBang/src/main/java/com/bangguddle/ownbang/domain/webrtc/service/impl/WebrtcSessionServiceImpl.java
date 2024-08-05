@@ -4,6 +4,7 @@ import com.bangguddle.ownbang.domain.webrtc.enums.UserType;
 import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
 import com.bangguddle.ownbang.global.handler.AppException;
 import io.openvidu.java.client.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 
 @Service
+@RequiredArgsConstructor
 public class WebrtcSessionServiceImpl implements WebrtcSessionService {
 
     private static final OpenViduRole DEFAULT_ROLE = OpenViduRole.PUBLISHER;
@@ -21,16 +23,9 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     private static final Recording.OutputMode outputMode = Recording.OutputMode.INDIVIDUAL;
 
     private final OpenVidu openVidu;
-    private final Map<Long, Session> mapSessions;
-    private final Map<Long, Map<UserType, String>> mapSessionReservationsTokens;
-    private final Map<Long, Recording> mapSessionRecordings;
-
-    WebrtcSessionServiceImpl(final OpenVidu openVidu){
-        this.openVidu = openVidu;
-        this.mapSessions = new ConcurrentHashMap<>();
-        this.mapSessionReservationsTokens = new ConcurrentHashMap<>();
-        this.mapSessionRecordings = new ConcurrentHashMap<>();
-    }
+    private final Map<Long, Session> mapSessions = new ConcurrentHashMap<>();
+    private final Map<Long, Map<UserType, String>> mapSessionReservationsTokens = new ConcurrentHashMap<>();
+    private final Map<Long, Recording> mapSessionRecordings = new ConcurrentHashMap<>();
 
 
     @Override
