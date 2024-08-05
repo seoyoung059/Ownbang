@@ -1,6 +1,6 @@
 package com.bangguddle.ownbang.domain.user.service.impl;
 
-import com.bangguddle.ownbang.domain.mypage.dto.ModifyMyPageRequest;
+import com.bangguddle.ownbang.domain.mypage.dto.MyPageModifyRequest;
 import com.bangguddle.ownbang.domain.mypage.dto.MyPageResponse;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
     // s3 관련 추후 수정
     @Override
-    public SuccessResponse<NoneResponse> modifyMyPage(MultipartFile file, ModifyMyPageRequest request, Long id) {
+    public SuccessResponse<NoneResponse> modifyMyPage(MultipartFile file, MyPageModifyRequest request, Long id) {
         User user = userRepository.getById(id);
 //        if (file != null)
 //            user.updateUserProfile(s3FileUploadService.uploadFile(file), request.nickname());
