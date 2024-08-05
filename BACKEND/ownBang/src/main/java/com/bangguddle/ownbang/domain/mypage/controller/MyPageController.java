@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class MyPageController {
     private final UserService userService;
     @GetMapping("")
-    public ResponseEntity<Response<MyPageResponse>> myPage(@AuthenticationPrincipal Long id) {
-        SuccessResponse<MyPageResponse> response = userService.myPage(id);
+    public ResponseEntity<Response<MyPageResponse>> getMyPage(@AuthenticationPrincipal Long id) {
+        SuccessResponse<MyPageResponse> response = userService.getMyPage(id);
         return Response.success(response);
     }
 }

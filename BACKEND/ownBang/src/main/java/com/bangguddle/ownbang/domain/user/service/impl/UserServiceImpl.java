@@ -16,7 +16,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public SuccessResponse<MyPageResponse> myPage(Long id) {
+    public SuccessResponse<MyPageResponse> getMyPage(Long id) {
         User user = userRepository.getById(id);
         MyPageResponse response = MyPageResponse.from(user);
         return new SuccessResponse<>(GET_MY_PAGE_SUCCESS, response);
