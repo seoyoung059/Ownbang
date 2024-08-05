@@ -14,6 +14,7 @@ import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import io.openvidu.java.client.Recording;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,20 +24,12 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCESS;
 
 @Service
+@RequiredArgsConstructor
 public class WebrtcUserService implements WebrtcService {
 
     private final WebrtcSessionService webrtcSessionService;
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
-
-    public WebrtcUserService(final WebrtcSessionService webrtcSessionService,
-                             final ReservationRepository reservationRepository,
-                             final UserRepository userRepository
-    ){
-        this.webrtcSessionService = webrtcSessionService;
-        this.reservationRepository = reservationRepository;
-        this.userRepository = userRepository;
-    }
 
     @Override
     public SuccessResponse<WebrtcTokenResponse> getToken(final WebrtcCreateTokenRequest request, final Long userId) {
