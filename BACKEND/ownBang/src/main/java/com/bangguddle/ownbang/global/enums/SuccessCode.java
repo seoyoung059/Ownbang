@@ -17,6 +17,9 @@ public enum SuccessCode implements ResponseCode {
     // Agent Auth API
     UPGRADE_SUCCESS(HttpStatus.CREATED, "중개인 계정으로 성공적으로 전환되었습니다."),
 
+    // My Page API
+    GET_MY_PAGE_SUCCESS(HttpStatus.OK, "내 정보 조회가 성공적으로 완료되었습니다."),
+
 
     // Room API
     ROOM_CREATE_SUCCESS(HttpStatus.CREATED, "매물이 성공적으로 등록되었습니다."),
