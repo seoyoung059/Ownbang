@@ -30,6 +30,7 @@ public class SecurityConfig {
             "/rooms", "/bookmarks",
             "/agents/auths/**",
             "/get-token", "/remove-token",
+            "/auths/password-check",
             "/videos"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {

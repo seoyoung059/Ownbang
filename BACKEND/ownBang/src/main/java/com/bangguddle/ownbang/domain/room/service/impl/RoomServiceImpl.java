@@ -1,21 +1,21 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
-import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomImageUpdateRequest;
-import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
-import com.bangguddle.ownbang.domain.room.dto.RoomUpdateRequest;
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
+import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
+import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
-import com.bangguddle.ownbang.domain.user.entity.User;
-import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +31,7 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomImageServiceImpl roomImageServiceImpl;
-    private final UserRepository userRepository;
+    private final AgentRepository agentRepository;
 
     /**
      * 매물 생성 Service 메서드
@@ -42,7 +42,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public SuccessResponse<NoneResponse> createRoom(Long userId, RoomCreateRequest request, List<MultipartFile> roomImageFiles) {
-        User agent = userRepository.getById(userId);
+        Agent agent = agentRepository.getByUserId(userId);
 
         RoomDetail roomDetail = request.roomDetailCreateRequest().toEntity();
         RoomAppliances roomAppliances = request.roomAppliancesCreateRequest().toEntity();
@@ -65,11 +65,9 @@ public class RoomServiceImpl implements RoomService {
      */
     @Override
     @Transactional
-    public SuccessResponse<NoneResponse> updateRoom(Long userId, Long roomId, RoomUpdateRequest request, List<MultipartFile> roomImageFiles) {
-        System.out.println("roomId = " + roomId);
+    public SuccessResponse<NoneResponse> modifyRoom(Long userId, Long roomId, RoomUpdateRequest request, List<MultipartFile> roomImageFiles) {
         Room existingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
-        System.out.println("ROOM EXISTS = " + existingRoom);
         validateAgent(userId, existingRoom);
 
         existingRoom.updateFromDto(request);
@@ -120,11 +118,26 @@ public class RoomServiceImpl implements RoomService {
         return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room));
     }
 
+    /**
+     * 특정 중개인이 올린 Room 검색 메서드
+     * @param userId
+     * @param page
+     * @param size
+     * @return
+     */
+    @Override
+    public SuccessResponse<List<RoomInfoSearchResponse>> getAgentRooms(Long userId, int page, int size) {
+        Agent agent = agentRepository.getByUserId(userId);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        List<RoomInfoSearchResponse> list = roomRepository.getByAgentId(agent.getId(), pageable).stream()
+                .map(RoomInfoSearchResponse::from)
+                .toList();
+        return new SuccessResponse<>(ROOM_FIND_SUCCESS, list);
+    }
+
     private void validateAgent(Long userId, Room existingRoom) {
-        System.out.println("ValidateAgent");
-        User agent = userRepository.getById(userId);
+        Agent agent = agentRepository.getByUserId(userId);
         if(agent != existingRoom.getAgent())
             throw new AppException(ACCESS_DENIED);
-        System.out.println("finfin");
     }
 }

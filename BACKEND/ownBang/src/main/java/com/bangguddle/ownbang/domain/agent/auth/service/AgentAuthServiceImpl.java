@@ -1,7 +1,7 @@
 package com.bangguddle.ownbang.domain.agent.auth.service;
 
 import com.bangguddle.ownbang.domain.agent.auth.dto.AgentSignUpRequest;
-import com.bangguddle.ownbang.domain.agent.auth.repository.AgentRepository;
+import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
