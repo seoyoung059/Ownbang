@@ -38,6 +38,9 @@ public enum ErrorCode implements ResponseCode {
     // Bookmark API
     BOOKMARK_DUPLICATED(HttpStatus.CONFLICT, "이미 존재하는 북마크입니다."),
 
+    // Checklist API
+    CHECKLIST_DUPLICATED(HttpStatus.CONFLICT, "이미 존재하는 체크리스트 템플릿입니다."),
+
     // Reservation API
     RESERVATION_DUPLICATED (HttpStatus.CONFLICT, " 이미 다른 사람이 신청된 예약 시간입니다. "),
     RESERVATION_COMPLETED(HttpStatus.CONFLICT, " 각 매물은 한 건씩만 예약이 가능합니다. "),
