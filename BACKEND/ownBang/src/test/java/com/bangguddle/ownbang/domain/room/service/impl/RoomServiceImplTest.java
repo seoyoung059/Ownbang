@@ -9,7 +9,6 @@ import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -417,21 +416,6 @@ class RoomServiceImplTest {
         assertThat(response.data()).size().isEqualTo(dataSize);
 
         verify(roomRepository, times(1)).getByAgentId(anyLong(), any(Pageable.class));
-    }
-
-
-    @Test
-    @DisplayName("중개인 매물 목록 조회 - 실패: 중개인이 아님(근데 이거 필터에서 걸러지기는 하는데 해야하나?)")
-    void getAgentRooms_Fail() {
-
-        Long userId = 1L; int page = 0, size = 10;
-
-        doThrow(new AppException(ErrorCode.ACCESS_DENIED)).when(agentRepository).getByUserId(userId);
-
-        // 매물 생성
-        assertThatThrownBy(()->
-                roomServiceImpl.getAgentRooms(userId, page, size)
-        ).isInstanceOf(AppException.class);
     }
 
 }
