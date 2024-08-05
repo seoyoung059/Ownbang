@@ -93,7 +93,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     public Optional<String> createToken(final Long reservationId, final UserType userType){
         if (!validateSessionAndToken(reservationId)) {
             throw new AppException(BAD_REQUEST);
-        } else if(this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)){
+        } else if(existTokenUserType(reservationId,userType)){
             throw new AppException(WEBRTC_TOKEN_DUPLICATED);
         }
 
@@ -131,7 +131,7 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     @Override
     public Optional<String> removeToken(final Long reservationId, final String token, final UserType userType){
         if (this.mapSessions.containsKey(reservationId)
-                && this.mapSessionReservationsTokens.get(reservationId).containsKey(userType)
+                && existTokenUserType(reservationId,userType)
         ) {
             if (this.mapSessionReservationsTokens.get(reservationId).get(userType).equals(token)
                     && this.mapSessionReservationsTokens.get(reservationId).remove(userType) != null
@@ -214,11 +214,11 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     }
 
     private Boolean validateSessionAndToken(final Long reservationId){
-        if(this.mapSessions.containsKey(reservationId)
-                && this.mapSessionReservationsTokens.containsKey(reservationId)
-        ) {
-            return true;
-        }else
-            return false;
+        return this.mapSessions.containsKey(reservationId)
+                && this.mapSessionReservationsTokens.containsKey(reservationId);
+    }
+
+    private Boolean existTokenUserType(Long reservationId, UserType userType){
+        return this.mapSessionReservationsTokens.get(reservationId).containsKey(userType);
     }
 }
