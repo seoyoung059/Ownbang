@@ -86,6 +86,7 @@ class WebrtcUserServiceTest {
     void 토큰_생성_성공() throws Exception {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getUserId()).thenReturn(userId);
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.createToken(reservationId, UserType.ROLE_USER))
@@ -105,12 +106,36 @@ class WebrtcUserServiceTest {
         // verify
         verify(webrtcSessionService, times(1)).createToken(any(), any());
     }
-    
+
+    @Test
+    @DisplayName("토큰 생성 실패 - 권한 없는 예약")
+    void 토큰_생성_실패__권한_없는_예약() throws Exception {
+        // given
+        Long invalidUserId = 100L;
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getUserId()).thenReturn(invalidUserId);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+
+        WebrtcCreateTokenRequest request = WebrtcCreateTokenRequest.builder().reservationId(reservationId).build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.getToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ACCESS_DENIED);
+
+        // verify
+        verify(webrtcSessionService, never()).createToken(any(), any());
+    }
+
     @Test
     @DisplayName("토큰 발급 실패 - 없는 세션")
     void 토큰_발급_실패__없는_세션() throws Exception {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getUserId()).thenReturn(userId);
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.empty());
 
@@ -195,6 +220,7 @@ class WebrtcUserServiceTest {
     void 토큰_발급_실패__이미_존재하는_토큰() throws Exception {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getUserId()).thenReturn(userId);
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.createToken(reservationId, UserType.ROLE_USER))
@@ -216,6 +242,7 @@ class WebrtcUserServiceTest {
     void 토큰_발급_실패__영상_녹화_실패() throws Exception {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getUserId()).thenReturn(userId);
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.createToken(reservationId, UserType.ROLE_USER))
@@ -241,6 +268,7 @@ class WebrtcUserServiceTest {
     void 토큰_삭제_성공() throws Exception {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getUserId()).thenReturn(userId);
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.removeToken(reservationId, "test-token", USER))
@@ -260,6 +288,32 @@ class WebrtcUserServiceTest {
 
         // verify
         verify(webrtcSessionService, times(1)).removeToken(any(),any(),any());
+    }
+
+    @Test
+    @DisplayName("토큰 삭제 실패 - 권한 없는 예약")
+    void 토큰_삭제_실패__권한_없는_예약() throws Exception {
+        // given
+        Long invalidUserId = 100L;
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getUserId()).thenReturn(invalidUserId);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+
+        WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
+                .reservationId(reservationId)
+                .token("test-token")
+                .build();
+
+        // when
+        Throwable thrown = catchThrowable(() -> webrtcService.removeToken(request, userId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ACCESS_DENIED);
+
+        // verify
+        verify(webrtcSessionService, never()).removeToken(any(), any(), any());
     }
 
     @Test
@@ -336,6 +390,7 @@ class WebrtcUserServiceTest {
     void 토큰_삭제_실패__없는_세션() throws Exception {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+        when(reservation.getUserId()).thenReturn(userId);
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.empty());
 
