@@ -5,6 +5,10 @@ import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
+import com.bangguddle.ownbang.domain.video.dto.VideoRecordRequest;
+import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
+import com.bangguddle.ownbang.domain.video.service.VideoService;
+import com.bangguddle.ownbang.domain.video.service.impl.VideoServiceImpl;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcTokenResponse;
@@ -28,6 +32,7 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCE
 @RequiredArgsConstructor
 public class WebrtcUserService implements WebrtcService {
 
+    private final VideoService videoService;
     private final WebrtcSessionService webrtcSessionService;
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
@@ -46,9 +51,19 @@ public class WebrtcUserService implements WebrtcService {
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
 
         // 영상 녹화 시작
-        Optional<Recording> recording = webrtcSessionService.startRecord(reservationId);
+        Recording recording = webrtcSessionService.startRecord(reservationId)
+                .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
 
-        // record 저장 - 추후 추가
+        // video 저장
+        VideoRecordRequest videoRecordRequest = VideoRecordRequest.builder()
+                .reservationId(reservationId)
+                .videoUrl("/openvidu/recordings/" +
+                        recording.getSessionId() + "/" +
+                        recording.getSessionId() + ".zip"
+                        )
+                .videoStatus(VideoStatus.RECORDING)
+                .build();
+        videoService.registerVideo(videoRecordRequest);
 
         // response 반환
         return new SuccessResponse<>(GET_TOKEN_SUCCESS, new WebrtcTokenResponse(token));

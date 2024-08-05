@@ -15,7 +15,7 @@ public record AgentSignUpRequest(
         return Agent.builder()
                 .officeAddress(officeAddress)
                 .licenseNumber(licenseNumber)
-                .officeAddress(officeAddress)
+                .officeNumber(officeNumber)
                 .officeName(officeName)
                 .user(user)
                 .build();
