@@ -6,6 +6,7 @@ import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
+import com.bangguddle.ownbang.domain.video.service.impl.VideoServiceImpl;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcTokenResponse;
@@ -41,6 +42,9 @@ import static org.mockito.Mockito.*;
 class WebrtcUserServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(WebrtcUserServiceTest.class);
+
+    @Mock
+    private VideoServiceImpl videoService;
 
     @Mock
     private ReservationRepository reservationRepository;
