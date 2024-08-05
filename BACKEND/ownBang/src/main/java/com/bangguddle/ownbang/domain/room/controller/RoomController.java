@@ -1,6 +1,7 @@
 package com.bangguddle.ownbang.domain.room.controller;
 
 import com.bangguddle.ownbang.domain.room.dto.RoomCreateRequest;
+import com.bangguddle.ownbang.domain.room.dto.RoomInfoSearchResponse;
 import com.bangguddle.ownbang.domain.room.dto.RoomSearchResponse;
 import com.bangguddle.ownbang.domain.room.dto.RoomUpdateRequest;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
@@ -8,6 +9,7 @@ import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -72,6 +74,14 @@ public class RoomController {
         return Response.success(roomService.getRoom(roomId));
     }
 
-    // 매물 이미지 업로드
-
+    /**
+     * 중개인이 올린 매물 목록 조회
+     * @param userId
+     * @return
+     */
+    @GetMapping("/agents")
+    public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getRooms(@AuthenticationPrincipal Long userId,
+                                                                           @RequestParam @PositiveOrZero @Valid int page) {
+        return Response.success(roomService.getAgentRooms(userId, page, 10));
+    }
 }
