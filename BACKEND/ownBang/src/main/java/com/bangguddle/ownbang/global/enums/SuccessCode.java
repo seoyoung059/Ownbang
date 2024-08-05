@@ -12,6 +12,7 @@ public enum SuccessCode implements ResponseCode {
     CHECK_EMAIL_DUPLICATE_SUCCESS(HttpStatus.OK, "이메일 중복 조회가 성공적으로 완료되었습니다."),
     CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS(HttpStatus.OK, "전화번호 중복 조회가 성공적으로 완료되었습니다."),
     LOGIN_SUCCESS(HttpStatus.CREATED, "로그인이 성공적으로 완료되었습니다."),
+    PASSWORD_CHECK_SUCCESS(HttpStatus.CREATED, "비밀번호 확인이 성공적으로 완료되었습니다."),
 
     // Agent Auth API
     UPGRADE_SUCCESS(HttpStatus.CREATED, "중개인 계정으로 성공적으로 전환되었습니다."),
@@ -35,6 +36,9 @@ public enum SuccessCode implements ResponseCode {
     ROOM_IMAGE_DELETE_SUCCESS(HttpStatus.OK, "사진이 성공적으로 삭제되었습니다."),
 
 
+    // Webrtc API
+    GET_TOKEN_SUCCESS(HttpStatus.CREATED, "토큰 발급이 성공적으로 완료되었습니다."),
+    REMOVE_TOKEN_SUCCESS(HttpStatus.OK, "토큰 삭제가 성공적으로 완료되었습니다."),
 
 
     //Reservation API

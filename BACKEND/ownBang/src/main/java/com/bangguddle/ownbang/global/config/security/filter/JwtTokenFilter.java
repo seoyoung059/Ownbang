@@ -34,7 +34,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private static final String[] REQUIRE_USER_ARRAY = {
             /* 임차인 권한 필요 URL */
             "/rooms", "/bookmarks",
-            "/agents/auths"
+            "/agents/auths",
+            "/get-token", "/remove-token",
+            "/auths/password-check"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
