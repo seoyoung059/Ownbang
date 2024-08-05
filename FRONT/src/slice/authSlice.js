@@ -39,7 +39,7 @@ export const createAuthSlice = (set) => ({
   logout: () => {
     localStorage.removeItem("accessToken");
     set({ isAuthenticated: false });
-    toast.success("로그아웃 완료되었습니다.", {
+    toast.success("로그아웃 완료", {
       position: "bottom-left",
       autoClose: 2000,
       hideProgressBar: true,

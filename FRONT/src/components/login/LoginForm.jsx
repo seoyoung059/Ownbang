@@ -1,5 +1,4 @@
-// 로그인 폼
-import * as React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import KakaoLoginButton from "./KakaoLoginButton";
@@ -15,11 +14,15 @@ import {
   Grid,
   Typography,
   Container,
+  keyframes,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import { useTheme, ThemeProvider } from "@mui/material/styles";
 
-// SignUp과 마찬가지로 카피라이트 작성 시 맨 아래 코드 활성화 하면 됩니다.
 function Copyright(props) {
   return (
     <Typography
@@ -38,38 +41,59 @@ function Copyright(props) {
   );
 }
 
+const shake = keyframes`
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+`;
+
 const LoginForm = () => {
   const { loginUser } = useBoundStore((state) => ({
     loginUser: state.loginUser,
   }));
   const theme = useTheme();
   const navigate = useNavigate();
+  const [loginFail, setLoginFail] = useState("");
+  const [shakeAnimation, setShakeAnimation] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("userId"),
-      password: data.get("password"),
-    });
     loginUser({
       email: data.get("userId"),
       password: data.get("password"),
-    }).then((res) => {
-      // 로그인 성공 시 TOAST 실패 시 다른 처리 추가
-      if (res.resultCode === "SUCCESS") {
-        toast.success(res.message, {
-          position: "bottom-left",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        navigate("/");
-      }
-    });
+    })
+      .then((res) => {
+        if (res.resultCode === "SUCCESS") {
+          toast.success("로그인 성공", {
+            position: "bottom-left",
+            autoClose: 2000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          navigate("/");
+        }
+      })
+      .catch((err) => {
+        setLoginFail(err.response.data.message);
+        setShakeAnimation(true);
+        setTimeout(() => setShakeAnimation(false), 300);
+      });
+  };
+
+  const handleChange = () => {
+    if (loginFail) {
+      setLoginFail("");
+    }
   };
 
   return (
@@ -91,7 +115,7 @@ const LoginForm = () => {
             sx={{ mt: 1 }}
           >
             <TextField
-              label="아이디"
+              label="이메일"
               id="userId"
               name="userId"
               margin="normal"
@@ -99,17 +123,52 @@ const LoginForm = () => {
               required
               fullWidth
               autoFocus
+              onChange={handleChange}
             />
             <TextField
               label="비밀번호"
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               margin="normal"
               autoComplete="current-password"
               required
               fullWidth
+              onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleTogglePasswordVisibility}
+                      edge="end"
+                    >
+                      {showPassword ? (
+                        <VisibilityOff
+                          sx={{ color: theme.palette.action.disabled }}
+                        />
+                      ) : (
+                        <Visibility
+                          sx={{ color: theme.palette.secondary.main }}
+                        />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
+            <Box sx={{ textAlign: "end", mr: 1, mt: 1 }}>
+              {loginFail && (
+                <Typography
+                  sx={{
+                    fontSize: theme.fontSize.small,
+                    color: "red",
+                    animation: shakeAnimation ? `${shake} 0.3s` : "none",
+                  }}
+                >
+                  {loginFail}
+                </Typography>
+              )}
+            </Box>
             <Button
               type="submit"
               fullWidth
@@ -124,8 +183,6 @@ const LoginForm = () => {
               로그인
             </Button>
             <KakaoLoginButton />
-
-            {/* 로그인 하기 버튼 하단에 위치한 부가 기능 */}
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">

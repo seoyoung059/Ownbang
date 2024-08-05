@@ -14,7 +14,6 @@ import {
 import { useTheme } from "@mui/material";
 import { useBoundStore } from "../../store/store";
 
-// 화면 하단에 사용하는 copyright인데 맨 아래 코드를 비활성화 시켜둠.
 function Copyright(props) {
   return (
     <Typography
@@ -33,7 +32,6 @@ function Copyright(props) {
   );
 }
 
-// 회원가입 폼
 const SignUp = () => {
   const {
     isDuplicatedEmail,
@@ -56,18 +54,33 @@ const SignUp = () => {
     userId: "",
     nickName: "",
     password: "",
+    passwordConfirm: "",
     userName: "",
     userPhoneNumber: "",
   });
 
   const [emailError, setEmailError] = useState("");
   const [emailChecked, setEmailChecked] = useState(false);
+  const [emailValidError, setEmailValidError] = useState("");
 
   const [phoneNumberError, setPhoneNumberError] = useState("");
   const [phoneNumberChecked, setPhoneNumberChecked] = useState(false);
 
-  // 이메일 중복 확인
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [passwordConfirmError, setPasswordConfirmError] = useState("");
+  const [passwordConfirmTouched, setPasswordConfirmTouched] = useState(false);
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordRegex =
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{9,16}$/;
+
   const handleEmailCheck = async () => {
+    if (!emailRegex.test(userData.userId)) {
+      setEmailValidError("유효한 이메일 주소를 입력해주세요.");
+      return;
+    }
+    setEmailValidError(""); // Clear any existing error message
     try {
       await duplicateCheckEmail(userData.userId);
       setEmailChecked(true);
@@ -77,7 +90,6 @@ const SignUp = () => {
     }
   };
 
-  // 전화번호 중복 확인
   const handlePhoneNumberCheck = async () => {
     try {
       const phoneNumber = userData.userPhoneNumber.split("-").join("");
@@ -89,7 +101,6 @@ const SignUp = () => {
     }
   };
 
-  // 중복 확인 변경 감지
   useEffect(() => {
     if (emailChecked) {
       if (isDuplicatedEmail) {
@@ -115,17 +126,59 @@ const SignUp = () => {
     if (event.target.name === "userId") {
       setEmailChecked(false);
       setEmailError("");
+      setEmailValidError("");
     }
     if (event.target.name === "userPhoneNumber") {
       setPhoneNumberChecked(false);
       setPhoneNumberError("");
     }
+    if (event.target.name === "password") {
+      setPasswordTouched(false);
+      setPasswordError("");
+      setPasswordConfirmError("");
+    }
+    if (event.target.name === "passwordConfirm") {
+      setPasswordConfirmTouched(false);
+      setPasswordConfirmError("");
+    }
+  };
+
+  const handlePasswordBlur = (event) => {
+    const password = event.target.value;
+    setPasswordTouched(true);
+    if (password === "") {
+      setPasswordError("");
+    } else if (!passwordRegex.test(password)) {
+      setPasswordError("유효한 비밀번호가 아닙니다.");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const handlePasswordConfirmBlur = (event) => {
+    const passwordConfirm = event.target.value;
+    setPasswordConfirmTouched(true);
+    if (passwordConfirm !== userData.password) {
+      setPasswordConfirmError("비밀번호가 일치하지 않습니다.");
+    } else {
+      setPasswordConfirmError("");
+    }
+  };
+
+  const handleEmailBlur = (event) => {
+    const email = event.target.value;
+    if (email === "") {
+      setEmailValidError(""); // Clear error if email is empty
+    } else if (!emailRegex.test(email)) {
+      setEmailValidError("유효한 이메일 주소를 입력해주세요.");
+    } else {
+      setEmailValidError(""); // Clear error if email is valid
+    }
   };
 
   const handleCallNumberChange = (event) => {
-    let formattedPhoneNumber = event.target.value.replace(/[^\d]/g, ""); // 숫자 이외의 문자 모두 제거
+    let formattedPhoneNumber = event.target.value.replace(/[^\d]/g, "");
 
-    // 전화번호 형식에 맞춰 '-' 기호 삽입
     if (formattedPhoneNumber.length > 3 && formattedPhoneNumber.length <= 7) {
       formattedPhoneNumber = formattedPhoneNumber.replace(
         /(\d{3})(\d{4})/,
@@ -144,7 +197,6 @@ const SignUp = () => {
     }));
   };
 
-  // 회원가입 성공 시 TOAST,  에러 처리 추가해야댐
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -156,7 +208,7 @@ const SignUp = () => {
       phoneNumber: data.get("userPhoneNumber").split("-").join(""),
     }).then((res) => {
       if (res === "SUCCESS") {
-        toast.success("회원가입에 성공했습니다.", {
+        toast.success("회원가입 완료", {
           position: "bottom-left",
           autoClose: 2000,
           hideProgressBar: true,
@@ -187,7 +239,7 @@ const SignUp = () => {
           <Grid container spacing={4}>
             <Grid item xs={12}>
               <TextField
-                label="아이디"
+                label="이메일"
                 name="userId"
                 id="userId"
                 required
@@ -195,12 +247,21 @@ const SignUp = () => {
                 autoFocus
                 value={userData.userId}
                 onChange={handleChange}
+                onBlur={handleEmailBlur}
+                error={emailValidError !== ""}
+                helperText={emailValidError || " "}
+                FormHelperTextProps={{
+                  style: {
+                    fontSize: theme.fontSize.small,
+                    color: emailValidError ? "red" : "inherit",
+                  },
+                }}
               />
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Button
                   variant="text"
                   onClick={handleEmailCheck}
-                  disabled={!userData.userId}
+                  disabled={!userData.userId || emailValidError !== ""}
                   sx={{ mt: 1 }}
                 >
                   이메일 중복 확인
@@ -232,17 +293,71 @@ const SignUp = () => {
                 fullWidth
                 value={userData.password}
                 onChange={handleChange}
-              />
-              <Typography
-                name="pwNotice"
-                style={{
-                  fontSize: theme.typography.body2.fontSize,
-                  marginTop: 10,
-                  marginLeft: 10,
+                onBlur={handlePasswordBlur}
+                error={passwordTouched && passwordError !== ""}
+                helperText={
+                  passwordTouched
+                    ? passwordError
+                      ? "유효한 비밀번호가 아닙니다.(9~16자리 영문 대소문자, 숫자, 특수문자)"
+                      : userData.password === ""
+                      ? "9~16자리 영문 대소문자, 숫자, 특수문자 조합"
+                      : "유효한 비밀번호입니다."
+                    : "9~16자리 영문 대소문자, 숫자, 특수문자 조합"
+                }
+                FormHelperTextProps={{
+                  style: {
+                    fontSize: theme.fontSize.small,
+                    color:
+                      passwordTouched &&
+                      !passwordError &&
+                      userData.password !== ""
+                        ? "green"
+                        : passwordTouched && passwordError
+                        ? "red"
+                        : "inherit",
+                  },
                 }}
-              >
-                9~16자리 영문 대소문자, 숫자, 특수문자 조합
-              </Typography>
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="비밀번호 확인"
+                name="passwordConfirm"
+                type="password"
+                id="passwordConfirm"
+                required
+                fullWidth
+                value={userData.passwordConfirm}
+                onChange={handleChange}
+                onBlur={handlePasswordConfirmBlur}
+                error={
+                  passwordConfirmTouched &&
+                  userData.passwordConfirm !== "" &&
+                  passwordConfirmError !== ""
+                }
+                helperText={
+                  passwordConfirmTouched
+                    ? userData.passwordConfirm === ""
+                      ? " "
+                      : passwordConfirmError !== ""
+                      ? "비밀번호가 일치하지 않습니다."
+                      : "비밀번호가 일치합니다."
+                    : " "
+                }
+                FormHelperTextProps={{
+                  style: {
+                    fontSize: theme.fontSize.small,
+                    color:
+                      passwordConfirmTouched &&
+                      userData.passwordConfirm !== "" &&
+                      passwordConfirmError !== ""
+                        ? "red"
+                        : passwordConfirmTouched && passwordConfirmError === ""
+                        ? "green"
+                        : "inherit",
+                  },
+                }}
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -313,14 +428,17 @@ const SignUp = () => {
               emailError === "이미 사용 중인 이메일입니다." ||
               !emailChecked ||
               phoneNumberError === "이미 사용 중인 전화번호입니다." ||
-              !phoneNumberChecked
+              !phoneNumberChecked ||
+              passwordError !== "" ||
+              userData.password === "" ||
+              passwordConfirmError !== "" ||
+              userData.passwordConfirm === ""
             }
           >
             회원가입 하기
           </Button>
         </Box>
       </Box>
-      {/* <Copyright sx={{ mt: 5 }} /> */}
     </Container>
   );
 };
