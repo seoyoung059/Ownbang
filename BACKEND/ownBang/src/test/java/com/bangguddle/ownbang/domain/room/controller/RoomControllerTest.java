@@ -29,10 +29,9 @@ import java.util.List;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.BAD_REQUEST;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.METHOD_NOT_ALLOWED;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -291,7 +290,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 성공")
     @WithMockUser
-    public void updateRoom_Success() throws Exception {
+    public void modifyRoom_Success() throws Exception {
         // DTO
         Long roomId = 1L;
 
@@ -320,7 +319,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(any(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(any(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
@@ -347,7 +346,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 실패: 유효하지 않은 매물 ID")
     @WithMockUser
-    public void updateRoom_Fail_InvalidId() throws Exception {
+    public void modifyRoom_Fail_InvalidId() throws Exception {
         // DTO
         Long roomId = -1L;
 
@@ -376,7 +375,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
@@ -400,7 +399,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 실패: 유효하지 않은 매물 ID")
     @WithMockUser
-    public void updateRoom_Fail_invalidId() throws Exception {
+    public void modifyRoom_Fail_invalidId() throws Exception {
         // DTO
         Long roomId = -1L;
 
@@ -429,7 +428,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
@@ -453,7 +452,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 실패: RoomId 누락")
     @WithMockUser
-    public void updateRoom_Fail_NoId() throws Exception {
+    public void modifyRoom_Fail_NoId() throws Exception {
         // DTO
         Long roomId = 1L;
 
@@ -482,7 +481,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
@@ -507,7 +506,7 @@ class RoomControllerTest {
     @Test
     @DisplayName("매물 수정 - 실패: 유효하지 않은 필드값")
     @WithMockUser
-    public void updateRoom_Fail_InvalidField() throws Exception {
+    public void modifyRoom_Fail_InvalidField() throws Exception {
         // DTO
         Long roomId = 1L;
 
@@ -536,7 +535,7 @@ class RoomControllerTest {
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
 
         // mock
-        given(roomServiceImpl.updateRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
+        given(roomServiceImpl.modifyRoom(anyLong(), anyLong(), any(RoomUpdateRequest.class), any())).willReturn(success);
 
         // when
         mockMvc.perform(
@@ -555,5 +554,56 @@ class RoomControllerTest {
                 //then
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("중개인 매물 목록 조회 - 성공")
+    public void getAgentRooms_Success() throws Exception {
+        // DTO
+        Long roomId = 1L;
+        List<RoomInfoSearchResponse> roomInfos = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            roomInfos.add(mock(RoomInfoSearchResponse.class));
+        }
+        SuccessResponse<List<RoomInfoSearchResponse>> successResponse = new SuccessResponse<>(ROOM_FIND_SUCCESS, roomInfos);
+
+        // when
+        when(roomServiceImpl.getAgentRooms(any(), anyInt(), anyInt())).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                        get("/rooms/agents")
+                                .param("page", "0")
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()
+                                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("ROOM_FIND_SUCCESS"));
+    }
+
+
+    @Test
+    @WithMockUser
+    @DisplayName("중개인 매물 목록 조회 - 성공: page defaultValue 0")
+    public void getAgentRooms_Success_pageDefault() throws Exception {
+        // DTO
+        Long roomId = 1L;
+        List<RoomInfoSearchResponse> roomInfos = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            roomInfos.add(mock(RoomInfoSearchResponse.class));
+        }
+        SuccessResponse<List<RoomInfoSearchResponse>> successResponse = new SuccessResponse<>(ROOM_FIND_SUCCESS, roomInfos);
+
+        // when
+        when(roomServiceImpl.getAgentRooms(any(), anyInt(), anyInt())).thenReturn(successResponse);
+
+        //then
+        mockMvc.perform(
+                        get("/rooms/agents")
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()
+                                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("ROOM_FIND_SUCCESS"));
+
     }
 }

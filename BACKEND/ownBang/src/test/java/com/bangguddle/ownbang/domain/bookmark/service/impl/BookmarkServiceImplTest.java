@@ -50,8 +50,8 @@ class BookmarkServiceImplTest {
         Room room = mock(Room.class);
         User user = mock(User.class);
 
-        when(roomRepository.findById(roomId)).thenReturn(Optional.ofNullable(room));
-        when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        when(roomRepository.getById(roomId)).thenReturn(room);
+        when(userRepository.getById(userId)).thenReturn(user);
         when(room.getId()).thenReturn(roomId);
         when(user.getId()).thenReturn(userId);
         when(bookmarkRepository.existsBookmarkByRoomIdAndUserId(anyLong(), anyLong())).thenReturn(false);
@@ -72,7 +72,7 @@ class BookmarkServiceImplTest {
         // given
         Long roomId = 1L, userId = 1L;
 
-        doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(roomRepository).findById(roomId);
+        doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(roomRepository).getById(roomId);
 
         assertThatThrownBy(() ->
             bookmarkService.createBookmark(userId, roomId)
@@ -87,8 +87,12 @@ class BookmarkServiceImplTest {
         // given
         Long roomId = 1L, userId = 1L;
 
-        when(roomRepository.findById(roomId)).thenReturn(Optional.ofNullable(Room.builder().build()));
-        doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(userRepository).findById(roomId);
+        Room room = mock(Room.class);
+        User user = mock(User.class);
+
+        when(roomRepository.getById(roomId)).thenReturn(room);
+
+        doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(userRepository).getById(roomId);
 
         assertThatThrownBy(() ->
             bookmarkService.createBookmark(userId, roomId)
@@ -101,6 +105,13 @@ class BookmarkServiceImplTest {
     @DisplayName("북마크 삭제 - 성공")
     void deleteBookmark_Success() {
         Long userId = 1L, bookmarkId = 1L;
+
+        Bookmark bookmark = mock(Bookmark.class);
+        User user = mock(User.class);
+
+        when(bookmarkRepository.findById(any())).thenReturn(Optional.ofNullable(bookmark));
+        when(bookmark.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn(userId);
 
         SuccessResponse<NoneResponse> response = bookmarkService.deleteBookmark(userId, bookmarkId);
 
@@ -117,7 +128,7 @@ class BookmarkServiceImplTest {
     void deleteBookmarkTest_Fail_NotExits() {
         //given
         Long userId = 1L, bookmarkId = 1L;
-        doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(bookmarkRepository).deleteById(bookmarkId);
+//        doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(bookmarkRepository).deleteById(bookmarkId);
 
         //when, then
         assertThatThrownBy(() ->

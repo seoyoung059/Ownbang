@@ -1,5 +1,7 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
+import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
@@ -7,7 +9,6 @@ import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.enums.*;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
-import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,8 +41,9 @@ class RoomServiceImplTest {
     @Mock
     private RoomRepository roomRepository;
 
+
     @Mock
-    private UserRepository userRepository;
+    private AgentRepository agentRepository;
 
     @Mock
     private RoomImageServiceImpl roomImageServiceImpl;
@@ -69,7 +72,6 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
         // mock
-        when(userRepository.getById(anyLong())).thenReturn(agent);
         when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
         when(roomRepository.save(any(Room.class))).thenReturn(Room.builder().build()); // 추가된 부분
 
@@ -190,7 +192,7 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 성공")
-    void updateRoomTest_SUCCESS() throws ParseException {
+    void modifyRoomTest_SUCCESS() throws ParseException {
         // DTO
         Long userId = 1L, roomId = 1L;
 
@@ -234,7 +236,7 @@ class RoomServiceImplTest {
 
 
         // when
-        SuccessResponse<NoneResponse> response = roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles);
+        SuccessResponse<NoneResponse> response = roomServiceImpl.modifyRoom(userId, roomId, roomUpdateRequest, roomImageFiles);
 
         // then
         assertThat(response).isNotNull();
@@ -249,7 +251,7 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 실패: 존재하지 않는 매물")
-    void updateRoomTest_RoomIdNotExist() throws ParseException {
+    void modifyRoomTest_RoomIdNotExist() throws ParseException {
         // DTO
         Long userId = 1L, roomId = 1L;
 
@@ -282,7 +284,7 @@ class RoomServiceImplTest {
 
         // 매물 생성
         assertThatThrownBy(()->
-            roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
+            roomServiceImpl.modifyRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
         ).isInstanceOf(AppException.class);
 
 
@@ -292,7 +294,7 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 실패: 이미지 업로드 실패")
-    void updateRoomTest_ImageUploadFailed() throws ParseException {
+    void modifyRoomTest_ImageUploadFailed() throws ParseException {
         // DTO
         Long userId = 1L, roomId = 1L;
 
@@ -335,7 +337,7 @@ class RoomServiceImplTest {
 
         // 매물 생성
         assertThatThrownBy(()->
-            roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
+            roomServiceImpl.modifyRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
         ).isInstanceOf(AppException.class);
 
 
@@ -345,7 +347,7 @@ class RoomServiceImplTest {
 
     @Test
     @DisplayName("매물 수정 - 실패: 이미지 삭제 실패")
-    void updateRoomTest_ImageDeleteFailed() throws ParseException {
+    void modifyRoomTest_ImageDeleteFailed() throws ParseException {
         // DTO
         Long userId = 1L, roomId = 1L;
 
@@ -384,12 +386,36 @@ class RoomServiceImplTest {
 
         // 매물 생성
         assertThatThrownBy(()->
-            roomServiceImpl.updateRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
+            roomServiceImpl.modifyRoom(userId, roomId, roomUpdateRequest, roomImageFiles)
         ).isInstanceOf(AppException.class);
 
 
         verify(roomRepository, never()).save(any(Room.class));
 
+    }
+
+    @Test
+    @DisplayName("중개인 매물 목록 조회 - 성공")
+    void getAgentRooms_Success() {
+        Long userId = 1L, agentId = 1L; int page = 0, size = 10, dataSize = 8;
+        Agent agent = mock(Agent.class);
+        List<Room> rooms = new ArrayList<>();
+        for (int i = 0; i < dataSize; i++) {
+            rooms.add(Room.builder().agent(agent).build());
+        }
+
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+        when(roomRepository.getByAgentId(anyLong(), any(Pageable.class))).thenReturn(rooms);
+
+
+        SuccessResponse<List<RoomInfoSearchResponse>> response = roomServiceImpl.getAgentRooms(userId, page, size);
+
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(ROOM_FIND_SUCCESS);
+        assertThat(response.data()).size().isEqualTo(dataSize);
+
+        verify(roomRepository, times(1)).getByAgentId(anyLong(), any(Pageable.class));
     }
 
 }

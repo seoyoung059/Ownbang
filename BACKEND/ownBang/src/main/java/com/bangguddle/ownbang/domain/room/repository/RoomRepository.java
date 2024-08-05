@@ -2,13 +2,18 @@ package com.bangguddle.ownbang.domain.room.repository;
 
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.global.handler.AppException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.ROOM_NOT_FOUND;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
+
+    List<Room> getByAgentId(Long agentId, Pageable pageable);
 
     /**
      * 해당 ID의 매물이 존재하는지 확인
