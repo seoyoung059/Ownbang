@@ -1,14 +1,18 @@
 package com.bangguddle.ownbang.domain.auth.service.impl;
 
-import com.bangguddle.ownbang.domain.auth.dto.DuplicateResponse;
-import com.bangguddle.ownbang.domain.auth.dto.UserSignUpRequest;
+import com.bangguddle.ownbang.domain.auth.dto.*;
+import com.bangguddle.ownbang.global.dto.Tokens;
 import com.bangguddle.ownbang.domain.auth.service.AuthService;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
+import com.bangguddle.ownbang.global.config.security.JwtProvider;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
+import com.bangguddle.ownbang.global.repository.RedisRepository;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +25,9 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
+    private final RedisRepository redisRepository;
     @Override
     public SuccessResponse<NoneResponse> signUp(UserSignUpRequest request) {
         validateByEmail(request.email());
@@ -45,6 +52,27 @@ public class AuthServiceImpl implements AuthService {
         return new SuccessResponse<>(CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS, response);
     }
 
+    @Override
+    public SuccessResponse<Tokens> login(LoginRequest request) {
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                request.email(), request.password()
+        );
+        authenticationManager.authenticate(token);
+        Long userId = getByEmail(request.email()).getId();
+        Tokens tokens = jwtProvider.generateTokens(userId);
+        redisRepository.save(tokens);
+        redisRepository.saveValidTokens(tokens, userId);
+        return new SuccessResponse<>(LOGIN_SUCCESS, tokens);
+    }
+
+    @Override
+    public SuccessResponse<PasswordCheckResponse> passwordCheck(Long id, PasswordCheckRequest request) {
+        User user = userRepository.getById(id);
+        boolean isCorrect = passwordEncoder.matches(request.password(), user.getPassword());
+        PasswordCheckResponse response = new PasswordCheckResponse(isCorrect);
+        return new SuccessResponse<>(PASSWORD_CHECK_SUCCESS, response);
+    }
+
 
     private void validateByEmail(final String email) {
         if (userRepository.findByEmail(email).isPresent())
@@ -54,5 +82,10 @@ public class AuthServiceImpl implements AuthService {
     private void validateByPhoneNumber(final String phoneNumber) {
         if (userRepository.findByPhoneNumber(phoneNumber).isPresent())
             throw new AppException(PHONE_NUMBER_DUPLICATED);
+    }
+
+    private User getByEmail(final String email) {
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new AppException(EMAIL_DUPLICATED));
     }
 }

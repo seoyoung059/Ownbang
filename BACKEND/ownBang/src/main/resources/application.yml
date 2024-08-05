@@ -13,15 +13,29 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+    elasticsearch:
+      rest:
+        uris: http://localhost:9200
+
+  main:
+    allow-bean-definition-overriding: true
 
 server:
   port: ${PORT}
   ssl:
     enabled: false
+  servlet:
+    context-path: /api/
 
 openvidu:
-  url: ${ OPENVIDU_URL }
-  secret: ${ OPENVIDU_SECRET }
+  url: ${OPENVIDU_URL}
+  secret: ${OPENVIDU_SECRET}
 
 cloud:
   aws:
@@ -33,3 +47,16 @@ cloud:
     s3:
       bucket: ${aws_s3bucket}
 
+
+key:
+  secret : ${JWT_SECRET_KEY}
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /api-docs
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8

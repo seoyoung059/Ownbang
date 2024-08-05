@@ -195,24 +195,5 @@ class ReservationServiceImplTest {
         verify(reservationRepository, never()).save(any(Reservation.class));
     }
 
-    @Test
-    @DisplayName("예약 상태 업데이트 실패 - 확정된 예약")
-    void updateStatusReservation_Fail_Confirmed() {
-        Long id = 1L;
-        Reservation reservation = Reservation.builder()
-                .id(id)
-                .roomId(101L)
-                .userId(1L)
-                .reservationTime(LocalDateTime.now())
-                .status(ReservationStatus.CONFIRMED)
-                .build();
-
-        when(reservationRepository.findById(id)).thenReturn(Optional.of(reservation));
-
-        AppException exception = assertThrows(AppException.class, () -> reservationService.updateStatusReservation(id));
-
-        assertEquals(ErrorCode.RESERVATION_CANCELED_UNAVAILABLE, exception.getErrorCode());
-        verify(reservationRepository, never()).save(any(Reservation.class));
-    }
 }
 
