@@ -1,16 +1,27 @@
 import Axios from "./index";
 
-// api 명세 보면 대분류(prefix) 기준으로 나눠져 있으니 이 기준으로 요청 파일 구분할 예정
-
-export const login = async (email, password) => {
-  const response = await Axios.post("/auth/login", {
-    email,
-    password,
-  });
+// 이메일 중복 확인 API 요청
+export const checkEmail = async (email) => {
+  const response = await Axios.get(`/auths/duplicates/email?email=${email}`);
   return response.data;
 };
 
-export const logout = async () => {
-  const response = await Axios.post("/auth/logout");
+// 전화번호 중복 확인 API 요청
+export const checkPhoneNumber = async (phoneNumber) => {
+  const response = await Axios.get(
+    `/auths/duplicates/phone?phoneNumber=${phoneNumber}`
+  );
+  return response.data;
+};
+
+// 회원가입 API 요청
+export const signUp = async (userData) => {
+  const response = await Axios.post("/auths/sign-up", userData);
+  return response.data;
+};
+
+// 로그인 API 요청
+export const login = async (loginData) => {
+  const response = await Axios.post("/auths/login", loginData);
   return response.data;
 };
