@@ -6,11 +6,13 @@ import com.bangguddle.ownbang.global.handler.AppException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface AgentRepository extends JpaRepository<Agent, Long> {
     boolean existsByLicenseNumber(String licenseNumber);
-
+    Optional<Agent> findByUserId(Long userId);
     default Agent getByUserId(Long userId) {
-        return findById(userId).orElseThrow(()->new AppException(ErrorCode.ACCESS_DENIED));
+        return findByUserId(userId).orElseThrow(()->new AppException(ErrorCode.ACCESS_DENIED));
     };
 }
