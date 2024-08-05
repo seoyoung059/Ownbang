@@ -4,6 +4,9 @@ import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
+import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
+import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
+import com.bangguddle.ownbang.domain.video.service.VideoService;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcTokenResponse;
@@ -26,6 +29,7 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 @RequiredArgsConstructor
 public class WebrtcAgentService implements WebrtcService {
 
+    private final VideoService videoService;
     private final WebrtcSessionService webrtcSessionService;
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
@@ -68,7 +72,8 @@ public class WebrtcAgentService implements WebrtcService {
                 () -> new AppException(BAD_REQUEST));
 
         // 영상 녹화 중지
-        Optional<Recording> recording =  webrtcSessionService.stopRecord(reservationId);
+        Recording recording =  webrtcSessionService.stopRecord(reservationId)
+                .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
 
         // token 제거
         String token = request.token();
@@ -77,9 +82,28 @@ public class WebrtcAgentService implements WebrtcService {
         // session 제거
         webrtcSessionService.removeSession(reservationId);
 
-        // record 저장 - 추후 추가
-        
-        // record 변환 api 호출 - 추후 추가
+        /**
+         * record hls 변환
+         * 파일 위치: opt/openvidu/recordings/<ses_SESSION_ID>/<ses_SESSION_ID>.zip
+         * sessionId: recording.getSessionId()
+         */
+
+        /**
+         * video modify
+         *
+         * VideoUpdateRequest videoUpdateRequest =
+         *         VideoUpdateRequest.builder()
+         *               .videoUrl("여기 URL")
+         *               .videoStatus(VideoStatus.RECORDED)
+         *               .build();
+         *
+         * videoService.modify(videoUpdateRequest);
+         */
+
+        /**
+         * reocrd 제거
+         * webrtcSessionService.deleteRecord(reservationId)
+         */
 
         // response 반환
         return new SuccessResponse<>(REMOVE_TOKEN_SUCCESS, NoneResponse.NONE);

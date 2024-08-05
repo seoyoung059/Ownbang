@@ -30,7 +30,8 @@ public class SecurityConfig {
             "/rooms", "/bookmarks",
             "/agents/auths/**",
             "/get-token", "/remove-token",
-            "/auths/password-check"
+            "/auths/password-check",
+            "/videos"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
