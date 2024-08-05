@@ -13,9 +13,11 @@ import com.bangguddle.ownbang.domain.video.service.VideoService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
@@ -23,6 +25,7 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class VideoServiceImpl implements VideoService {
 
     private final ReservationRepository reservationRepository;
@@ -55,7 +58,7 @@ public class VideoServiceImpl implements VideoService {
      * @return NoneResponse
      */
     @Override
-    public SuccessResponse<NoneResponse> registerVideo(final VideoRecordRequest request) {
+    public SuccessResponse<NoneResponse> registerVideo(@Valid final VideoRecordRequest request) {
         // 예약 유효성 검사
         Long reservationId = request.reservationId();
         Reservation reservation = validateReservation(reservationId);
@@ -64,10 +67,7 @@ public class VideoServiceImpl implements VideoService {
         validateVideoByReservation(reservationId);
         
         // request 유효성 검사
-        if(request.videoUrl() == null
-                || request.videoUrl().equals("")
-                || request.videoStatus() != VideoStatus.RECORDING
-        ){
+        if(!equalToRecording(request.videoStatus())){
             throw new AppException(BAD_REQUEST);
         }
 
@@ -87,18 +87,17 @@ public class VideoServiceImpl implements VideoService {
      * @return NoneResponse
      */
     @Override
-    public SuccessResponse<NoneResponse> modifyVideo(final VideoUpdateRequest request, final Long videoId) {
+    public SuccessResponse<NoneResponse> modifyVideo(
+            @Valid final VideoUpdateRequest request, final Long videoId
+    ) {
         // 영상 유효성 검사
         Video video = validateVideo(videoId);
-        if(video.getVideoStatus() != VideoStatus.RECORDING){
+        if(!equalToRecording(video.getVideoStatus())){
             throw new AppException(VIDEO_DUPLICATE);
         }
 
         // request 유효성 검사
-        if(request.videoUrl() == null
-                || request.videoUrl().equals("")
-                || request.videoStatus() == VideoStatus.RECORDING
-        ){
+        if(equalToRecording(request.videoStatus())){
             throw new AppException(BAD_REQUEST);
         }
 
@@ -133,6 +132,10 @@ public class VideoServiceImpl implements VideoService {
     private Video validateVideo(final Long videoId){
         return videoRepository.findById(videoId)
                 .orElseThrow(() -> new AppException(BAD_REQUEST));
+    }
 
+    // 녹화 상태 확인
+    private Boolean equalToRecording(VideoStatus status){
+        return status == VideoStatus.RECORDING;
     }
 }
