@@ -26,6 +26,7 @@ public class Video {
     private String videoUrl;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private VideoStatus videoStatus;
 
     @Builder
