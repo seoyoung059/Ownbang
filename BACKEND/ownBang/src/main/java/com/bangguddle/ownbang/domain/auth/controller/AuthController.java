@@ -1,8 +1,6 @@
 package com.bangguddle.ownbang.domain.auth.controller;
 
-import com.bangguddle.ownbang.domain.auth.dto.DuplicateResponse;
-import com.bangguddle.ownbang.domain.auth.dto.LoginRequest;
-import com.bangguddle.ownbang.domain.auth.dto.UserSignUpRequest;
+import com.bangguddle.ownbang.domain.auth.dto.*;
 import com.bangguddle.ownbang.domain.auth.service.AuthService;
 import com.bangguddle.ownbang.global.dto.Tokens;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -10,6 +8,7 @@ import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,6 +39,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Response<Tokens>> login(@RequestBody LoginRequest request) {
         SuccessResponse<Tokens> response = authService.login(request);
+        return Response.success(response);
+    }
+
+    @PostMapping("/password-check")
+    public ResponseEntity<Response<PasswordCheckResponse>> passwordCheck(
+            @AuthenticationPrincipal Long id, @RequestBody PasswordCheckRequest request) {
+        SuccessResponse<PasswordCheckResponse> response = authService.passwordCheck(id, request);
         return Response.success(response);
     }
 
