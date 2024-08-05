@@ -7,6 +7,7 @@ const RealEstateMap = ({
   mark,
   onBoundsChange,
   onSelectMarker,
+  size,
 }) => {
   const realEstateData = useBoundStore((state) => state.realEstateData);
   const [map, setMap] = useState(null);
@@ -66,7 +67,7 @@ const RealEstateMap = ({
       }}
       style={{
         width: "100%",
-        height: "900px",
+        height: size ? size : "900px",
       }}
       level={7}
       onCreate={setMap}

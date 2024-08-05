@@ -1,30 +1,53 @@
-import { setCookie, getCookie, removeCookie } from "react-cookie";
+import { checkEmail, checkPhoneNumber, signUp, login } from "../api/auth";
+import { Cookies } from "react-cookie";
+import { toast } from "react-toastify";
 
-import { login, logout } from "../api/auth";
+const cookies = new Cookies();
 
-// 일단 이 정도로 구성해봤는데 통신하면서 수정-보완해야 할듯
-// 사용이 애매함 로그인 상태 검증 ?
+export const createAuthSlice = (set) => ({
+  isAuthenticated: false,
+  isDuplicatedEmail: false,
+  isDuplicatedPhoneNumber: false,
 
-export const authSlice = (set) => ({
-  isLogin: true,
-  email: "",
-  password: "",
-  doLogin: async () => {
-    const jwt = await login(email, password);
-    await setCookie("jwt", jwt, { path: "/" });
-    await set({ isLogin: true });
+  duplicateCheckEmail: async (email) => {
+    const result = await checkEmail(email);
+    set({ isDuplicatedEmail: result.data.isDuplicate });
   },
-  doLogout: async () => {
-    await logout();
-    await removeCookie("jwt", { path: "/" });
-    await set({ isLogin: false });
+
+  duplicateCheckPhoneNumber: async (phoneNumber) => {
+    const result = await checkPhoneNumber(phoneNumber);
+    set({ isDuplicatedPhoneNumber: result.data.isDuplicate });
   },
-  checkLogin: () => {
-    const jwt = getCookie("jwt");
-    if (jwt) {
-      set({ isLogin: true });
-    } else {
-      set({ isLogin: false });
-    }
+
+  makeUser: async (userData) => {
+    const result = await signUp(userData);
+    return result.resultCode;
+  },
+
+  loginUser: async (loginData) => {
+    const result = await login(loginData);
+    localStorage.setItem("accessToken", result.data.accessToken);
+    cookies.set("refreshToken", result.data.refreshToken);
+    set({ isAuthenticated: true });
+    return result;
+  },
+
+  isLogin: () => {
+    return localStorage.getItem("accessToken");
+  },
+
+  logout: () => {
+    localStorage.removeItem("accessToken");
+    set({ isAuthenticated: false });
+    toast.success("로그아웃 완료", {
+      position: "bottom-left",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
   },
 });
