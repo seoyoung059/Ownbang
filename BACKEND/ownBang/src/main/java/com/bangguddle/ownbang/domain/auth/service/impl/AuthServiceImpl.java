@@ -23,6 +23,7 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+    private static final int TOKEN_SPLIT_INDEX = 7;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -71,6 +72,14 @@ public class AuthServiceImpl implements AuthService {
         boolean isCorrect = passwordEncoder.matches(request.password(), user.getPassword());
         PasswordCheckResponse response = new PasswordCheckResponse(isCorrect);
         return new SuccessResponse<>(PASSWORD_CHECK_SUCCESS, response);
+    }
+
+    @Override
+    public SuccessResponse<NoneResponse> logout(String header, Long id) {
+        String accessToken = header.substring(TOKEN_SPLIT_INDEX);
+        redisRepository.delete(accessToken);
+        redisRepository.deleteValidTokens(id);
+        return new SuccessResponse<>(LOGOUT_SUCCESS, NoneResponse.NONE);
     }
 
 

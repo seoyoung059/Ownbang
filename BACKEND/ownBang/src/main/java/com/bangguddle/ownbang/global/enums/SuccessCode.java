@@ -13,6 +13,7 @@ public enum SuccessCode implements ResponseCode {
     CHECK_PHONE_NUMBER_DUPLICATE_SUCCESS(HttpStatus.OK, "전화번호 중복 조회가 성공적으로 완료되었습니다."),
     LOGIN_SUCCESS(HttpStatus.CREATED, "로그인이 성공적으로 완료되었습니다."),
     PASSWORD_CHECK_SUCCESS(HttpStatus.CREATED, "비밀번호 확인이 성공적으로 완료되었습니다."),
+    LOGOUT_SUCCESS(HttpStatus.CREATED, "로그아웃이 성공적으로 완료되었습니다."),
 
     // Agent Auth API
     UPGRADE_SUCCESS(HttpStatus.CREATED, "중개인 계정으로 성공적으로 전환되었습니다."),
@@ -24,17 +25,23 @@ public enum SuccessCode implements ResponseCode {
     ROOM_DELETE_SUCCESS(HttpStatus.OK, "매물이 성공적으로 삭제되었습니다."),
 
     ROOM_FIND_SUCCESS(HttpStatus.OK, "해당하는 ID의 매물을 찾았습니다."),
+    SEARCH_ROOM_SUCCESS(HttpStatus.OK, "매물 검색에 성공했습니다."),
 
     // Bookmark API
     BOOKMARK_CREATE_SUCCESS(HttpStatus.CREATED, "북마크가 성공적으로 등록되었습니다."),
     BOOKMARK_DELETE_SUCCESS(HttpStatus.OK, "북마크가 성공적으로 삭제되었습니다."),
     BOOKMARK_FIND_SUCCESS(HttpStatus.OK, "북마크 목록 조회가 성공적으로 완료되었습니다."),
 
-
-
     ROOM_IMAGE_UPLOAD_SUCCESS(HttpStatus.OK, "사진이 성공적으로 저장되었습니다."),
     ROOM_IMAGE_DELETE_SUCCESS(HttpStatus.OK, "사진이 성공적으로 삭제되었습니다."),
 
+    // Checklist API
+    CHECKLIST_TEMPLATE_CREATE_SUCCESS(HttpStatus.CREATED, "체크리스트 템플릿이 성공적으로 저장되었습니다."),
+    CHECKLIST_CREATE_SUCCESS(HttpStatus.CREATED, "체크리스트 정보가 성공적으로 저장되었습니다."),
+    CHECKLIST_FIND_SUCCESS(HttpStatus.OK, "체크리스트 조회가 성공적으로 완료되었습니다."),
+    CHECKLIST_TEMPLATE_FIND_ALL_SUCCESS(HttpStatus.OK, "체크리스트 템플릿 목록 조회가 성공적으로 완료되었습니다."),
+    CHECKLIST_UPDATE_SUCCESS(HttpStatus.OK, "체크리스트 정보가 성공적으로 수정되었습니다."),
+    CHECKLIST_REMOVE_SUCCESS(HttpStatus.OK, "체크리스트 템플릿이 성공적으로 삭제되었습니다."),
 
     // Webrtc API
     GET_TOKEN_SUCCESS(HttpStatus.CREATED, "토큰 발급이 성공적으로 완료되었습니다."),

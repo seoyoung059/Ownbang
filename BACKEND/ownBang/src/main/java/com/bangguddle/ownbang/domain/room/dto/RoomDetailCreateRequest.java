@@ -27,9 +27,7 @@ public record RoomDetailCreateRequest(
         Date approvalDate,
         Date firstRegistrationDate,
         Facing facing,
-        Purpose purpose,
-        String road,
-        String detailAddress
+        Purpose purpose
 ) {
 
     static public RoomDetailCreateRequest of(
@@ -44,9 +42,7 @@ public record RoomDetailCreateRequest(
             Date approvalDate,
             Date firstRegistrationDate,
             Facing facing,
-            Purpose purpose,
-            String road,
-            String detailAddress){
+            Purpose purpose){
         return RoomDetailCreateRequest.builder()
                 .roomCount(roomCount)
                 .bathroomCount(bathroomCount)
@@ -60,8 +56,6 @@ public record RoomDetailCreateRequest(
                 .firstRegistrationDate(firstRegistrationDate)
                 .facing(facing)
                 .purpose(purpose)
-                .road(road)
-                .detailAddress(detailAddress)
                 .build();
     }
 
@@ -79,8 +73,6 @@ public record RoomDetailCreateRequest(
                 .firstRegistrationDate(roomDetail.getFirstRegistrationDate())
                 .facing(roomDetail.getFacing())
                 .purpose(roomDetail.getPurpose())
-                .road(roomDetail.getRoad())
-                .detailAddress(roomDetail.getDetailAddress())
                 .build();
     }
 
@@ -98,8 +90,6 @@ public record RoomDetailCreateRequest(
                 .firstRegistrationDate(firstRegistrationDate)
                 .facing(facing)
                 .purpose(purpose)
-                .road(road)
-                .detailAddress(detailAddress)
                 .build();
     }
 }

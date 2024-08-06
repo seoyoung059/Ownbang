@@ -31,13 +31,16 @@ import java.util.Collection;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
+    private static final String ROLE_USER = "ROLE_USER", ROLE_AGENT = "ROLE_AGENT";
     private static final String[] REQUIRE_USER_ARRAY = {
             /* 임차인 권한 필요 URL */
             "/bookmarks",
             "/agents/auths",
+            "/logout",
             "/get-token", "/remove-token",
             "/auths/password-check",
-            "/videos"
+            "/videos",
+            "/checklists"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
@@ -88,8 +91,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private void authenticate(HttpServletRequest request, long userId) {
         User user = userRepository.getById(userId);
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        if (user.isAgent()) authorities.add(new SimpleGrantedAuthority("ROLE_AGENT"));
+        authorities.add(new SimpleGrantedAuthority(ROLE_USER));
+        if (user.isAgent()) authorities.add(new SimpleGrantedAuthority(ROLE_AGENT));
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userId, null, authorities);

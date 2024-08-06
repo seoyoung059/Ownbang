@@ -32,7 +32,8 @@ public record RoomCreateRequest(
         @PositiveOrZero
         Long maintenanceFee,
         String parcel,
-        String profileImageUrl,
+        String road,
+        String detailAddress,
         @Valid
         RoomAppliancesCreateRequest roomAppliancesCreateRequest,
         @Valid
@@ -53,7 +54,8 @@ public record RoomCreateRequest(
             Long monthlyRent,
             Long maintenanceFee,
             String parcel,
-            String profileImageUrl,
+            String road,
+            String detailAddress,
             RoomAppliancesCreateRequest roomAppliancesCreateRequest,
             RoomDetailCreateRequest roomDetailCreateRequest
     ) {
@@ -71,7 +73,8 @@ public record RoomCreateRequest(
                 .monthlyRent(monthlyRent)
                 .maintenanceFee(maintenanceFee)
                 .parcel(parcel)
-                .profileImageUrl(profileImageUrl)
+                .road(road)
+                .detailAddress(detailAddress)
                 .roomAppliancesCreateRequest(roomAppliancesCreateRequest)
                 .roomDetailCreateRequest(roomDetailCreateRequest)
                 .build();
@@ -93,7 +96,8 @@ public record RoomCreateRequest(
                 .monthlyRent(monthlyRent)
                 .maintenanceFee(maintenanceFee)
                 .parcel(parcel)
-                .profileImageUrl(profileImageUrl)
+                .road(road)
+                .detailAddress(detailAddress)
                 .roomAppliances(roomAppliances)
                 .roomDetail(roomDetail)
                 .build();
