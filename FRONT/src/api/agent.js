@@ -6,3 +6,8 @@ export const postRealEstate = (estateData) => {
   });
   return response;
 };
+
+export const getAllRealEstate = () => {
+  const response = Axios.get("/rooms/agents");
+  return response;
+};

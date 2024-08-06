@@ -32,6 +32,7 @@ export default function RealEstateRegisterPage() {
   const [visibleMarkers, setVisibleMarkers] = useState([]);
   const theme = useTheme();
   const [address, setAddress] = useState("");
+  const [parcel, setParcel] = useState("");
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
   const [open, setOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -55,7 +56,6 @@ export default function RealEstateRegisterPage() {
     deposit: "",
     monthlyRent: "",
     maintenanceFee: "",
-    parcel: "",
     profileImageUrl: "",
   });
 
@@ -86,8 +86,9 @@ export default function RealEstateRegisterPage() {
     detailAddress: "",
   });
 
-  const handleAddress = (newAddress) => {
+  const handleAddress = (newAddress, newParcel) => {
     setAddress(newAddress);
+    setParcel(newParcel);
     handleClose();
   };
 
@@ -158,6 +159,7 @@ export default function RealEstateRegisterPage() {
       ...basicInfo,
       latitude: coordinates.lat,
       longitude: coordinates.lng,
+      parcel: parcel,
       roomAppliancesCreateRequest: appliances,
       roomDetailCreateRequest: roomDetailCreateRequest,
     };
@@ -796,7 +798,18 @@ export default function RealEstateRegisterPage() {
         open={snackbarOpen}
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "center", horizontal: "center" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        sx={{
+          "& .MuiSnackbarContent-root": {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            position: "fixed",
+            bottom: "50%",
+            transform: "translateY(50%)",
+          },
+        }}
       >
         <Alert
           onClose={handleSnackbarClose}
