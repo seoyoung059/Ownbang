@@ -3,9 +3,12 @@ package com.bangguddle.ownbang.domain.webrtc.service.impl;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
+import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
+import com.bangguddle.ownbang.domain.video.entity.Video;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
+import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
 import com.bangguddle.ownbang.domain.video.service.VideoService;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
@@ -20,19 +23,20 @@ import io.openvidu.java.client.Recording;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
-import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCESS;
 
 @Service
 @RequiredArgsConstructor
 public class WebrtcAgentService implements WebrtcService {
 
     private final VideoService videoService;
+    private final StreamingService streamingService;
     private final WebrtcSessionService webrtcSessionService;
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
+    private final VideoRepository videoRepository;
 
     @Override
     public SuccessResponse<WebrtcTokenResponse> getToken(WebrtcCreateTokenRequest request, final Long userId) {
@@ -84,9 +88,10 @@ public class WebrtcAgentService implements WebrtcService {
 
         /**
          * record hls 변환
-         * 파일 위치: opt/openvidu/recordings/<ses_SESSION_ID>/<ses_SESSION_ID>.zip
+         * 파일 위치: opt/openvidu/recordings/<ses_SESSION_ID>/<ses_SESSION_ID>.zip // TODO: 환경변수 변경하기
          * sessionId: recording.getSessionId()
          */
+        SuccessResponse<String> uploadSuccess = streamingService.uploadStreaming(recording.getSessionId());
 
         /**
          * video modify
@@ -99,6 +104,13 @@ public class WebrtcAgentService implements WebrtcService {
          *
          * videoService.modify(videoUpdateRequest);
          */
+        Video video = videoRepository.findByReservationId(reservationId).orElseThrow(()->new AppException(INTERNAL_SERVER_ERROR));
+        VideoUpdateRequest videoUpdateRequest =
+                VideoUpdateRequest.builder()
+                                .videoUrl(uploadSuccess.data())
+                                .videoStatus(VideoStatus.RECORDED)
+                                .build();
+        videoService.modifyVideo(videoUpdateRequest, video.getId());
 
         /**
          * reocrd 제거
