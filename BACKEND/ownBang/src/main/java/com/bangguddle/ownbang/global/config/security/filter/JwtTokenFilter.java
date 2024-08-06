@@ -39,7 +39,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/logout",
             "/get-token", "/remove-token",
             "/auths/password-check",
-            "/videos"
+            "/videos",
+            "/checklists"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
