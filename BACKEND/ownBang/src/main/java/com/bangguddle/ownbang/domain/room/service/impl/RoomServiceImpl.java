@@ -50,9 +50,7 @@ public class RoomServiceImpl implements RoomService {
 
         if(roomImageFiles!=null && !roomImageFiles.isEmpty()) {
             for (MultipartFile roomImageFile : roomImageFiles) {
-                // TODO: S3 업로드 시 변경하기!!!!
-//            roomImageServiceImpl.uploadImageToS3(roomImageFile, room);
-                roomImageServiceImpl.uploadImage(roomImageFile, room);
+                roomImageServiceImpl.uploadImageToS3(roomImageFile, room);
             }
         }
         roomRepository.save(room);
@@ -87,7 +85,7 @@ public class RoomServiceImpl implements RoomService {
         // 추가 이미지 업로드
         if(roomImageFiles!=null && !roomImageFiles.isEmpty()) {
             for (MultipartFile roomImageFile : roomImageFiles) {
-                roomImageServiceImpl.uploadImage(roomImageFile, existingRoom);
+                roomImageServiceImpl.uploadImageToS3(roomImageFile, existingRoom);
             }
         }
 

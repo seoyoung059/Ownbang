@@ -7,7 +7,6 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface RoomImageService {
-    SuccessResponse<NoneResponse> uploadImage(MultipartFile roomImage, Room room) throws AppException;
 
     SuccessResponse<NoneResponse> uploadImageToS3(MultipartFile roomImage, Room room) throws AppException;
 

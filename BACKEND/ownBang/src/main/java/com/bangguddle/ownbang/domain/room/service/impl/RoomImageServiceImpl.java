@@ -37,39 +37,7 @@ public class RoomImageServiceImpl implements RoomImageService {
     private String s3RoomImagePath;
 
     /**
-     * 매물 이미지를 로컬에 업로드하기 위한 서비스 메서드
-     * @param roomImage MultipartFile 이미지 파일
-     * @param room 이미지를 업로드할 매물
-     * @return Success Response
-     * @throws AppException 매물 파일 저장 실패 시 AppException(IMAGE_UPLOAD_FAILED) 발생
-     */
-    @Override
-    @Transactional
-    public SuccessResponse<NoneResponse> uploadImage(MultipartFile roomImage, Room room) throws AppException {
-        validateImageFile(roomImage);
-
-        try {
-            //파일명: UUID + 사진 원래이름
-            String fileName = UUID.randomUUID().toString().replace("-", "") + "_" + roomImage.getOriginalFilename();
-
-            //실제 저장 경로
-            String dbFilePath = "/upload/roomImages/" + fileName;
-            Path filePath = Paths.get("src/main/resources/static", dbFilePath);
-
-            if (!Files.exists(filePath)) {
-                Files.createDirectories(filePath.getParent());
-            }
-            Files.write(filePath, roomImage.getBytes());
-            room.getRoomImages().add(new RoomImage(room, dbFilePath));
-
-            return new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
-        } catch (IOException e) {
-            throw new AppException(IMAGE_UPLOAD_FAILED);
-        }
-    }
-
-    /**
-     * 매물 이미지를 S3에 업로드하기 위한 서비스 메서드
+     * 매물 이미지를 S3에 업로드하기 위한 서비스 메서드, Multifile 상태의 파일을 바로 업로드
      * @param roomImage MultipartFile 이미지 파일
      * @param room 이미지를 업로드할 매물
      * @return Success Response
