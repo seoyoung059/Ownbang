@@ -208,4 +208,81 @@ class ReservationServiceImplTest {
         AppException exception = assertThrows(AppException.class, () -> reservationService.confirmStatusReservation(reservationId));
         assertThat(exception.getErrorCode()).isEqualTo(RESERVATION_CONFIRMED_UNAVAILABLE);
     }
+
+    @Test
+    @DisplayName("중개인 예약 목록 조회 성공 - 시간순, ID순 정렬 확인")
+    void getAgentReservations_Success_WithSorting() {
+        Long agentId = 1L;
+        LocalDateTime baseTime = LocalDateTime.of(2023, 1, 1, 0, 0);
+
+        // 목업 객체 생성
+        Room room1 = mock(Room.class);
+        Room room2 = mock(Room.class);
+        Room room3 = mock(Room.class);
+        User user1 = mock(User.class);
+        User user2 = mock(User.class);
+        User user3 = mock(User.class);
+
+        Reservation reservation1 = mock(Reservation.class);
+        Reservation reservation2 = mock(Reservation.class);
+        Reservation reservation3 = mock(Reservation.class);
+
+        // Reservation 목업 설정 - 의도적으로 순서를 섞어서 설정
+        when(reservation1.getId()).thenReturn(2L);
+        when(reservation1.getRoom()).thenReturn(room1);
+        when(reservation1.getUser()).thenReturn(user1);
+        when(reservation1.getReservationTime()).thenReturn(baseTime);
+        when(reservation1.getStatus()).thenReturn(ReservationStatus.APPLYED);
+
+        when(reservation2.getId()).thenReturn(1L);
+        when(reservation2.getRoom()).thenReturn(room2);
+        when(reservation2.getUser()).thenReturn(user2);
+        when(reservation2.getReservationTime()).thenReturn(baseTime);  // 같은 시간
+        when(reservation2.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+
+        when(reservation3.getId()).thenReturn(3L);
+        when(reservation3.getRoom()).thenReturn(room3);
+        when(reservation3.getUser()).thenReturn(user3);
+        when(reservation3.getReservationTime()).thenReturn(baseTime.plusDays(1));
+        when(reservation3.getStatus()).thenReturn(ReservationStatus.APPLYED);
+
+        // 의도적으로 순서를 섞어서 리턴
+        when(reservationRepository.findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(eq(agentId), any(LocalDateTime.class)))
+                .thenReturn(List.of(reservation2, reservation1, reservation3));
+
+        SuccessResponse<ReservationListResponse> response = reservationService.getAgentReservations(agentId);
+
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(RESERVATION_LIST_SUCCESS);
+        assertThat(response.data().reservations()).hasSize(3);
+
+        // 정렬 확인
+        List<ReservationResponse> reservations = response.data().reservations();
+        assertThat(reservations.get(0).id()).isEqualTo(1L);
+        assertThat(reservations.get(1).id()).isEqualTo(2L);
+        assertThat(reservations.get(2).id()).isEqualTo(3L);
+
+        assertThat(reservations.get(0).reservationTime()).isEqualTo(baseTime);
+        assertThat(reservations.get(1).reservationTime()).isEqualTo(baseTime);
+        assertThat(reservations.get(2).reservationTime()).isEqualTo(baseTime.plusDays(1));
+
+        // 추가적인 필드 확인
+        assertThat(reservations.get(0).status()).isEqualTo(ReservationStatus.CONFIRMED);
+        assertThat(reservations.get(1).status()).isEqualTo(ReservationStatus.APPLYED);
+        assertThat(reservations.get(2).status()).isEqualTo(ReservationStatus.APPLYED);
+    }
+    @Test
+    @DisplayName("중개인 예약 목록 조회 - 빈 목록")
+    void getAgentReservations_Empty() {
+        Long agentId = 1L;
+
+        when(reservationRepository.findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(eq(agentId), any(LocalDateTime.class)))
+                .thenReturn(List.of());
+
+        SuccessResponse<ReservationListResponse> response = reservationService.getAgentReservations(agentId);
+
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(RESERVATION_LIST_EMPTY);
+        assertThat(response.data().reservations()).isEmpty();
+    }
 }
