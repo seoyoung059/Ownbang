@@ -28,7 +28,6 @@ const Reservation = ({ onClose, makeReservation, item }) => {
 
     const reservationData = {
       roomId: item.id,
-      userId: 1, // 나중에 유저 정보 받아와서 연결
       reservationTime: reservationTime,
       status: "APPLYED",
     };
