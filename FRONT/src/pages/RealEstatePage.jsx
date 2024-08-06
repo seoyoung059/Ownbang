@@ -11,10 +11,13 @@ import { useBoundStore } from "../store/store";
 
 const RealEstatePage = () => {
   const theme = useTheme();
-  const { searchTerm, setSearchTerm } = useBoundStore((state) => ({
-    searchTerm: state.searchTerm,
-    setSearchTerm: state.setSearchTerm,
-  }));
+  const { searchTerm, setSearchTerm, makeReservation } = useBoundStore(
+    (state) => ({
+      searchTerm: state.searchTerm,
+      setSearchTerm: state.setSearchTerm,
+      makeReservation: state.makeReservation,
+    })
+  );
 
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showReservation, setShowReservation] = React.useState(false);
@@ -171,7 +174,10 @@ const RealEstatePage = () => {
               >
                 <CloseIcon />
               </IconButton>
-              <Reservation />
+              <Reservation
+                makeReservation={makeReservation}
+                item={selectedItem}
+              />
             </Box>
           )}
         </Box>
