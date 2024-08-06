@@ -138,6 +138,16 @@ public class RoomServiceImpl implements RoomService {
         return new SuccessResponse<>(ROOM_FIND_SUCCESS, list);
     }
 
+    @Override
+    public SuccessResponse<List<RoomInfoSearchResponse>> search() {
+        List<RoomInfoSearchResponse> list = roomRepository.findAll().stream()
+                .map(RoomInfoSearchResponse::from)
+                .toList();
+        SuccessResponse<List<RoomInfoSearchResponse>> response =
+                new SuccessResponse<>(SEARCH_ROOM_SUCCESS, list);
+        return response;
+    }
+
     private void validateAgent(Long userId, Room existingRoom) {
         Agent agent = agentRepository.getByUserId(userId);
         if(agent != existingRoom.getAgent())
