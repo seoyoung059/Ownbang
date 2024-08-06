@@ -14,6 +14,7 @@ import static com.bangguddle.ownbang.global.enums.ErrorCode.ROOM_NOT_FOUND;
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
     List<Room> getByAgentId(Long agentId, Pageable pageable);
+    List<Room> findAll();
 
     /**
      * 해당 ID의 매물이 존재하는지 확인

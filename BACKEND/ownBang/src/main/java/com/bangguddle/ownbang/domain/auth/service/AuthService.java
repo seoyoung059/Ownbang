@@ -11,4 +11,5 @@ public interface AuthService {
     SuccessResponse<DuplicateResponse> checkPhoneNumberDuplicate(String phoneNumber);
     SuccessResponse<Tokens> login(LoginRequest request);
     SuccessResponse<PasswordCheckResponse> passwordCheck(Long id, PasswordCheckRequest request);
+    SuccessResponse<NoneResponse> logout(String header, Long id);
 }
