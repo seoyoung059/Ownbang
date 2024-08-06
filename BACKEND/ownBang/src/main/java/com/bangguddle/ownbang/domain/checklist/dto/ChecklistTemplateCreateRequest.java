@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 @Builder
 public record ChecklistTemplateCreateRequest(
-        @NotNull
         @NotBlank
         String title,
 

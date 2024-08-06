@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 @Builder
 public record ChecklistUpdateRequest(
-        @NotNull
         @NotBlank
         String title,
 
