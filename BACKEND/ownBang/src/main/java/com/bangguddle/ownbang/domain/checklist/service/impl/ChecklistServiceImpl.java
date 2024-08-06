@@ -4,8 +4,8 @@ import com.bangguddle.ownbang.domain.checklist.dto.*;
 import com.bangguddle.ownbang.domain.checklist.entity.Checklist;
 import com.bangguddle.ownbang.domain.checklist.repository.ChecklistRepository;
 import com.bangguddle.ownbang.domain.checklist.service.ChecklistService;
-import com.bangguddle.ownbang.domain.room.entity.Room;
-import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
+import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
+import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
@@ -26,7 +25,7 @@ public class ChecklistServiceImpl implements ChecklistService {
 
     private final ChecklistRepository checklistRepository;
     private final UserRepository userRepository;
-    private final RoomRepository roomRepository;
+    private final ReservationRepository reservationRepository;
 
     @Override
     public SuccessResponse<NoneResponse> registerChecklistTemplate(Long userId, ChecklistTemplateCreateRequest request) {
@@ -50,15 +49,16 @@ public class ChecklistServiceImpl implements ChecklistService {
         User user = userRepository.getById(userId);
 
         // roomId 유효성 검사
-        Room room = roomRepository.getById(request.roomId());
+        Reservation reservation = reservationRepository.findById(request.reservationId())
+                .orElseThrow(() -> new AppException(BAD_REQUEST));
 
         // room & user 로 검색 및 업데이트
-        Checklist checklist = checklistRepository.findChecklistByUserAndRoom(user, room)
+        Checklist checklist = checklistRepository.findByUserAndReservation(user, reservation)
                 .map(existingChecklist -> {
                     existingChecklist.update(request.title(), request.contentsToString());
                     return existingChecklist;
                 })
-                .orElseGet(() -> request.toEntity(user, room));
+                .orElseGet(() -> request.toEntity(user, reservation));
 
         // 저장
         checklistRepository.save(checklist);

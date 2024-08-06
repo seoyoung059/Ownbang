@@ -1,6 +1,6 @@
 package com.bangguddle.ownbang.domain.checklist.entity;
 
-import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -22,9 +22,9 @@ public class Checklist {
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name="room_id")
-    private Room room;
+    @OneToOne
+    @JoinColumn(name="reservation_id")
+    private Reservation reservation;
 
     @Column(nullable = false, length = 30)
     private String title;
@@ -36,9 +36,10 @@ public class Checklist {
     private Boolean isTemplate;
 
     @Builder
-    public Checklist(User user, Room room, String title, String contents, Boolean isTemplate){
+    public Checklist(User user, Reservation reservation, String title,
+                     String contents, Boolean isTemplate){
         this.user = user;
-        this.room = room;
+        this.reservation = reservation;
         this.title = title;
         this.contents = contents;
         this.isTemplate = isTemplate;

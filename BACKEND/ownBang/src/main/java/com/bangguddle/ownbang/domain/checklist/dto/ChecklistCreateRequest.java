@@ -1,7 +1,7 @@
 package com.bangguddle.ownbang.domain.checklist.dto;
 
 import com.bangguddle.ownbang.domain.checklist.entity.Checklist;
-import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public record ChecklistCreateRequest(
         @NotNull
         @Positive
-        Long roomId,
+        Long reservationId,
 
         @NotBlank
         String title,
@@ -21,10 +21,10 @@ public record ChecklistCreateRequest(
         @NotNull
         Map<String, String> contents
 ){
-    public Checklist toEntity(User user, Room room){
+    public Checklist toEntity(User user, Reservation reservation){
         return Checklist.builder()
                 .user(user)
-                .room(room)
+                .reservation(reservation)
                 .title(title)
                 .contents(contentsToString())
                 .isTemplate(false)
