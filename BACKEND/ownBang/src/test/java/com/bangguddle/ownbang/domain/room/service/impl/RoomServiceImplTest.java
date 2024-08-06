@@ -61,11 +61,10 @@ class RoomServiceImplTest {
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
         RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesCreateRequest, roomDetailCreateRequest);
 
         List<MultipartFile> roomImageFiles = new ArrayList<>();
         roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
@@ -100,11 +99,10 @@ class RoomServiceImplTest {
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
         RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesCreateRequest, roomDetailCreateRequest);
         List<MultipartFile> roomImageFiles = new ArrayList<>();
         roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
@@ -201,8 +199,7 @@ class RoomServiceImplTest {
                 true, true, true, true, true, true, true);
         RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
 
         RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
         RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
@@ -214,7 +211,7 @@ class RoomServiceImplTest {
 
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
 
         List<MultipartFile> roomImageFiles = new ArrayList<>();
         roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
@@ -260,8 +257,7 @@ class RoomServiceImplTest {
                 true, true, true, true, true, true, true);
         RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
 
         RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
         RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
@@ -273,7 +269,7 @@ class RoomServiceImplTest {
 
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
 
         List<MultipartFile> roomImageFiles = new ArrayList<>();
         roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
@@ -303,8 +299,7 @@ class RoomServiceImplTest {
                 true, true, true, true, true, true, true);
         RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
 
         RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
         RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
@@ -316,7 +311,7 @@ class RoomServiceImplTest {
 
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
 
         List<MultipartFile> roomImageFiles = new ArrayList<>();
         roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));
@@ -356,8 +351,7 @@ class RoomServiceImplTest {
                 true, true, true, true, true, true, true);
         RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
 
         RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
         RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
@@ -369,7 +363,7 @@ class RoomServiceImplTest {
 
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
 
         List<MultipartFile> roomImageFiles = new ArrayList<>();
         roomImageFiles.add(new MockMultipartFile("file", "image1.png", "image/png", "image/png".getBytes()));

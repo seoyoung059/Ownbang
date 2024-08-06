@@ -22,9 +22,7 @@ public record RoomDetailSearchResponse(
         Date approvalDate,
         Date firstRegistrationDate,
         Facing facing,
-        Purpose purpose,
-        String road,
-        String detailAddress
+        Purpose purpose
 ) {
 
     static public RoomDetailSearchResponse of(
@@ -40,9 +38,7 @@ public record RoomDetailSearchResponse(
             Date approvalDate,
             Date firstRegistrationDate,
             Facing facing,
-            Purpose purpose,
-            String road,
-            String detailAddress){
+            Purpose purpose){
         return RoomDetailSearchResponse.builder()
                 .id(id)
                 .roomCount(roomCount)
@@ -57,8 +53,6 @@ public record RoomDetailSearchResponse(
                 .firstRegistrationDate(firstRegistrationDate)
                 .facing(facing)
                 .purpose(purpose)
-                .road(road)
-                .detailAddress(detailAddress)
                 .build();
     }
 
@@ -77,8 +71,6 @@ public record RoomDetailSearchResponse(
                 .firstRegistrationDate(roomDetail.getFirstRegistrationDate())
                 .facing(roomDetail.getFacing())
                 .purpose(roomDetail.getPurpose())
-                .road(roomDetail.getRoad())
-                .detailAddress(roomDetail.getDetailAddress())
                 .build();
     }
 
@@ -96,8 +88,6 @@ public record RoomDetailSearchResponse(
                 .firstRegistrationDate(firstRegistrationDate)
                 .facing(facing)
                 .purpose(purpose)
-                .road(road)
-                .detailAddress(detailAddress)
                 .build();
     }
 }

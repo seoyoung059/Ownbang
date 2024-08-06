@@ -28,9 +28,7 @@ public record RoomDetailUpdateRequest(
         Date approvalDate,
         Date firstRegistrationDate,
         Facing facing,
-        Purpose purpose,
-        String road,
-        String detailAddress
+        Purpose purpose
 ) {
 
     static public RoomDetailUpdateRequest of(
@@ -46,9 +44,7 @@ public record RoomDetailUpdateRequest(
             Date approvalDate,
             Date firstRegistrationDate,
             Facing facing,
-            Purpose purpose,
-            String road,
-            String detailAddress) {
+            Purpose purpose) {
         return RoomDetailUpdateRequest.builder()
                 .id(id)
                 .roomCount(roomCount)
@@ -63,8 +59,6 @@ public record RoomDetailUpdateRequest(
                 .firstRegistrationDate(firstRegistrationDate)
                 .facing(facing)
                 .purpose(purpose)
-                .road(road)
-                .detailAddress(detailAddress)
                 .build();
     }
 
@@ -83,8 +77,6 @@ public record RoomDetailUpdateRequest(
                 .firstRegistrationDate(roomDetail.getFirstRegistrationDate())
                 .facing(roomDetail.getFacing())
                 .purpose(roomDetail.getPurpose())
-                .road(roomDetail.getRoad())
-                .detailAddress(roomDetail.getDetailAddress())
                 .build();
     }
 
@@ -102,8 +94,6 @@ public record RoomDetailUpdateRequest(
                 .firstRegistrationDate(firstRegistrationDate)
                 .facing(facing)
                 .purpose(purpose)
-                .road(road)
-                .detailAddress(detailAddress)
                 .build();
     }
 }

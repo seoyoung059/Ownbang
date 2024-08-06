@@ -66,11 +66,6 @@ public class RoomDetail {
     @Column
     private Purpose purpose;
 
-    @Column(nullable = false)
-    private String road;
-
-    @Column(nullable = false)
-    private String detailAddress;
 
     @Builder
     public RoomDetail(byte roomCount, byte bathroomCount, HeatingType heatingType, Date moveInDate, Long buildingFloor, boolean elevator, Long totalParking, float parking, Date approvalDate, Date firstRegistrationDate, Facing facing, Purpose purpose, String road, String detailAddress) {
@@ -86,8 +81,6 @@ public class RoomDetail {
         this.firstRegistrationDate = firstRegistrationDate;
         this.facing = facing;
         this.purpose = purpose;
-        this.road = road;
-        this.detailAddress = detailAddress;
     }
 
 
@@ -104,8 +97,6 @@ public class RoomDetail {
         this.firstRegistrationDate = roomDetailUpdateRequest.firstRegistrationDate();
         this.facing = roomDetailUpdateRequest.facing();
         this.purpose = roomDetailUpdateRequest.purpose();
-        this.road = roomDetailUpdateRequest.road();
-        this.detailAddress = roomDetailUpdateRequest.detailAddress();
     }
 }
 
