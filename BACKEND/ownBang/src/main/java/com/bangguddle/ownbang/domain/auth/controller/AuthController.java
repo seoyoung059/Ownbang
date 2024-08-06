@@ -6,6 +6,7 @@ import com.bangguddle.ownbang.global.dto.Tokens;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,14 @@ public class AuthController {
     public ResponseEntity<Response<PasswordCheckResponse>> passwordCheck(
             @AuthenticationPrincipal Long id, @RequestBody @Valid PasswordCheckRequest request) {
         SuccessResponse<PasswordCheckResponse> response = authService.passwordCheck(id, request);
+        return Response.success(response);
+    }
+
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PostMapping("/logout")
+    public ResponseEntity<Response<NoneResponse>> logout(@RequestHeader("Authorization") String header
+            , @AuthenticationPrincipal Long id) {
+        SuccessResponse<NoneResponse> response = authService.logout(header, id);
         return Response.success(response);
     }
 
