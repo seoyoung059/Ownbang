@@ -13,9 +13,14 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useBoundStore } from "../../store/store";
 
 export default function PasswordCheckForm({ onPasswordVerified }) {
   const theme = useTheme();
+
+  const { confirmPassword } = useBoundStore((state) => ({
+    confirmPassword: state.confirmPassword,
+  }));
 
   const [password, setPassword] = useState("");
   const [verificationError, setVerificationError] = useState(false);
@@ -34,13 +39,10 @@ export default function PasswordCheckForm({ onPasswordVerified }) {
     setShowPassword((prev) => !prev);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (password === "password123") {
-      onPasswordVerified(true);
-    } else {
-      setVerificationError(true);
-    }
+  const handleSubmit = async (e) => {
+    await e.preventDefault();
+    const isCorrect = await confirmPassword(password);
+    (await isCorrect) ? onPasswordVerified(true) : setVerificationError(true);
   };
 
   return (

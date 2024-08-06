@@ -1,22 +1,34 @@
 import React, { useState } from "react";
 import { useBoundStore } from "../../store/store";
-import { Box, Button, Typography, IconButton, Badge } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  IconButton,
+  Badge,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import { Notifications, MenuOutlined } from "@mui/icons-material";
 import { useTheme, useMediaQuery } from "@mui/material";
 
 import Notification from "./Notification";
 
 const Header = () => {
-  const { isAuthenticated, logout } = useBoundStore((state) => ({
+  const { isAuthenticated, logout, user } = useBoundStore((state) => ({
     isAuthenticated: state.isAuthenticated,
     logout: state.logout,
+    user: state.user,
   }));
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [open, setOpen] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null); // Menu anchor element
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const handleMenuOpen = (event) => setMenuAnchorEl(event.currentTarget); // 메뉴 열기
+  const handleMenuClose = () => setMenuAnchorEl(null); // 메뉴 닫기
 
   const notificationCount = 1; // 알림 개수 설정
 
@@ -57,6 +69,26 @@ const Header = () => {
     window.location.href = "/login";
   };
 
+  const handleEstate = () => {
+    window.location.href = "/estate";
+  };
+
+  const handleMyinfo = () => {
+    window.location.href = "/mypage";
+  };
+
+  const handleUserEdit = () => {
+    window.location.href = "/user-edit";
+  };
+
+  const handleAgent = () => {
+    window.location.href = "/agent";
+  };
+
+  const handleEstateRegister = () => {
+    window.location.href = "/estate-register";
+  };
+
   return (
     <>
       <Box sx={headerStyle}>
@@ -84,7 +116,7 @@ const Header = () => {
                   <Notifications />
                 </Badge>
               </IconButton>
-              <IconButton color="inherit">
+              <IconButton color="inherit" onClick={handleMenuOpen}>
                 <MenuOutlined />
               </IconButton>
             </div>
@@ -92,6 +124,35 @@ const Header = () => {
         </Box>
       </Box>
       <Notification open={open} handleClose={handleClose} />
+
+      <Menu
+        sx={{ mt: 4 }}
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <MenuItem onClick={handleEstate}>지도 검색</MenuItem>
+        {isAuthenticated && (
+          <MenuItem onClick={handleMyinfo}>정보 관리</MenuItem>
+        )}
+        {isAuthenticated && (
+          <MenuItem onClick={handleUserEdit}>유저 수정</MenuItem>
+        )}
+        {isAuthenticated && user.isAgent && (
+          <MenuItem onClick={handleAgent}>내 사무소</MenuItem>
+        )}
+        {isAuthenticated && user.isAgent && (
+          <MenuItem onClick={handleEstateRegister}>매물 등록</MenuItem>
+        )}
+      </Menu>
     </>
   );
 };
