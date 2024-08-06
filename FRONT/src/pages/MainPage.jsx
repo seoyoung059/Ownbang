@@ -82,10 +82,11 @@ export default function MainPage() {
       {/* 왼쪽 섹션 */}
       <Box
         sx={{
-          width: "100vw",
+          width: "100%",
           backgroundColor: "#f5f5f5",
           display: "flex",
           justifyContent: "center",
+          overflowX: "hidden", // 가로 스크롤바를 숨깁니다.
         }}
       >
         <Box
@@ -182,23 +183,30 @@ export default function MainPage() {
 
       {/* 오른쪽 섹션 */}
       <Box
-        ref={rightSection}
         sx={{
-          flex: 1,
-          opacity: 0,
-          transform: "translateX(50%)",
-          transition: "transform 0.5s ease-out, opacity 0.5s ease-out",
-          "&.slide-in": {
-            opacity: 1,
-            transform: "translateX(0)",
-          },
-
-          mb: isLg ? 12 : 28,
-          mr: !isLg && 24,
-          mt: 16,
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          overflowX: "hidden", // 가로 스크롤바를 숨깁니다.
         }}
       >
-        <Box sx={{ flex: 1, textAlign: isSm ? "center" : "end" }}>
+        <Box
+          ref={rightSection}
+          sx={{
+            flex: 1,
+            textAlign: isSm ? "center" : "right",
+            mb: isLg ? 12 : 28,
+            mt: 16,
+            mr: !isLg && 24,
+            opacity: 0,
+            transform: "translateX(50%)",
+            transition: "transform 0.5s ease-out, opacity 0.5s ease-out",
+            "&.slide-in": {
+              opacity: 1,
+              transform: "translateX(0)",
+            },
+          }}
+        >
           <Typography
             variant="h4"
             component="div"
@@ -213,7 +221,7 @@ export default function MainPage() {
               display: "flex",
               flexDirection: isSm ? "column" : "row",
               alignItems: isSm ? "center" : "flex-start",
-              justifyContent: "end",
+              justifyContent: "center",
               mb: 4,
               gap: 4,
             }}

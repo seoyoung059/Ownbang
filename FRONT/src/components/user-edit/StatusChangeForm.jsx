@@ -12,17 +12,17 @@ import {
 } from "@mui/material";
 import AddressSearch from "../common/AddressSearch";
 import { useTheme } from "@mui/material";
+import { toast } from "react-toastify";
 
-// 더미데이터 데이터 연결 필요
-const user = {
-  userName: "김일태",
-  phoneNumber: "010-1234-5678",
-  userId: "iltae94@gmail.com",
-  password: "password123",
-};
+import { useNavigate } from "react-router-dom";
+
+import { useBoundStore } from "../../store/store";
 
 export default function UserInfoEditForm({ toggleEdit }) {
   const theme = useTheme();
+  const navigate = useNavigate();
+
+  const upgradeAgent = useBoundStore((state) => state.upgradeAgent);
   // 유저 정보
   const [userInfo, setUserInfo] = useState({
     officeNumber: "",
@@ -33,6 +33,7 @@ export default function UserInfoEditForm({ toggleEdit }) {
   });
 
   const [open, setOpen] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -85,12 +86,33 @@ export default function UserInfoEditForm({ toggleEdit }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // 일단 정보 출력 - 나중엔 api post
-    console.log("중개인 정보:", userInfo);
+    try {
+      const res = await upgradeAgent({
+        officeNumber: userInfo.officeNumber.split("-").join(""),
+        licenseNumber: userInfo.licenseNumber,
+        officeAddress:
+          userInfo.officeAddress + " " + userInfo.officeDetailAddress,
+        officeName: userInfo.officeName,
+      });
+      if (res.resultCode === "SUCCESS") {
+        toast.info("중개인 회원전환 신청 완료.", {
+          position: "bottom-left",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        navigate("/");
+      }
+    } catch (err) {
+      setErrMsg(err.response.data.message || "An error occurred");
+    }
   };
-
   return (
     <>
       <Container component="main" maxWidth="xs">
@@ -193,6 +215,16 @@ export default function UserInfoEditForm({ toggleEdit }) {
                   onChange={handleInputChange}
                   fullWidth
                 />
+              </Grid>
+              <Grid item xs={12} sx={{ textAlign: "end" }}>
+                <Typography
+                  sx={{
+                    fontSize: theme.fontSize.small,
+                    color: theme.palette.error.main,
+                  }}
+                >
+                  {errMsg}
+                </Typography>
               </Grid>
             </Grid>
             <Grid
