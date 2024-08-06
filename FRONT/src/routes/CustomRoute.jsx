@@ -47,7 +47,10 @@ export const AgentRoute = ({ element }) => {
 };
 
 export const UserRoute = ({ element }) => {
-  const isAuthenticated = useBoundStore((state) => state.isAuthenticated);
+  const { isAuthenticated, user } = useBoundStore((state) => ({
+    isAuthenticated: state.isAuthenticated,
+    user: state.user,
+  }));
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -62,10 +65,14 @@ export const UserRoute = ({ element }) => {
         theme: "light",
       });
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
+  }
+
+  if (user && user.isAgent) {
+    return <Navigate to="/agent" />;
   }
 
   return <>{element}</>;

@@ -6,7 +6,7 @@ export default function AddressSearch({ handleAddress }) {
     <Postcode
       style={{ width: 320, height: 320, top: 10 }}
       jsOptions={{ animation: true }}
-      onSelected={(data) => handleAddress(data.address)}
+      onSelected={(data) => handleAddress(data.address, data.jibunAddress)}
     />
   );
 }
