@@ -40,11 +40,16 @@ public enum SuccessCode implements ResponseCode {
     BOOKMARK_DELETE_SUCCESS(HttpStatus.OK, "북마크가 성공적으로 삭제되었습니다."),
     BOOKMARK_FIND_SUCCESS(HttpStatus.OK, "북마크 목록 조회가 성공적으로 완료되었습니다."),
 
-
-
     ROOM_IMAGE_UPLOAD_SUCCESS(HttpStatus.OK, "사진이 성공적으로 저장되었습니다."),
     ROOM_IMAGE_DELETE_SUCCESS(HttpStatus.OK, "사진이 성공적으로 삭제되었습니다."),
 
+    // Checklist API
+    CHECKLIST_TEMPLATE_CREATE_SUCCESS(HttpStatus.CREATED, "체크리스트 템플릿이 성공적으로 저장되었습니다."),
+    CHECKLIST_CREATE_SUCCESS(HttpStatus.CREATED, "체크리스트 정보가 성공적으로 저장되었습니다."),
+    CHECKLIST_FIND_SUCCESS(HttpStatus.OK, "체크리스트 조회가 성공적으로 완료되었습니다."),
+    CHECKLIST_TEMPLATE_FIND_ALL_SUCCESS(HttpStatus.OK, "체크리스트 템플릿 목록 조회가 성공적으로 완료되었습니다."),
+    CHECKLIST_UPDATE_SUCCESS(HttpStatus.OK, "체크리스트 정보가 성공적으로 수정되었습니다."),
+    CHECKLIST_REMOVE_SUCCESS(HttpStatus.OK, "체크리스트 템플릿이 성공적으로 삭제되었습니다."),
 
     // Webrtc API
     GET_TOKEN_SUCCESS(HttpStatus.CREATED, "토큰 발급이 성공적으로 완료되었습니다."),

@@ -42,6 +42,8 @@ public enum ErrorCode implements ResponseCode {
     IMAGE_S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 S3 업로드에 실패하였습니다."),
     AWS_SDK_CLIENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "AWS SDK 클라이언트 설정에 실패하였습니다."),
 
+    // Checklist API
+    CHECKLIST_DUPLICATED(HttpStatus.CONFLICT, "이미 존재하는 체크리스트 템플릿입니다."),
 
     // Reservation API
     RESERVATION_DUPLICATED (HttpStatus.CONFLICT, " 이미 다른 사람이 신청된 예약 시간입니다. "),
