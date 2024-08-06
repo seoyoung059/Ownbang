@@ -4,26 +4,45 @@ import ReservationCalendar from "./ReservationCalendar";
 import ReservationClock from "./ReservationClock";
 import { useTheme } from "@mui/material/styles";
 
-const Reservation = ({ onClose }) => {
+const Reservation = ({ onClose, makeReservation, item }) => {
   const theme = useTheme();
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false); // 성공 메시지 상태
 
+  const reservationTime =
+    selectedDate && selectedTime
+      ? `${selectedDate.format("YYYY-MM-DD")}T${selectedTime.format(
+          "HH:mm:ss"
+        )}.000Z`
+      : "";
+
   // 날짜와 시간 선택 후 예약 처리
-  const onDateCheck = useCallback(() => {
+  const onDateCheck = useCallback(async () => {
     if (!selectedDate || !selectedTime) {
-      setShowAlert(true); // 날짜와 시간이 선택되지 않았을 때 경고 표시
+      setShowAlert(true);
       return;
     }
-    setShowAlert(false); // 경고 숨기기
-    console.log(
-      `${selectedDate.format("YYYY-MM-DD")} ${selectedTime.format("HH:mm")}`
-    );
-    setShowSuccess(true); // 성공 메시지 표시
-    // onClose(); // 예약 완료 후 화면을 닫지 않음
-  }, [selectedDate, selectedTime]);
+    setShowAlert(false);
+
+    const reservationData = {
+      roomId: item.id,
+      userId: 1, // 나중에 유저 정보 받아와서 연결
+      reservationTime: reservationTime,
+      status: "APPLYED",
+    };
+
+    console.log(reservationData);
+
+    try {
+      await makeReservation(reservationData);
+      setShowSuccess(true);
+      setTimeout(onClose, 2000); // Optionally close the reservation after a delay
+    } catch (error) {
+      console.error("Reservation failed:", error);
+    }
+  }, [selectedDate, selectedTime, makeReservation, reservationTime, onClose]);
 
   // 날짜 변경 핸들러
   const handleDateChange = (date) => {
