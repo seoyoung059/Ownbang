@@ -2,9 +2,9 @@ spring:
   application:
     name: ownBang
   datasource:
-    url: test
-    username: test
-    password: test
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     properties:
@@ -13,15 +13,53 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  elasticsearch:
-    rest:
-      uris: http://localhost:9200
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+    elasticsearch:
+      rest:
+        uris: http://localhost:9200
+
+  main:
+    allow-bean-definition-overriding: true
+
 server:
-  port: 1234
+  port: ${PORT}
   ssl:
     enabled: false
+  servlet:
+    context-path: /api/
 
 openvidu:
-  url: test
-  secret: test
+  url: ${OPENVIDU_URL}
+  secret: ${OPENVIDU_SECRET}
 
+cloud:
+  aws:
+    credentials:
+      accessKey: ${aws_accessKey}
+      secretKey: ${aws_secretKey}
+    region:
+      static: ${aws_region}
+    s3:
+      bucket: ${aws_s3bucket}
+
+s3:
+  room-image:
+    path: ${S3_ROOMIMAGE_PATH}
+
+key:
+  secret : ${JWT_SECRET_KEY}
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /api-docs
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8

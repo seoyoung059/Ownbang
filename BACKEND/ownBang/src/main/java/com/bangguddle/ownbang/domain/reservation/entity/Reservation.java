@@ -2,6 +2,7 @@ package com.bangguddle.ownbang.domain.reservation.entity;
 
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "reservation")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //Lombok 어노테이션 : 기본 생성자
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Reservation {
 
     @Id
@@ -20,11 +22,11 @@ public class Reservation {
     private Long id;
 
     @ManyToOne
-    @Column(name ="room_id",nullable = false, columnDefinition = "INT UNSIGNED")
+    @JoinColumn(name ="room_id",nullable = false)
     private Room room;
 
     @ManyToOne
-    @Column(name ="user_id" ,nullable = false, columnDefinition = "INT UNSIGNED")
+    @JoinColumn(name ="user_id" ,nullable = false)
     private User user;
 
     @Column(nullable = false, columnDefinition = "DATETIME(0)")

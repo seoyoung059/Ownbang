@@ -2,6 +2,7 @@ package com.bangguddle.ownbang.domain.reservation.service;
 
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationResponse;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
@@ -108,7 +109,16 @@ class ReservationServiceImplTest {
         assertThat(response).isNotNull();
         assertThat(response.successCode()).isEqualTo(RESERVATION_LIST_SUCCESS);
         assertThat(response.data().reservations().size()).isEqualTo(2);
-        assertThat(response.data().reservations()).contains(reservation1, reservation2);
+
+        List<ReservationResponse> expectedResponses = List.of(
+                ReservationResponse.from(reservation1),
+                ReservationResponse.from(reservation2)
+        );
+
+        assertThat(response.data().reservations())
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(expectedResponses);
     }
 
     @Test

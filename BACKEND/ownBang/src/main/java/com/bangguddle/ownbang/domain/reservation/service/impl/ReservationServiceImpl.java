@@ -31,6 +31,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+
     @Override
     @Transactional
     public SuccessResponse<NoneResponse> createReservation(ReservationRequest reservationRequest) {
@@ -62,7 +63,7 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(RESERVATION_MAKE_SUCCESS, NoneResponse.NONE);
     }
 
-
+    @Transactional(readOnly =true)
     public SuccessResponse<ReservationListResponse> getMyReservationList(Long userId) {
         List<Reservation> reservations = reservationRepository.findByUserId(userId);
         if (reservations == null || reservations.isEmpty()) {
@@ -70,11 +71,12 @@ public class ReservationServiceImpl implements ReservationService {
             return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
         }
 
-        ReservationListResponse reservationListResponse = new ReservationListResponse(reservations);
+        ReservationListResponse reservationListResponse = ReservationListResponse.from(reservations);
         return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
     }
 
     // 예약 철회 시 사용
+    @Transactional
     public SuccessResponse<NoneResponse> updateStatusReservation(Long id) {
         Reservation reservation = vaildateReservation(id);
 
@@ -103,6 +105,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     // 예약 확정 시 사용
+    @Transactional
     public SuccessResponse<NoneResponse> confirmStatusReservation(Long id) {
         Reservation reservation = vaildateReservation(id);
 
@@ -125,4 +128,16 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(RESERVATION_CONFIRM_SUCCESS, NoneResponse.NONE);
     }
 
+    @Transactional(readOnly = true)
+    public SuccessResponse<ReservationListResponse> getAgentReservations(Long agentId) {
+        LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        List<Reservation> reservations = reservationRepository.findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(agentId, today);
+
+        if (reservations.isEmpty()) {
+            return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
+        }
+
+        ReservationListResponse reservationListResponse = ReservationListResponse.from(reservations);
+        return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
+    }
 }

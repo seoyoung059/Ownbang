@@ -153,7 +153,7 @@ public class VideoServiceTest {
 
         // when
         when(reservationRepository.findById(invalidReservationId)).thenReturn(Optional.of(reservation));
-        when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELED);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELLED);
 
         // then
         Throwable thrown = catchThrowable(() -> videoService.registerVideo(eRequest));
@@ -213,7 +213,7 @@ public class VideoServiceTest {
         when(video.getReservation()).thenReturn(reservation);
         when(video.getVideoUrl()).thenReturn(videoUrl);
         when(reservation.getId()).thenReturn(reservationId);
-        when(reservation.getUserId()).thenReturn(userId);
+        when(reservation.getUser().getId()).thenReturn(userId);
 
         // then
         SuccessResponse response = videoService.getVideo(userId, videoId);
@@ -277,7 +277,7 @@ public class VideoServiceTest {
         when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
         when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDED);
         when(video.getReservation()).thenReturn(reservation);
-        when(reservation.getUserId()).thenReturn(1L);
+        when(reservation.getUser().getId()).thenReturn(1L);
 
         // then
         Throwable thrown = catchThrowable(() -> videoService.getVideo(invalidUserId, videoId));

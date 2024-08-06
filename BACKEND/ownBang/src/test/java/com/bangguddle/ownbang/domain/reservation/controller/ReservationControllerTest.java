@@ -140,7 +140,7 @@ public class ReservationControllerTest {
                 .status(ReservationStatus.CONFIRMED)
                 .build();
 
-        ReservationListResponse listResponse = new ReservationListResponse(Arrays.asList(reservation1, reservation2));
+        ReservationListResponse listResponse =  ReservationListResponse.from(Arrays.asList(reservation1, reservation2));
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(SuccessCode.RESERVATION_LIST_SUCCESS, listResponse);
 
         when(reservationService.getMyReservationList(anyLong())).thenReturn(successResponse);

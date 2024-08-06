@@ -5,6 +5,12 @@ import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import java.util.List;
 
 public record ReservationListResponse (
-        List<Reservation> reservations
+        List<ReservationResponse> reservations
 ){
+    public static ReservationListResponse from(List<Reservation> reservations) {
+        List<ReservationResponse> reservationResponses = reservations.stream()
+                .map(ReservationResponse::from)
+                .toList();
+        return new ReservationListResponse(reservationResponses);
+    }
 }
