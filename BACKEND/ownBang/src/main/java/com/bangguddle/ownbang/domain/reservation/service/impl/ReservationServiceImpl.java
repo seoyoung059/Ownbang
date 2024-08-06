@@ -1,5 +1,9 @@
 package com.bangguddle.ownbang.domain.reservation.service.impl;
 
+import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
+import com.bangguddle.ownbang.domain.agent.repository.AgentWorkhourRepository;
+import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeRequest;
+import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
@@ -10,6 +14,7 @@ import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -17,9 +22,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
@@ -31,6 +41,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final AgentWorkhourRepository agentWorkhourRepository;
 
     @Override
     @Transactional
@@ -139,5 +150,44 @@ public class ReservationServiceImpl implements ReservationService {
 
         ReservationListResponse reservationListResponse = ReservationListResponse.from(reservations);
         return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
+    }
+
+    // 매물, 날짜별 예약 가능한 시간 반환
+    @Override
+    @Transactional(readOnly = true)
+    public SuccessResponse<AvailableTimeResponse> getAvailableTimes(AvailableTimeRequest request) {
+        Room room = roomRepository.findById(request.roomId())
+                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+
+        AgentWorkhour workhour = agentWorkhourRepository.findByAgentAndDay(room.getAgent(), getDayOfWeek(request.date()))
+                .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
+
+        LocalTime startTime = LocalTime.parse(workhour.getStartTime());
+        LocalTime endTime = LocalTime.parse(workhour.getEndTime());
+
+        List<LocalTime> allPossibleTimes = generateTimeSlots(startTime, endTime);
+        List<LocalTime> bookedTimes = reservationRepository.findConfirmedReservationTimes(request.roomId(), request.date());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        List<String> availableTimes = allPossibleTimes.stream()
+                .filter(time -> !bookedTimes.contains(time))
+                .map(time -> time.format(formatter))
+                .collect(Collectors.toList());
+
+        return new SuccessResponse<>(AVAILABLE_TIMES_RETRIEVED, new AvailableTimeResponse(availableTimes));
+    }
+
+    private AgentWorkhour.Day getDayOfWeek(LocalDate date) {
+        return AgentWorkhour.Day.valueOf(date.getDayOfWeek().name().substring(0, 3));
+    }
+
+    private List<LocalTime> generateTimeSlots(LocalTime start, LocalTime end) {
+        List<LocalTime> slots = new ArrayList<>();
+        LocalTime current = start;
+        while (current.isBefore(end)) {
+            slots.add(current);
+            current = current.plusMinutes(30);
+        }
+        return slots;
     }
 }

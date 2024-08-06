@@ -1,8 +1,9 @@
 package com.bangguddle.ownbang.domain.reservation.service;
 
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationResponse;
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
+import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
+import com.bangguddle.ownbang.domain.agent.repository.AgentWorkhourRepository;
+import com.bangguddle.ownbang.domain.reservation.dto.*;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
@@ -21,7 +22,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +49,9 @@ class ReservationServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private AgentWorkhourRepository agentWorkhourRepository;
 
     @BeforeEach
     void setUp() {
@@ -285,4 +291,70 @@ class ReservationServiceImplTest {
         assertThat(response.successCode()).isEqualTo(RESERVATION_LIST_EMPTY);
         assertThat(response.data().reservations()).isEmpty();
     }
+    @Test
+    @DisplayName("예약 가능 시간 조회 성공")
+    void getAvailableTimes_Success() {
+        // Given
+        Long roomId = 1L;
+        LocalDate date = LocalDate.now().plusDays(1);
+        AvailableTimeRequest request = new AvailableTimeRequest(roomId, date);
+
+        Room room = mock(Room.class);
+        Agent agent = mock(Agent.class);
+        when(room.getAgent()).thenReturn(agent);
+
+        AgentWorkhour workhour = mock(AgentWorkhour.class);
+        when(workhour.getStartTime()).thenReturn("09:00");
+        when(workhour.getEndTime()).thenReturn("18:00");
+
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(agentWorkhourRepository.findByAgentAndDay(any(Agent.class), any(AgentWorkhour.Day.class)))
+                .thenReturn(Optional.of(workhour));
+        when(reservationRepository.findConfirmedReservationTimes(eq(roomId), eq(date)))
+                .thenReturn(List.of(LocalTime.of(10, 0), LocalTime.of(14, 30)));
+
+        // When
+        SuccessResponse<AvailableTimeResponse> response = reservationService.getAvailableTimes(request);
+
+        // Then
+        assertThat(response.successCode()).isEqualTo(AVAILABLE_TIMES_RETRIEVED);
+        assertThat(response.data().availableTimes()).hasSize(16); // 9:00부터 17:30까지, 10:00와 14:30 제외
+        assertThat(response.data().availableTimes()).contains("09:00", "09:30", "11:00", "14:00", "15:00", "17:30");
+        assertThat(response.data().availableTimes()).doesNotContain("10:00", "14:30", "18:00");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 매물로 조회 시 실패")
+    void getAvailableTimes_RoomNotFound() {
+        // Given
+        Long roomId = 1L;
+        LocalDate date = LocalDate.now().plusDays(1);
+        AvailableTimeRequest request = new AvailableTimeRequest(roomId, date);
+
+        when(roomRepository.findById(roomId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(AppException.class, () -> reservationService.getAvailableTimes(request));
+    }
+
+    @Test
+    @DisplayName("근무 시간 정보가 없을 때 실패")
+    void getAvailableTimes_WorkhourNotFound() {
+        // Given
+        Long roomId = 1L;
+        LocalDate date = LocalDate.now().plusDays(1);
+        AvailableTimeRequest request = new AvailableTimeRequest(roomId, date);
+
+        Room room = mock(Room.class);
+        Agent agent = mock(Agent.class);
+        when(room.getAgent()).thenReturn(agent);
+
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(agentWorkhourRepository.findByAgentAndDay(any(Agent.class), any(AgentWorkhour.Day.class)))
+                .thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(AppException.class, () -> reservationService.getAvailableTimes(request));
+    }
+
 }

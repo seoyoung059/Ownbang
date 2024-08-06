@@ -8,13 +8,16 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "agent_workhour", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"agent_id", "day"})
+})
 public class AgentWorkhour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "agent_workhour_id", nullable = false, columnDefinition = "INT UNSIGNED")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "agent_id", nullable = false)
     private Agent agent;
 

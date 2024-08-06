@@ -61,6 +61,7 @@ public enum SuccessCode implements ResponseCode {
 
     RESERVATION_LIST_EMPTY(HttpStatus.OK, " 예약한 목록이 없습니다. "),
 
+    AVAILABLE_TIMES_RETRIEVED(HttpStatus.OK, "예약 가능한 시간 목록을 성공적으로 조회했습니다."),
     // ElasticSearch API
     SEARCH_SUCCESS (HttpStatus.CREATED, "데이터가 성공적으로 입력되었습니다. "),
     SEARCH_LIST_SUCEESS(HttpStatus.OK ,"검색 목록을 조회할 수 있습니다.");
