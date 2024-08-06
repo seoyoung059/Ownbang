@@ -7,6 +7,7 @@ import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
+import com.bangguddle.ownbang.domain.room.service.RoomImageService;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
@@ -30,7 +31,7 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
-    private final RoomImageServiceImpl roomImageServiceImpl;
+    private final RoomImageService roomImageService;
     private final AgentRepository agentRepository;
 
     /**
@@ -48,8 +49,10 @@ public class RoomServiceImpl implements RoomService {
         RoomAppliances roomAppliances = request.roomAppliancesCreateRequest().toEntity();
         Room room = request.toEntity(agent, roomAppliances, roomDetail);
 
-        for (MultipartFile roomImageFile : roomImageFiles) {
-            roomImageServiceImpl.uploadImage(roomImageFile, room);
+        if(roomImageFiles!=null && !roomImageFiles.isEmpty()) {
+            for (MultipartFile roomImageFile : roomImageFiles) {
+                roomImageService.uploadImageToS3(roomImageFile, room);
+            }
         }
         roomRepository.save(room);
 
@@ -76,14 +79,14 @@ public class RoomServiceImpl implements RoomService {
         if(request.roomImageUpdateRequestList()!=null && !request.roomImageUpdateRequestList().isEmpty()) {
             for (RoomImageUpdateRequest imageRequest : request.roomImageUpdateRequestList()) {
                 if (!imageRequest.isDeleted()) continue;
-                roomImageServiceImpl.deleteImage(roomId, imageRequest.id());
+                roomImageService.deleteImage(roomId, imageRequest.id());
             }
         }
 
         // 추가 이미지 업로드
         if(roomImageFiles!=null && !roomImageFiles.isEmpty()) {
             for (MultipartFile roomImageFile : roomImageFiles) {
-                roomImageServiceImpl.uploadImage(roomImageFile, existingRoom);
+                roomImageService.uploadImageToS3(roomImageFile, existingRoom);
             }
         }
 

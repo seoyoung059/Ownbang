@@ -72,7 +72,7 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
         // mock
-        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
+        when(roomImageServiceImpl.uploadImageToS3(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
         when(roomRepository.save(any(Room.class))).thenReturn(Room.builder().build()); // 추가된 부분
 
 
@@ -85,7 +85,7 @@ class RoomServiceImplTest {
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(roomRepository, times(1)).save(any(Room.class));
-        verify(roomImageServiceImpl, times(roomImageFiles.size())).uploadImage(any(MultipartFile.class), any(Room.class));
+        verify(roomImageServiceImpl, times(roomImageFiles.size())).uploadImageToS3(any(MultipartFile.class), any(Room.class));
 
     }
 
@@ -110,7 +110,7 @@ class RoomServiceImplTest {
         roomImageFiles.add(new MockMultipartFile("file", "image2.png", "image/png", "image/png".getBytes()));
 
         // when
-        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
+        when(roomImageServiceImpl.uploadImageToS3(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
 
         // 매물 생성
         assertThatThrownBy(()->
@@ -230,7 +230,7 @@ class RoomServiceImplTest {
 
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
-        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
+        when(roomImageServiceImpl.uploadImageToS3(any(MultipartFile.class), any(Room.class))).thenReturn(new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE));
         when(roomImageServiceImpl.deleteImage(anyLong(), anyLong())).thenReturn(success);
         when(roomRepository.save(any(Room.class))).thenReturn(any(Room.class)); // 추가된 부분
 
@@ -244,7 +244,7 @@ class RoomServiceImplTest {
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(roomRepository, times(1)).save(any(Room.class));
-        verify(roomImageServiceImpl, times(roomImageFiles.size())).uploadImage(any(MultipartFile.class), any(Room.class));
+        verify(roomImageServiceImpl, times(roomImageFiles.size())).uploadImageToS3(any(MultipartFile.class), any(Room.class));
         verify(roomRepository, times(1)).findById(anyLong());
 
     }
@@ -332,7 +332,7 @@ class RoomServiceImplTest {
 
         // mock
         when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
-        when(roomImageServiceImpl.uploadImage(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
+        when(roomImageServiceImpl.uploadImageToS3(any(MultipartFile.class), any(Room.class))).thenThrow(new AppException(INTERNAL_SERVER_ERROR));
         when(roomImageServiceImpl.deleteImage(anyLong(), anyLong())).thenReturn(success);
 
         // 매물 생성
