@@ -1,6 +1,8 @@
 package com.bangguddle.ownbang.domain.checklist.repository;
 
 import com.bangguddle.ownbang.domain.checklist.entity.Checklist;
+import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +15,5 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
     Optional<Checklist> findChecklistByIdAndUserId(Long checklistId, Long userId);
     Optional<Checklist> findChecklistByIdAndIsTemplate(Long userId, Boolean isTemplate);
     List<Checklist> findByUserIdAndIsTemplateTrue(Long userId);
+    Optional<Checklist> findChecklistByUserAndRoom(User user, Room room);
 }

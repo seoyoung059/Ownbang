@@ -1,12 +1,11 @@
 package com.bangguddle.ownbang.domain.checklist.service.impl;
 
-import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchAllResponse;
-import com.bangguddle.ownbang.domain.checklist.dto.ChecklistUpdateRequest;
-import com.bangguddle.ownbang.domain.checklist.dto.ChecklistSearchResponse;
-import com.bangguddle.ownbang.domain.checklist.dto.ChecklistTemplateCreateRequest;
+import com.bangguddle.ownbang.domain.checklist.dto.*;
 import com.bangguddle.ownbang.domain.checklist.entity.Checklist;
 import com.bangguddle.ownbang.domain.checklist.repository.ChecklistRepository;
 import com.bangguddle.ownbang.domain.checklist.service.ChecklistService;
+import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -16,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
@@ -26,6 +26,7 @@ public class ChecklistServiceImpl implements ChecklistService {
 
     private final ChecklistRepository checklistRepository;
     private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
 
     @Override
     public SuccessResponse<NoneResponse> registerChecklistTemplate(Long userId, ChecklistTemplateCreateRequest request) {
@@ -41,6 +42,28 @@ public class ChecklistServiceImpl implements ChecklistService {
         checklistRepository.save(request.toEntity(user));
 
         return new SuccessResponse<>(CHECKLIST_TEMPLATE_CREATE_SUCCESS ,NoneResponse.NONE);
+    }
+
+    @Override
+    public SuccessResponse<NoneResponse> registerChecklist(Long userId, ChecklistCreateRequest request) {
+        // userid 유효성 검사
+        User user = userRepository.getById(userId);
+
+        // roomId 유효성 검사
+        Room room = roomRepository.getById(request.roomId());
+
+        // room & user 로 검색 및 업데이트
+        Checklist checklist = checklistRepository.findChecklistByUserAndRoom(user, room)
+                .map(existingChecklist -> {
+                    existingChecklist.update(request.title(), request.contentsToString());
+                    return existingChecklist;
+                })
+                .orElseGet(() -> request.toEntity(user, room));
+
+        // 저장
+        checklistRepository.save(checklist);
+
+        return new SuccessResponse<>(CHECKLIST_CREATE_SUCCESS ,NoneResponse.NONE);
     }
 
     @Override
