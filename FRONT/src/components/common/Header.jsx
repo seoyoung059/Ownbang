@@ -140,7 +140,7 @@ const Header = () => {
         }}
       >
         <MenuItem onClick={handleEstate}>지도 검색</MenuItem>
-        {isAuthenticated && (
+        {isAuthenticated && !user.isAgent && (
           <MenuItem onClick={handleMyinfo}>정보 관리</MenuItem>
         )}
         {isAuthenticated && (
