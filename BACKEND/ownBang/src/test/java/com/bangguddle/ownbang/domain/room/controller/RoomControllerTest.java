@@ -61,11 +61,10 @@ class RoomControllerTest {
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
         RoomCreateRequest roomCreateRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
+                "parcel","서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesCreateRequest, roomDetailCreateRequest);
 
         MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(roomCreateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
@@ -105,11 +104,10 @@ class RoomControllerTest {
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) -1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
         RoomCreateRequest invalidRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, -999999999L, 10L, 10L,
-                "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesCreateRequest, roomDetailCreateRequest);
         MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(invalidRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
         MockMultipartFile file2 = new MockMultipartFile("roomImageFile", "image2.png", "image/png", "image/png".getBytes());
@@ -160,11 +158,10 @@ class RoomControllerTest {
                 true, true, true, true, true, true, true);
         RoomDetailCreateRequest roomDetailCreateRequest = RoomDetailCreateRequest.of((byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
         RoomCreateRequest invalidRequest = RoomCreateRequest.of(37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 999999999L, 10L, 10L,
-                "parcel", "url", roomAppliancesCreateRequest, roomDetailCreateRequest);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesCreateRequest, roomDetailCreateRequest);
         MockMultipartFile file0 = new MockMultipartFile("roomCreateRequest", null, "application/json", objectMapper.writeValueAsString(invalidRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
         MockMultipartFile file2 = new MockMultipartFile("roomImageFile", "image2.png", "image/png", "image/png".getBytes());
@@ -299,8 +296,7 @@ class RoomControllerTest {
                 true, true, true, true, true, true, true);
         RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
 
         RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
         RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
@@ -312,7 +308,7 @@ class RoomControllerTest {
 
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
@@ -355,8 +351,7 @@ class RoomControllerTest {
                 true, true, true, true, true, true, true);
         RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
 
         RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
         RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
@@ -368,7 +363,7 @@ class RoomControllerTest {
 
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
@@ -408,8 +403,7 @@ class RoomControllerTest {
                 true, true, true, true, true, true, true);
         RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
 
         RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
         RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
@@ -421,7 +415,7 @@ class RoomControllerTest {
 
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
@@ -461,8 +455,7 @@ class RoomControllerTest {
                 true, true, true, true, true, true, true);
         RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
 
         RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
         RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
@@ -474,7 +467,7 @@ class RoomControllerTest {
 
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, 3000L, 10L, 10L,
-                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
@@ -515,8 +508,7 @@ class RoomControllerTest {
                 true, true, true, true, true, true, true);
         RoomDetailUpdateRequest roomDetailUpdateRequest = RoomDetailUpdateRequest.of(1L, (byte) 1, (byte) 1,
                 HeatingType.LOCAL, sdf.parse("2024-08-22"), 7L, true, 10L, 0.66f,
-                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI,
-                "서울시 강남구 역삼대로", "멀티캠퍼스 역삼");
+                sdf.parse("2020-04-11"), sdf.parse("2020-07-01"), Facing.SOUTH, Purpose.MULTI);
 
         RoomImageUpdateRequest roomImageUpdateRequest1 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", true);
         RoomImageUpdateRequest roomImageUpdateRequest2 = RoomImageUpdateRequest.of(1L, roomId, "roomImageUrl", false);
@@ -528,7 +520,7 @@ class RoomControllerTest {
 
         RoomUpdateRequest roomUpdateRequest = RoomUpdateRequest.of(roomId, 37.5f, 127.039f, DealType.MONTHLY, RoomType.OFFICE, Structure.SEPERATED,
                 true, 12.88f, 15.66f, (byte) 1, -3000L, -10L, -10L,
-                "parcel", "url", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
+                "parcel", "서울시 강남구 역삼대로", "멀티캠퍼스 역삼", roomAppliancesUpdateRequest, roomDetailUpdateRequest, roomImageUpdateRequestList);
 
         MockMultipartFile file0 = new MockMultipartFile("roomUpdateRequest", null, "application/json", objectMapper.writeValueAsString(roomUpdateRequest).getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file1 = new MockMultipartFile("roomImageFile", "image1.png", "image/png", "image/png".getBytes());
