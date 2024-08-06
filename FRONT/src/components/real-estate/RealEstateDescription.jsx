@@ -23,7 +23,8 @@ const InfoItem = ({ icon: Icon, text, item }) => (
 
 const RealEstateDescription = ({ item }) => {
   const theme = useTheme();
-
+  const detailInfo = item.roomDetailSearchResponse;
+  const applianceInfo = item.roomAppliancesSearchResponse;
   const infoItems = [
     {
       icon: CropIcon,
@@ -39,8 +40,8 @@ const RealEstateDescription = ({ item }) => {
     {
       icon: DomainIcon,
       text:
-        item.roomFloor && item.roomDetailSearchResponse.buildingFloor
-          ? `${item.roomFloor}층/${item.roomDetailSearchResponse.buildingFloor}층`
+        item.roomFloor && detailInfo.buildingFloor
+          ? `${item.roomFloor}층/${detailInfo.buildingFloor}층`
           : "정보 없음",
       // text: item.roomFloor ? `${item.roomFloor}층` : "정보 없음",
     },

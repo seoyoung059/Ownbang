@@ -11,18 +11,37 @@ import { useBoundStore } from "../store/store";
 
 const RealEstatePage = () => {
   const theme = useTheme();
-  const { searchTerm, setSearchTerm, room, getRoom } = useBoundStore(
-    (state) => ({
-      searchTerm: state.searchTerm,
-      setSearchTerm: state.setSearchTerm,
-      room: state.room,
-      getRoom: state.getRoom,
-    })
-  );
+  const {
+    searchTerm,
+    setSearchTerm,
+    room,
+    getRoom,
+    realEstateData,
+    getAllRoom,
+  } = useBoundStore((state) => ({
+    searchTerm: state.searchTerm,
+    setSearchTerm: state.setSearchTerm,
+    room: state.room,
+    getRoom: state.getRoom,
+    getAllRoom: state.getAllRoom,
+    realEstateData: state.realEstateData,
+  }));
 
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showReservation, setShowReservation] = React.useState(false);
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
+
+  // 초기 로드 시 전체 매물 불러오기
+  useEffect(() => {
+    getAllRoom();
+  }, [getAllRoom, searchTerm]);
+
+  // 전체 매물 데이터를 visibleMarkers로 설정
+  useEffect(() => {
+    if (realEstateData.data.length > 0) {
+      setVisibleMarkers(realEstateData.data);
+    }
+  }, [realEstateData.data]);
 
   useEffect(() => {
     if (selectedItem) {

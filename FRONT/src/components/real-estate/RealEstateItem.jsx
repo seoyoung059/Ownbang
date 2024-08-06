@@ -14,9 +14,9 @@ import { useTheme } from "@mui/material/styles";
 const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
   const theme = useTheme();
 
-  const formatCurrency = (amount) => {
-    return (amount / 10000).toLocaleString(); // 1000으로 나누고 천 단위로 포맷팅
-  };
+  // const formatCurrency = (amount) => {
+  //   return (amount / 10000).toLocaleString(); // 1000으로 나누고 천 단위로 포맷팅
+  // };
   return (
     <Card
       sx={{
@@ -48,8 +48,7 @@ const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
         <Box>
           <Typography component="div">
             {/* 상가 원룸 투룸 등 */}
-            {marker.dealType} {formatCurrency(marker.deposit)}/
-            {formatCurrency(marker.monthlyRent)}
+            {marker.dealType} {marker.deposit}/{marker.monthlyRent}
           </Typography>
           <Typography
             variant="subtitle1"
