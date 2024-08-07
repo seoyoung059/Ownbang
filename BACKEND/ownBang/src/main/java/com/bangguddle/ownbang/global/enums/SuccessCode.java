@@ -21,11 +21,11 @@ public enum SuccessCode implements ResponseCode {
 
     // My Page API
     GET_MY_PAGE_SUCCESS(HttpStatus.OK, "내 정보 조회가 성공적으로 완료되었습니다."),
-    UPDATE_MY_PAGE_SUCCESS(HttpStatus.OK, "내 정보 수정이 성공적으로 완료되었습니다."),
+    UPDATE_MY_PAGE_SUCCESS(HttpStatus.CREATED, "내 정보 수정이 성공적으로 완료되었습니다."),
 
     // Agent My Page API
     GET_AGENT_MY_PAGE_SUCCESS(HttpStatus.OK, "내 사무실 정보 조회가 성공적으로 완료되었습니다."),
-    UPDATE_AGENT_MY_PAGE_SUCCESS(HttpStatus.OK, "내 사무실 정보 수정이 성공적으로 완료되었습니다."),
+    UPDATE_AGENT_MY_PAGE_SUCCESS(HttpStatus.CREATED, "내 사무실 정보 수정이 성공적으로 완료되었습니다."),
 
 
     // Room API
