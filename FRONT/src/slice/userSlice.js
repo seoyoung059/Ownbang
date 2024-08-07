@@ -1,20 +1,20 @@
-import { getUserInfo } from "../api/user";
+import { getUserInfo, patchUserInfo } from "../api/user";
 
 export const createUserSlice = (set) => ({
-  user: { isAgent: true },
+  user: null,
   fetchUser: async (token) => {
     try {
       const userData = await getUserInfo(token);
-      set({ user: userData });
+      set({ user: userData.data });
     } catch (error) {
-      console.error(error);
       set({ user: null });
     }
   },
-  modifyUser: async (token, data) => {
+  modifyUser: async (data) => {
     try {
-      const response = await patchUserInfo(token, data);
-      console.log(response.result);
+      const response = await patchUserInfo(data);
+      console.log(response);
+      return response;
     } catch (error) {
       console.error(error);
     }
