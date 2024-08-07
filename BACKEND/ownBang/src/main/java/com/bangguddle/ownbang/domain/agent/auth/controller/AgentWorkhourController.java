@@ -1,11 +1,12 @@
 package com.bangguddle.ownbang.domain.agent.auth.controller;
 
 import com.bangguddle.ownbang.domain.agent.auth.dto.AgentWorkhourListResponse;
+import com.bangguddle.ownbang.domain.agent.auth.dto.AgentWorkhourRequest;
 import com.bangguddle.ownbang.domain.agent.auth.service.AgentWorkhourService;
-import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,23 +18,23 @@ public class AgentWorkhourController {
     private final AgentWorkhourService agentWorkhourService;
 
     @PostMapping
-    public ResponseEntity<Response<NoneResponse>> createAgentWorkhour(@RequestBody AgentWorkhour agentWorkhour) {
-        SuccessResponse<NoneResponse> response = agentWorkhourService.createAgentWorkhour(agentWorkhour);
+    public ResponseEntity<Response<NoneResponse>> createAgentWorkhour(@RequestBody @Valid AgentWorkhourRequest request) {
+        SuccessResponse<NoneResponse> response =  agentWorkhourService.createAgentWorkhour(request);
         return Response.success(response);
     }
 
     @GetMapping
     public ResponseEntity<Response<AgentWorkhourListResponse>> getAgentWorkhour(
-            @RequestParam Long agentId) {
+            @RequestParam(name="agentId") Long agentId) {
         SuccessResponse<AgentWorkhourListResponse> response = agentWorkhourService.getAgentWorkhour(agentId);
         return Response.success(response);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Response<NoneResponse>> updateAgentWorkhour(
-            @PathVariable Long id,
-            @RequestBody AgentWorkhour agentWorkhour) {
-        SuccessResponse<NoneResponse> response = agentWorkhourService.updateAgentWorkhour(id, agentWorkhour);
+            @PathVariable("id") Long id,
+            @RequestBody @Valid AgentWorkhourRequest request) {
+        SuccessResponse<NoneResponse> response = agentWorkhourService.updateAgentWorkhour(id, request);
         return Response.success(response);
     }
 }

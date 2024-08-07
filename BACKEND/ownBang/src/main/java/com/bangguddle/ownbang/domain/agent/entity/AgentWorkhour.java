@@ -1,12 +1,12 @@
 package com.bangguddle.ownbang.domain.agent.entity;
-import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+@AllArgsConstructor
 @Getter
 @Entity
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "agent_workhour", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"agent_id", "day"})
@@ -21,7 +21,7 @@ public class AgentWorkhour {
     @JoinColumn(name = "agent_id", nullable = false)
     private Agent agent;
 
-    @Column(nullable = false, columnDefinition = "ENUM('MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN')")
+    @Column(nullable = false, columnDefinition = "ENUM('WEEKDAY','WEEKEND')")
     @Enumerated(EnumType.STRING)
     private Day day;
 
@@ -31,20 +31,13 @@ public class AgentWorkhour {
     @Column(name = "end_time", nullable = false, columnDefinition = "TIME")
     private String endTime;
 
-    @Builder
-    public AgentWorkhour(Agent agent, Day day, String startTime, String endTime) {
-        this.agent = agent;
-        this.day = day;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
 
     public enum Day {
         WEEKEND, WEEKDAY
     }
 
-    public void updateWorkhour(Day day, String startTime, String endTime) {
-        this.day = day;
+    public void updateWorkhour(Long id,String startTime, String endTime) {
+        this.id=id;
         this.startTime = startTime;
         this.endTime = endTime;
     }

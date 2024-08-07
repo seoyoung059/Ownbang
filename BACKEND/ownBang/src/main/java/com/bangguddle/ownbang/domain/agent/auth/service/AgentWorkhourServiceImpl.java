@@ -1,6 +1,7 @@
 package com.bangguddle.ownbang.domain.agent.auth.service;
 
 import com.bangguddle.ownbang.domain.agent.auth.dto.AgentWorkhourListResponse;
+import com.bangguddle.ownbang.domain.agent.auth.dto.AgentWorkhourRequest;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
@@ -26,8 +27,13 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
     private final AgentRepository agentRepository;
 
     @Override
-    public SuccessResponse<NoneResponse> createAgentWorkhour(AgentWorkhour agentWorkhour) {
+    public SuccessResponse<NoneResponse> createAgentWorkhour(AgentWorkhourRequest request) {
+        Agent agent = agentRepository.findById(request.agentId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+
+        AgentWorkhour agentWorkhour = request.toEntity(agent);
         agentWorkhourRepository.save(agentWorkhour);
+
         return new SuccessResponse<>(AGENT_WORKHOUR_CREATE_SUCCESS, NoneResponse.NONE);
     }
 
@@ -41,13 +47,18 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
         return new SuccessResponse<>(AGENT_WORKHOUR_GET_SUCCESS, AgentWorkhourListResponse.from(workhours));
     }
 
-    @Override
-    public SuccessResponse<NoneResponse> updateAgentWorkhour(Long id, AgentWorkhour updatedWorkhour) {
-        AgentWorkhour existingWorkhour = agentWorkhourRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.WORKHOUR_NOT_FOUND));
+    @Transactional
+    public SuccessResponse<NoneResponse> updateAgentWorkhour(Long id, AgentWorkhourRequest request) {
+        AgentWorkhour agentWorkhour = agentWorkhourRepository.findById(id)
+                .orElseThrow(() -> new AppException(NOT_FOUND));
 
-        existingWorkhour.updateWorkhour(updatedWorkhour.getDay(), updatedWorkhour.getStartTime(), updatedWorkhour.getEndTime());
-        agentWorkhourRepository.save(existingWorkhour);
+        // 요청된 agentId와 실제 AgentWorkhour의 agentId가 일치하는지 확인
+        if (!agentWorkhour.getAgent().getId().equals(request.agentId())) {
+            throw new AppException(NOT_FOUND);
+        }
+
+        agentWorkhour.updateWorkhour(id,request.startTime(), request.endTime());
+
 
         return new SuccessResponse<>(AGENT_WORKHOUR_UPDATE_SUCCESS, NoneResponse.NONE);
     }
