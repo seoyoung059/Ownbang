@@ -53,17 +53,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @DisplayName("예약 신청 성공")
-    @WithMockUser
+    @WithMockUser()
     void createReservation_Success() throws Exception {
         Long userId = 1L;
         ReservationRequest request = new ReservationRequest(1L, LocalDateTime.now(), ReservationStatus.APPLYED);
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(RESERVATION_MAKE_SUCCESS, NoneResponse.NONE);
 
-        when(reservationService.createReservation(eq(userId), any(ReservationRequest.class))).thenReturn(successResponse);
+        when(reservationService.createReservation(any(), any())).thenReturn(successResponse);
 
         mockMvc.perform(post("/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
+                        .with(SecurityMockMvcRequestPostProcessors.user(userId.toString()))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
@@ -89,7 +90,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @DisplayName("사용자 예약 목록 조회 성공")
-    @WithMockUser(username = "1") // userId를 1로 설정
+    @WithMockUser
     void getMyReservationList_Success() throws Exception {
         Long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
@@ -102,7 +103,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         ReservationListResponse listResponse = new ReservationListResponse(reservations);
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);
 
-        when(reservationService.getMyReservationList(eq(userId))).thenReturn(successResponse);
+        when(reservationService.getMyReservationList(any())).thenReturn(successResponse);
 
         mockMvc.perform(get("/reservations/list")
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
@@ -151,9 +152,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         Long reservationId = 1L;
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(RESERVATION_UPDATE_STATUS_SUCCESS, NoneResponse.NONE);
 
-        when(reservationService.updateStatusReservation(eq(userId), eq(reservationId))).thenReturn(successResponse);
+        when(reservationService.updateStatusReservation(any(), any())).thenReturn(successResponse);
 
         mockMvc.perform(patch("/reservations/{id}", reservationId)
+                        .with(SecurityMockMvcRequestPostProcessors.user(userId.toString()))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))

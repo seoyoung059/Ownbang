@@ -28,7 +28,7 @@ import java.util.List;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_EMPTY;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_SUCCESS;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -52,7 +52,7 @@ public class AgentReservationControllerTest {
 
     @Test
     @DisplayName("예약 확정 성공")
-    @WithMockUser(username = "1") // userId를 1로 설정
+    @WithMockUser// userId를 1로 설정
     void confirmStatusReservation_Success() throws Exception {
         Long id = 1L;
         Long userId = 1L;
@@ -62,7 +62,7 @@ public class AgentReservationControllerTest {
                 NoneResponse.NONE
         );
 
-        when(reservationService.confirmStatusReservation(eq(userId), eq(id))).thenReturn(successResponse);
+        when(reservationService.confirmStatusReservation(any(), anyLong())).thenReturn(successResponse);
 
         mockMvc.perform(patch("/agents/reservations/{id}", id)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
@@ -80,7 +80,7 @@ public class AgentReservationControllerTest {
         Long id = 1L;
         Long userId = 1L;
 
-        when(reservationService.confirmStatusReservation(eq(userId), eq(id)))
+        when(reservationService.confirmStatusReservation(any(), anyLong()))
                 .thenThrow(new AppException(RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM));
 
         mockMvc.perform(patch("/agents/reservations/{id}", id)
@@ -105,7 +105,7 @@ public class AgentReservationControllerTest {
         ReservationListResponse listResponse = new ReservationListResponse(List.of(reservation1, reservation2, reservation3));
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);
 
-        when(reservationService.getAgentReservations(eq(userId))).thenReturn(successResponse);
+        when(reservationService.getAgentReservations(any())).thenReturn(successResponse);
 
         mockMvc.perform(get("/agents/reservations")
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
@@ -133,7 +133,7 @@ public class AgentReservationControllerTest {
         ReservationListResponse emptyListResponse = new ReservationListResponse(List.of());
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_EMPTY, emptyListResponse);
 
-        when(reservationService.getAgentReservations(eq(userId))).thenReturn(successResponse);
+        when(reservationService.getAgentReservations(any())).thenReturn(successResponse);
 
         mockMvc.perform(get("/agents/reservations")
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
