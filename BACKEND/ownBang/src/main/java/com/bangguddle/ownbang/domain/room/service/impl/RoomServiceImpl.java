@@ -2,6 +2,8 @@ package com.bangguddle.ownbang.domain.room.service.impl;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
+import com.bangguddle.ownbang.domain.bookmark.entity.Bookmark;
+import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.ACCESS_DENIED;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.ROOM_NOT_FOUND;
@@ -33,6 +36,7 @@ public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final RoomImageService roomImageService;
     private final AgentRepository agentRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     /**
      * 매물 생성 Service 메서드
@@ -116,9 +120,10 @@ public class RoomServiceImpl implements RoomService {
      */
     @Override
     @Transactional
-    public SuccessResponse<RoomSearchResponse> getRoom(Long roomId) {
+    public SuccessResponse<RoomSearchResponse> getRoom(Long userId, Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
-        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room));
+        Optional<Bookmark> bookmarkOptional = bookmarkRepository.findBookmarkByRoomIdAndUserId(roomId, userId);
+        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room, bookmarkOptional.isPresent()));
     }
 
     /**
@@ -133,15 +138,20 @@ public class RoomServiceImpl implements RoomService {
         Agent agent = agentRepository.getByUserId(userId);
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         List<RoomInfoSearchResponse> list = roomRepository.getByAgentId(agent.getId(), pageable).stream()
-                .map(RoomInfoSearchResponse::from)
+                .map((room)->{
+                    return RoomInfoSearchResponse.from(room, false);
+                })
                 .toList();
         return new SuccessResponse<>(ROOM_FIND_SUCCESS, list);
     }
 
     @Override
-    public SuccessResponse<List<RoomInfoSearchResponse>> search() {
+    public SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId) {
         List<RoomInfoSearchResponse> list = roomRepository.findAll().stream()
-                .map(RoomInfoSearchResponse::from)
+                .map((room)->{
+                    Optional<Bookmark> bookmarkOptional = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId);
+                    return RoomInfoSearchResponse.from(room, bookmarkOptional.isPresent());
+                })
                 .toList();
         SuccessResponse<List<RoomInfoSearchResponse>> response =
                 new SuccessResponse<>(SEARCH_ROOM_SUCCESS, list);
