@@ -103,15 +103,14 @@ public class WebrtcAgentService implements WebrtcService {
         webrtcSessionService.removeSession(reservationId);
 
         // record hls 변환
-//        SuccessResponse<String> uploadSuccess = streamingService.uploadStreaming(recording.getSessionId());
+        SuccessResponse<String> uploadSuccess = streamingService.uploadStreaming(recording.getSessionId());
 
         // video 수정
         Video video = videoRepository.findByReservationId(reservationId)
                 .orElseThrow(()->new AppException(INTERNAL_SERVER_ERROR));
         VideoUpdateRequest videoUpdateRequest =
                 VideoUpdateRequest.builder()
-//                                .videoUrl(uploadSuccess.data())
-                                .videoUrl("test")
+                                .videoUrl(uploadSuccess.data())
                                 .videoStatus(VideoStatus.RECORDED)
                                 .build();
         videoService.modifyVideo(videoUpdateRequest, video.getId());
