@@ -74,7 +74,7 @@ public class RoomController {
      * @param roomId 조회할 매물의 ID
      * @return Success Response. RoomSearchResponse - 조회한 매물 정보 JSON DTO
      */
-    @GetMapping("/{roomId}")
+    @GetMapping("/search/{roomId}")
     public ResponseEntity<Response<RoomSearchResponse>> getRoom(@AuthenticationPrincipal Long userId,
                                                                 @PathVariable(name = "roomId") @Positive @Valid Long roomId) {
         return Response.success(roomService.getRoom(userId, roomId));

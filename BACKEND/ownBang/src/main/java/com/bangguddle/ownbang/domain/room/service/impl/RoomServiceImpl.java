@@ -2,7 +2,6 @@ package com.bangguddle.ownbang.domain.room.service.impl;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
-import com.bangguddle.ownbang.domain.bookmark.entity.Bookmark;
 import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.ACCESS_DENIED;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.ROOM_NOT_FOUND;
@@ -122,8 +120,11 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     public SuccessResponse<RoomSearchResponse> getRoom(Long userId, Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
-        Optional<Bookmark> bookmarkOptional = bookmarkRepository.findBookmarkByRoomIdAndUserId(roomId, userId);
-        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room, bookmarkOptional.isPresent()));
+        boolean isBookmarked = false;
+        if(userId!=null){
+            isBookmarked = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId).isPresent();
+        }
+        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room, isBookmarked));
     }
 
     /**
@@ -149,8 +150,11 @@ public class RoomServiceImpl implements RoomService {
     public SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId) {
         List<RoomInfoSearchResponse> list = roomRepository.findAll().stream()
                 .map((room)->{
-                    Optional<Bookmark> bookmarkOptional = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId);
-                    return RoomInfoSearchResponse.from(room, bookmarkOptional.isPresent());
+                    boolean isBookmarked = false;
+                    if(userId!=null){
+                        isBookmarked = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId).isPresent();
+                    }
+                    return RoomInfoSearchResponse.from(room, isBookmarked);
                 })
                 .toList();
         SuccessResponse<List<RoomInfoSearchResponse>> response =

@@ -31,9 +31,9 @@ public record RoomInfoSearchResponse(
         Long maintenanceFee,
         String parcel,
         String road,
+        Boolean isBookmarked,
         String detailAddress,
-        String profileImageUrl,
-        Boolean isBookmarked
+        String profileImageUrl
 ) {
 
     static public RoomInfoSearchResponse from(Room room, Boolean isBookmarked) {

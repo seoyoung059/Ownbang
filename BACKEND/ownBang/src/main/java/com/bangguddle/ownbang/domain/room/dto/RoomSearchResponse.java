@@ -37,11 +37,11 @@ public record RoomSearchResponse(
         String road,
         String detailAddress,
         String profileImageUrl,
+        Boolean isBookmarked,
         RoomAppliancesSearchResponse roomAppliancesSearchResponse,
         RoomDetailSearchResponse roomDetailSearchResponse,
         @Valid
-        List<RoomImageResponse> roomImageResponses,
-        Boolean isBookmarked
+        List<RoomImageResponse> roomImageResponses
 ) {
 
     static public RoomSearchResponse from(Room room, Boolean isBookmarked) {
