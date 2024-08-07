@@ -16,7 +16,7 @@ public record ChecklistUpdateRequest(
         Map<String, String> contents
 ){
 
-    public String getContentsToString() {
+    public String contentsToString() {
         return contents.entrySet()
                 .stream()
                 .map(entry -> entry.getKey() + ": " + entry.getValue())

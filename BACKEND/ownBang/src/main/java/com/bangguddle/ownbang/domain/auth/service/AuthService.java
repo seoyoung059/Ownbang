@@ -12,4 +12,5 @@ public interface AuthService {
     SuccessResponse<Tokens> login(LoginRequest request);
     SuccessResponse<PasswordCheckResponse> passwordCheck(Long id, PasswordCheckRequest request);
     SuccessResponse<NoneResponse> logout(String header, Long id);
+    SuccessResponse<NoneResponse> passwordChange(Long id, PasswordChangeRequest request);
 }

@@ -9,6 +9,7 @@ import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import com.bangguddle.ownbang.global.service.S3UploaderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +21,10 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.UPDATE_MY_PAGE_SUC
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final S3UploaderService s3UploaderService;
+
+    @Value("${S3_USERIMG_PATH}")
+    private String userImagePath;
+
 
     @Override
     public SuccessResponse<MyPageResponse> getMyPage(Long id) {
@@ -33,7 +38,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getById(id);
         String uploadedFileUrl = user.getProfileImageUrl();
         if (file != null) {
-            uploadedFileUrl = s3UploaderService.uploadMultipartFileToS3(file, "user");
+            uploadedFileUrl = s3UploaderService.uploadFile(file, userImagePath);
         }
         user.updateUserProfile(uploadedFileUrl, request.nickname());
         userRepository.save(user);

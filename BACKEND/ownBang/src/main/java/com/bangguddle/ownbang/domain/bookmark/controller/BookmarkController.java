@@ -21,15 +21,9 @@ public class BookmarkController {
     private final BookmarkService bookmarkService;
 
     @PostMapping("/{roomId}")
-    public ResponseEntity<Response<NoneResponse>> addBookmark(@AuthenticationPrincipal Long userId,
+    public ResponseEntity<Response<NoneResponse>> toggleBookmark(@AuthenticationPrincipal Long userId,
                                                               @PathVariable(name = "roomId") @Positive @Valid Long roomId) {
-        return Response.success(bookmarkService.createBookmark(userId, roomId));
-    }
-
-    @DeleteMapping("/{bookmarkId}")
-    public ResponseEntity<Response<NoneResponse>> deleteBookmark(@AuthenticationPrincipal Long userId,
-                                                                 @PathVariable(name = "bookmarkId") @Positive @Valid Long bookmarkId) {
-        return Response.success(bookmarkService.deleteBookmark(userId, bookmarkId));
+        return Response.success(bookmarkService.toggleBookmark(userId, roomId));
     }
 
     @GetMapping
