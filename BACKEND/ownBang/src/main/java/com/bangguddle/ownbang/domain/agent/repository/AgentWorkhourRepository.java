@@ -5,9 +5,10 @@ import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface AgentWorkhourRepository extends JpaRepository<AgentWorkhour, Long> {
-    Optional<AgentWorkhour> findByAgentAndDay(Agent agent, AgentWorkhour.Day day);
+    AgentWorkhour findByAgentAndDay(Agent agent, AgentWorkhour.Day day);
+    List<AgentWorkhour> findByAgent(Agent agent);
 }

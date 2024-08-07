@@ -40,6 +40,12 @@ public class AgentWorkhour {
     }
 
     public enum Day {
-        MON, TUE, WED, THU, FRI, SAT, SUN
+        WEEKEND, WEEKDAY
+    }
+
+    public void updateWorkhour(Day day, String startTime, String endTime) {
+        this.day = day;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 }

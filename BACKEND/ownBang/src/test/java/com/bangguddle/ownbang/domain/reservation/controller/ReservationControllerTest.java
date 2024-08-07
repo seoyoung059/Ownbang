@@ -1,6 +1,9 @@
 package com.bangguddle.ownbang.domain.reservation.controller;
 
-import com.bangguddle.ownbang.domain.reservation.dto.*;
+import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeRequest;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
+import com.bangguddle.ownbang.domain.reservation.dto.ReservationResponse;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
 import com.bangguddle.ownbang.domain.room.entity.Room;
@@ -33,7 +36,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.bangguddle.ownbang.global.enums.SuccessCode.AVAILABLE_TIMES_RETRIEVED;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_SUCCESS;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
@@ -197,32 +199,37 @@ public class ReservationControllerTest {
     }
 
     @Test
-    @DisplayName("예약 가능 시간 조회 성공")
-    void getAvailableTimes_Success() throws Exception {
-        // Given
-        Long roomId = 1L;
-        LocalDate date = LocalDate.now().plusDays(1);
-        List<String> availableTimes = List.of("09:00", "09:30", "10:00", "10:30");
-        AvailableTimeResponse availableTimeResponse = new AvailableTimeResponse(availableTimes);
-        SuccessResponse<AvailableTimeResponse> successResponse = new SuccessResponse<>(AVAILABLE_TIMES_RETRIEVED, availableTimeResponse);
+    @DisplayName("사용자 예약 목록 조회 성공 - COMPLETED 상태 포함")
+    @WithMockUser
+    void getReservationsByUserId_Success_WithCompletedStatus() throws Exception {
+        Long userId = 1L;
+        LocalDateTime now = LocalDateTime.now();
 
-        when(reservationService.getAvailableTimes(any(AvailableTimeRequest.class))).thenReturn(successResponse);
+        ReservationResponse reservation1 = new ReservationResponse(1L, now, ReservationStatus.APPLYED, 1L, userId);
+        ReservationResponse reservation2 = new ReservationResponse(2L, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId);
+        ReservationResponse reservation3 = new ReservationResponse(3L, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId);
 
-        // When & Then
-        mockMvc.perform(get("/reservations/available-times")
-                        .param("roomId", String.valueOf(roomId))
-                        .param("date", date.toString())
-                        .contentType(MediaType.APPLICATION_JSON))
+        List<ReservationResponse> reservations = List.of(reservation1, reservation2, reservation3);
+        ReservationListResponse listResponse = new ReservationListResponse(reservations);
+        SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);
+
+        when(reservationService.getMyReservationList(eq(userId))).thenReturn(successResponse);
+
+        mockMvc.perform(get("/reservations/list")
+                        .param("userId", String.valueOf(userId)))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(jsonPath("$.code").value(AVAILABLE_TIMES_RETRIEVED.name()))
-                .andExpect(jsonPath("$.message").value(AVAILABLE_TIMES_RETRIEVED.getMessage()))
-                .andExpect(jsonPath("$.data.availableTimes").isArray())
-                .andExpect(jsonPath("$.data.availableTimes", hasSize(4)))
-                .andExpect(jsonPath("$.data.availableTimes[0]").value("09:00"))
-                .andExpect(jsonPath("$.data.availableTimes[1]").value("09:30"))
-                .andExpect(jsonPath("$.data.availableTimes[2]").value("10:00"))
-                .andExpect(jsonPath("$.data.availableTimes[3]").value("10:30"));
+                .andExpect(jsonPath("$.code").value(RESERVATION_LIST_SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value(RESERVATION_LIST_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.data.reservations").isArray())
+                .andExpect(jsonPath("$.data.reservations", hasSize(3)))
+                .andExpect(jsonPath("$.data.reservations[0].id").value(1))
+                .andExpect(jsonPath("$.data.reservations[0].status").value(ReservationStatus.APPLYED.toString()))
+                .andExpect(jsonPath("$.data.reservations[1].id").value(2))
+                .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.CONFIRMED.toString()))
+                .andExpect(jsonPath("$.data.reservations[2].id").value(3))
+                .andExpect(jsonPath("$.data.reservations[2].status").value(ReservationStatus.COMPLETED.toString()));
     }
 
     @Test

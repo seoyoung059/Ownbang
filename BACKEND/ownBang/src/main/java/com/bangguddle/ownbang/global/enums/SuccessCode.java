@@ -64,7 +64,16 @@ public enum SuccessCode implements ResponseCode {
     AVAILABLE_TIMES_RETRIEVED(HttpStatus.OK, "예약 가능한 시간 목록을 성공적으로 조회했습니다."),
     // ElasticSearch API
     SEARCH_SUCCESS (HttpStatus.CREATED, "데이터가 성공적으로 입력되었습니다. "),
-    SEARCH_LIST_SUCEESS(HttpStatus.OK ,"검색 목록을 조회할 수 있습니다.");
+    SEARCH_LIST_SUCEESS(HttpStatus.OK ,"검색 목록을 조회할 수 있습니다."),
+
+    //Agent Workhour API
+    AGENT_WORKHOUR_CREATE_SUCCESS(HttpStatus.CREATED, "중개인 영업시간 등록이 성공적으로 완료되었습니다."),
+    AGENT_WORKHOUR_GET_SUCCESS(HttpStatus.OK ,"중개인 영업시간을 조회할 수 있습니다."),
+    AGENT_WORKHOUR_UPDATE_SUCCESS(HttpStatus.OK, "중개인 영업시간을 수정할 수 있습니다.");
+
+
     private final HttpStatus httpStatus;
     private final String message;
+
+
 }

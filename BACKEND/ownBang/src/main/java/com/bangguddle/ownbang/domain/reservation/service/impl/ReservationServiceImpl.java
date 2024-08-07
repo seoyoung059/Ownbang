@@ -14,7 +14,9 @@ import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
-import com.bangguddle.ownbang.global.enums.ErrorCode;
+import com.bangguddle.ownbang.domain.video.entity.Video;
+import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
+import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -22,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -42,6 +45,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final AgentWorkhourRepository agentWorkhourRepository;
+    private final VideoRepository videoRepository;
 
     @Override
     @Transactional
@@ -74,15 +78,31 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(RESERVATION_MAKE_SUCCESS, NoneResponse.NONE);
     }
 
-    @Transactional(readOnly =true)
+    // 예약 목록 조회
+    @Transactional
     public SuccessResponse<ReservationListResponse> getMyReservationList(Long userId) {
         List<Reservation> reservations = reservationRepository.findByUserId(userId);
         if (reservations == null || reservations.isEmpty()) {
-            // 예약이 없는 경우에 대한 처리
             return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
         }
 
-        ReservationListResponse reservationListResponse = ReservationListResponse.from(reservations);
+        List<Reservation> updatedReservations = new ArrayList<>();
+        for (Reservation reservation : reservations) {
+            if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+                Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
+                if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED) {
+                    Reservation updatedReservation = reservation.completeStatus();
+                    reservationRepository.save(updatedReservation);  // 상태 변경을 데이터베이스에 반영
+                    updatedReservations.add(updatedReservation);
+                } else {
+                    updatedReservations.add(reservation);
+                }
+            } else {
+                updatedReservations.add(reservation);
+            }
+        }
+
+        ReservationListResponse reservationListResponse = ReservationListResponse.from(updatedReservations);
         return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
     }
 
@@ -130,6 +150,12 @@ public class ReservationServiceImpl implements ReservationService {
             throw new AppException(RESERVATION_CONFIRMED_DUPLICATED);
         }
 
+        Optional<Reservation> existsConfirmedReservation = reservationRepository.existsByRoomAndReservationTimeAndStatus(
+                reservation.getRoom(), reservation.getReservationTime(), ReservationStatus.CONFIRMED);
+        if (existsConfirmedReservation.isPresent()) {
+            throw new AppException(RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM);
+        }
+
         // 상태를 '예약취소'로 변경
         Reservation confirmedReservation = reservation.confirmStatus();
 
@@ -138,8 +164,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         return new SuccessResponse<>(RESERVATION_CONFIRM_SUCCESS, NoneResponse.NONE);
     }
-
-    @Transactional(readOnly = true)
+    // 중개인 예약 목록조회
+    @Transactional
     public SuccessResponse<ReservationListResponse> getAgentReservations(Long agentId) {
         LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         List<Reservation> reservations = reservationRepository.findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(agentId, today);
@@ -148,20 +174,35 @@ public class ReservationServiceImpl implements ReservationService {
             return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
         }
 
-        ReservationListResponse reservationListResponse = ReservationListResponse.from(reservations);
+        List<Reservation> updatedReservations = new ArrayList<>();
+        for (Reservation reservation : reservations) {
+            if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+                Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
+                if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED) {
+                    Reservation updatedReservation = reservation.completeStatus();
+                    updatedReservation = reservationRepository.save(updatedReservation);
+                    updatedReservations.add(updatedReservation);
+                } else {
+                    updatedReservations.add(reservation);
+                }
+            } else {
+                updatedReservations.add(reservation);
+            }
+        }
+
+        ReservationListResponse reservationListResponse = ReservationListResponse.from(updatedReservations);
         return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
     }
 
-    // 매물, 날짜별 예약 가능한 시간 반환
+    //예약가능한 시간 조회
     @Override
     @Transactional(readOnly = true)
     public SuccessResponse<AvailableTimeResponse> getAvailableTimes(AvailableTimeRequest request) {
         Room room = roomRepository.findById(request.roomId())
-                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
 
-        AgentWorkhour workhour = agentWorkhourRepository.findByAgentAndDay(room.getAgent(), getDayOfWeek(request.date()))
-                .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
-
+        AgentWorkhour.Day dayOfWeek = getDayCategory(request.date());
+        AgentWorkhour workhour = agentWorkhourRepository.findByAgentAndDay(room.getAgent(), dayOfWeek);
         LocalTime startTime = LocalTime.parse(workhour.getStartTime());
         LocalTime endTime = LocalTime.parse(workhour.getEndTime());
 
@@ -177,8 +218,16 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(AVAILABLE_TIMES_RETRIEVED, new AvailableTimeResponse(availableTimes));
     }
 
-    private AgentWorkhour.Day getDayOfWeek(LocalDate date) {
-        return AgentWorkhour.Day.valueOf(date.getDayOfWeek().name().substring(0, 3));
+    private AgentWorkhour.Day getDayCategory(LocalDate date) {
+        // 날짜에 따라 주말, 주중인지 파악
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        switch (dayOfWeek) {
+            case SATURDAY:
+            case SUNDAY:
+                return AgentWorkhour.Day.WEEKEND;
+            default:
+                return AgentWorkhour.Day.WEEKDAY;
+        }
     }
 
     private List<LocalTime> generateTimeSlots(LocalTime start, LocalTime end) {
@@ -190,4 +239,5 @@ public class ReservationServiceImpl implements ReservationService {
         }
         return slots;
     }
+
 }

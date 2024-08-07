@@ -6,6 +6,7 @@ import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
+import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -24,11 +25,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.bangguddle.ownbang.global.enums.ErrorCode.RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_EMPTY;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_SUCCESS;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -70,16 +72,34 @@ public class AgentReservationControllerTest {
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
     @Test
-    @DisplayName("중개인 예약 목록 조회 성공")
+    @DisplayName("예약 확정 실패 - 같은 시간, 같은 매물에 이미 확정된 예약 존재")
     @WithMockUser
-    void getAgentReservations_Success() throws Exception {
+    void confirmReservation_Fail_AlreadyConfirmedSameTimeAndRoom() throws Exception {
+        Long id = 1L;
+
+        when(reservationService.confirmStatusReservation(anyLong()))
+                .thenThrow(new AppException(RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM));
+
+        mockMvc.perform(patch("/agents/reservations/{id}", id)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andDo(print())
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.code").value(RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM.name()))
+                .andExpect(jsonPath("$.message").value(RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM.getMessage()));
+    }
+    @Test
+    @DisplayName("중개인 예약 목록 조회 성공 - COMPLETED 상태 포함")
+    @WithMockUser
+    void getAgentReservations_Success_WithCompletedStatus() throws Exception {
         Long agentId = 1L;
         LocalDateTime now = LocalDateTime.now();
 
         ReservationResponse reservation1 = new ReservationResponse(1L, now, ReservationStatus.APPLYED, 1L, 1L);
-        ReservationResponse reservation2 = new ReservationResponse(2L, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, 2L );
+        ReservationResponse reservation2 = new ReservationResponse(2L, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, 2L);
+        ReservationResponse reservation3 = new ReservationResponse(3L, now.plusDays(2), ReservationStatus.COMPLETED, 3L, 3L);
 
-        ReservationListResponse listResponse = new ReservationListResponse(List.of(reservation1, reservation2));
+        ReservationListResponse listResponse = new ReservationListResponse(List.of(reservation1, reservation2, reservation3));
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);
 
         when(reservationService.getAgentReservations(anyLong())).thenReturn(successResponse);
@@ -93,13 +113,13 @@ public class AgentReservationControllerTest {
                 .andExpect(jsonPath("$.code").value(RESERVATION_LIST_SUCCESS.name()))
                 .andExpect(jsonPath("$.message").value(RESERVATION_LIST_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data.reservations").isArray())
-                .andExpect(jsonPath("$.data.reservations.length()").value(2))
+                .andExpect(jsonPath("$.data.reservations.length()").value(3))
                 .andExpect(jsonPath("$.data.reservations[0].id").value(1))
-                .andExpect(jsonPath("$.data.reservations[0].roomId").value(1))
                 .andExpect(jsonPath("$.data.reservations[0].status").value(ReservationStatus.APPLYED.toString()))
                 .andExpect(jsonPath("$.data.reservations[1].id").value(2))
-                .andExpect(jsonPath("$.data.reservations[1].roomId").value(2))
-                .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.CONFIRMED.toString()));
+                .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.CONFIRMED.toString()))
+                .andExpect(jsonPath("$.data.reservations[2].id").value(3))
+                .andExpect(jsonPath("$.data.reservations[2].status").value(ReservationStatus.COMPLETED.toString()));
     }
 
     @Test

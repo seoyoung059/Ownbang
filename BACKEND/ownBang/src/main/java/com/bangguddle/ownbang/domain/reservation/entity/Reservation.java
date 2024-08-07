@@ -46,7 +46,15 @@ public class Reservation {
                 ReservationStatus.CANCELLED
         );
     }
-
+    public Reservation completeStatus() {
+        return new Reservation(
+                this.id,
+                this.room,
+                this.user,
+                this.reservationTime,
+                ReservationStatus.COMPLETED
+        );
+    }
     public Reservation confirmStatus() {
         return new Reservation(
                 this.id,
