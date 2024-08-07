@@ -22,6 +22,8 @@ public enum ErrorCode implements ResponseCode {
 
     // Webrtc API
     WEBRTC_SESSION_DUPLICATED(HttpStatus.CONFLICT, "이미 생성된 세션입니다"),
+    WEBRTC_SESSION_CLOSED(HttpStatus.CONFLICT, "이미 종료된 세션입니다"),
+    WEBRTC_SESSION_UNOPENED(HttpStatus.CONFLICT, "아직 생성되지 않은 세션입니다"),
     WEBRTC_TOKEN_DUPLICATED(HttpStatus.CONFLICT, "이미 생성된 토큰입니다."),
     WEBRTC_NO_PUBLISHER(HttpStatus.BAD_REQUEST, "해당 세션에 연결된 사용자가 없습니다."),
 

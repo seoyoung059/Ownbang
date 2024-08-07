@@ -20,6 +20,8 @@ import io.openvidu.java.client.Recording;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCESS;
@@ -111,6 +113,6 @@ public class WebrtcUserService implements WebrtcService {
 
     private void validateSession(final Long reservationId){
         webrtcSessionService.getSession(reservationId).orElseThrow(
-                () -> new AppException(BAD_REQUEST));
+                () -> new AppException(WEBRTC_SESSION_UNOPENED));
     }
 }

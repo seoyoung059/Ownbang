@@ -197,8 +197,10 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     }
 
     @Override
-    public Optional<Recording> deleteRecord(final Long reservationId) {
-        validateSessionAndRecord(reservationId);
+    public Optional<Recording> deleteRecord(final Long reservationId)  {
+        if(!mapSessionRecordings.containsKey(reservationId)){
+            throw new AppException(BAD_REQUEST);
+        }
 
         String recordingId = mapSessionRecordings.get(reservationId).getId();
 

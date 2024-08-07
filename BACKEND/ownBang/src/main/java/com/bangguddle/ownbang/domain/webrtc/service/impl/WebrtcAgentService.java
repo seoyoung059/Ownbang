@@ -47,8 +47,12 @@ public class WebrtcAgentService implements WebrtcService {
         validateReservation(reservationId);
 
         // session 중복 검사
-        webrtcSessionService.getSession(reservationId).ifPresent(
-                i -> {throw new AppException(WEBRTC_SESSION_DUPLICATED);});
+        webrtcSessionService.getSession(reservationId)
+                .ifPresent(i -> {throw new AppException(WEBRTC_SESSION_DUPLICATED);});
+
+        // 이전에 종료된 세션 여부 확인
+        videoRepository.findByReservationId(reservationId)
+                .ifPresent(i -> {throw new AppException(WEBRTC_SESSION_CLOSED);});
 
         // session 생성
         webrtcSessionService.createSession(reservationId);
@@ -73,10 +77,6 @@ public class WebrtcAgentService implements WebrtcService {
         // session 유효성 검사
         webrtcSessionService.getSession(reservationId).orElseThrow(
                 () -> new AppException(BAD_REQUEST));
-
-        // 이전에 종료된 세션 여부 확인
-        videoRepository.findByReservationId(reservationId)
-                .orElseThrow(()->new AppException(BAD_REQUEST));
 
         // 영상 녹화 확인
         if(webrtcSessionService.getRecord(reservationId).isEmpty()){
@@ -103,14 +103,15 @@ public class WebrtcAgentService implements WebrtcService {
         webrtcSessionService.removeSession(reservationId);
 
         // record hls 변환
-        SuccessResponse<String> uploadSuccess = streamingService.uploadStreaming(recording.getSessionId());
+//        SuccessResponse<String> uploadSuccess = streamingService.uploadStreaming(recording.getSessionId());
 
         // video 수정
         Video video = videoRepository.findByReservationId(reservationId)
                 .orElseThrow(()->new AppException(INTERNAL_SERVER_ERROR));
         VideoUpdateRequest videoUpdateRequest =
                 VideoUpdateRequest.builder()
-                                .videoUrl(uploadSuccess.data())
+//                                .videoUrl(uploadSuccess.data())
+                                .videoUrl("test")
                                 .videoStatus(VideoStatus.RECORDED)
                                 .build();
         videoService.modifyVideo(videoUpdateRequest, video.getId());
