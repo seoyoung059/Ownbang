@@ -40,6 +40,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/get-token", "/remove-token",
             "/auths/password-check",
             "/videos",
+            "/mypage",
             "/checklists"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {

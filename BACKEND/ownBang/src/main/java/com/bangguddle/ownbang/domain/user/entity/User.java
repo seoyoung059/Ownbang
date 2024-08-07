@@ -60,4 +60,9 @@ public class User {
     public void updateIsAgent(boolean isAgent) {
         this.isAgent = isAgent;
     }
+
+    public void updateUserProfile(String profileImageUrl, String nickname) {
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+    }
 }

@@ -9,7 +9,7 @@ public interface S3UploaderService {
 
     String uploadToS3(File uploadFile, String dirName);
 
-    String uploadMultipartFileToS3(String fileName, MultipartFile multipartFile, String dirName);
+    String uploadMultipartFileToS3(MultipartFile multipartFile, String dirName);
 
     String uploadHlsFiles(Path outputPath, String sessionId);
 }
