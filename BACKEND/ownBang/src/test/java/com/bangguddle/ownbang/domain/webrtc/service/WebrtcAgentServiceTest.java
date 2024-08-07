@@ -1,8 +1,10 @@
 package com.bangguddle.ownbang.domain.webrtc.service;
 
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
+import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
@@ -65,18 +67,18 @@ public class WebrtcAgentServiceTest {
 
     @Mock
     private User user;
-
     @Mock
     private Session mockSession;
-
     @Mock
     private Recording recording;
-
     @Mock
     private Reservation reservation;
-
     @Mock
     private Video video;
+    @Mock
+    private Room room;
+    @Mock
+    private Agent agent;
 
     @InjectMocks
     private WebrtcAgentService webrtcService;
@@ -106,6 +108,10 @@ public class WebrtcAgentServiceTest {
         when(webrtcSessionService.createSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.createToken(reservationId, AGENT)).thenReturn(Optional.of("test-token"));
         when(videoRepository.findByReservationId(reservationId)).thenReturn(Optional.empty());
+        when(reservation.getRoom()).thenReturn(room);
+        when(room.getAgent()).thenReturn(agent);
+        when(agent.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn(userId);
 
         WebrtcCreateTokenRequest request = WebrtcCreateTokenRequest.builder().reservationId(reservationId).build();
 
@@ -194,6 +200,10 @@ public class WebrtcAgentServiceTest {
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.of(mockSession));
+        when(reservation.getRoom()).thenReturn(room);
+        when(room.getAgent()).thenReturn(agent);
+        when(agent.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn(userId);
 
         WebrtcCreateTokenRequest request = WebrtcCreateTokenRequest.builder().reservationId(reservationId).build();
 
@@ -221,6 +231,10 @@ public class WebrtcAgentServiceTest {
         when(webrtcSessionService.createSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.createToken(reservationId,AGENT))
                 .thenThrow(new AppException(WEBRTC_TOKEN_DUPLICATED));
+        when(reservation.getRoom()).thenReturn(room);
+        when(room.getAgent()).thenReturn(agent);
+        when(agent.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn(userId);
 
         WebrtcCreateTokenRequest request = WebrtcCreateTokenRequest.builder().reservationId(reservationId).build();
 
@@ -249,6 +263,10 @@ public class WebrtcAgentServiceTest {
                 .thenReturn(Optional.of("test-token"));
         when(webrtcSessionService.removeSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(streamingService.uploadStreaming(any())).thenReturn(mock(SuccessResponse.class));
+        when(reservation.getRoom()).thenReturn(room);
+        when(room.getAgent()).thenReturn(agent);
+        when(agent.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn(userId);
 
         WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
                 .reservationId(reservationId)
@@ -352,6 +370,10 @@ public class WebrtcAgentServiceTest {
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.empty());
+        when(reservation.getRoom()).thenReturn(room);
+        when(room.getAgent()).thenReturn(agent);
+        when(agent.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn(userId);
 
         WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
                 .reservationId(reservationId)
