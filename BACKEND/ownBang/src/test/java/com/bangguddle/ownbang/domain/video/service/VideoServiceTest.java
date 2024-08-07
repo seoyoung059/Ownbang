@@ -3,6 +3,7 @@ package com.bangguddle.ownbang.domain.video.service;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
+import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.video.dto.VideoRecordRequest;
 import com.bangguddle.ownbang.domain.video.dto.VideoSearchResponse;
 import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
@@ -38,6 +39,8 @@ public class VideoServiceTest {
     private Reservation reservation;
     @Mock
     private Video video;
+    @Mock
+    private User user;
 
     @InjectMocks
     private VideoServiceImpl videoService;
@@ -213,7 +216,8 @@ public class VideoServiceTest {
         when(video.getReservation()).thenReturn(reservation);
         when(video.getVideoUrl()).thenReturn(videoUrl);
         when(reservation.getId()).thenReturn(reservationId);
-        when(reservation.getUser().getId()).thenReturn(userId);
+        when(reservation.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn(userId);
 
         // then
         SuccessResponse response = videoService.getVideo(userId, videoId);
@@ -270,14 +274,13 @@ public class VideoServiceTest {
         // given
         Long invalidUserId = 123L;
         Long videoId = 1L;
-        Long reservationId = 10L;
-        String videoUrl = "VIDEO_TEST_URL";
 
         // when
         when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
         when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDED);
         when(video.getReservation()).thenReturn(reservation);
-        when(reservation.getUser().getId()).thenReturn(1L);
+        when(reservation.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn(1L);
 
         // then
         Throwable thrown = catchThrowable(() -> videoService.getVideo(invalidUserId, videoId));

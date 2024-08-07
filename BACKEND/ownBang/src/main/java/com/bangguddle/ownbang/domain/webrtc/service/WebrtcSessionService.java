@@ -17,6 +17,7 @@ public interface WebrtcSessionService {
     Optional<String> removeToken(Long reservationId, String token, UserType userType);
 
     Optional<Recording> startRecord(Long reservationId);
+    Optional<Recording> getRecord(Long reservationId);
     Optional<Recording> stopRecord(Long reservationId);
     Optional<Recording> deleteRecord(Long reservationId);
 }

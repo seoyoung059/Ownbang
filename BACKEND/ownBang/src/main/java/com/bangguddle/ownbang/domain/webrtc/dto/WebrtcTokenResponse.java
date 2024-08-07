@@ -3,4 +3,4 @@ package com.bangguddle.ownbang.domain.webrtc.dto;
 import lombok.Builder;
 
 @Builder
-public record WebrtcTokenResponse(String token) { }
+public record WebrtcTokenResponse(String token, Long createdAt) { }

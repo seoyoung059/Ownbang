@@ -1,6 +1,7 @@
 package com.bangguddle.ownbang.domain.streaming.service.impl;
 
 
+import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -32,7 +33,7 @@ import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class StreamingServiceImpl implements com.bangguddle.ownbang.domain.streaming.service.StreamingService {
+public class StreamingServiceImpl implements StreamingService {
 
 
     private final ObjectMapper objectMapper;
@@ -62,6 +63,8 @@ public class StreamingServiceImpl implements com.bangguddle.ownbang.domain.strea
         log.info(outputPath.toAbsolutePath().toString());
 
         // json에서 publisher(중개인)의 녹화 파일명을 얻는다.
+        String jsonFile = unzipFile(outputPath.toString(), sessionId, sessionId);
+
         String filename = getPublisherFileName(outputPath.toString(), sessionId);
         if(filename == null) throw new AppException(RECORDING_ERROR);
 
@@ -74,7 +77,7 @@ public class StreamingServiceImpl implements com.bangguddle.ownbang.domain.strea
         // s3에 업로드한다.
         String uploadedUrl = s3UploaderService.uploadHlsFiles(Paths.get(outputPath.toString(),sessionId), sessionId);
 
-        return new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, uploadedUrl);
+        return new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, uploadedUrl+"/"+sessionId+m3u8Extend);
     }
 
     /**
