@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Video from "../components/video-chat/Video";
 import CheckList from "../components/checklist/CheckList";
@@ -9,30 +9,29 @@ import {
   Box,
   Button,
   Divider,
-  IconButton,
   useMediaQuery,
   Typography,
 } from "@mui/material";
 
-import { ExitToApp } from "@mui/icons-material";
-
-const exampleData = {
-  roomToken: "sampleToken",
-  role: "host",
-  nickname: "user123",
-  leftUser: "userLeft",
-  rightUser: "userRight",
-  leftOpinion: "opinionLeft",
-  rightOpinion: "opinionRight",
-  phaseNum: 1,
-  phaseDetail: 2,
-  roomId: "412321",
-};
-
 export default function VideoChatPage() {
+  const { enterVideoRoom, leaveVideoRoom, fetchUser, user } = useBoundStore(
+    (state) => ({
+      enterVideoRoom: state.enterVideoRoom,
+      leaveVideoRoom: state.leaveVideoRoom,
+      fetchUser: state.fetchUser,
+      user: state.user,
+    })
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchUser();
+    };
+    fetchData();
+  }, []);
+
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
-  const user = useBoundStore((state) => state.user);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   const handleChange = (newValue) => {
@@ -52,7 +51,12 @@ export default function VideoChatPage() {
           direction={isSmallScreen ? "column" : "row"}
         >
           <Grid item xs={12} md={8}>
-            <Video data={exampleData} />
+            <Video
+              enterVideoRoom={enterVideoRoom}
+              leaveVideoRoom={leaveVideoRoom}
+              user={user}
+              fetchUser={fetchUser}
+            />
           </Grid>
           <Grid item xs={12} md={4}>
             <Box
@@ -87,9 +91,14 @@ export default function VideoChatPage() {
       ) : (
         <Grid container spacing={2} direction="column">
           <Grid item xs={12}>
-            <Video data={exampleData} />
+            <Video
+              enterVideoRoom={enterVideoRoom}
+              leaveVideoRoom={leaveVideoRoom}
+              user={user}
+              fetchUser={fetchUser}
+            />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sx={{ mt: 12 }}>
             <Typography>채팅 컴퍼넌트</Typography>
           </Grid>
         </Grid>

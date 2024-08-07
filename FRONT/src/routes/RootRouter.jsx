@@ -39,7 +39,7 @@ const RootRouter = () => {
           />
           <Route
             path="/video-chat"
-            element={<UserRoute element={<VideoChat />} />}
+            element={<UserRoute element={<VideoChat />} allowAgents={true} />}
           />
           <Route
             path="/agent"

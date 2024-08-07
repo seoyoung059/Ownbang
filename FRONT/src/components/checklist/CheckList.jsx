@@ -1,80 +1,151 @@
-import { useState, useRef } from "react";
-import { Box } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Container, Box } from "@mui/material";
 import CheckListTitle from "./CheckListTitle";
 import CheckListList from "./CheckListList";
 import CheckListAddInput from "./CheckListAddInput";
-import tmpData from "./CheckListData.json";
+import { useBoundStore } from "../../store/store";
 
-const CheckList = () => {
-  const [checkitems, setCheckItems] = useState(tmpData);
-  const [selectedTitle, setSelectedTitle] = useState(null);
-  const idRef = useRef(3);
+const CheckList = ({ canEdit }) => {
+  const {
+    checklist,
+    fetchCheckLists,
+    addNewTemplate,
+    modifyCheckLists,
+    deleteTemplate,
+  } = useBoundStore((state) => ({
+    checklist: state.checklist,
+    fetchCheckLists: state.fetchCheckLists,
+    addNewTemplate: state.addNewTemplate,
+    deleteTemplate: state.deleteTemplate,
+    modifyCheckLists: state.modifyCheckLists,
+  }));
 
-  const onCreate = (content) => {
-    const newCheckItem = {
-      id: idRef.current++,
-      isDone: false,
-      content: content,
+  const [selectedChecklist, setSelectedChecklist] = useState(null);
+  const [selectedTitle, setSelectedTitle] = useState("");
+
+  useEffect(() => {
+    fetchCheckLists();
+  }, [fetchCheckLists]);
+
+  useEffect(() => {
+    if (selectedTitle === "") {
+      setSelectedChecklist(null);
+    } else {
+      const selected = checklist.find((item) => item.title === selectedTitle);
+      if (selected) {
+        setSelectedChecklist(selected);
+      }
+    }
+  }, [selectedTitle, checklist]);
+
+  const onCreate = async (newKey) => {
+    const updatedChecklist = {
+      ...selectedChecklist,
+      contents: { ...selectedChecklist.contents, [newKey]: "" },
     };
-    setCheckItems([newCheckItem, ...checkitems]);
+    setSelectedChecklist(updatedChecklist);
+    await modifyCheckLists(updatedChecklist.checklistId, {
+      title: updatedChecklist.title,
+      contents: updatedChecklist.contents,
+    });
   };
 
-  const onUpdate = (targetId) => {
-    setCheckItems(
-      checkitems.map((checkitem) =>
-        checkitem.id === targetId
-          ? { ...checkitem, isDone: !checkitem.isDone }
-          : checkitem
-      )
-    );
+  const onUpdate = async (key) => {
+    const updatedChecklist = {
+      ...selectedChecklist,
+      contents: {
+        ...selectedChecklist.contents,
+        [key]: selectedChecklist.contents[key] === "" ? "Checked" : "",
+      },
+    };
+    setSelectedChecklist(updatedChecklist);
+    await modifyCheckLists(updatedChecklist.checklistId, {
+      title: updatedChecklist.title,
+      contents: updatedChecklist.contents,
+    });
   };
 
-  const onDelete = (targetId) => {
-    setCheckItems(checkitems.filter((checkitem) => checkitem.id !== targetId));
+  const onDelete = async (key) => {
+    const { [key]: _, ...rest } = selectedChecklist.contents;
+    const updatedChecklist = {
+      ...selectedChecklist,
+      contents: rest,
+    };
+    setSelectedChecklist(updatedChecklist);
+    await modifyCheckLists(updatedChecklist.checklistId, {
+      title: updatedChecklist.title,
+      contents: updatedChecklist.contents,
+    });
+  };
+
+  const addTemplate = async (title) => {
+    const newTemplate = {
+      title,
+      contents: {},
+    };
+    await addNewTemplate(newTemplate);
+    fetchCheckLists();
   };
 
   return (
-    <Box
+    <Container
       sx={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
-        border: "1px solid lightGray",
-        borderRadius: "10px",
-        padding: "30px",
-        height: "82%",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <CheckListTitle setSelectedTitle={setSelectedTitle} />
-      </Box>
-
-      {selectedTitle && (
-        <Box
-          sx={{
-            flexGrow: 1,
-            overflowY: "auto",
-            mt: "30px",
-            height: "320px",
-            "::-webkit-scrollbar": {
-              display: "none",
-            },
-          }}
-        >
-          <CheckListList
-            checkitems={checkitems}
-            onUpdate={onUpdate}
-            onDelete={onDelete}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          border: "1px solid lightGray",
+          borderRadius: "10px",
+          padding: "30px",
+          height: "82%",
+          maxWidth: "500px",
+          width: "100%",
+        }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <CheckListTitle
+            checklist={checklist}
+            setSelectedTitle={setSelectedTitle}
+            addTemplate={addTemplate}
+            deleteTemplate={deleteTemplate}
           />
         </Box>
-      )}
 
-      {selectedTitle && (
-        <Box sx={{ mt: "20px" }}>
-          <CheckListAddInput onCreate={onCreate} />
-        </Box>
-      )}
-    </Box>
+        {selectedChecklist && (
+          <Box
+            sx={{
+              flexGrow: 1,
+              overflowY: "auto",
+              mt: "30px",
+              height: "320px",
+              "::-webkit-scrollbar": {
+                display: "none",
+              },
+            }}
+          >
+            <CheckListList
+              contents={selectedChecklist.contents}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              canEdit={canEdit}
+            />
+          </Box>
+        )}
+
+        {selectedChecklist && (
+          <Box sx={{ mt: "20px" }}>
+            <CheckListAddInput onCreate={onCreate} />
+          </Box>
+        )}
+      </Box>
+    </Container>
   );
 };
 
