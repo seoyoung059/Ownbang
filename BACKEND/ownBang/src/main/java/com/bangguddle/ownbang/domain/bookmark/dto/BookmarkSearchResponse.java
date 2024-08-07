@@ -15,7 +15,7 @@ public record BookmarkSearchResponse(
         return BookmarkSearchResponse.builder()
                 .id(bookmark.getId())
                 .userId(bookmark.getUser().getId())
-                .roomInfoSearchResponse(RoomInfoSearchResponse.from(bookmark.getRoom()))
+                .roomInfoSearchResponse(RoomInfoSearchResponse.from(bookmark.getRoom(), true))
                 .build();
     }
 
