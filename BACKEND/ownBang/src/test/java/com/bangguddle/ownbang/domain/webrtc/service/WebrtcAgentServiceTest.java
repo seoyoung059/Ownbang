@@ -3,8 +3,12 @@ package com.bangguddle.ownbang.domain.webrtc.service;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
+import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
+import com.bangguddle.ownbang.domain.video.entity.Video;
+import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
+import com.bangguddle.ownbang.domain.video.service.VideoService;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcTokenResponse;
@@ -45,10 +49,19 @@ public class WebrtcAgentServiceTest {
     private ReservationRepository reservationRepository;
 
     @Mock
+    private VideoRepository videoRepository;
+
+    @Mock
+    private VideoService videoService;
+
+    @Mock
     private WebrtcSessionServiceImpl webrtcSessionService;
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private StreamingService streamingService;
 
     @Mock
     private User user;
@@ -61,6 +74,9 @@ public class WebrtcAgentServiceTest {
 
     @Mock
     private Reservation reservation;
+
+    @Mock
+    private Video video;
 
     @InjectMocks
     private WebrtcAgentService webrtcService;
@@ -89,6 +105,7 @@ public class WebrtcAgentServiceTest {
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.empty());
         when(webrtcSessionService.createSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.createToken(reservationId, AGENT)).thenReturn(Optional.of("test-token"));
+        when(videoRepository.findByReservationId(reservationId)).thenReturn(Optional.empty());
 
         WebrtcCreateTokenRequest request = WebrtcCreateTokenRequest.builder().reservationId(reservationId).build();
 
@@ -199,6 +216,7 @@ public class WebrtcAgentServiceTest {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+        when(videoRepository.findByReservationId(reservationId)).thenReturn(Optional.empty());
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.empty());
         when(webrtcSessionService.createSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.createToken(reservationId,AGENT))
@@ -221,11 +239,16 @@ public class WebrtcAgentServiceTest {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+        when(videoRepository.findByReservationId(reservationId)).thenReturn(Optional.of(video));
+        when(videoService.modifyVideo(any(), any()))
+                .thenReturn((mock(SuccessResponse.class)));
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.stopRecord(reservationId)).thenReturn(Optional.of(recording));
+        when(webrtcSessionService.getRecord(reservationId)).thenReturn(Optional.of(recording));
         when(webrtcSessionService.removeToken(reservationId, "test-token", AGENT))
                 .thenReturn(Optional.of("test-token"));
         when(webrtcSessionService.removeSession(reservationId)).thenReturn(Optional.of(mockSession));
+        when(streamingService.uploadStreaming(any())).thenReturn(mock(SuccessResponse.class));
 
         WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
                 .reservationId(reservationId)
