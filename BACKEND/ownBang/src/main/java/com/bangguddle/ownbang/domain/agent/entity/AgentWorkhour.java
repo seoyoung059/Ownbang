@@ -25,10 +25,10 @@ public class AgentWorkhour {
     @Enumerated(EnumType.STRING)
     private Day day;
 
-    @Column(name = "start_time", nullable = false, columnDefinition = "TIME")
+    @Column(nullable = false, columnDefinition = "TIME")
     private String startTime;
 
-    @Column(name = "end_time", nullable = false, columnDefinition = "TIME")
+    @Column(nullable = false, columnDefinition = "TIME")
     private String endTime;
 
 
