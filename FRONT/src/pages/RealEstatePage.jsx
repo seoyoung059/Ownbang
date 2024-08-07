@@ -11,17 +11,28 @@ import { useBoundStore } from "../store/store";
 
 const RealEstatePage = () => {
   const theme = useTheme();
-  const { searchTerm, setSearchTerm, makeReservation } = useBoundStore(
-    (state) => ({
-      searchTerm: state.searchTerm,
-      setSearchTerm: state.setSearchTerm,
-      makeReservation: state.makeReservation,
-    })
-  );
+  const {
+    searchTerm,
+    setSearchTerm,
+    makeReservation,
+
+    bookmarkList,
+    getBookmarks,
+    makeBookmarks,
+  } = useBoundStore((state) => ({
+    searchTerm: state.searchTerm,
+    setSearchTerm: state.setSearchTerm,
+    makeReservation: state.makeReservation,
+
+    bookmarkList: state.bookmarkList,
+    getBookmarks: state.getBookmarks,
+    makeBookmarks: state.makeBookmarks,
+  }));
 
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showReservation, setShowReservation] = React.useState(false);
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
+  // const [bookmarkList, setBookmarkList] = React.useState([]);
 
   // 검색어를 업데이트하는 함수
   const onSearch = (term) => {
@@ -75,7 +86,13 @@ const RealEstatePage = () => {
           position: "relative",
         }}
       >
-        <RealEstateList markers={visibleMarkers} onSelectItem={onSelectItem} />
+        <RealEstateList
+          markers={visibleMarkers}
+          onSelectItem={onSelectItem}
+          bookmarkList={bookmarkList}
+          getBookmarks={getBookmarks}
+          makeBookmarks={makeBookmarks}
+        />
       </Box>
 
       {/* 지도와 검색 바 */}

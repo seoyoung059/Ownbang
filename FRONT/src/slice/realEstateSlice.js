@@ -21,6 +21,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 99999,
         parcel: "변경된지번주소",
         profileImageUrl: "changedURL",
+        favorite: false,
       },
       {
         id: 1,
@@ -38,6 +39,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 중구",
         profileImageUrl: "신세계백화점 본점",
+        favorite: false,
       },
       {
         id: 2,
@@ -55,6 +57,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 중구",
         profileImageUrl: "롯데백화점 본점",
+        favorite: false,
       },
       {
         id: 3,
@@ -72,6 +75,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 광진구",
         profileImageUrl: "롯데백화점 건대스타시티점",
+        favorite: false,
       },
       {
         id: 4,
@@ -89,6 +93,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 송파구",
         profileImageUrl: "롯데백화점 잠실점",
+        favorite: false,
       },
       {
         id: 5,
@@ -106,6 +111,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 강남구",
         profileImageUrl: "현대백화점 무역센터점",
+        favorite: false,
       },
       {
         id: 6,
@@ -123,6 +129,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 영등포구",
         profileImageUrl: "신세계백화점 타임스퀘어점",
+        favorite: false,
       },
       {
         id: 7,
@@ -140,6 +147,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 강남구",
         profileImageUrl: "현대백화점 압구정본점",
+        favorite: false,
       },
       {
         id: 8,
@@ -157,6 +165,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 서초구",
         profileImageUrl: "신세계백화점 강남점",
+        favorite: false,
       },
       {
         id: 9,
@@ -174,6 +183,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 강남구",
         profileImageUrl: "갤러리아 백화점 WEST",
+        favorite: false,
       },
       {
         id: 10,
@@ -191,6 +201,7 @@ export const createRealEstateSlice = (set) => ({
         maintenanceFee: 1000000,
         parcel: "서울시 영등포구",
         profileImageUrl: "더현대 서울",
+        favorite: false,
       },
     ],
   },

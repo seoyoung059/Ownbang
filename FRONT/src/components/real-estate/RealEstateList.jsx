@@ -4,7 +4,13 @@ import { useTheme } from "@mui/material";
 import { SearchOff } from "@mui/icons-material";
 import RealEstateItem from "./RealEstateItem";
 
-const RealEstateList = ({ markers, onSelectItem }) => {
+const RealEstateList = ({
+  markers,
+  onSelectItem,
+  bookmarkList,
+  getBookmarks,
+  makeBookmarks,
+}) => {
   const theme = useTheme();
   const [displayedMarkers, setDisplayedMarkers] = useState([]);
 
@@ -13,11 +19,14 @@ const RealEstateList = ({ markers, onSelectItem }) => {
   }, [markers]);
 
   const toggleFavorite = (index) => {
+    getBookmarks();
     const newMarkers = displayedMarkers.map((marker, i) => {
       if (i === index) {
         const updatedMarker = { ...marker, favorite: !marker.favorite };
-        console.log(`${marker.title} - favorite: ${updatedMarker.favorite}`);
-        return updatedMarker;
+        console.log(`${marker.id} - favorite: ${updatedMarker.favorite}`);
+        marker = updatedMarker;
+        makeBookmarks(updatedMarker.id);
+        return marker;
       }
       return marker;
     });
