@@ -65,4 +65,8 @@ public class User {
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }

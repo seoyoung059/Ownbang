@@ -59,6 +59,13 @@ public class AuthController {
         return Response.success(response);
     }
 
+    @PatchMapping("/password-change")
+    public ResponseEntity<Response<NoneResponse>> passwordChange(
+            @AuthenticationPrincipal Long id, @RequestBody @Valid PasswordChangeRequest request) {
+        SuccessResponse<NoneResponse> response = authService.passwordChange(id, request);
+        return Response.success(response);
+    }
+
 }
 
 

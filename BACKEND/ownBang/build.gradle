@@ -21,6 +21,10 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+
+	all {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+	}
 }
 
 repositories {
@@ -61,6 +65,9 @@ dependencies {
 
 	//ffmpeg 관련 의존성 추가
 	implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
+
+	// log 관련 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'

@@ -3,6 +3,7 @@ package com.bangguddle.ownbang.global.service.impl;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.bangguddle.ownbang.global.enums.ErrorCode;
@@ -41,10 +42,24 @@ public class S3UploaderServiceImpl implements S3UploaderService {
     @Value("${s3.hls.path}")
     private String hlsPath;
 
+    @Override
+    public String uploadFile(MultipartFile file, String dirName) {
+        String fileName = makeImageUUID(file);
+        String key = dirName + "/" + fileName;
+        try {
+            amazonS3.putObject(new PutObjectRequest(bucketName, key,
+                    file.getInputStream(), getObjectMetadata(file)));
+            return getImageUrl(key);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     /**
      * S3 버켓 bucket에 파일 uploadFile을 업로드하고, 기존 파일을 삭제하는 메서드
+     *
      * @param uploadFile S3에 업로드할 파일
-     * @param dirName 저장될 버켓 내 경로
+     * @param dirName    저장될 버켓 내 경로
      * @return S3상의 url
      */
     public String uploadToS3(File uploadFile, String dirName) {
@@ -57,31 +72,32 @@ public class S3UploaderServiceImpl implements S3UploaderService {
 
     /**
      * S3 버켓 bucket에 MultipartFile을 file로 변환하여 업로드하고, 기존 파일을 삭제하는 메서드
+     *
      * @param multipartFile S3에 업로드할 MultipartFile
-     * @param dirName 저장될 버켓 내 경로
+     * @param dirName       저장될 버켓 내 경로
      * @return S3상의 url
      */
     public String uploadMultipartFileToS3(MultipartFile multipartFile, String dirName) {
-        String fileName = getImageUrl(multipartFile);
+        String fileName = makeImageUUID(multipartFile);
         File convertedFile = new File(fileName);
-        try(FileOutputStream fos = new FileOutputStream(convertedFile)) {
+        try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
             fos.write(multipartFile.getBytes());
         } catch (IOException e) {
             throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
-        return cloudfrontUrl+uploadToS3(convertedFile, dirName);
+        return cloudfrontUrl + uploadToS3(convertedFile, dirName);
     }
 
 
     public String uploadHlsFiles(Path outputPath, String sessionId) {
-        try(Stream<Path> paths = Files.walk(outputPath)) {
-            String dirName = hlsPath+"/"+sessionId;
+        try (Stream<Path> paths = Files.walk(outputPath)) {
+            String dirName = hlsPath + "/" + sessionId;
             paths.filter(Files::isRegularFile)
                     .forEach(filePath -> {
                         uploadToS3(filePath.toFile(), dirName);
                     });
-            return cloudfrontUrl+"/"+dirName;
-        } catch (IOException e){
+            return cloudfrontUrl + "/" + dirName;
+        } catch (IOException e) {
             log.error("Error walking through output directory:", e);
             throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
@@ -89,13 +105,14 @@ public class S3UploaderServiceImpl implements S3UploaderService {
 
     /**
      * upLoadFile을 S3버켓 bucketName에 fileName이란 파일명으로 업로드
+     *
      * @param uploadFile
      * @param bucket
      * @param fileName
      * @return s3 url
      */
     private String putS3(File uploadFile, String bucket, String fileName) {
-        log.info("Uploading {} to {}",uploadFile.getName() , bucket);
+        log.info("Uploading {} to {}", uploadFile.getName(), bucket);
         try {
             PutObjectResult result = amazonS3.putObject(new PutObjectRequest(bucket, fileName, uploadFile));
         } catch (AmazonServiceException e) {
@@ -107,20 +124,33 @@ public class S3UploaderServiceImpl implements S3UploaderService {
         return amazonS3.getUrl(bucket, fileName).getPath();
     }
 
+
     /**
      * 로컬 파일 targetFile 삭제
+     *
      * @param targetFile
      */
     private void removeNewFile(File targetFile) {
-        if(targetFile.delete()) {
+        if (targetFile.delete()) {
             log.info("FILE DELETE SUCCESS: " + targetFile.getAbsolutePath());
             return;
         }
         log.info("FILE DELETE FAILED: " + targetFile.getAbsolutePath());
     }
 
-    private String getImageUrl(MultipartFile targetFile) {
+    private ObjectMetadata getObjectMetadata(MultipartFile file) {
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType(file.getContentType());
+        objectMetadata.setContentLength(file.getSize());
+        return objectMetadata;
+    }
+
+    private String makeImageUUID(MultipartFile targetFile) {
         return UUID.randomUUID().toString().replace("-", "") + "_" + targetFile.getOriginalFilename();
+    }
+
+    private String getImageUrl(String fileDir) {
+        return cloudfrontUrl + amazonS3.getUrl(bucketName, fileDir).getPath();
     }
 
 }
