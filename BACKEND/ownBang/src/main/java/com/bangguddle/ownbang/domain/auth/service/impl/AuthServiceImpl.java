@@ -82,6 +82,14 @@ public class AuthServiceImpl implements AuthService {
         return new SuccessResponse<>(LOGOUT_SUCCESS, NoneResponse.NONE);
     }
 
+    @Override
+    public SuccessResponse<NoneResponse> passwordChange(Long id, PasswordChangeRequest request) {
+        User user = userRepository.getById(id);
+        user.updatePassword(passwordEncoder.encode(request.password()));
+        userRepository.save(user);
+        return new SuccessResponse<>(PASSWORD_CHANGE_SUCCESS, NoneResponse.NONE);
+    }
+
 
     private void validateByEmail(final String email) {
         if (userRepository.findByEmail(email).isPresent())
