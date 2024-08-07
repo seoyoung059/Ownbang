@@ -175,6 +175,13 @@ public class WebrtcSessionServiceImpl implements WebrtcSessionService {
     }
 
     @Override
+    public Optional<Recording> getRecord(final Long reservationId){
+        // 세션에서 녹화가 진행중인 경우 - 임차인 재입장 고려
+        System.out.println("Record 상태: " + mapSessionRecordings.get(reservationId));
+        return Optional.ofNullable(mapSessionRecordings.get(reservationId));
+    }
+
+    @Override
     public Optional<Recording> stopRecord(final Long reservationId) {
         validateSessionAndRecord(reservationId);
 

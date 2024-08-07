@@ -50,6 +50,13 @@ public class WebrtcUserService implements WebrtcService {
         String token = webrtcSessionService.createToken(reservationId, UserType.ROLE_USER)
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
 
+        // 기존 세션에서 녹화 진행중인 경우
+        Optional<Recording> existingRecording =  webrtcSessionService.getRecord(reservationId);
+        if(existingRecording.isPresent()){
+            return new SuccessResponse<>(GET_TOKEN_SUCCESS,
+                    new WebrtcTokenResponse(token, existingRecording.get().getCreatedAt()));
+        }
+
         // 영상 녹화 시작
         Recording recording = webrtcSessionService.startRecord(reservationId)
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
@@ -66,7 +73,8 @@ public class WebrtcUserService implements WebrtcService {
         videoService.registerVideo(videoRecordRequest);
 
         // response 반환
-        return new SuccessResponse<>(GET_TOKEN_SUCCESS, new WebrtcTokenResponse(token));
+        return new SuccessResponse<>(GET_TOKEN_SUCCESS,
+                new WebrtcTokenResponse(token, recording.getCreatedAt()));
     }
 
     @Override

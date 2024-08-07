@@ -24,8 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
-import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
-import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +58,7 @@ public class WebrtcAgentService implements WebrtcService {
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
         
         // response 반환
-        return new SuccessResponse<>(GET_TOKEN_SUCCESS, new WebrtcTokenResponse(token));
+        return new SuccessResponse<>(GET_TOKEN_SUCCESS, new WebrtcTokenResponse(token, 0l));
     }
 
     @Override
@@ -75,6 +74,23 @@ public class WebrtcAgentService implements WebrtcService {
         webrtcSessionService.getSession(reservationId).orElseThrow(
                 () -> new AppException(BAD_REQUEST));
 
+        // 이전에 종료된 세션 여부 확인
+        videoRepository.findByReservationId(reservationId)
+                .orElseThrow(()->new AppException(BAD_REQUEST));
+
+        // 영상 녹화 확인
+        if(webrtcSessionService.getRecord(reservationId).isEmpty()){
+            // token 제거
+            String token = request.token();
+            webrtcSessionService.removeToken(reservationId, token, UserType.ROLE_AGENT);
+
+            // session 제거
+            webrtcSessionService.removeSession(reservationId);
+
+            // response 반환
+            return new SuccessResponse<>(REMOVE_TOKEN_SUCCESS, NoneResponse.NONE);
+        }
+
         // 영상 녹화 중지
         Recording recording =  webrtcSessionService.stopRecord(reservationId)
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
@@ -86,25 +102,12 @@ public class WebrtcAgentService implements WebrtcService {
         // session 제거
         webrtcSessionService.removeSession(reservationId);
 
-        /**
-         * record hls 변환
-         * 파일 위치: opt/openvidu/recordings/<ses_SESSION_ID>/<ses_SESSION_ID>.zip // TODO: 환경변수 변경하기
-         * sessionId: recording.getSessionId()
-         */
+        // record hls 변환
         SuccessResponse<String> uploadSuccess = streamingService.uploadStreaming(recording.getSessionId());
 
-        /**
-         * video modify
-         *
-         * VideoUpdateRequest videoUpdateRequest =
-         *         VideoUpdateRequest.builder()
-         *               .videoUrl("여기 URL")
-         *               .videoStatus(VideoStatus.RECORDED)
-         *               .build();
-         *
-         * videoService.modify(videoUpdateRequest);
-         */
-        Video video = videoRepository.findByReservationId(reservationId).orElseThrow(()->new AppException(INTERNAL_SERVER_ERROR));
+        // video 수정
+        Video video = videoRepository.findByReservationId(reservationId)
+                .orElseThrow(()->new AppException(INTERNAL_SERVER_ERROR));
         VideoUpdateRequest videoUpdateRequest =
                 VideoUpdateRequest.builder()
                                 .videoUrl(uploadSuccess.data())
@@ -112,10 +115,9 @@ public class WebrtcAgentService implements WebrtcService {
                                 .build();
         videoService.modifyVideo(videoUpdateRequest, video.getId());
 
-        /**
-         * reocrd 제거
-         * webrtcSessionService.deleteRecord(reservationId)
-         */
+
+        // record 제거
+        webrtcSessionService.deleteRecord(reservationId);
 
         // response 반환
         return new SuccessResponse<>(REMOVE_TOKEN_SUCCESS, NoneResponse.NONE);
