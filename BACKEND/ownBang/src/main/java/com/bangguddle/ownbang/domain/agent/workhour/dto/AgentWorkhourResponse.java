@@ -1,6 +1,6 @@
-package com.bangguddle.ownbang.domain.agent.auth.workhour.dto;
+package com.bangguddle.ownbang.domain.agent.workhour.dto;
 
-import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 
 public record AgentWorkhourResponse(
         Long id,

@@ -1,7 +1,7 @@
-package com.bangguddle.ownbang.domain.agent.auth.workhour.dto;
+package com.bangguddle.ownbang.domain.agent.workhour.dto;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
-import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import jakarta.validation.constraints.NotNull;
 
 public record AgentWorkhourRequest(

@@ -1,7 +1,7 @@
-package com.bangguddle.ownbang.domain.agent.auth.workhour.repository;
+package com.bangguddle.ownbang.domain.agent.workhour.repository;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
-import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

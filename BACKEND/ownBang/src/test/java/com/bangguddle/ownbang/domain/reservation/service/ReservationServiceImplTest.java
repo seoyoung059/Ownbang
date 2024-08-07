@@ -1,9 +1,9 @@
 package com.bangguddle.ownbang.domain.reservation.service;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
-import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
-import com.bangguddle.ownbang.domain.agent.auth.workhour.repository.AgentWorkhourRepository;
+import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
 import com.bangguddle.ownbang.domain.reservation.dto.*;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;

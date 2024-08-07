@@ -1,8 +1,8 @@
-package com.bangguddle.ownbang.domain.agent.auth.workhour.controller;
+package com.bangguddle.ownbang.domain.agent.workhour.controller;
 
-import com.bangguddle.ownbang.domain.agent.auth.workhour.dto.AgentWorkhourListResponse;
-import com.bangguddle.ownbang.domain.agent.auth.workhour.dto.AgentWorkhourRequest;
-import com.bangguddle.ownbang.domain.agent.auth.workhour.service.AgentWorkhourService;
+import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourListResponse;
+import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourRequest;
+import com.bangguddle.ownbang.domain.agent.workhour.service.AgentWorkhourService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;

@@ -1,12 +1,12 @@
-package com.bangguddle.ownbang.domain.agent.auth.workhour.service.impl;
+package com.bangguddle.ownbang.domain.agent.workhour.service.impl;
 
-import com.bangguddle.ownbang.domain.agent.auth.workhour.dto.AgentWorkhourListResponse;
-import com.bangguddle.ownbang.domain.agent.auth.workhour.dto.AgentWorkhourRequest;
+import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourListResponse;
+import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourRequest;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
-import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
-import com.bangguddle.ownbang.domain.agent.auth.workhour.repository.AgentWorkhourRepository;
-import com.bangguddle.ownbang.domain.agent.auth.workhour.service.AgentWorkhourService;
+import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
+import com.bangguddle.ownbang.domain.agent.workhour.service.AgentWorkhourService;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;

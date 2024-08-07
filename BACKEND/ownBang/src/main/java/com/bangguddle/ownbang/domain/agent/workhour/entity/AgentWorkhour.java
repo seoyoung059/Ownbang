@@ -1,5 +1,6 @@
-package com.bangguddle.ownbang.domain.agent.entity;
+package com.bangguddle.ownbang.domain.agent.workhour.entity;
 
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import jakarta.persistence.*;
 import lombok.*;
 
