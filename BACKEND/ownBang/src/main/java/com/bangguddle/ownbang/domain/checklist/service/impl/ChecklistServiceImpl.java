@@ -147,7 +147,7 @@ public class ChecklistServiceImpl implements ChecklistService {
         Checklist checklist = validateTemplateByIdAndUser(checklistId, userId);
 
         // update
-        checklist.update(request.title(), request.getContentsToString());
+        checklist.update(request.title(), request.contentsToString());
         checklistRepository.save(checklist);
 
         return new SuccessResponse<>(CHECKLIST_UPDATE_SUCCESS, NoneResponse.NONE);
