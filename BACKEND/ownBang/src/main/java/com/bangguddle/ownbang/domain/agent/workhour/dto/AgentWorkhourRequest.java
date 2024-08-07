@@ -17,6 +17,7 @@ public record AgentWorkhourRequest(
 ) {
     public AgentWorkhour toEntity(Agent agent) {
         return AgentWorkhour.builder()
+                .agent(agent)
                 .day(day)
                 .startTime(startTime)
                 .endTime(endTime)
