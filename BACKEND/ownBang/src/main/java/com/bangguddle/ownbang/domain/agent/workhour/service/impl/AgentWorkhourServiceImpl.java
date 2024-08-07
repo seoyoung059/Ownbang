@@ -1,8 +1,8 @@
 package com.bangguddle.ownbang.domain.agent.workhour.service.impl;
 
-import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourListResponse;
 import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourRequest;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
+import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourResponse;
 import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
@@ -16,8 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
+import static com.bangguddle.ownbang.global.enums.ErrorCode.ACCESS_DENIED;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.WORKHOUR_NOT_FOUND;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
@@ -41,12 +40,12 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
 
     @Override
     @Transactional(readOnly = true)
-    public SuccessResponse<AgentWorkhourListResponse> getAgentWorkhour(Long agentId) {
+    public SuccessResponse<AgentWorkhourResponse> getAgentWorkhour(Long agentId) {
         Agent agent = agentRepository.findById(agentId)
                 .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
-        List<AgentWorkhour> workhours = agentWorkhourRepository.findByAgent(agent);
-
-        return new SuccessResponse<>(AGENT_WORKHOUR_GET_SUCCESS, AgentWorkhourListResponse.from(workhours));
+        AgentWorkhour agentWorkhour = agentWorkhourRepository.findByAgent(agent)
+                .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
+        return new SuccessResponse<>(AGENT_WORKHOUR_GET_SUCCESS, AgentWorkhourResponse.from(agentWorkhour));
     }
 
     /*
@@ -54,19 +53,16 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
     id는 agentworkhourid
     */
     @Transactional
-    public SuccessResponse<NoneResponse> updateAgentWorkhour(Long id, Long userId, AgentWorkhourRequest request) {
+    public SuccessResponse<NoneResponse> updateAgentWorkhour( Long userId, AgentWorkhourRequest request) {
         User user = userRepository.getById(userId);
         Agent agent = agentRepository.getByUserId(userId);
         Long agentId = agent.getId();
+        System.out.println(agentId);
 
-        AgentWorkhour agentWorkhour = agentWorkhourRepository.findById(id)
+        AgentWorkhour agentWorkhour = agentWorkhourRepository.findByAgent(agent)
                 .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
-
-        if (!agentWorkhour.getAgent().getId().equals(agentId)) {
-            throw new AppException(WORKHOUR_NOT_FOUND);
-        }
-
-        agentWorkhour.updateWorkhour(request.startTime(), request.endTime());
+        
+        agentWorkhour.updateWorkhour(request.weekdayStartTime(), request.weekdayEndTime(), request.weekendStartTime(), request.weekendEndTime());
         agentWorkhourRepository.save(agentWorkhour);
 
         return new SuccessResponse<>(AGENT_WORKHOUR_UPDATE_SUCCESS, NoneResponse.NONE);

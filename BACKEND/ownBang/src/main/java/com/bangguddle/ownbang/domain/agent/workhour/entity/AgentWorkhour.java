@@ -9,9 +9,7 @@ import lombok.*;
 @Entity
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "agent_workhour", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"agent_id", "day"})
-})
+
 public class AgentWorkhour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,24 +20,23 @@ public class AgentWorkhour {
     @JoinColumn(name = "agent_id", nullable = false)
     private Agent agent;
 
-    @Column(nullable = false, columnDefinition = "ENUM('WEEKDAY','WEEKEND')")
-    @Enumerated(EnumType.STRING)
-    private Day day;
+    @Column(name = "weekday_start_time",nullable = false, columnDefinition = "TIME")
+    private String weekdayStartTime;
 
-    @Column(nullable = false, columnDefinition = "TIME")
-    private String startTime;
+    @Column(name = "weekday_end_time", nullable = false, columnDefinition = "TIME")
+    private String weekdayEndTime;
 
-    @Column(nullable = false, columnDefinition = "TIME")
-    private String endTime;
+    @Column(name = "weekend_start_time",nullable = false, columnDefinition = "TIME")
+    private String weekendStartTime;
 
+    @Column(name = "weekend_end_time",nullable = false, columnDefinition = "TIME")
+    private String weekendEndTime;
 
-    public enum Day {
-        WEEKEND, WEEKDAY
-    }
+    public void updateWorkhour(String weekdayStartTime, String weekdayEndTime, String weekendStartTime, String weekendEndTime) {
 
-    public void updateWorkhour(String startTime, String endTime) {
-
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.weekdayStartTime = weekdayStartTime;
+        this.weekdayEndTime = weekdayEndTime;
+        this.weekendStartTime = weekendStartTime;
+        this.weekendEndTime = weekendEndTime;
     }
 }

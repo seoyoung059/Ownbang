@@ -209,11 +209,14 @@ public class ReservationServiceImpl implements ReservationService {
     public SuccessResponse<AvailableTimeResponse> getAvailableTimes(AvailableTimeRequest request) {
         Room room = roomRepository.findById(request.roomId())
                 .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
-
-        AgentWorkhour.Day dayOfWeek = getDayCategory(request.date());
-        AgentWorkhour workhour = agentWorkhourRepository.findByAgentAndDay(room.getAgent(), dayOfWeek);
-        LocalTime startTime = LocalTime.parse(workhour.getStartTime());
-        LocalTime endTime = LocalTime.parse(workhour.getEndTime());
+        AgentWorkhour workhour = agentWorkhourRepository.findByAgent(room.getAgent())
+                .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
+        LocalTime startTime = LocalTime.parse(workhour.getWeekdayStartTime());
+        LocalTime endTime = LocalTime.parse(workhour.getWeekdayEndTime() );
+        if (getDayCategory(request.date())=="WEEKEND"){
+            startTime = LocalTime.parse(workhour.getWeekendStartTime());
+            endTime = LocalTime.parse(workhour.getWeekendEndTime());
+        }
 
         List<LocalTime> allPossibleTimes = generateTimeSlots(startTime, endTime);
         List<LocalTime> bookedTimes = reservationRepository.findConfirmedReservationTimes(request.roomId(), request.date());
@@ -227,15 +230,15 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(AVAILABLE_TIMES_RETRIEVED, new AvailableTimeResponse(availableTimes));
     }
 
-    private AgentWorkhour.Day getDayCategory(LocalDate date) {
+    private String getDayCategory(LocalDate date) {
         // 날짜에 따라 주말, 주중인지 파악
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         switch (dayOfWeek) {
             case SATURDAY:
             case SUNDAY:
-                return AgentWorkhour.Day.WEEKEND;
+                return "WEEKEND";
             default:
-                return AgentWorkhour.Day.WEEKDAY;
+                return "WEEKDAY";
         }
     }
 

@@ -7,32 +7,38 @@ import jakarta.validation.constraints.NotNull;
 public record AgentWorkhourRequest(
 
         @NotNull
-        AgentWorkhour.Day day,
+        String weekendStartTime,
 
         @NotNull
-        String startTime,
+        String weekendEndTime,
 
         @NotNull
-        String endTime
+        String weekdayStartTime,
+
+        @NotNull
+        String weekdayEndTime
+
 ) {
     public AgentWorkhour toEntity(Agent agent) {
         return AgentWorkhour.builder()
                 .agent(agent)
-                .day(day)
-                .startTime(startTime)
-                .endTime(endTime)
+                .weekdayEndTime(weekdayEndTime)
+                .weekendStartTime(weekendStartTime)
+                .weekdayStartTime(weekdayStartTime)
+                .weekendEndTime(weekendEndTime)
                 .build();
     }
 
-    public static AgentWorkhourRequest of( AgentWorkhour.Day day, String startTime, String endTime) {
-        return new AgentWorkhourRequest( day, startTime, endTime);
+    public static AgentWorkhourRequest of( String weekdayStartTime, String weekdayEndTime,String weekendStartTime, String weekendEndTime) {
+        return new AgentWorkhourRequest(weekdayStartTime, weekdayEndTime, weekendStartTime, weekendEndTime);
     }
 
     public static AgentWorkhourRequest from(AgentWorkhour agentWorkhour) {
         return new AgentWorkhourRequest(
-                agentWorkhour.getDay(),
-                agentWorkhour.getStartTime(),
-                agentWorkhour.getEndTime()
+                agentWorkhour.getWeekdayStartTime(),
+                agentWorkhour.getWeekdayEndTime(),
+                agentWorkhour.getWeekendStartTime(),
+                agentWorkhour.getWeekendEndTime()
         );
     }
 

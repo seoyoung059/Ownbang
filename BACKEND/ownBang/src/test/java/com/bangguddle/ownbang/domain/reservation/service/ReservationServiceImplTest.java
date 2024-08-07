@@ -419,12 +419,14 @@ class ReservationServiceImplTest {
         when(room.getAgent()).thenReturn(agent);
 
         AgentWorkhour workhour = mock(AgentWorkhour.class);
-        when(workhour.getStartTime()).thenReturn("09:00");
-        when(workhour.getEndTime()).thenReturn("18:00");
+        when(workhour.getWeekdayStartTime()).thenReturn("09:00");
+        when(workhour.getWeekdayEndTime()).thenReturn("18:00");
+        when(workhour.getWeekendStartTime()).thenReturn("10:30");
+        when(workhour.getWeekendEndTime()).thenReturn("17:00");
 
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
-        when(agentWorkhourRepository.findByAgentAndDay(any(Agent.class), any(AgentWorkhour.Day.class)))
-                .thenReturn(workhour);
+        when(agentWorkhourRepository.findByAgent(any(Agent.class)))
+                .thenReturn(Optional.of(workhour));
         when(reservationRepository.findConfirmedReservationTimes(eq(roomId), eq(date)))
                 .thenReturn(List.of(LocalTime.of(10, 0), LocalTime.of(14, 30)));
 

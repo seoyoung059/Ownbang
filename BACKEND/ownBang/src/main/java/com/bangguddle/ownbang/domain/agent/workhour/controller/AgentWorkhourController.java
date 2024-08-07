@@ -1,7 +1,7 @@
 package com.bangguddle.ownbang.domain.agent.workhour.controller;
 
-import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourListResponse;
 import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourRequest;
+import com.bangguddle.ownbang.domain.agent.workhour.dto.AgentWorkhourResponse;
 import com.bangguddle.ownbang.domain.agent.workhour.service.AgentWorkhourService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
@@ -25,17 +25,17 @@ public class AgentWorkhourController {
     }
 
     @GetMapping
-    public ResponseEntity<Response<AgentWorkhourListResponse>> getAgentWorkhour(
+    public ResponseEntity<Response<AgentWorkhourResponse>> getAgentWorkhour(
             @RequestParam(name="agentId") Long agentId) {
-        SuccessResponse<AgentWorkhourListResponse> response = agentWorkhourService.getAgentWorkhour(agentId);
+        SuccessResponse<AgentWorkhourResponse> response = agentWorkhourService.getAgentWorkhour(agentId);
         return Response.success(response);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping
     public ResponseEntity<Response<NoneResponse>> updateAgentWorkhour(
-            @PathVariable("id") Long id,@AuthenticationPrincipal Long userId,
+            @AuthenticationPrincipal Long userId,
             @RequestBody @Valid AgentWorkhourRequest request) {
-        SuccessResponse<NoneResponse> response = agentWorkhourService.updateAgentWorkhour(id, userId, request);
+        SuccessResponse<NoneResponse> response = agentWorkhourService.updateAgentWorkhour( userId, request);
         return Response.success(response);
     }
 }

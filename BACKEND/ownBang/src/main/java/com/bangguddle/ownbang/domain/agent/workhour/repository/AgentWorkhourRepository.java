@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface AgentWorkhourRepository extends JpaRepository<AgentWorkhour, Long> {
-    AgentWorkhour findByAgentAndDay(Agent agent, AgentWorkhour.Day day);
-    List<AgentWorkhour> findByAgent(Agent agent);
-    Optional<AgentWorkhour> findByAgent_IdAndDay(Long agentId, AgentWorkhour.Day day);
+
+    Optional<AgentWorkhour> findByAgent(Agent agent);
+
 }
