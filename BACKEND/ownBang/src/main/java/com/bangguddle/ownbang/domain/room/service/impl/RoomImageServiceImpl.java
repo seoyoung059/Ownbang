@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.ROOM_DELETE_SUCCESS;
@@ -38,8 +37,9 @@ public class RoomImageServiceImpl implements RoomImageService {
 
     /**
      * 매물 이미지를 S3에 업로드하기 위한 서비스 메서드, Multifile 상태의 파일을 바로 업로드
+     *
      * @param roomImage MultipartFile 이미지 파일
-     * @param room 이미지를 업로드할 매물
+     * @param room      이미지를 업로드할 매물
      * @return Success Response
      * @throws AppException 매물 파일 저장 실패 시 AppException(IMAGE_UPLOAD_FAILED) 발생
      */
@@ -49,12 +49,9 @@ public class RoomImageServiceImpl implements RoomImageService {
 
         validateImageFile(roomImage);
         try {
-            //파일명: UUID + 사진 원래이름
-            String fileName = UUID.randomUUID().toString().replace("-", "") + "_" + roomImage.getOriginalFilename();
-
             List<RoomImage> roomImageList = room.getRoomImages();
 
-            String uploadedFileUrl = s3UploaderService.uploadMultipartFileToS3(fileName, roomImage,s3RoomImagePath);
+            String uploadedFileUrl = s3UploaderService.uploadMultipartFileToS3(roomImage, s3RoomImagePath);
             roomImageList.add(new RoomImage(room, uploadedFileUrl));
 
             return new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);
@@ -67,7 +64,8 @@ public class RoomImageServiceImpl implements RoomImageService {
 
     /**
      * 로컬의 매물 이미지 삭제 서비스 메서드
-     * @param roomId 유효성 확인을 위한 매물 ID
+     *
+     * @param roomId      유효성 확인을 위한 매물 ID
      * @param roomImageId 삭제할 매물 이미지 ID
      * @return SuccessResponse
      * @throws AppException 매물 이미지 삭제 실패 시 IMAGE_DELETE_FAILED 발생
@@ -77,7 +75,7 @@ public class RoomImageServiceImpl implements RoomImageService {
     public SuccessResponse<NoneResponse> deleteImage(Long roomId, Long roomImageId) throws AppException {
         RoomImage roomImage = roomImageRepository.findById(roomImageId)
                 .orElseThrow(() -> new AppException(INVALID_IMAGE_FILE));
-        if(!roomImage.getRoom().getId().equals(roomId)) {
+        if (!roomImage.getRoom().getId().equals(roomId)) {
             throw new AppException(INVALID_IMAGE_FILE);
         }
 
@@ -100,6 +98,7 @@ public class RoomImageServiceImpl implements RoomImageService {
 
     /**
      * 이미지 파일 유효성 검사
+     *
      * @param roomImage MultipartFile 형식의 이미지 파일
      * @throws AppException 이미지 파일이 아니거나 적절한 형식이 아닐 때 INVALID_IMAGE_FILE 예외 발생
      */

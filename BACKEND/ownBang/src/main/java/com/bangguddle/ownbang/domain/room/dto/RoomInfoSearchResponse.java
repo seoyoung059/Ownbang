@@ -30,6 +30,8 @@ public record RoomInfoSearchResponse(
         @PositiveOrZero
         Long maintenanceFee,
         String parcel,
+        String road,
+        String detailAddress,
         String profileImageUrl
 ) {
 
@@ -49,6 +51,8 @@ public record RoomInfoSearchResponse(
                 .monthlyRent(room.getMonthlyRent())
                 .maintenanceFee(room.getMaintenanceFee())
                 .parcel(room.getParcel())
+                .road(room.getRoad())
+                .detailAddress(room.getDetailAddress())
                 .profileImageUrl(room.getProfileImageUrl())
                 .build();
     }

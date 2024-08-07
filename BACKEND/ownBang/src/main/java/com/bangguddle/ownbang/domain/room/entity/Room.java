@@ -82,12 +82,18 @@ public class Room {
     @Column(nullable = false)
     private String parcel;
 
-    @Column(nullable = false)
+    @Column
     private String profileImageUrl;
+
+    @Column(nullable = false)
+    private String road;
+
+    @Column(nullable = false)
+    private String detailAddress;
 
 
     @Builder
-    public Room(Agent agent, RoomAppliances roomAppliances, RoomDetail roomDetail, /*List<RoomImage> roomImages,*/float latitude, float longitude, DealType dealType, RoomType roomType, Structure structure, boolean isLoft, float exclusiveArea, float supplyArea, byte roomFloor, Long deposit, Long monthlyRent, Long maintenanceFee, String parcel, String profileImageUrl) {
+    public Room(Agent agent, RoomAppliances roomAppliances, RoomDetail roomDetail, /*List<RoomImage> roomImages,*/float latitude, float longitude, DealType dealType, RoomType roomType, Structure structure, boolean isLoft, float exclusiveArea, float supplyArea, byte roomFloor, Long deposit, Long monthlyRent, Long maintenanceFee, String parcel, String profileImageUrl, String road, String detailAddress) {
         this.agent = agent;
         this.roomAppliances = roomAppliances;
         this.roomDetail = roomDetail;
@@ -106,6 +112,8 @@ public class Room {
         this.maintenanceFee = maintenanceFee;
         this.parcel = parcel;
         this.profileImageUrl = profileImageUrl;
+        this.road = road;
+        this.detailAddress = detailAddress;
     }
 
     public void updateFromDto (RoomUpdateRequest roomUpdateRequest) {
@@ -124,6 +132,7 @@ public class Room {
         this.monthlyRent = roomUpdateRequest.monthlyRent();
         this.maintenanceFee = roomUpdateRequest.maintenanceFee();
         this.parcel = roomUpdateRequest.parcel();
-        this.profileImageUrl = roomUpdateRequest.profileImageUrl();
+        this.road = roomUpdateRequest.road();
+        this.detailAddress = roomUpdateRequest.detailAddress();
     }
 }

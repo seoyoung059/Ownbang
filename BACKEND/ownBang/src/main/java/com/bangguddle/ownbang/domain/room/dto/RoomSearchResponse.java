@@ -33,6 +33,8 @@ public record RoomSearchResponse(
         @PositiveOrZero
         Long maintenanceFee,
         String parcel,
+        String road,
+        String detailAddress,
         String profileImageUrl,
         RoomAppliancesSearchResponse roomAppliancesSearchResponse,
         RoomDetailSearchResponse roomDetailSearchResponse,
@@ -55,6 +57,8 @@ public record RoomSearchResponse(
                 .monthlyRent(room.getMonthlyRent())
                 .maintenanceFee(room.getMaintenanceFee())
                 .parcel(room.getParcel())
+                .road(room.getRoad())
+                .detailAddress(room.getDetailAddress())
                 .profileImageUrl(room.getProfileImageUrl())
                 .roomAppliancesSearchResponse(RoomAppliancesSearchResponse.from(room.getRoomAppliances()))
                 .roomDetailSearchResponse(RoomDetailSearchResponse.from(room.getRoomDetail()))

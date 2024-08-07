@@ -46,13 +46,25 @@ cloud:
       static: ${aws_region}
     s3:
       bucket: ${aws_s3bucket}
-
+    cloudfront:
+      dns: ${aws_cloudfront}
 s3:
   room-image:
     path: ${S3_ROOMIMAGE_PATH}
+  hls:
+    path: ${S3_HLS_PATH}
 
 key:
   secret : ${JWT_SECRET_KEY}
+
+ffmpeg:
+  path: ${FFMPEG_PATH}
+ffprobe:
+  path: ${FFPROBE_PATH}
+
+video:
+  recordings:
+    path: ${VIDEO_RECORDINGS_PATH}
 
 springdoc:
   swagger-ui:

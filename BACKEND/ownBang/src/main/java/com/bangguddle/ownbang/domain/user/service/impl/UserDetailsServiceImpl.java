@@ -1,4 +1,4 @@
-package com.bangguddle.ownbang.domain.user.service;
+package com.bangguddle.ownbang.domain.user.service.impl;
 
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;

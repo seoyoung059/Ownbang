@@ -35,7 +35,8 @@ public record RoomUpdateRequest(
         @PositiveOrZero
         Long maintenanceFee,
         String parcel,
-        String profileImageUrl,
+        String road,
+        String detailAddress,
         @Valid
         RoomAppliancesUpdateRequest roomAppliancesUpdateRequest,
         @Valid
@@ -58,7 +59,8 @@ public record RoomUpdateRequest(
             Long monthlyRent,
             Long maintenanceFee,
             String parcel,
-            String profileImageUrl,
+            String road,
+            String detailAddress,
             RoomAppliancesUpdateRequest roomAppliancesUpdateRequest,
             RoomDetailUpdateRequest roomDetailUpdateRequest,
             List<RoomImageUpdateRequest> roomImageUpdateRequestList
@@ -78,7 +80,8 @@ public record RoomUpdateRequest(
                 .monthlyRent(monthlyRent)
                 .maintenanceFee(maintenanceFee)
                 .parcel(parcel)
-                .profileImageUrl(profileImageUrl)
+                .road(road)
+                .detailAddress(detailAddress)
                 .roomAppliancesUpdateRequest(roomAppliancesUpdateRequest)
                 .roomDetailUpdateRequest(roomDetailUpdateRequest)
                 .roomImageUpdateRequestList(roomImageUpdateRequestList)
@@ -101,8 +104,9 @@ public record RoomUpdateRequest(
                 .monthlyRent(room.getMonthlyRent())
                 .maintenanceFee(room.getMaintenanceFee())
                 .parcel(room.getParcel())
-                .profileImageUrl(room.getProfileImageUrl())
-                .roomAppliancesUpdateRequest(RoomAppliancesUpdateRequest.from(room.getRoomAppliances()))
+                .road(room.getRoad())
+                .detailAddress(room.getDetailAddress())
+                .roomAppliancesUpdateRequest(com.bangguddle.ownbang.domain.room.dto.RoomAppliancesUpdateRequest.from(room.getRoomAppliances()))
                 .roomDetailUpdateRequest(RoomDetailUpdateRequest.from(room.getRoomDetail()))
                 .roomImageUpdateRequestList(
                         room.getRoomImages().stream()
@@ -128,7 +132,8 @@ public record RoomUpdateRequest(
                 .monthlyRent(monthlyRent)
                 .maintenanceFee(maintenanceFee)
                 .parcel(parcel)
-                .profileImageUrl(profileImageUrl)
+                .road(road)
+                .detailAddress(detailAddress)
                 .roomAppliances(roomAppliances)
                 .roomDetail(roomDetail)
                 .build();
