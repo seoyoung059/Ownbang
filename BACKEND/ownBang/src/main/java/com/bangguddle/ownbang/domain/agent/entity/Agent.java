@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.agent.entity;
 
+import com.bangguddle.ownbang.domain.agent.mypage.dto.AgentMyPageModifyRequest;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -42,5 +43,12 @@ public class Agent {
         this.greetings = greetings;
         this.officeName = officeName;
         this.user = user;
+    }
+
+    public void updateAgent(AgentMyPageModifyRequest request) {
+        this.officeNumber = request.officeNumber();
+        this.officeAddress = request.officeAddress();
+        this.greetings = request.greetings();
+        this.officeName = request.officeName();
     }
 }
