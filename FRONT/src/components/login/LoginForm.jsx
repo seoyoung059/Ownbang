@@ -48,8 +48,9 @@ const shake = keyframes`
 `;
 
 const LoginForm = () => {
-  const { loginUser } = useBoundStore((state) => ({
+  const { loginUser, fetchUser } = useBoundStore((state) => ({
     loginUser: state.loginUser,
+    fetchUser: state.fetchUser,
   }));
   const theme = useTheme();
   const navigate = useNavigate();
@@ -70,16 +71,17 @@ const LoginForm = () => {
     })
       .then((res) => {
         if (res.resultCode === "SUCCESS") {
-          toast.success("로그인 성공", {
-            position: "bottom-left",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
+          // toast.success("로그인 성공", {
+          //   position: "bottom-left",
+          //   autoClose: 2000,
+          //   hideProgressBar: true,
+          //   closeOnClick: true,
+          //   pauseOnHover: true,
+          //   draggable: true,
+          //   progress: undefined,
+          //   theme: "light",
+          // });
+          fetchUser();
           navigate("/");
         }
       })
