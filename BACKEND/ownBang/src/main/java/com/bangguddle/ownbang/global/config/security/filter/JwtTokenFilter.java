@@ -32,6 +32,10 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
     private static final String ROLE_USER = "ROLE_USER", ROLE_AGENT = "ROLE_AGENT";
+    private static final String[] POSSIBLE_ANONYMOUS_ARRAY = {
+            /* 로그인/비로그인 모두 이용 가능한 URL */
+            "/search"
+    };
     private static final String[] REQUIRE_USER_ARRAY = {
             /* 임차인 권한 필요 URL */
             "/bookmarks",
@@ -67,8 +71,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        if(header == null || !header.startsWith(HEADER_PREFIX))
-            throw new AppException(ErrorCode.TOKEN_INVALID);
+
+        if(header == null || !header.startsWith(HEADER_PREFIX)){
+            if(possibleNonAuthenticationUri(request.getRequestURI())){
+                chain.doFilter(request, response);
+                return;
+            }
+                throw new AppException(ErrorCode.TOKEN_INVALID);
+        }
 
         final String token = header.substring(TOKEN_SPLIT_INDEX);
         long userId = jwtProvider.parseUserId(token);
@@ -86,11 +96,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
 
-    private boolean isNonAuthenticatedUri(String uri) {
-        return !(Arrays.stream(REQUIRE_AGENT_ARRAY).anyMatch(uri::contains)
-                || Arrays.stream(REQUIRE_USER_ARRAY).anyMatch(uri::contains));
-    }
-
     private void authenticate(HttpServletRequest request, long userId) {
         User user = userRepository.getById(userId);
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
@@ -102,5 +107,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         context.setAuthentication(authenticationToken);
         SecurityContextHolder.setContext(context);
+    }
+
+
+    private boolean isNonAuthenticatedUri(String uri) {
+        return !(Arrays.stream(REQUIRE_AGENT_ARRAY).anyMatch(uri::contains)
+                || Arrays.stream(REQUIRE_USER_ARRAY).anyMatch(uri::contains)
+                || Arrays.stream(POSSIBLE_ANONYMOUS_ARRAY).anyMatch(uri::contains));
+    }
+
+    private boolean possibleNonAuthenticationUri(String uri) {
+        return Arrays.stream(POSSIBLE_ANONYMOUS_ARRAY).anyMatch(uri::contains);
     }
 }
