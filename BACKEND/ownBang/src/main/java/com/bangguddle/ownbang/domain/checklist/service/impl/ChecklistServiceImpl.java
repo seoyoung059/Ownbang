@@ -140,9 +140,6 @@ public class ChecklistServiceImpl implements ChecklistService {
         // userid 유효성 검사
         userRepository.getById(userId);
 
-        // title 중복 검사 - user & title 이용
-        validateTemplateByUserAndTitle(userId, request.title());
-
         // checklistId 유효성 검사 - checklist & user 이용
         Checklist checklist = validateTemplateByIdAndUser(checklistId, userId);
 
