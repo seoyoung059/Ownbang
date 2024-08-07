@@ -68,7 +68,7 @@ public class RoomDetail {
 
 
     @Builder
-    public RoomDetail(byte roomCount, byte bathroomCount, HeatingType heatingType, Date moveInDate, Long buildingFloor, boolean elevator, Long totalParking, float parking, Date approvalDate, Date firstRegistrationDate, Facing facing, Purpose purpose, String road, String detailAddress) {
+    public RoomDetail(byte roomCount, byte bathroomCount, HeatingType heatingType, Date moveInDate, Long buildingFloor, boolean elevator, Long totalParking, float parking, Date approvalDate, Date firstRegistrationDate, Facing facing, Purpose purpose) {
         this.roomCount = roomCount;
         this.bathroomCount = bathroomCount;
         this.heatingType = heatingType;
