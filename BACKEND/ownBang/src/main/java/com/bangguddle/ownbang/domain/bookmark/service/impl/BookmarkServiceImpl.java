@@ -15,9 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.BAD_REQUEST;
-import static com.bangguddle.ownbang.global.enums.ErrorCode.BOOKMARK_DUPLICATED;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 
@@ -30,21 +30,19 @@ public class BookmarkServiceImpl implements BookmarkService {
     private final RoomRepository roomRepository;
 
     @Override
-    public SuccessResponse<NoneResponse> createBookmark(Long userId, Long roomId) {
+    public SuccessResponse<NoneResponse> toggleBookmark(Long userId, Long roomId) {
         Room room = roomRepository.getById(roomId);
         User user = userRepository.getById(userId);
-        validateBookmark(room, user);
-        bookmarkRepository.save(Bookmark.builder().room(room).user(user).build());
-        return new SuccessResponse<>(BOOKMARK_CREATE_SUCCESS, NoneResponse.NONE);
-    }
 
-    @Override
-    public SuccessResponse<NoneResponse> deleteBookmark(Long userId, Long bookmarkId) {
-        userRepository.getById(userId);
-        Bookmark bookmark = bookmarkRepository.findById(bookmarkId).orElseThrow(() -> new AppException(BAD_REQUEST));
-        if(!bookmark.getUser().getId().equals(userId)) throw new AppException(BAD_REQUEST);
-        bookmarkRepository.deleteById(bookmarkId);
-        return new SuccessResponse<>(BOOKMARK_DELETE_SUCCESS, NoneResponse.NONE);
+        Optional<Bookmark> bookmark = bookmarkRepository.findBookmarkByRoomIdAndUserId(roomId, userId);
+        if(bookmark.isPresent()) {
+            bookmarkRepository.delete(bookmark.get());
+            return new SuccessResponse<>(BOOKMARK_DELETE_SUCCESS, NoneResponse.NONE);
+        } else {
+            bookmarkRepository.save(Bookmark.builder().room(room).user(user).build());
+            return new SuccessResponse<>(BOOKMARK_CREATE_SUCCESS, NoneResponse.NONE);
+        }
+
     }
 
     @Override
@@ -56,11 +54,6 @@ public class BookmarkServiceImpl implements BookmarkService {
         return new SuccessResponse<>(BOOKMARK_FIND_SUCCESS, bookmarkList);
     }
 
-    private void validateBookmark(Room room, User user) {
-        if(bookmarkRepository.existsBookmarkByRoomIdAndUserId(room.getId(), user.getId())) {
-            throw new AppException(BOOKMARK_DUPLICATED);
-        }
-    }
 
     private User validateUser(Long userId) {
         return userRepository.findById(userId)
