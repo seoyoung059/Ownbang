@@ -1,6 +1,7 @@
 package com.bangguddle.ownbang.domain.streaming.service.impl;
 
 
+import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -32,7 +33,7 @@ import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class StreamingServiceImpl implements com.bangguddle.ownbang.domain.streaming.service.StreamingService {
+public class StreamingServiceImpl implements StreamingService {
 
 
     private final ObjectMapper objectMapper;
