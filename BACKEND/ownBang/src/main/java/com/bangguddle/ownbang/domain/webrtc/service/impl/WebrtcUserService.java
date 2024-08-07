@@ -20,6 +20,8 @@ import io.openvidu.java.client.Recording;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCESS;
@@ -46,6 +48,13 @@ public class WebrtcUserService implements WebrtcService {
         String token = webrtcSessionService.createToken(reservationId, UserType.ROLE_USER)
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
 
+        // 기존 세션에서 녹화 진행중인 경우
+        Optional<Recording> existingRecording =  webrtcSessionService.getRecord(reservationId);
+        if(existingRecording.isPresent()){
+            return new SuccessResponse<>(GET_TOKEN_SUCCESS,
+                    new WebrtcTokenResponse(token, existingRecording.get().getCreatedAt()));
+        }
+
         // 영상 녹화 시작
         Recording recording = webrtcSessionService.startRecord(reservationId)
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
@@ -62,7 +71,8 @@ public class WebrtcUserService implements WebrtcService {
         videoService.registerVideo(videoRecordRequest);
 
         // response 반환
-        return new SuccessResponse<>(GET_TOKEN_SUCCESS, new WebrtcTokenResponse(token));
+        return new SuccessResponse<>(GET_TOKEN_SUCCESS,
+                new WebrtcTokenResponse(token, recording.getCreatedAt()));
     }
 
     @Override
@@ -103,6 +113,6 @@ public class WebrtcUserService implements WebrtcService {
 
     private void validateSession(final Long reservationId){
         webrtcSessionService.getSession(reservationId).orElseThrow(
-                () -> new AppException(BAD_REQUEST));
+                () -> new AppException(WEBRTC_SESSION_UNOPENED));
     }
 }
