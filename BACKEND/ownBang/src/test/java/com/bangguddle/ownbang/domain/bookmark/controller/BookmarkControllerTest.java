@@ -42,12 +42,12 @@ class BookmarkControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("북마크 생성 - 성공")
+    @DisplayName("북마크 토글 - 성공")
     void addBookmark_Success() throws Exception {
         Long roomId = 1L;
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(BOOKMARK_CREATE_SUCCESS, NoneResponse.NONE);
 
-        when(bookmarkService.createBookmark(any(), any())).thenReturn(success);
+        when(bookmarkService.toggleBookmark(any(), any())).thenReturn(success);
 
         mockMvc.perform(
                 post("/bookmarks/{roomId}", roomId)
@@ -62,51 +62,15 @@ class BookmarkControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("북마크 생성 - 실패: 유효하지 않은 값")
+    @DisplayName("북마크 생성 - 토글: 유효하지 않은 값")
     void addBookmark_Failed_InvalidParam() throws Exception {
         Long roomId = -1L;
         SuccessResponse<NoneResponse> success = new SuccessResponse<>(BOOKMARK_CREATE_SUCCESS, NoneResponse.NONE);
 
-        when(bookmarkService.createBookmark(any(), anyLong())).thenReturn(success);
+        when(bookmarkService.toggleBookmark(any(), anyLong())).thenReturn(success);
 
         mockMvc.perform(
                         post("/bookmarks/{roomId}", roomId)
-                                .with(SecurityMockMvcRequestPostProcessors.csrf())
-                )
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser
-    @DisplayName("북마크 삭제 - 성공")
-    void deleteBookmark_Success() throws Exception{
-        Long bookmarkId = 1L;
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(BOOKMARK_DELETE_SUCCESS, NoneResponse.NONE);
-
-        when(bookmarkService.deleteBookmark(any(), anyLong())).thenReturn(success);
-
-        mockMvc.perform(
-                delete("/bookmarks/{bookmarkId}", String.valueOf(bookmarkId))
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
-        )
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(jsonPath("$.code").value(BOOKMARK_DELETE_SUCCESS.name()))
-                .andExpect(jsonPath("$.data").value("NONE"));
-    }
-
-    @Test
-    @WithMockUser
-    @DisplayName("북마크 삭제 - 실패: 적절하지 않은 북마크 ID")
-    void deleteBookmark_Fail_InvalidID() throws Exception{
-        Long bookmarkId = -1L;
-        SuccessResponse<NoneResponse> success = new SuccessResponse<>(BOOKMARK_DELETE_SUCCESS, NoneResponse.NONE);
-
-        when(bookmarkService.deleteBookmark(anyLong(), anyLong())).thenReturn(success);
-
-        mockMvc.perform(
-                        delete("/bookmarks/{bookmarkId}", String.valueOf(bookmarkId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 )
                 .andExpect(status().isBadRequest());
