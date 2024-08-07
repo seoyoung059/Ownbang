@@ -32,7 +32,6 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
     public SuccessResponse<NoneResponse> createAgentWorkhour(Long userId, AgentWorkhourRequest request) {
         User user = userRepository.getById(userId);
         Agent agent = agentRepository.getByUserId(userId);
-        Long agentId = agent.getId();
 
         AgentWorkhour agentWorkhour = request.toEntity(agent);
         agentWorkhourRepository.save(agentWorkhour);
@@ -67,8 +66,8 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
             throw new AppException(WORKHOUR_NOT_FOUND);
         }
 
-        agentWorkhour.updateWorkhour(id,request.startTime(), request.endTime());
-
+        agentWorkhour.updateWorkhour(request.startTime(), request.endTime());
+        agentWorkhourRepository.save(agentWorkhour);
 
         return new SuccessResponse<>(AGENT_WORKHOUR_UPDATE_SUCCESS, NoneResponse.NONE);
     }

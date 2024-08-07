@@ -52,7 +52,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             /* 중개인 권한 필요 URL */
             "/rooms/agents",
             "/agents/reservations",
-            "/agents/mypage"
+            "/agents/mypage",
+            "agents/workhour"
     };
     private static final String HEADER_PREFIX = "Bearer ";
     private static final int TOKEN_SPLIT_INDEX = 7;

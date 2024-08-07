@@ -37,8 +37,8 @@ public class AgentWorkhour {
         WEEKEND, WEEKDAY
     }
 
-    public void updateWorkhour(Long id,String startTime, String endTime) {
-        this.id=id;
+    public void updateWorkhour(String startTime, String endTime) {
+
         this.startTime = startTime;
         this.endTime = endTime;
     }
