@@ -17,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 import java.util.UUID;
 
 
@@ -31,8 +34,12 @@ public class S3UploaderServiceImpl implements S3UploaderService {
     private String bucketName;
 
 
-    @Value("${aws_cloudfront}")
+    @Value("${cloud.aws.cloudfront.dns}")
     private String cloudfrontUrl;
+
+
+    @Value("${s3.hls.path}")
+    private String hlsPath;
 
     /**
      * S3 버켓 bucket에 파일 uploadFile을 업로드하고, 기존 파일을 삭제하는 메서드
@@ -44,10 +51,7 @@ public class S3UploaderServiceImpl implements S3UploaderService {
         // S3에 저장될 파일 이름
         String fileName = dirName + "/" + uploadFile.getName();
         // S3에 업로드
-        String uploadImageUrl = putS3(uploadFile, bucketName, fileName);
-        // 기존 로컬 파일 삭제
-        removeNewFile(uploadFile);
-        return cloudfrontUrl+uploadImageUrl;
+        return putS3(uploadFile, bucketName, fileName);
     }
 
 
@@ -65,7 +69,22 @@ public class S3UploaderServiceImpl implements S3UploaderService {
         } catch (IOException e) {
             throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
-        return uploadToS3(convertedFile, dirName);
+        return cloudfrontUrl+uploadToS3(convertedFile, dirName);
+    }
+
+
+    public String uploadHlsFiles(Path outputPath, String sessionId) {
+        try(Stream<Path> paths = Files.walk(outputPath)) {
+            String dirName = hlsPath+"/"+sessionId;
+            paths.filter(Files::isRegularFile)
+                    .forEach(filePath -> {
+                        uploadToS3(filePath.toFile(), dirName);
+                    });
+            return cloudfrontUrl+"/"+dirName;
+        } catch (IOException e){
+            log.error("Error walking through output directory:", e);
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
