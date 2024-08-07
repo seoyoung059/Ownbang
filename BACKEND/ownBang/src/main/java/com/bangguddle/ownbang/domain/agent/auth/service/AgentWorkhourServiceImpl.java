@@ -6,6 +6,8 @@ import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.agent.repository.AgentWorkhourRepository;
+import com.bangguddle.ownbang.domain.user.entity.User;
+import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -24,11 +26,12 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
 
     private final AgentWorkhourRepository agentWorkhourRepository;
     private final AgentRepository agentRepository;
-
+    private final UserRepository userRepository;
     @Override
-    public SuccessResponse<NoneResponse> createAgentWorkhour(AgentWorkhourRequest request) {
-        Agent agent = agentRepository.findById(request.agentId())
-                .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
+    public SuccessResponse<NoneResponse> createAgentWorkhour(Long userId, AgentWorkhourRequest request) {
+        User user = userRepository.getById(userId);
+        Agent agent = agentRepository.getByUserId(userId);
+        Long agentId = agent.getId();
 
         AgentWorkhour agentWorkhour = request.toEntity(agent);
         agentWorkhourRepository.save(agentWorkhour);
@@ -47,11 +50,15 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
     }
 
     @Transactional
-    public SuccessResponse<NoneResponse> updateAgentWorkhour(Long id, AgentWorkhourRequest request) {
+    public SuccessResponse<NoneResponse> updateAgentWorkhour(Long id, Long userId, AgentWorkhourRequest request) {
+        User user = userRepository.getById(userId);
+        Agent agent = agentRepository.getByUserId(userId);
+        Long agentId = agent.getId();
+
         AgentWorkhour agentWorkhour = agentWorkhourRepository.findById(id)
                 .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
 
-        if (!agentWorkhour.getAgent().getId().equals(request.agentId())) {
+        if (!agentWorkhour.getAgent().getId().equals(agentId)) {
             throw new AppException(WORKHOUR_NOT_FOUND);
         }
 

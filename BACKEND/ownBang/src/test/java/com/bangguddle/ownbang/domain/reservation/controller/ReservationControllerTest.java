@@ -1,15 +1,8 @@
 package com.bangguddle.ownbang.domain.reservation.controller;
 
-import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeRequest;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationResponse;
+import com.bangguddle.ownbang.domain.reservation.dto.*;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
-import com.bangguddle.ownbang.domain.room.entity.Room;
-import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
-import com.bangguddle.ownbang.domain.user.entity.User;
-import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
@@ -28,18 +21,15 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
-import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -50,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         excludeAutoConfiguration = SecurityAutoConfiguration.class,
         excludeFilters =
                 {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {OncePerRequestFilter.class})})
-public class ReservationControllerTest {
+ class ReservationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -58,39 +48,18 @@ public class ReservationControllerTest {
     @MockBean
     private ReservationService reservationService;
 
-    @MockBean
-    private RoomRepository roomRepository;
-
-    @MockBean
-    private UserRepository userRepository;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("예약 신청 Post 컨트롤러 성공")
+    @DisplayName("예약 신청 성공")
     @WithMockUser
     void createReservation_Success() throws Exception {
-        LocalDateTime now = LocalDateTime.now();
-        ReservationRequest request = new ReservationRequest(
-                2L,
-                1L,
-                now,
-                ReservationStatus.APPLYED
-        );
+        Long userId = 1L;
+        ReservationRequest request = new ReservationRequest(1L, LocalDateTime.now(), ReservationStatus.APPLYED);
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(RESERVATION_MAKE_SUCCESS, NoneResponse.NONE);
 
-        Room room = mock(Room.class);
-        User user = mock(User.class);
-
-        when(roomRepository.findById(request.roomId())).thenReturn(Optional.of(room));
-        when(userRepository.findById(request.userId())).thenReturn(Optional.of(user));
-
-        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
-                SuccessCode.RESERVATION_MAKE_SUCCESS,
-                NoneResponse.NONE
-        );
-
-        when(reservationService.createReservation(any(ReservationRequest.class))).thenReturn(successResponse);
+        when(reservationService.createReservation(eq(userId), any(ReservationRequest.class))).thenReturn(successResponse);
 
         mockMvc.perform(post("/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -98,63 +67,61 @@ public class ReservationControllerTest {
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(jsonPath("$.code").value(SuccessCode.RESERVATION_MAKE_SUCCESS.name()))
-                .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_MAKE_SUCCESS.getMessage()))
-                .andExpect(jsonPath("$.data").value("NONE"));
+                .andExpect(jsonPath("$.code").value(RESERVATION_MAKE_SUCCESS.name()))
+                .andExpect(jsonPath("$.data").value("NONE"))
+                .andDo(print());
     }
 
     @Test
-    @DisplayName("Invalid Field 검증 - 조건 불만족")
+    @DisplayName("예약 신청 실패 - 유효하지 않은 필드")
     @WithMockUser
     void createReservation_Fail_InvalidField() throws Exception {
-        ReservationRequest invalidRequest = ReservationRequest.of(-1L, -1L, LocalDateTime.now(), ReservationStatus.APPLYED);
-        String requestBody = objectMapper.writeValueAsString(invalidRequest);
+        ReservationRequest invalidRequest = new ReservationRequest(-1L, LocalDateTime.now(), null);
 
         mockMvc.perform(post("/reservations/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody)
+                        .content(objectMapper.writeValueAsString(invalidRequest))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andDo(print());
     }
 
     @Test
     @DisplayName("사용자 예약 목록 조회 성공")
-    @WithMockUser
-    void getReservationsByUserId_Success() throws Exception {
+    @WithMockUser(username = "1") // userId를 1로 설정
+    void getMyReservationList_Success() throws Exception {
         Long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
 
         ReservationResponse reservation1 = new ReservationResponse(1L, now, ReservationStatus.APPLYED, 1L, userId);
         ReservationResponse reservation2 = new ReservationResponse(2L, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId);
+        ReservationResponse reservation3 = new ReservationResponse(3L, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId);
 
-        List<ReservationResponse> reservations = List.of(reservation1, reservation2);
+        List<ReservationResponse> reservations = List.of(reservation1, reservation2, reservation3);
         ReservationListResponse listResponse = new ReservationListResponse(reservations);
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);
 
         when(reservationService.getMyReservationList(eq(userId))).thenReturn(successResponse);
 
         mockMvc.perform(get("/reservations/list")
-                        .param("userId", String.valueOf(userId)))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
                 .andExpect(jsonPath("$.code").value(RESERVATION_LIST_SUCCESS.name()))
                 .andExpect(jsonPath("$.message").value(RESERVATION_LIST_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data.reservations").isArray())
-                .andExpect(jsonPath("$.data.reservations", hasSize(2)))
+                .andExpect(jsonPath("$.data.reservations", hasSize(3)))
                 .andExpect(jsonPath("$.data.reservations[0].id").value(1))
-                .andExpect(jsonPath("$.data.reservations[0].reservationTime").exists())
                 .andExpect(jsonPath("$.data.reservations[0].status").value(ReservationStatus.APPLYED.toString()))
-                .andExpect(jsonPath("$.data.reservations[0].roomId").value(1))
-                .andExpect(jsonPath("$.data.reservations[0].userId").value(userId))
                 .andExpect(jsonPath("$.data.reservations[1].id").value(2))
-                .andExpect(jsonPath("$.data.reservations[1].reservationTime").exists())
                 .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.CONFIRMED.toString()))
-                .andExpect(jsonPath("$.data.reservations[1].roomId").value(2))
-                .andExpect(jsonPath("$.data.reservations[1].userId").value(userId));
-
+                .andExpect(jsonPath("$.data.reservations[2].id").value(3))
+                .andExpect(jsonPath("$.data.reservations[2].status").value(ReservationStatus.COMPLETED.toString()));
     }
+
+
     @Test
     @DisplayName("예약 목록 조회 시 빈 리스트 반환")
     @WithMockUser
@@ -177,26 +144,25 @@ public class ReservationControllerTest {
     }
 
     @Test
-    @DisplayName("예약 철회 성공")
-    @WithMockUser
+    @DisplayName("예약 상태 업데이트 성공")
+    @WithMockUser(username = "1")
     void updateStatusReservation_Success() throws Exception {
-        Long id = 1L;
+        Long userId = 1L;
+        Long reservationId = 1L;
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(RESERVATION_UPDATE_STATUS_SUCCESS, NoneResponse.NONE);
 
-        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
-                SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS,
-                NoneResponse.NONE
-        );
+        when(reservationService.updateStatusReservation(eq(userId), eq(reservationId))).thenReturn(successResponse);
 
-        when(reservationService.updateStatusReservation(anyLong())).thenReturn(successResponse);
-
-        mockMvc.perform(patch("/reservations/{id}", id)
+        mockMvc.perform(patch("/reservations/{id}", reservationId)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(jsonPath("$.code").value(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS.name()))
-                .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS.getMessage()))
-                .andExpect(jsonPath("$.data").value("NONE"));
+                .andExpect(jsonPath("$.code").value(RESERVATION_UPDATE_STATUS_SUCCESS.name()))
+                .andExpect(jsonPath("$.data").value("NONE"))
+                .andDo(print());
     }
+
+
 
     @Test
     @DisplayName("사용자 예약 목록 조회 성공 - COMPLETED 상태 포함")
@@ -250,7 +216,7 @@ public class ReservationControllerTest {
     @Test
     @DisplayName("서비스 예외 발생 시 실패")
     void getAvailableTimes_ServiceException() throws Exception {
-        // Given
+
         Long roomId = 1L;
         LocalDate date = LocalDate.now().plusDays(1);
 
@@ -266,4 +232,27 @@ public class ReservationControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("ERROR"))
                 .andExpect(jsonPath("$.code").value(ErrorCode.ROOM_NOT_FOUND.name()));
     }
+    @Test
+    @DisplayName("예약 가능 시간 조회 성공")
+    @WithMockUser
+    void getAvailableTimes_Success() throws Exception {
+        Long roomId = 1L;
+        LocalDate date = LocalDate.now().plusDays(1);
+        List<String> availableTimes = List.of("09:00", "10:00", "11:00");
+        AvailableTimeResponse response = new AvailableTimeResponse(availableTimes);
+        SuccessResponse<AvailableTimeResponse> successResponse = new SuccessResponse<>(AVAILABLE_TIMES_RETRIEVED, response);
+
+        when(reservationService.getAvailableTimes(any(AvailableTimeRequest.class))).thenReturn(successResponse);
+
+        mockMvc.perform(get("/reservations/available-times")
+                        .param("roomId", String.valueOf(roomId))
+                        .param("date", date.toString())
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.code").value(AVAILABLE_TIMES_RETRIEVED.name()))
+                .andExpect(jsonPath("$.data.availableTimes", hasSize(3)))
+                .andDo(print());
+    }
+
 }

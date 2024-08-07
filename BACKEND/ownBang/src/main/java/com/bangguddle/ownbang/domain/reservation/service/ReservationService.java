@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ReservationService {
 
-    SuccessResponse<NoneResponse> createReservation(ReservationRequest reservationRequest);
+    SuccessResponse<NoneResponse> createReservation(Long userId, ReservationRequest reservationRequest);
 
     SuccessResponse<ReservationListResponse> getMyReservationList (Long userId);
 
-    SuccessResponse<NoneResponse> updateStatusReservation(Long id) ;
+    SuccessResponse<NoneResponse> updateStatusReservation(Long userId, Long id) ;
 
-    SuccessResponse<NoneResponse> confirmStatusReservation(Long id);
+    SuccessResponse<NoneResponse> confirmStatusReservation(Long userId, Long id);
 
-    SuccessResponse<ReservationListResponse> getAgentReservations(Long agentId);
+    SuccessResponse<ReservationListResponse> getAgentReservations(Long userId);
 
     SuccessResponse<AvailableTimeResponse> getAvailableTimes(AvailableTimeRequest request);
 }
