@@ -1,11 +1,12 @@
-package com.bangguddle.ownbang.domain.agent.auth.service;
+package com.bangguddle.ownbang.domain.agent.auth.workhour.service.impl;
 
-import com.bangguddle.ownbang.domain.agent.auth.dto.AgentWorkhourListResponse;
-import com.bangguddle.ownbang.domain.agent.auth.dto.AgentWorkhourRequest;
+import com.bangguddle.ownbang.domain.agent.auth.workhour.dto.AgentWorkhourListResponse;
+import com.bangguddle.ownbang.domain.agent.auth.workhour.dto.AgentWorkhourRequest;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
-import com.bangguddle.ownbang.domain.agent.repository.AgentWorkhourRepository;
+import com.bangguddle.ownbang.domain.agent.auth.workhour.repository.AgentWorkhourRepository;
+import com.bangguddle.ownbang.domain.agent.auth.workhour.service.AgentWorkhourService;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -49,6 +50,10 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
         return new SuccessResponse<>(AGENT_WORKHOUR_GET_SUCCESS, AgentWorkhourListResponse.from(workhours));
     }
 
+    /*
+    중개인 업무시간 수정
+    id는 agentworkhourid
+    */
     @Transactional
     public SuccessResponse<NoneResponse> updateAgentWorkhour(Long id, Long userId, AgentWorkhourRequest request) {
         User user = userRepository.getById(userId);

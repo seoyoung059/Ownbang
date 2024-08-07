@@ -1,4 +1,4 @@
-package com.bangguddle.ownbang.domain.agent.repository;
+package com.bangguddle.ownbang.domain.agent.auth.workhour.repository;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
