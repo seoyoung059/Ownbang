@@ -44,7 +44,7 @@ public class WebrtcAgentService implements WebrtcService {
 
         // reservationId 유효성 검사
         Long reservationId = request.reservationId();
-        validateReservation(reservationId);
+        validateReservationAndUser(reservationId, userId);
 
         // session 중복 검사
         webrtcSessionService.getSession(reservationId)
@@ -72,7 +72,7 @@ public class WebrtcAgentService implements WebrtcService {
 
         // reservationId 유효성 검사
         Long reservationId = request.reservationId();
-        validateReservation(reservationId);
+        validateReservationAndUser(reservationId, userId);
 
         // session 유효성 검사
         webrtcSessionService.getSession(reservationId).orElseThrow(
@@ -123,7 +123,7 @@ public class WebrtcAgentService implements WebrtcService {
         return new SuccessResponse<>(REMOVE_TOKEN_SUCCESS, NoneResponse.NONE);
     }
 
-    private void validateReservation(Long reservationId){
+    private void validateReservationAndUser(Long reservationId, Long userId){
         // 예약 repo로 접근해 Reservation 을 얻어와 확인
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
                 () -> new AppException(RESERVATION_NOT_FOUND)
@@ -131,6 +131,10 @@ public class WebrtcAgentService implements WebrtcService {
 
         if(reservation.getStatus() != ReservationStatus.CONFIRMED){
             throw new AppException(RESERVATION_STATUS_NOT_CONFIRMED);
+        }
+
+        if(userId != reservation.getRoom().getAgent().getUser().getId()){
+            throw new AppException(ACCESS_DENIED);
         }
     }
 }
