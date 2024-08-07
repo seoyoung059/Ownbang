@@ -12,7 +12,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
   data:
     redis:
       host: ${REDIS_HOST}
@@ -32,6 +32,7 @@ server:
     enabled: false
   servlet:
     context-path: /api/
+
 
 openvidu:
   url: ${OPENVIDU_URL}
@@ -75,3 +76,6 @@ springdoc:
     path: /api-docs
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
+
+logging:
+  config: classpath:log4j2.xml
