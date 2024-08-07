@@ -24,4 +24,3 @@ server:
 openvidu:
   url: test
   secret: test
-

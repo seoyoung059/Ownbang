@@ -153,7 +153,7 @@ public class WebrtcAgentServiceTest {
     void 토큰_발급_실패__취소된_예약인_경우() throws Exception {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
-        when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELED);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELLED);
 
         WebrtcCreateTokenRequest request = WebrtcCreateTokenRequest.builder().reservationId(reservationId).build();
 
@@ -300,7 +300,7 @@ public class WebrtcAgentServiceTest {
     void 토큰_삭제_실패__취소된_예약인_경우() throws Exception {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
-        when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELED);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELLED);
 
         WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
                 .reservationId(reservationId)

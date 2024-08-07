@@ -44,7 +44,7 @@ public class VideoServiceImpl implements VideoService {
         Video video = validateVideo(videoId);
         if(video.getVideoStatus() == VideoStatus.RECORDING){
             throw new AppException(VIDEO_IS_BEING_RECORDED);
-        }else if(video.getReservation().getUserId() != userId){
+        }else if(video.getReservation().getUser().getId() != userId){
             throw new AppException(ACCESS_DENIED);
         }
 

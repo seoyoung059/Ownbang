@@ -1,5 +1,7 @@
 package com.bangguddle.ownbang.domain.reservation.controller;
 
+import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeRequest;
+import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
@@ -8,8 +10,11 @@ import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("reservations")
@@ -36,6 +41,14 @@ public class ReservationController {
         return Response.success(response);
     }
 
+    @GetMapping("/available-times")
+    public ResponseEntity<Response<AvailableTimeResponse>> getAvailableTimes(
+            @RequestParam("roomId") Long roomId,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        AvailableTimeRequest request = new AvailableTimeRequest(roomId, date);
+        SuccessResponse<AvailableTimeResponse> response = reservationService.getAvailableTimes(request);
+        return Response.success(response);
+    }
 
 
 }
