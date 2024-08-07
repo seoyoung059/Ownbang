@@ -63,6 +63,8 @@ public class StreamingServiceImpl implements StreamingService {
         log.info(outputPath.toAbsolutePath().toString());
 
         // json에서 publisher(중개인)의 녹화 파일명을 얻는다.
+        String jsonFile = unzipFile(outputPath.toString(), sessionId, sessionId);
+
         String filename = getPublisherFileName(outputPath.toString(), sessionId);
         if(filename == null) throw new AppException(RECORDING_ERROR);
 
@@ -75,7 +77,7 @@ public class StreamingServiceImpl implements StreamingService {
         // s3에 업로드한다.
         String uploadedUrl = s3UploaderService.uploadHlsFiles(Paths.get(outputPath.toString(),sessionId), sessionId);
 
-        return new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, uploadedUrl);
+        return new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, uploadedUrl+"/"+sessionId+m3u8Extend);
     }
 
     /**
