@@ -2,8 +2,10 @@ package com.bangguddle.ownbang.domain.reservation.dto;
 
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
-import jakarta.validation.constraints.Positive;
+import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.domain.user.entity.User;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDateTime;
 
@@ -20,10 +22,10 @@ public record ReservationRequest(
         ReservationStatus status
 
 ) {
-    public Reservation toEntity() {
+    public Reservation toEntity(Room room, User user) {
         return Reservation.builder()
-                .roomId(roomId)
-                .userId(userId)
+                .room(room)
+                .user(user)
                 .reservationTime(reservationTime)
                 .status(status)
                 .build();
@@ -35,13 +37,11 @@ public record ReservationRequest(
 
     public static ReservationRequest from(Reservation reservation) {
         return new ReservationRequest(
-                reservation.getRoomId(),
-                reservation.getUserId(),
+                reservation.getRoom().getId(),
+                reservation.getUser().getId(),
                 reservation.getReservationTime(),
                 reservation.getStatus()
         );
     }
-
-
 
 }

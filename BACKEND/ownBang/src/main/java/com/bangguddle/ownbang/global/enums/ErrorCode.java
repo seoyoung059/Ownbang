@@ -52,12 +52,15 @@ public enum ErrorCode implements ResponseCode {
     // Reservation API
     RESERVATION_DUPLICATED (HttpStatus.CONFLICT, " 이미 다른 사람이 신청된 예약 시간입니다. "),
     RESERVATION_COMPLETED(HttpStatus.CONFLICT, " 각 매물은 한 건씩만 예약이 가능합니다. "),
-    RESERVATION_CANCELED_DUPLICATED (HttpStatus.CONFLICT, " 이미 취소한 예약입니다. "),
-    RESERVATION_CANCELED_UNAVAILABLE (HttpStatus.BAD_REQUEST, " 확정된 예약은 취소할 수 없습니다."),
+    RESERVATION_CANCELLED_DUPLICATED (HttpStatus.CONFLICT, " 이미 취소한 예약입니다. "),
+    RESERVATION_CANCELLED_UNAVAILABLE (HttpStatus.BAD_REQUEST, " 확정된 예약은 취소할 수 없습니다."),
     RESERVATION_CONFIRMED_DUPLICATED(HttpStatus.CONFLICT, " 이미 확정된 예약 입니다. "),
     RESERVATION_CONFIRMED_UNAVAILABLE(HttpStatus.BAD_REQUEST, " 취소된 예약은 확정할 수 없습니다. "),
     RESERVATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 예약입니다."),
     RESERVATION_STATUS_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "확정된 예약이 아닙니다."),
+    RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM(HttpStatus.CONFLICT, "예약 확정은 각 매물, 시간 당 한 건만 가능합니다."),
+    WORKHOUR_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 날짜의 근무 시간 정보를 찾을 수 없습니다."),
+    INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 형식입니다."),
 
     // Common Error Code
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부적 에러가 발생했습니다."),

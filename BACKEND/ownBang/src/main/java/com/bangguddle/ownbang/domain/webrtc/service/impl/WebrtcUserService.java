@@ -3,12 +3,10 @@ package com.bangguddle.ownbang.domain.webrtc.service.impl;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
-import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.video.dto.VideoRecordRequest;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.service.VideoService;
-import com.bangguddle.ownbang.domain.video.service.impl.VideoServiceImpl;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcRemoveTokenRequest;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcTokenResponse;
@@ -21,8 +19,6 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 import io.openvidu.java.client.Recording;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
@@ -108,7 +104,7 @@ public class WebrtcUserService implements WebrtcService {
             throw new AppException(RESERVATION_STATUS_NOT_CONFIRMED);
         }
 
-        if(reservation.getUserId() != userId){
+        if(reservation.getUser().getId() != userId){
             throw new AppException(ACCESS_DENIED);
         }
     }
