@@ -108,7 +108,6 @@ class BookmarkServiceImplTest {
         Long roomId = 1L, userId = 1L;
 
         Room room = mock(Room.class);
-        User user = mock(User.class);
 
         when(roomRepository.getById(roomId)).thenReturn(room);
 
