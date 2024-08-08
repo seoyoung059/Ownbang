@@ -97,10 +97,10 @@ public class AgentReservationControllerTest {
     void getAgentReservations_Success_WithCompletedStatus() throws Exception {
         Long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
-
-        ReservationResponse reservation1 = new ReservationResponse(1L, now, ReservationStatus.APPLYED, 1L, 1L);
-        ReservationResponse reservation2 = new ReservationResponse(2L, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, 2L);
-        ReservationResponse reservation3 = new ReservationResponse(3L, now.plusDays(2), ReservationStatus.COMPLETED, 3L, 3L);
+        String officeName = "공인중개사";
+        ReservationResponse reservation1 = new ReservationResponse(1L, officeName, now, ReservationStatus.APPLYED, 1L, 1L);
+        ReservationResponse reservation2 = new ReservationResponse(2L, officeName, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, 2L);
+        ReservationResponse reservation3 = new ReservationResponse(3L, officeName, now.plusDays(2), ReservationStatus.COMPLETED, 3L, 3L);
 
         ReservationListResponse listResponse = new ReservationListResponse(List.of(reservation1, reservation2, reservation3));
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);

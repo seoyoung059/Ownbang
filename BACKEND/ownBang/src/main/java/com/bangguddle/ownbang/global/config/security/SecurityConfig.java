@@ -37,15 +37,15 @@ public class SecurityConfig {
             "/checklists/**",
             "/reservations",
             "/auths/password-change",
-            "/search"
-
+            "/reviews",
+            "/search/**"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
             "/rooms/agents/**",
             "/agents/mypage",
             "/agents/reservations",
-            "agents/workhour"
+            "/agents/workhour"
     };
     private final UserDetailsService userDetailsService;
     private final JwtTokenFilter jwtTokenFilter;

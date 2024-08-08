@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.bookmark.service.impl;
 
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.bookmark.dto.BookmarkSearchResponse;
 import com.bangguddle.ownbang.domain.bookmark.entity.Bookmark;
 import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
@@ -43,8 +44,8 @@ class BookmarkServiceImplTest {
     private BookmarkServiceImpl bookmarkService;
 
     @Test
-    @DisplayName("북마크 생성 - 성공")
-    void createBookmark_Success() {
+    @DisplayName("북마크 토글 - 성공: 등록 성공")
+    void toggleBookmark_Success_create() {
         // given
         Long roomId = 1L, userId = 1L;
         Room room = mock(Room.class);
@@ -52,17 +53,37 @@ class BookmarkServiceImplTest {
 
         when(roomRepository.getById(roomId)).thenReturn(room);
         when(userRepository.getById(userId)).thenReturn(user);
-        when(room.getId()).thenReturn(roomId);
-        when(user.getId()).thenReturn(userId);
-        when(bookmarkRepository.existsBookmarkByRoomIdAndUserId(anyLong(), anyLong())).thenReturn(false);
+        when(bookmarkRepository.findBookmarkByRoomIdAndUserId(anyLong(), anyLong())).thenReturn(Optional.empty());
 
-        SuccessResponse<NoneResponse> response = bookmarkService.createBookmark(userId, roomId);
+        SuccessResponse<NoneResponse> response = bookmarkService.toggleBookmark(userId, roomId);
 
         assertThat(response).isNotNull();
         assertThat(response.successCode()).isEqualTo(BOOKMARK_CREATE_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
         verify(bookmarkRepository, times(1)).save(any(Bookmark.class));
+
+    }
+
+    @Test
+    @DisplayName("북마크 토글 - 성공: 삭제 성공")
+    void toggleBookmark_Success_delete() {
+        // given
+        Long roomId = 1L, userId = 1L;
+        Room room = mock(Room.class);
+        User user = mock(User.class);
+
+        when(roomRepository.getById(roomId)).thenReturn(room);
+        when(userRepository.getById(userId)).thenReturn(user);
+        when(bookmarkRepository.findBookmarkByRoomIdAndUserId(anyLong(), anyLong())).thenReturn(Optional.of(mock(Bookmark.class)));
+
+        SuccessResponse<NoneResponse> response = bookmarkService.toggleBookmark(userId, roomId);
+
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(BOOKMARK_DELETE_SUCCESS);
+        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
+
+        verify(bookmarkRepository, times(1)).delete(any(Bookmark.class));
 
     }
 
@@ -75,7 +96,7 @@ class BookmarkServiceImplTest {
         doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(roomRepository).getById(roomId);
 
         assertThatThrownBy(() ->
-            bookmarkService.createBookmark(userId, roomId)
+            bookmarkService.toggleBookmark(userId, roomId)
         )
                 .isInstanceOf(AppException.class)
                 .hasMessageContaining(ErrorCode.BAD_REQUEST.getMessage());
@@ -88,61 +109,27 @@ class BookmarkServiceImplTest {
         Long roomId = 1L, userId = 1L;
 
         Room room = mock(Room.class);
-        User user = mock(User.class);
 
         when(roomRepository.getById(roomId)).thenReturn(room);
 
         doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(userRepository).getById(roomId);
 
         assertThatThrownBy(() ->
-            bookmarkService.createBookmark(userId, roomId)
+            bookmarkService.toggleBookmark(userId, roomId)
         )
                 .isInstanceOf(AppException.class)
                 .hasMessageContaining(ErrorCode.BAD_REQUEST.getMessage());
     }
 
-    @Test
-    @DisplayName("북마크 삭제 - 성공")
-    void deleteBookmark_Success() {
-        Long userId = 1L, bookmarkId = 1L;
-
-        Bookmark bookmark = mock(Bookmark.class);
-        User user = mock(User.class);
-
-        when(bookmarkRepository.findById(any())).thenReturn(Optional.ofNullable(bookmark));
-        when(bookmark.getUser()).thenReturn(user);
-        when(user.getId()).thenReturn(userId);
-
-        SuccessResponse<NoneResponse> response = bookmarkService.deleteBookmark(userId, bookmarkId);
-
-        assertThat(response).isNotNull();
-        assertThat(response.successCode()).isEqualTo(BOOKMARK_DELETE_SUCCESS);
-        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
-
-        verify(bookmarkRepository, times(1)).deleteById(bookmarkId);
-    }
-
-
-    @Test
-    @DisplayName("매물 삭제 - 실패: 존재하지 않는 ID")
-    void deleteBookmarkTest_Fail_NotExits() {
-        //given
-        Long userId = 1L, bookmarkId = 1L;
-//        doThrow(new AppException(ErrorCode.BAD_REQUEST)).when(bookmarkRepository).deleteById(bookmarkId);
-
-        //when, then
-        assertThatThrownBy(() ->
-            bookmarkService.deleteBookmark(userId, bookmarkId)
-        ).isInstanceOf(AppException.class);
-    }
 
     @Test
     @DisplayName("유저 북마크 조회 - 성공")
     void getBookmarks_Success() {
         long userId = 1L;
         User user = User.builder().build();
-        Room room1 = Room.builder().build();
-        Room room2 = Room.builder().build();
+        Agent agent = Agent.builder().build();
+        Room room1 = Room.builder().agent(agent).build();
+        Room room2 = Room.builder().agent(agent).build();
         List<Bookmark> bookmarkList = new ArrayList<>();
         bookmarkList.add(Bookmark.builder().user(user).room(room1).build());
         bookmarkList.add(Bookmark.builder().user(user).room(room2).build());

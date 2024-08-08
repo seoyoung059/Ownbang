@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.room.dto;
 
+import com.bangguddle.ownbang.domain.agent.dto.AgentResponse;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.enums.DealType;
 import com.bangguddle.ownbang.domain.room.enums.RoomType;
@@ -14,7 +15,8 @@ import java.util.stream.Collectors;
 
 @Builder
 public record RoomSearchResponse(
-//        User agent,
+        Long id,
+        AgentResponse agentResponse,
         Float latitude,
         Float longitude,
         DealType dealType,
@@ -36,14 +38,17 @@ public record RoomSearchResponse(
         String road,
         String detailAddress,
         String profileImageUrl,
+        Boolean isBookmarked,
         RoomAppliancesSearchResponse roomAppliancesSearchResponse,
         RoomDetailSearchResponse roomDetailSearchResponse,
         @Valid
         List<RoomImageResponse> roomImageResponses
 ) {
 
-    static public RoomSearchResponse from(Room room) {
+    static public RoomSearchResponse from(Room room, AgentResponse agentResponse, Boolean isBookmarked) {
         return RoomSearchResponse.builder()
+                .id(room.getId())
+                .agentResponse(agentResponse)
                 .latitude(room.getLatitude())
                 .longitude(room.getLongitude())
                 .dealType(room.getDealType())
@@ -64,7 +69,8 @@ public record RoomSearchResponse(
                 .roomDetailSearchResponse(RoomDetailSearchResponse.from(room.getRoomDetail()))
                 .roomImageResponses(room.getRoomImages().stream()
                         .map(RoomImageResponse::from)
-                .collect(Collectors.toList()))
+                        .collect(Collectors.toList()))
+                .isBookmarked(isBookmarked)
                 .build();
     }
 }

@@ -2,6 +2,9 @@ package com.bangguddle.ownbang.domain.room.service.impl;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
+import com.bangguddle.ownbang.domain.bookmark.entity.Bookmark;
+import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
+import com.bangguddle.ownbang.domain.review.repository.ReviewRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
@@ -41,6 +44,11 @@ class RoomServiceImplTest {
     @Mock
     private RoomRepository roomRepository;
 
+    @Mock
+    private BookmarkRepository bookmarkRepository;
+
+    @Mock
+    private ReviewRepository reviewRepository;
 
     @Mock
     private AgentRepository agentRepository;
@@ -158,15 +166,25 @@ class RoomServiceImplTest {
     @DisplayName("매물 단건 조회 - 성공")
     void findRoomTest_Success() {
         // given
-        Room room = Room.builder()
-                .roomDetail(RoomDetail.builder().build())
-                .roomAppliances(RoomAppliances.builder().build())
-                .build();
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.ofNullable(room));
-        Long roomId = 1L;
+//        Room room = Room.builder()
+//                .roomDetail(RoomDetail.builder().build())
+//                .roomAppliances(RoomAppliances.builder().build())
+//                .build();
+        Room room = mock(Room.class);
+        User user = mock(User.class);
+        Agent agent = mock(Agent.class); RoomDetail roomDetail = mock(RoomDetail.class); RoomAppliances roomAppliances = mock(RoomAppliances.class);
+        Long roomId = 1L, userId = 1L, agentId = 1L;
+        when(room.getId()).thenReturn(roomId);
+        when(room.getAgent()).thenReturn(agent);
+        when(agent.getUser()).thenReturn(user);
+        when(room.getRoomDetail()).thenReturn(roomDetail);
+        when(room.getRoomAppliances()).thenReturn(roomAppliances);
+        when(agent.getId()).thenReturn(agentId);
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
+        when(bookmarkRepository.findBookmarkByRoomIdAndUserId(anyLong(), anyLong())).thenReturn(Optional.of(mock(Bookmark.class)));
 
         //when
-        roomServiceImpl.getRoom(roomId);
+        roomServiceImpl.getRoom(userId, roomId);
 
         //then
         verify(roomRepository, times(1)).findById(anyLong());
@@ -177,13 +195,13 @@ class RoomServiceImplTest {
     void findRoomTest_Fail_InvalidId() {
         // given
         doThrow(new AppException(ROOM_NOT_FOUND)).when(roomRepository).findById(anyLong());
-        Long roomId = 1L;
+        Long roomId = 1L, userId = 1L;
 
         //when
 
         //then
         assertThatThrownBy(() ->
-            roomServiceImpl.getRoom(roomId)
+            roomServiceImpl.getRoom(userId, roomId)
         ).isInstanceOf(AppException.class);
     }
 

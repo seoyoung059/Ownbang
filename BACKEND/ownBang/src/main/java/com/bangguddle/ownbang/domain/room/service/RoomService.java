@@ -22,10 +22,10 @@ public interface RoomService {
     SuccessResponse<NoneResponse> deleteRoom(Long userId, Long roomId);
 
     // 매물 단건 조회
-    SuccessResponse<RoomSearchResponse> getRoom(Long roomId);
+    SuccessResponse<RoomSearchResponse> getRoom(Long userId, Long roomId);
 
     // 중개인의 매물 목록 조회
     SuccessResponse<List<RoomInfoSearchResponse>> getAgentRooms(Long userId, int page, int size);
 
-    SuccessResponse<List<RoomInfoSearchResponse>> search();
+    SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId);
 }

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 public record ReservationResponse(
         Long id,
+        String AgentOfficeName,
         LocalDateTime reservationTime,
         ReservationStatus status,
         Long roomId,
@@ -16,6 +17,7 @@ public record ReservationResponse(
     public static ReservationResponse from(Reservation reservation,Boolean enstance) {
         return new ReservationResponse(
                 reservation.getId(),
+                reservation.getRoom().getAgent().getOfficeName(),
                 reservation.getReservationTime(),
                 reservation.getStatus(),
                 reservation.getRoom().getId(),

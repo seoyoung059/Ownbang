@@ -56,7 +56,7 @@ public class WebrtcController {
      * @param authentication
      * @return Response NoneResponse
      */
-    @DeleteMapping(value = "/remove-token")
+    @PostMapping(value = "/remove-token")
     public ResponseEntity<Response<NoneResponse>> removeToken(@RequestBody @Valid WebrtcRemoveTokenRequest request,
                                                               @AuthenticationPrincipal Long userId,
                                                               Authentication authentication
