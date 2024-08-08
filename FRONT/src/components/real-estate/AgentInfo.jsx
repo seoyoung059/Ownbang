@@ -1,23 +1,22 @@
-// 중개인 정보가 담긴 컴퍼넌트
 import { Rating, Typography, Box, Divider, ImageListItem } from "@mui/material";
 import { useTheme } from "@mui/material";
 
-const defaultProfileImage = "https://via.placeholder.com/150"; // 실제 이미지 URL 예시
-const AgentStarRate = 4;
-
-const AgentInfo = () => {
-  const profileImage = defaultProfileImage;
+const AgentInfo = ({ item }) => {
+  const { agentResponse } = item;
   const theme = useTheme();
+
+  if (!agentResponse) {
+    return null;
+  }
 
   return (
     <>
-      <Divider variant="middle" sx={{ margin: 2 }} />
+      <Divider variant="middle" sx={{ margin: 1 }} />
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
           padding: 1,
-          gap: 2,
         }}
       >
         <Typography variant="h6">중개인 정보</Typography>
@@ -50,15 +49,15 @@ const AgentInfo = () => {
                 },
               }}
             >
-              <img src={profileImage} alt="Agent Profile" />
+              <img src={agentResponse.profileImage} alt="Agent Profile" />
             </ImageListItem>
 
             <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <Typography>김준영의 행복덕방</Typography>
+              <Typography>{agentResponse.officeName}</Typography>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Rating
                   name="read-only-rating"
-                  value={AgentStarRate}
+                  value={agentResponse.starRating}
                   readOnly
                   sx={{ color: theme.palette.bookmark }}
                 />
@@ -69,7 +68,7 @@ const AgentInfo = () => {
             variant="body2"
             sx={{ marginTop: "20px", color: theme.palette.text.secondary }}
           >
-            "역삼의 모든 원룸은 저를 통합니다."
+            {agentResponse.greeting}
           </Typography>
         </Box>
       </Box>

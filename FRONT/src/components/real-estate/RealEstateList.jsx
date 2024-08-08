@@ -6,7 +6,7 @@ import RealEstateItem from "./RealEstateItem";
 
 const RealEstateList = ({ markers, onSelectItem }) => {
   const theme = useTheme();
-  const [displayedMarkers, setDisplayedMarkers] = useState([]);
+  const [displayedMarkers, setDisplayedMarkers] = useState();
 
   useEffect(() => {
     setDisplayedMarkers(markers);
@@ -32,15 +32,16 @@ const RealEstateList = ({ markers, onSelectItem }) => {
         bgcolor: theme.palette.background.default,
       }}
     >
-      {displayedMarkers.map((marker, index) => (
-        <RealEstateItem
-          key={index}
-          marker={marker}
-          toggleFavorite={() => toggleFavorite(index)}
-          onClick={() => onSelectItem(marker)}
-        />
-      ))}
-      {!displayedMarkers.length && (
+      {displayedMarkers &&
+        displayedMarkers.map((marker, index) => (
+          <RealEstateItem
+            key={index}
+            marker={marker}
+            toggleFavorite={() => toggleFavorite(index)}
+            onClick={() => onSelectItem(marker)}
+          />
+        ))}
+      {displayedMarkers && !displayedMarkers.length && (
         <Box
           sx={{
             display: "flex",
