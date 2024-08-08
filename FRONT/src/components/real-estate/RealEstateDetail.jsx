@@ -9,7 +9,7 @@ const RealEstateDetail = ({ item, onOpenReservationCard }) => {
   const theme = useTheme();
 
   const styles = {
-    container: { display: "flex", flexDirection: "column", gap: 3 },
+    container: { display: "flex", flexDirection: "column", gap: 1 },
     title: { marginTop: 4 },
     button: {
       marginTop: "16px",
@@ -19,9 +19,6 @@ const RealEstateDetail = ({ item, onOpenReservationCard }) => {
       fontSize: theme.typography.fontSize,
     },
   };
-  // const formatCurrency = (amount) => {
-  //   return (amount / 10000).toLocaleString(); // 1000으로 나누고 천 단위로 포맷팅
-  // };
 
   return (
     <Box sx={styles.container}>
@@ -38,7 +35,7 @@ const RealEstateDetail = ({ item, onOpenReservationCard }) => {
       </Box>
 
       <Box>
-        <AgentInfo />
+        <AgentInfo item={item} />
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column" }}>

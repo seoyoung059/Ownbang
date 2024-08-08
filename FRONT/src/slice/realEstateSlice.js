@@ -9,12 +9,12 @@ export const createRealEstateSlice = (set) => ({
 
   getAllRoom: async () => {
     const result = await getRealEstateAll();
-    console.log(result);
+    // console.log(result);
     set({ realEstateData: result });
   },
   getRoom: async (roomNum) => {
     const result = await getRealEstateDetail(roomNum);
-    // console.log(result);
+    console.log(result);
     set({ room: result.data });
   },
 });

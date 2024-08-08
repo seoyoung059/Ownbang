@@ -14,9 +14,6 @@ import { useTheme } from "@mui/material/styles";
 const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
   const theme = useTheme();
 
-  // const formatCurrency = (amount) => {
-  //   return (amount / 10000).toLocaleString(); // 1000으로 나누고 천 단위로 포맷팅
-  // };
   return (
     <Card
       sx={{
