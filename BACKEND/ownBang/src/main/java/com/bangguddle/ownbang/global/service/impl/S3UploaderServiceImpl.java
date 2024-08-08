@@ -16,12 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Stream;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 
 @Slf4j
@@ -69,24 +68,6 @@ public class S3UploaderServiceImpl implements S3UploaderService {
         return putS3(uploadFile, bucketName, fileName);
     }
 
-
-    /**
-     * S3 버켓 bucket에 MultipartFile을 file로 변환하여 업로드하고, 기존 파일을 삭제하는 메서드
-     *
-     * @param multipartFile S3에 업로드할 MultipartFile
-     * @param dirName       저장될 버켓 내 경로
-     * @return S3상의 url
-     */
-    public String uploadMultipartFileToS3(MultipartFile multipartFile, String dirName) {
-        String fileName = makeImageUUID(multipartFile);
-        File convertedFile = new File(fileName);
-        try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
-            fos.write(multipartFile.getBytes());
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
-        return cloudfrontUrl + uploadToS3(convertedFile, dirName);
-    }
 
 
     public String uploadHlsFiles(Path outputPath, String sessionId) {
