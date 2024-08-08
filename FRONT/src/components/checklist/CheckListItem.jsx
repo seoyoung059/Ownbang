@@ -9,6 +9,7 @@ const CheckListItem = ({
   timestamp, // 타임스탬프 prop 추가
   onUpdate,
   onDelete,
+  onTimestampClick,
   canEdit,
 }) => {
   const theme = useTheme();
@@ -19,6 +20,12 @@ const CheckListItem = ({
 
   const onClickDeleteButton = () => {
     onDelete(id);
+  };
+
+  const onClickTimestamp = () => {
+    if (onTimestampClick && timestamp) {
+      onTimestampClick(timestamp); // 타임스탬프 클릭 시 핸들러 호출
+    }
   };
 
   return (
@@ -48,7 +55,6 @@ const CheckListItem = ({
         ) : (
           <Box sx={{ width: "20px" }} />
         )}
-
         <Typography
           sx={{
             fontSize: "12px",
@@ -68,6 +74,7 @@ const CheckListItem = ({
         {canEdit &&
           isDone && ( // isDone이 true일 때만 타임스탬프 표시
             <Typography
+              onClick={onClickTimestamp}
               sx={{
                 fontSize: "10px",
                 color: "gray",

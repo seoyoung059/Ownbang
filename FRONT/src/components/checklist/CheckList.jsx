@@ -5,7 +5,7 @@ import CheckListList from "./CheckListList";
 import CheckListAddInput from "./CheckListAddInput";
 import { useBoundStore } from "../../store/store";
 
-const CheckList = ({ canEdit }) => {
+const CheckList = ({ canEdit, onTimestampClick }) => {
   const {
     checklist,
     fetchCheckLists,
@@ -124,6 +124,12 @@ const CheckList = ({ canEdit }) => {
     setSelectedTitle(newTitle);
   };
 
+  const handleTimestampClick = (timestamp) => {
+    if (onTimestampClick) {
+      onTimestampClick(timestamp); // 부모 컴포넌트의 핸들러 호출
+    }
+  };
+
   return (
     <Container
       sx={{
@@ -175,6 +181,7 @@ const CheckList = ({ canEdit }) => {
               onUpdate={onUpdate}
               onDelete={onDelete}
               canEdit={canEdit}
+              onTimestampClick={handleTimestampClick}
             />
           </Box>
         )}
