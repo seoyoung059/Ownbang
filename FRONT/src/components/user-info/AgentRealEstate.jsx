@@ -1,3 +1,5 @@
+import React, { useEffect } from "react";
+
 import {
   Table,
   TableBody,
@@ -9,12 +11,21 @@ import {
   Avatar,
 } from "@mui/material";
 import { useTheme } from "@mui/material";
+import { useBoundStore } from "../../store/store";
 
-const MyRealEstate = ({ myRealEstate }) => {
+const MyRealEstate = () => {
+  const { myRooms, viewAllRooms } = useBoundStore((state) => ({
+    myRooms: state.myRooms,
+    viewAllRooms: state.viewAllRooms,
+  }));
   const theme = useTheme();
   const formatCurrency = (value) => {
     return value ? Number(value).toLocaleString() : "0";
   };
+
+  useEffect(() => {
+    viewAllRooms();
+  }, [viewAllRooms]);
 
   return (
     <TableContainer
@@ -24,7 +35,6 @@ const MyRealEstate = ({ myRealEstate }) => {
       <Table sx={{ minWidth: 500 }}>
         <TableHead>
           <TableRow>
-            <TableCell>ID</TableCell>
             <TableCell align="right">매물 사진</TableCell>
             <TableCell align="right">매물 주소지</TableCell>
             <TableCell align="right">방 종류</TableCell>
@@ -39,14 +49,11 @@ const MyRealEstate = ({ myRealEstate }) => {
           </TableRow>
         </TableHead>
         <TableBody sx={{ backgroundColor: theme.palette.background.default }}>
-          {myRealEstate.map((row, index) => (
+          {myRooms.map((row) => (
             <TableRow
               key={row.id}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
-              <TableCell component="th" scope="row">
-                {index + 1}
-              </TableCell>
               <TableCell align="right">
                 {row.profileImageUrl ? (
                   <img
@@ -60,7 +67,7 @@ const MyRealEstate = ({ myRealEstate }) => {
                 )}
               </TableCell>
               <TableCell align="right">
-                {row.parcel ? row.parcel : "저장된 정보가 없습니다."}
+                {row.address ? row.address : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
                 {row.roomType ? row.roomType : "저장된 정보가 없습니다."}

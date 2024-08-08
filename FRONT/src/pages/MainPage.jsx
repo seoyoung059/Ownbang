@@ -221,7 +221,7 @@ export default function MainPage() {
               display: "flex",
               flexDirection: isSm ? "column" : "row",
               alignItems: isSm ? "center" : "flex-start",
-              justifyContent: "center",
+              justifyContent: isSm ? "center" : "right",
               mb: 4,
               gap: 4,
             }}

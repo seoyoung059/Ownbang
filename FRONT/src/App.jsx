@@ -8,7 +8,6 @@ function App() {
   return (
     <>
       <CookiesProvider>
-        <Header />
         <RootRouter />
         <ToastContainer />
       </CookiesProvider>

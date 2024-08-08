@@ -13,19 +13,52 @@ import {
   Modal,
   Input,
   IconButton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import { useTheme } from "@mui/material";
 import AddressSearch from "../components/common/AddressSearch";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
+import { useBoundStore } from "../store/store";
+import { useNavigate } from "react-router-dom";
 
 export default function RealEstateRegisterPage() {
+  const navigate = useNavigate();
+  const { makeRoom } = useBoundStore((state) => ({
+    makeRoom: state.makeRoom,
+  }));
+
   const [visibleMarkers, setVisibleMarkers] = useState([]);
   const theme = useTheme();
   const [address, setAddress] = useState("");
+  const [parcel, setParcel] = useState("");
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
   const [open, setOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const [errMsg, setErrMsg] = useState("");
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const [basicInfo, setBasicInfo] = useState({
+    dealType: "",
+    roomType: "",
+    structure: "",
+    isLoft: false,
+    exclusiveArea: "",
+    supplyArea: "",
+    roomFloor: "",
+    deposit: "",
+    monthlyRent: "",
+    maintenanceFee: "",
+    profileImageUrl: "",
+  });
+
   const [appliances, setAppliances] = useState({
     refrigerator: false,
     washingMachine: false,
@@ -38,24 +71,24 @@ export default function RealEstateRegisterPage() {
   });
 
   const [roomDetails, setRoomDetails] = useState({
-    room_count: "",
-    bathroom_count: "",
-    heating_type: "개별",
-    movein_date: "",
-    building_floor: "",
+    roomCount: "",
+    bathroomCount: "",
+    heatingType: "",
+    moveInDate: "",
+    buildingFloor: "",
     elevator: false,
-    total_parking: "",
+    totalParking: "",
     parking: "",
-    approval_date: "",
-    first_registration_date: "",
-    facing: "동",
-    purpose: "단독주택",
-    road: "",
-    detail_address: "",
+    approvalDate: "",
+    firstRegistrationDate: "",
+    facing: "",
+    purpose: "",
+    detailAddress: "",
   });
 
-  const handleAddress = (newAddress) => {
+  const handleAddress = (newAddress, newParcel) => {
     setAddress(newAddress);
+    setParcel(newParcel);
     handleClose();
   };
 
@@ -87,6 +120,14 @@ export default function RealEstateRegisterPage() {
     });
   };
 
+  const handleBasicInfoChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    setBasicInfo({
+      ...basicInfo,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
   const onBoundsChange = (markers) => {
     setVisibleMarkers(markers);
   };
@@ -102,13 +143,54 @@ export default function RealEstateRegisterPage() {
           lng: result[0].x,
         };
         setCoordinates(coords);
-        console.log(coords);
       }
     });
   }, [address]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const handleSubmit = async () => {
+    const formData = new FormData();
+
+    const roomDetailCreateRequest = { ...roomDetails, road: address };
+
+    const roomCreateRequest = {
+      ...basicInfo,
+      latitude: coordinates.lat,
+      longitude: coordinates.lng,
+      parcel: parcel,
+      roomAppliancesCreateRequest: appliances,
+      roomDetailCreateRequest: roomDetailCreateRequest,
+    };
+
+    formData.append(
+      "roomCreateRequest",
+      new Blob([JSON.stringify(roomCreateRequest)], {
+        type: "application/json",
+      })
+    );
+
+    selectedFiles.forEach((file) => {
+      formData.append("roomImageFiles", file);
+    });
+
+    try {
+      await makeRoom(formData);
+      setErrMsg("");
+      setSnackbarOpen(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    } catch (error) {
+      console.log(error);
+      if (error.response.data.status === 413) {
+        setErrMsg("이미지 용량 초과입니다.");
+      } else if (error.response.data.status === 400) {
+        setErrMsg("잘못된 입력이 있습니다. 수정하고 다시 시도하세요.");
+      }
+    }
+  };
 
   return (
     <Container
@@ -139,7 +221,9 @@ export default function RealEstateRegisterPage() {
               select
               fullWidth
               label="매물 종류"
-              defaultValue="오피스텔"
+              name="roomType"
+              value={basicInfo.roomType}
+              onChange={handleBasicInfoChange}
             >
               <MenuItem value="오피스텔">오피스텔</MenuItem>
               <MenuItem value="아파트">아파트</MenuItem>
@@ -147,14 +231,28 @@ export default function RealEstateRegisterPage() {
             </TextField>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField select fullWidth label="거래 종류" defaultValue="월세">
+            <TextField
+              select
+              fullWidth
+              label="거래 종류"
+              name="dealType"
+              value={basicInfo.dealType}
+              onChange={handleBasicInfoChange}
+            >
               <MenuItem value="월세">월세</MenuItem>
               <MenuItem value="전세">전세</MenuItem>
               <MenuItem value="매매">매매</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField select fullWidth label="구조" defaultValue="원룸">
+            <TextField
+              select
+              fullWidth
+              label="구조"
+              name="structure"
+              value={basicInfo.structure}
+              onChange={handleBasicInfoChange}
+            >
               <MenuItem value="원룸">원룸</MenuItem>
               <MenuItem value="투룸">투룸</MenuItem>
               <MenuItem value="쓰리룸">쓰리룸</MenuItem>
@@ -202,11 +300,29 @@ export default function RealEstateRegisterPage() {
                     <TextField
                       fullWidth
                       label="상세 주소"
+                      name="detailAddress"
+                      value={roomDetails.detailAddress}
+                      onChange={handleRoomDetailChange}
                       placeholder="추가 주소 정보를 입력하세요. (동, 호수 등)"
                     />
                   </Grid>
-                  <Grid item xs={8}>
-                    <TextField fullWidth label="해당 층" />
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="건물 층"
+                      name="buildingFloor"
+                      value={roomDetails.buildingFloor}
+                      onChange={handleRoomDetailChange}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="해당 층"
+                      name="roomFloor"
+                      value={basicInfo.roomFloor}
+                      onChange={handleBasicInfoChange}
+                    />
                   </Grid>
                   <Grid
                     item
@@ -214,15 +330,35 @@ export default function RealEstateRegisterPage() {
                     sx={{ display: "flex", justifyContent: "center" }}
                   >
                     <FormControlLabel
-                      control={<Checkbox defaultChecked />}
+                      control={
+                        <Checkbox
+                          checked={basicInfo.isLoft}
+                          onChange={handleBasicInfoChange}
+                          name="isLoft"
+                        />
+                      }
                       label="복층여부"
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <TextField fullWidth label="전용 면적" placeholder="㎡" />
+                    <TextField
+                      fullWidth
+                      label="전용 면적"
+                      name="exclusiveArea"
+                      value={basicInfo.exclusiveArea}
+                      onChange={handleBasicInfoChange}
+                      placeholder="㎡"
+                    />
                   </Grid>
                   <Grid item xs={12}>
-                    <TextField fullWidth label="공급 면적" placeholder="㎡" />
+                    <TextField
+                      fullWidth
+                      label="공급 면적"
+                      name="supplyArea"
+                      value={basicInfo.supplyArea}
+                      onChange={handleBasicInfoChange}
+                      placeholder="㎡"
+                    />
                   </Grid>
                 </Grid>
               </Grid>
@@ -234,28 +370,66 @@ export default function RealEstateRegisterPage() {
                 <TextField
                   fullWidth
                   label="상세 주소"
+                  name="detailAddress"
+                  value={roomDetails.detailAddress}
+                  onChange={handleRoomDetailChange}
                   placeholder="추가 주소 정보를 입력하세요. (동, 호수 등)"
                 />
               </Grid>
-              <Grid item xs={12} sm={8}>
-                <TextField fullWidth label="해당 층" />
+              <Grid item xs={12} sm={5}>
+                <TextField
+                  fullWidth
+                  label="건물 층"
+                  name="buildingFloor"
+                  value={roomDetails.buildingFloor}
+                  onChange={handleRoomDetailChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={5}>
+                <TextField
+                  fullWidth
+                  label="해당 층"
+                  name="roomFloor"
+                  value={basicInfo.roomFloor}
+                  onChange={handleBasicInfoChange}
+                />
               </Grid>
               <Grid
                 item
                 xs={12}
-                sm={4}
+                sm={2}
                 sx={{ display: "flex", justifyContent: "center" }}
               >
                 <FormControlLabel
-                  control={<Checkbox defaultChecked />}
+                  control={
+                    <Checkbox
+                      checked={basicInfo.isLoft}
+                      onChange={handleBasicInfoChange}
+                      name="isLoft"
+                    />
+                  }
                   label="복층여부"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="전용 면적" placeholder="㎡" />
+                <TextField
+                  fullWidth
+                  label="전용 면적"
+                  name="exclusiveArea"
+                  value={basicInfo.exclusiveArea}
+                  onChange={handleBasicInfoChange}
+                  placeholder="㎡"
+                />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField fullWidth label="공급 면적" placeholder="㎡" />
+                <TextField
+                  fullWidth
+                  label="공급 면적"
+                  name="supplyArea"
+                  value={basicInfo.supplyArea}
+                  onChange={handleBasicInfoChange}
+                  placeholder="㎡"
+                />
               </Grid>
             </>
           )}
@@ -263,7 +437,9 @@ export default function RealEstateRegisterPage() {
             <TextField
               fullWidth
               label="보증금"
-              defaultValue="3000"
+              name="deposit"
+              value={basicInfo.deposit}
+              onChange={handleBasicInfoChange}
               InputProps={{
                 endAdornment: (
                   <Typography sx={{ whiteSpace: "nowrap" }}>만원</Typography>
@@ -275,7 +451,9 @@ export default function RealEstateRegisterPage() {
             <TextField
               fullWidth
               label="월세"
-              defaultValue="50"
+              name="monthlyRent"
+              value={basicInfo.monthlyRent}
+              onChange={handleBasicInfoChange}
               InputProps={{
                 endAdornment: (
                   <Typography sx={{ whiteSpace: "nowrap" }}>만원</Typography>
@@ -287,7 +465,9 @@ export default function RealEstateRegisterPage() {
             <TextField
               fullWidth
               label="관리비"
-              defaultValue="8"
+              name="maintenanceFee"
+              value={basicInfo.maintenanceFee}
+              onChange={handleBasicInfoChange}
               InputProps={{
                 endAdornment: (
                   <Typography sx={{ whiteSpace: "nowrap" }}>만원</Typography>
@@ -311,10 +491,10 @@ export default function RealEstateRegisterPage() {
                   sx={{
                     display: "flex",
                     flexWrap: "nowrap",
-                    overflowY: "hidden", // 가로 스크롤바 제거
-                    overflowX: "auto", // 세로 스크롤바 활성화
+                    overflowY: "hidden",
+                    overflowX: "auto",
                     width: "100%",
-                    alignItems: "center", // 버튼과 이미지 리스트를 수평으로 맞추기
+                    alignItems: "center",
                     p: 2,
                   }}
                 >
@@ -342,7 +522,7 @@ export default function RealEstateRegisterPage() {
                             top: "8px",
                             right: "16px",
                             background: "rgba(0, 0, 0, 0.5)",
-                            color: "white", // 아이콘 색상을 흰색으로 설정
+                            color: "white",
                           }}
                           onClick={() => handleFileRemove(file.name)}
                         >
@@ -362,8 +542,8 @@ export default function RealEstateRegisterPage() {
               fullWidth
               label="방 개수"
               type="number"
-              name="room_count"
-              value={roomDetails.room_count}
+              name="roomCount"
+              value={roomDetails.roomCount}
               onChange={handleRoomDetailChange}
             />
           </Grid>
@@ -372,8 +552,8 @@ export default function RealEstateRegisterPage() {
               fullWidth
               label="욕실 개수"
               type="number"
-              name="bathroom_count"
-              value={roomDetails.bathroom_count}
+              name="bathroomCount"
+              value={roomDetails.bathroomCount}
               onChange={handleRoomDetailChange}
             />
           </Grid>
@@ -382,8 +562,8 @@ export default function RealEstateRegisterPage() {
               select
               fullWidth
               label="난방 방식"
-              name="heating_type"
-              value={roomDetails.heating_type}
+              name="heatingType"
+              value={roomDetails.heatingType}
               onChange={handleRoomDetailChange}
             >
               <MenuItem value="개별">개별</MenuItem>
@@ -425,8 +605,8 @@ export default function RealEstateRegisterPage() {
               fullWidth
               label="총 주차 수"
               type="number"
-              name="total_parking"
-              value={roomDetails.total_parking}
+              name="totalParking"
+              value={roomDetails.totalParking}
               onChange={handleRoomDetailChange}
             />
           </Grid>
@@ -445,8 +625,8 @@ export default function RealEstateRegisterPage() {
               fullWidth
               label="승인 날짜"
               type="date"
-              name="approval_date"
-              value={roomDetails.approval_date}
+              name="approvalDate"
+              value={roomDetails.approvalDate}
               onChange={handleRoomDetailChange}
               InputLabelProps={{ shrink: true }}
             />
@@ -456,8 +636,8 @@ export default function RealEstateRegisterPage() {
               fullWidth
               label="최초 등록 날짜"
               type="date"
-              name="first_registration_date"
-              value={roomDetails.first_registration_date}
+              name="firstRegistrationDate"
+              value={roomDetails.firstRegistrationDate}
               onChange={handleRoomDetailChange}
               InputLabelProps={{ shrink: true }}
             />
@@ -467,8 +647,8 @@ export default function RealEstateRegisterPage() {
               fullWidth
               label="입주 날짜"
               type="date"
-              name="movein_date"
-              value={roomDetails.movein_date}
+              name="moveInDate"
+              value={roomDetails.moveInDate}
               onChange={handleRoomDetailChange}
               InputLabelProps={{ shrink: true }}
             />
@@ -563,6 +743,11 @@ export default function RealEstateRegisterPage() {
             />
           </Grid>
         </Box>
+        <Box sx={{ textAlign: "end" }}>
+          <Typography sx={{ color: "red", fontSize: theme.fontSize.small }}>
+            {errMsg}
+          </Typography>
+        </Box>
       </Box>
       <Box
         sx={{
@@ -580,7 +765,12 @@ export default function RealEstateRegisterPage() {
         >
           취소
         </Button>
-        <Button variant="contained" size="large" color="primary">
+        <Button
+          variant="contained"
+          size="large"
+          color="primary"
+          onClick={handleSubmit}
+        >
           등록
         </Button>
       </Box>
@@ -603,6 +793,32 @@ export default function RealEstateRegisterPage() {
           <AddressSearch handleAddress={handleAddress} />
         </Box>
       </Modal>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        sx={{
+          "& .MuiSnackbarContent-root": {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            position: "fixed",
+            bottom: "50%",
+            transform: "translateY(50%)",
+          },
+        }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          등록이 완료되었습니다!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
