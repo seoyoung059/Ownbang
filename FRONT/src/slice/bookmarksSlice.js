@@ -1,4 +1,4 @@
-import { Bookmarks, addBookmarks } from "../api/bookmarks";
+import { Bookmarks, switchBookmarks } from "../api/bookmarks";
 
 export const createBookmarks = (set) => ({
   bookmarkList: [],
@@ -18,10 +18,10 @@ export const createBookmarks = (set) => ({
     }
   },
 
-  makeBookmarks: async (roomId) => {
+  toggleBookmarks: async (roomId) => {
     try {
-      const response = await addBookmarks(roomId);
-      console.log("Added bookmark:", response);
+      const response = await switchBookmarks(roomId);
+      console.log("now bookmark:", response);
       return response;
     } catch (error) {
       console.error("Error making bookmarks:", error);

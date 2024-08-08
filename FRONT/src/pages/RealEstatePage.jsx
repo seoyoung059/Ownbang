@@ -18,7 +18,7 @@ const RealEstatePage = () => {
 
     bookmarkList,
     getBookmarks,
-    makeBookmarks,
+    toggleBookmarks,
   } = useBoundStore((state) => ({
     searchTerm: state.searchTerm,
     setSearchTerm: state.setSearchTerm,
@@ -26,7 +26,7 @@ const RealEstatePage = () => {
 
     bookmarkList: state.bookmarkList,
     getBookmarks: state.getBookmarks,
-    makeBookmarks: state.makeBookmarks,
+    toggleBookmarks: state.toggleBookmarks,
   }));
 
   const [selectedItem, setSelectedItem] = React.useState(null);
@@ -91,7 +91,7 @@ const RealEstatePage = () => {
           onSelectItem={onSelectItem}
           bookmarkList={bookmarkList}
           getBookmarks={getBookmarks}
-          makeBookmarks={makeBookmarks}
+          toggleBookmarks={toggleBookmarks}
         />
       </Box>
 

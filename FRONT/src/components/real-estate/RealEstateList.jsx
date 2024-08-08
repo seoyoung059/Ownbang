@@ -9,7 +9,7 @@ const RealEstateList = ({
   onSelectItem,
   bookmarkList,
   getBookmarks,
-  makeBookmarks,
+  toggleBookmarks,
 }) => {
   const theme = useTheme();
   const [displayedMarkers, setDisplayedMarkers] = useState([]);
@@ -18,19 +18,18 @@ const RealEstateList = ({
     setDisplayedMarkers(markers);
   }, [markers]);
 
-  const toggleFavorite = (index) => {
-    getBookmarks();
-    const newMarkers = displayedMarkers.map((marker, i) => {
-      if (i === index) {
-        const updatedMarker = { ...marker, favorite: !marker.favorite };
-        console.log(`${marker.id} - favorite: ${updatedMarker.favorite}`);
-        marker = updatedMarker;
-        makeBookmarks(updatedMarker.id);
+  const toggleFavorite = (id) => {
+    setDisplayedMarkers((prevMarkers) =>
+      prevMarkers.map((marker) => {
+        if (marker.id === id) {
+          const updatedMarker = { ...marker, favorite: !marker.favorite };
+          toggleBookmarks(updatedMarker.id);
+          return updatedMarker;
+        }
         return marker;
-      }
-      return marker;
-    });
-    setDisplayedMarkers(newMarkers);
+      })
+    );
+    getBookmarks();
   };
 
   return (
@@ -41,15 +40,16 @@ const RealEstateList = ({
         bgcolor: theme.palette.background.default,
       }}
     >
-      {displayedMarkers.map((marker, index) => (
-        <RealEstateItem
-          key={index}
-          marker={marker}
-          toggleFavorite={() => toggleFavorite(index)}
-          onClick={() => onSelectItem(marker)}
-        />
-      ))}
-      {!displayedMarkers.length && (
+      {displayedMarkers.length > 0 ? (
+        displayedMarkers.map((marker) => (
+          <RealEstateItem
+            key={marker.id} // Using marker.id as key
+            marker={marker}
+            toggleFavorite={() => toggleFavorite(marker.id)}
+            onClick={() => onSelectItem(marker)}
+          />
+        ))
+      ) : (
         <Box
           sx={{
             display: "flex",
