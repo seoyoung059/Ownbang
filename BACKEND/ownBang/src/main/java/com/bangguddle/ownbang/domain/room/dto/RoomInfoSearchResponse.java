@@ -10,7 +10,6 @@ import lombok.Builder;
 
 @Builder
 public record RoomInfoSearchResponse(
-//        User agent,
         Long id,
         Float latitude,
         Float longitude,
