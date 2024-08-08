@@ -48,11 +48,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/checklists",
             "/auths/password-change",
             "/reviews"
+            "/reservations"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
             "/rooms/agents",
+            "/agents/reservations",
             "/agents/mypage",
+            "agents/workhour"
     };
     private static final String HEADER_PREFIX = "Bearer ";
     private static final int TOKEN_SPLIT_INDEX = 7;

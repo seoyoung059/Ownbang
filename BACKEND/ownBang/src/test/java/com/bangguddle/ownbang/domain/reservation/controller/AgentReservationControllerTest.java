@@ -28,9 +28,9 @@ import java.util.List;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_EMPTY;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_SUCCESS;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -52,16 +52,17 @@ public class AgentReservationControllerTest {
 
     @Test
     @DisplayName("예약 확정 성공")
-    @WithMockUser
+    @WithMockUser// userId를 1로 설정
     void confirmStatusReservation_Success() throws Exception {
         Long id = 1L;
+        Long userId = 1L;
 
         SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
                 SuccessCode.RESERVATION_CONFIRM_SUCCESS,
                 NoneResponse.NONE
         );
 
-        when(reservationService.confirmStatusReservation(anyLong())).thenReturn(successResponse);
+        when(reservationService.confirmStatusReservation(any(), anyLong())).thenReturn(successResponse);
 
         mockMvc.perform(patch("/agents/reservations/{id}", id)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
@@ -71,13 +72,15 @@ public class AgentReservationControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_CONFIRM_SUCCESS.getMessage()))
                 .andExpect(jsonPath("$.data").value("NONE"));
     }
+
     @Test
     @DisplayName("예약 확정 실패 - 같은 시간, 같은 매물에 이미 확정된 예약 존재")
     @WithMockUser
     void confirmReservation_Fail_AlreadyConfirmedSameTimeAndRoom() throws Exception {
         Long id = 1L;
+        Long userId = 1L;
 
-        when(reservationService.confirmStatusReservation(anyLong()))
+        when(reservationService.confirmStatusReservation(any(), anyLong()))
                 .thenThrow(new AppException(RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM));
 
         mockMvc.perform(patch("/agents/reservations/{id}", id)
@@ -90,9 +93,9 @@ public class AgentReservationControllerTest {
     }
     @Test
     @DisplayName("중개인 예약 목록 조회 성공 - COMPLETED 상태 포함")
-    @WithMockUser
+    @WithMockUser(username = "1") // userId를 1로 설정
     void getAgentReservations_Success_WithCompletedStatus() throws Exception {
-        Long agentId = 1L;
+        Long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
 
         ReservationResponse reservation1 = new ReservationResponse(1L, now, ReservationStatus.APPLYED, 1L, 1L);
@@ -102,10 +105,9 @@ public class AgentReservationControllerTest {
         ReservationListResponse listResponse = new ReservationListResponse(List.of(reservation1, reservation2, reservation3));
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);
 
-        when(reservationService.getAgentReservations(anyLong())).thenReturn(successResponse);
+        when(reservationService.getAgentReservations(any())).thenReturn(successResponse);
 
         mockMvc.perform(get("/agents/reservations")
-                        .param("agentId", String.valueOf(agentId))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -124,17 +126,16 @@ public class AgentReservationControllerTest {
 
     @Test
     @DisplayName("중개인 예약 목록 조회 - 빈 목록")
-    @WithMockUser
+    @WithMockUser(username = "1") // userId를 1로 설정
     void getAgentReservations_Empty() throws Exception {
-        Long agentId = 1L;
+        Long userId = 1L;
 
         ReservationListResponse emptyListResponse = new ReservationListResponse(List.of());
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_EMPTY, emptyListResponse);
 
-        when(reservationService.getAgentReservations(anyLong())).thenReturn(successResponse);
+        when(reservationService.getAgentReservations(any())).thenReturn(successResponse);
 
         mockMvc.perform(get("/agents/reservations")
-                        .param("agentId", String.valueOf(agentId))
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
