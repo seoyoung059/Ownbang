@@ -36,7 +36,8 @@ public class SecurityConfig {
             "/mypage",
             "/checklists/**",
             "/auths/password-change",
-            "/search"
+            "/search",
+            "/reviews"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
             /* 중개인 권한 필요 URL */
