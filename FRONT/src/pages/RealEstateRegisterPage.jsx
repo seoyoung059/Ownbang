@@ -56,7 +56,7 @@ export default function RealEstateRegisterPage() {
     deposit: "",
     monthlyRent: "",
     maintenanceFee: "",
-    profileImageUrl: "",
+    detailAddress: "",
   });
 
   const [appliances, setAppliances] = useState({
@@ -83,7 +83,6 @@ export default function RealEstateRegisterPage() {
     firstRegistrationDate: "",
     facing: "",
     purpose: "",
-    detailAddress: "",
   });
 
   const handleAddress = (newAddress, newParcel) => {
@@ -153,13 +152,14 @@ export default function RealEstateRegisterPage() {
   const handleSubmit = async () => {
     const formData = new FormData();
 
-    const roomDetailCreateRequest = { ...roomDetails, road: address };
+    const roomDetailCreateRequest = { ...roomDetails };
 
     const roomCreateRequest = {
       ...basicInfo,
       latitude: coordinates.lat,
       longitude: coordinates.lng,
       parcel: parcel,
+      road: address,
       roomAppliancesCreateRequest: appliances,
       roomDetailCreateRequest: roomDetailCreateRequest,
     };
@@ -226,7 +226,6 @@ export default function RealEstateRegisterPage() {
               onChange={handleBasicInfoChange}
             >
               <MenuItem value="오피스텔">오피스텔</MenuItem>
-              <MenuItem value="아파트">아파트</MenuItem>
               <MenuItem value="빌라">빌라</MenuItem>
             </TextField>
           </Grid>
@@ -301,8 +300,8 @@ export default function RealEstateRegisterPage() {
                       fullWidth
                       label="상세 주소"
                       name="detailAddress"
-                      value={roomDetails.detailAddress}
-                      onChange={handleRoomDetailChange}
+                      value={basicInfo.detailAddress}
+                      onChange={handleBasicInfoChange}
                       placeholder="추가 주소 정보를 입력하세요. (동, 호수 등)"
                     />
                   </Grid>

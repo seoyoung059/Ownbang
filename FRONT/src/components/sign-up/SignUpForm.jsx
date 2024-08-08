@@ -207,19 +207,19 @@ const SignUp = () => {
       nickname: data.get("nickName"),
       phoneNumber: data.get("userPhoneNumber").split("-").join(""),
     }).then((res) => {
-      if (res === "SUCCESS") {
-        toast.success("회원가입 완료", {
-          position: "bottom-left",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        navigate("/login");
-      }
+      // if (res === "SUCCESS") {
+      //   toast.success("회원가입 완료", {
+      //     position: "bottom-left",
+      //     autoClose: 2000,
+      //     hideProgressBar: true,
+      //     closeOnClick: true,
+      //     pauseOnHover: true,
+      //     draggable: true,
+      //     progress: undefined,
+      //     theme: "light",
+      //   });
+      // }
+      navigate("/login");
     });
   };
 

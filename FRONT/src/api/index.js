@@ -6,7 +6,7 @@ const cookies = new Cookies();
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL + "/api",
-  timeout: 3000,
+  // timeout: 10000,
 });
 
 axiosInstance.interceptors.request.use(
