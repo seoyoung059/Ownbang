@@ -74,9 +74,10 @@ public class RoomController {
      * @param roomId 조회할 매물의 ID
      * @return Success Response. RoomSearchResponse - 조회한 매물 정보 JSON DTO
      */
-    @GetMapping("/{roomId}")
-    public ResponseEntity<Response<RoomSearchResponse>> getRoom(@PathVariable(name = "roomId") @Positive @Valid Long roomId) {
-        return Response.success(roomService.getRoom(roomId));
+    @GetMapping("/search/{roomId}")
+    public ResponseEntity<Response<RoomSearchResponse>> getRoom(@AuthenticationPrincipal Long userId,
+                                                                @PathVariable(name = "roomId") @Positive @Valid Long roomId) {
+        return Response.success(roomService.getRoom(userId, roomId));
     }
 
     /**
@@ -92,8 +93,8 @@ public class RoomController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getRooms() {
-        SuccessResponse<List<RoomInfoSearchResponse>> response = roomService.search();
+    public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getRooms(@AuthenticationPrincipal Long userId) {
+        SuccessResponse<List<RoomInfoSearchResponse>> response = roomService.search(userId);
         return Response.success(response);
     }
 }
