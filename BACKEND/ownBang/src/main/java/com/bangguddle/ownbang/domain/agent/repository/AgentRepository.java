@@ -15,4 +15,7 @@ public interface AgentRepository extends JpaRepository<Agent, Long> {
     default Agent getByUserId(Long userId) {
         return findByUserId(userId).orElseThrow(()->new AppException(ErrorCode.ACCESS_DENIED));
     };
+    default Agent getById(Long agentId) {
+        return findById(agentId).orElseThrow(()->new AppException(ErrorCode.ACCESS_DENIED));
+    };
 }

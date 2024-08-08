@@ -3,6 +3,8 @@ package com.bangguddle.ownbang.domain.reservation.repository;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.room.entity.Room;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
+import com.bangguddle.ownbang.global.handler.AppException;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -44,4 +46,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
     List<LocalTime> findConfirmedReservationTimes(@Param("roomId") Long roomId, @Param("date") LocalDate date);
 
 
+
+    default Reservation getById(Long id) {
+        return this.findById(id).orElseThrow(()->new AppException(ErrorCode.BAD_REQUEST));
+    }
 }

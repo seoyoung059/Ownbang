@@ -47,6 +47,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/mypage",
             "/checklists",
             "/auths/password-change",
+            "/reviews",
             "/room",
             "/reservations"
     };

@@ -11,7 +11,5 @@ public interface S3UploaderService {
 
     String uploadFile(MultipartFile file, String dirName);
 
-    String uploadMultipartFileToS3(MultipartFile multipartFile, String dirName);
-
     String uploadHlsFiles(Path outputPath, String sessionId);
 }

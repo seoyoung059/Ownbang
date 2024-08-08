@@ -37,6 +37,7 @@ public class SecurityConfig {
             "/checklists/**",
             "/reservations",
             "/auths/password-change",
+            "/reviews",
             "/search/**"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {
@@ -44,7 +45,7 @@ public class SecurityConfig {
             "/rooms/agents/**",
             "/agents/mypage",
             "/agents/reservations",
-            "agents/workhour"
+            "/agents/workhour"
     };
     private final UserDetailsService userDetailsService;
     private final JwtTokenFilter jwtTokenFilter;
