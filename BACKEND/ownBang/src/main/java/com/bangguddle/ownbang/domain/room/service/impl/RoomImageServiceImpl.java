@@ -51,7 +51,7 @@ public class RoomImageServiceImpl implements RoomImageService {
         try {
             List<RoomImage> roomImageList = room.getRoomImages();
 
-            String uploadedFileUrl = s3UploaderService.uploadMultipartFileToS3(roomImage, s3RoomImagePath);
+            String uploadedFileUrl = s3UploaderService.uploadFile(roomImage, s3RoomImagePath);
             roomImageList.add(new RoomImage(room, uploadedFileUrl));
 
             return new SuccessResponse<>(ROOM_IMAGE_UPLOAD_SUCCESS, NoneResponse.NONE);

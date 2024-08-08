@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.bookmark.service.impl;
 
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.bookmark.dto.BookmarkSearchResponse;
 import com.bangguddle.ownbang.domain.bookmark.entity.Bookmark;
 import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
@@ -126,8 +127,9 @@ class BookmarkServiceImplTest {
     void getBookmarks_Success() {
         long userId = 1L;
         User user = User.builder().build();
-        Room room1 = Room.builder().build();
-        Room room2 = Room.builder().build();
+        Agent agent = Agent.builder().build();
+        Room room1 = Room.builder().agent(agent).build();
+        Room room2 = Room.builder().agent(agent).build();
         List<Bookmark> bookmarkList = new ArrayList<>();
         bookmarkList.add(Bookmark.builder().user(user).room(room1).build());
         bookmarkList.add(Bookmark.builder().user(user).room(room2).build());

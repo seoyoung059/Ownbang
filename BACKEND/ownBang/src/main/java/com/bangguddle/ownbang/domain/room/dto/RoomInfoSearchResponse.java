@@ -11,6 +11,7 @@ import lombok.Builder;
 @Builder
 public record RoomInfoSearchResponse(
         Long id,
+        Long agentId,
         Float latitude,
         Float longitude,
         DealType dealType,
@@ -30,13 +31,15 @@ public record RoomInfoSearchResponse(
         Long maintenanceFee,
         String parcel,
         String road,
+        Boolean isBookmarked,
         String detailAddress,
         String profileImageUrl
 ) {
 
-    static public RoomInfoSearchResponse from(Room room) {
+    static public RoomInfoSearchResponse from(Room room, Boolean isBookmarked) {
         return RoomInfoSearchResponse.builder()
                 .id(room.getId())
+                .agentId(room.getAgent().getId())
                 .latitude(room.getLatitude())
                 .longitude(room.getLongitude())
                 .dealType(room.getDealType())
@@ -53,6 +56,7 @@ public record RoomInfoSearchResponse(
                 .road(room.getRoad())
                 .detailAddress(room.getDetailAddress())
                 .profileImageUrl(room.getProfileImageUrl())
+                .isBookmarked(isBookmarked)
                 .build();
     }
 }

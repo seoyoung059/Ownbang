@@ -38,13 +38,14 @@ public record RoomSearchResponse(
         String road,
         String detailAddress,
         String profileImageUrl,
+        Boolean isBookmarked,
         RoomAppliancesSearchResponse roomAppliancesSearchResponse,
         RoomDetailSearchResponse roomDetailSearchResponse,
         @Valid
         List<RoomImageResponse> roomImageResponses
 ) {
 
-    static public RoomSearchResponse from(Room room, AgentResponse agentResponse) {
+    static public RoomSearchResponse from(Room room, AgentResponse agentResponse, Boolean isBookmarked) {
         return RoomSearchResponse.builder()
                 .id(room.getId())
                 .agentResponse(agentResponse)
@@ -68,7 +69,8 @@ public record RoomSearchResponse(
                 .roomDetailSearchResponse(RoomDetailSearchResponse.from(room.getRoomDetail()))
                 .roomImageResponses(room.getRoomImages().stream()
                         .map(RoomImageResponse::from)
-                .collect(Collectors.toList()))
+                        .collect(Collectors.toList()))
+                .isBookmarked(isBookmarked)
                 .build();
     }
 }

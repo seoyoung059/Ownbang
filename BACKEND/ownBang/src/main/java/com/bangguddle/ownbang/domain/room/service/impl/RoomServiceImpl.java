@@ -34,6 +34,7 @@ public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final RoomImageService roomImageService;
     private final AgentRepository agentRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     /**
      * 매물 생성 Service 메서드
@@ -117,11 +118,15 @@ public class RoomServiceImpl implements RoomService {
      */
     @Override
     @Transactional
-    public SuccessResponse<RoomSearchResponse> getRoom(Long roomId) {
+    public SuccessResponse<RoomSearchResponse> getRoom(Long userId, Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
+        boolean isBookmarked = false;
+        if(userId!=null){
+            isBookmarked = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId).isPresent();
+        }
         Agent agent = room.getAgent();
         AgentResponse agentResponse = AgentResponse.from(agent, reviewReposiory.getRating(agent.getId()));
-        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room, ));
+        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room, agentResponse, isBookmarked));
     }
 
     /**
@@ -136,15 +141,23 @@ public class RoomServiceImpl implements RoomService {
         Agent agent = agentRepository.getByUserId(userId);
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         List<RoomInfoSearchResponse> list = roomRepository.getByAgentId(agent.getId(), pageable).stream()
-                .map(RoomInfoSearchResponse::from)
+                .map((room)->{
+                    RoomInfoSearchResponse.from(room, false);
+                })
                 .toList();
         return new SuccessResponse<>(ROOM_FIND_SUCCESS, list);
     }
 
     @Override
-    public SuccessResponse<List<RoomInfoSearchResponse>> search() {
+    public SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId) {
         List<RoomInfoSearchResponse> list = roomRepository.findAll().stream()
-                .map(RoomInfoSearchResponse::from)
+                .map((room)->{
+                    boolean isBookmarked = false;
+                    if(userId!=null){
+                        isBookmarked = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId).isPresent();
+                    }
+                    return RoomInfoSearchResponse.from(room, isBookmarked);
+                })
                 .toList();
         SuccessResponse<List<RoomInfoSearchResponse>> response =
                 new SuccessResponse<>(SEARCH_ROOM_SUCCESS, list);
