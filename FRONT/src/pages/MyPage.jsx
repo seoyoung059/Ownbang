@@ -5,6 +5,7 @@ import { useTheme } from "@mui/material";
 import MyCheckList from "../components/user-info/MyCheckList";
 import MyBookmarkList from "../components/user-info/MyBookmarkList";
 import MyReservationList from "../components/user-info/MyReservationList";
+import CheckList from "../components/checklist/CheckList";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -104,7 +105,7 @@ export default function Mypage() {
             <MyBookmarkList />
           </TabPanel>
           <TabPanel value={tabValue} index={2}>
-            <MyCheckList />
+            <CheckList canEdit={false} />
           </TabPanel>
         </Box>
       </Box>
