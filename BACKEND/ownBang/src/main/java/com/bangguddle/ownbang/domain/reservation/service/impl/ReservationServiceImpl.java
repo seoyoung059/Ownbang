@@ -4,10 +4,7 @@ import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
-import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeRequest;
-import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeResponse;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
+import com.bangguddle.ownbang.domain.reservation.dto.*;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
@@ -100,6 +97,7 @@ public class ReservationServiceImpl implements ReservationService {
                     updatedReservations.add(reservation);
                 }
             } else {
+
                 updatedReservations.add(reservation);
             }
         }
@@ -176,26 +174,29 @@ public class ReservationServiceImpl implements ReservationService {
         User user = userRepository.getById(userId);
         Agent agent = agentRepository.getByUserId(userId);
         Long agentId = agent.getId();
-        LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime today = now.withHour(0).withMinute(0).withSecond(0).withNano(0);
         List<Reservation> reservations = reservationRepository.findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(agentId, today);
 
         if (reservations.isEmpty()) {
             return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
         }
 
-        List<Reservation> updatedReservations = new ArrayList<>();
+        List<ReservationResponse> updatedReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {
+            boolean enstance = reservation.getReservationTime().minusMinutes(10).isBefore(now);
+
             if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
                 Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
                 if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED) {
                     Reservation updatedReservation = reservation.completeStatus();
                     updatedReservation = reservationRepository.save(updatedReservation);
-                    updatedReservations.add(updatedReservation);
+                    updatedReservations.add(ReservationResponse.from(updatedReservation, enstance));
                 } else {
-                    updatedReservations.add(reservation);
+                    updatedReservations.add(ReservationResponse.from(reservation, enstance));
                 }
             } else {
-                updatedReservations.add(reservation);
+                updatedReservations.add(ReservationResponse.from(reservation, enstance));
             }
         }
 

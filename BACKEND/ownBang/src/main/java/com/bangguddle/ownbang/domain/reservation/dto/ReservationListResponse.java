@@ -7,10 +7,7 @@ import java.util.List;
 public record ReservationListResponse (
         List<ReservationResponse> reservations
 ){
-    public static ReservationListResponse from(List<Reservation> reservations) {
-        List<ReservationResponse> reservationResponses = reservations.stream()
-                .map(ReservationResponse::from)
-                .toList();
-        return new ReservationListResponse(reservationResponses);
+    public static ReservationListResponse from(List<ReservationResponse> reservations) {
+        return new ReservationListResponse(reservations);
     }
 }
