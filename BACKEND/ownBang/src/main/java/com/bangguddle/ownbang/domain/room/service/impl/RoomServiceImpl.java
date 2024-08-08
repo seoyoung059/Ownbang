@@ -1,5 +1,6 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
+import com.bangguddle.ownbang.domain.agent.dto.AgentResponse;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
@@ -118,7 +119,9 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     public SuccessResponse<RoomSearchResponse> getRoom(Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
-        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room));
+        Agent agent = room.getAgent();
+        AgentResponse agentResponse = AgentResponse.from(agent, reviewReposiory.getRating(agent.getId()));
+        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room, ));
     }
 
     /**
