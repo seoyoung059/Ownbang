@@ -41,6 +41,10 @@ public enum ErrorCode implements ResponseCode {
     INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 이미지 파일입니다."),
     ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 매물입니다."),
 
+    // Review API
+    REVIEW_DUPLICATED(HttpStatus.CONFLICT, "이미 리뷰가 작성된 예약입니다."),
+    REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "유효하지 않은 리뷰입니다."),
+
     // Bookmark API
     BOOKMARK_DUPLICATED(HttpStatus.CONFLICT, "이미 존재하는 북마크입니다."),
 
