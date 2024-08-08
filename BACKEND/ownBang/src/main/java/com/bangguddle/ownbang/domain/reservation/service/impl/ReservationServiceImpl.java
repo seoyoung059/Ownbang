@@ -4,10 +4,7 @@ import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
-import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeRequest;
-import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeResponse;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
+import com.bangguddle.ownbang.domain.reservation.dto.*;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
@@ -19,10 +16,14 @@ import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.video.entity.Video;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
+import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
+import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcSessionServiceImpl;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import io.openvidu.java.client.Session;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +50,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final AgentWorkhourRepository agentWorkhourRepository;
     private final VideoRepository videoRepository;
     private final AgentRepository agentRepository;
+    private final WebrtcSessionService webrtcSessionService;
 
     @Override
     @Transactional
@@ -88,20 +90,23 @@ public class ReservationServiceImpl implements ReservationService {
             return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
         }
 
-        List<Reservation> updatedReservations = new ArrayList<>();
+        List<ReservationResponse> updatedReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {
+            boolean enstance = false;
             if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
                 Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
                 if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED) {
                     Reservation updatedReservation = reservation.completeStatus();
-                    reservationRepository.save(updatedReservation);  // 상태 변경을 데이터베이스에 반영
-                    updatedReservations.add(updatedReservation);
-                } else {
-                    updatedReservations.add(reservation);
+                    reservationRepository.save(updatedReservation);
+                    reservation = updatedReservation;
                 }
-            } else {
-                updatedReservations.add(reservation);
+
+                // 중개인이 세션을 생성했는지 확인
+                Optional<Session> session = webrtcSessionService.getSession(reservation.getId());
+                enstance = session.isPresent();
             }
+
+            updatedReservations.add(ReservationResponse.from(reservation, enstance));
         }
 
         ReservationListResponse reservationListResponse = ReservationListResponse.from(updatedReservations);
@@ -143,7 +148,11 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public SuccessResponse<NoneResponse> confirmStatusReservation(Long userId, Long id) {
         Reservation reservation = vaildateReservation(id);
-        if(reservation.getUser().getId()!=userId){
+        User user = userRepository.getById(userId);
+        Agent agent = agentRepository.getByUserId(userId);
+        Long agentId = agent.getId();
+
+        if(reservation.getRoom().getAgent().getId()!=agentId){
             throw new AppException(ACCESS_DENIED);
         }
         // 취소된 예약이라면 확정할 수 없다.
@@ -176,26 +185,29 @@ public class ReservationServiceImpl implements ReservationService {
         User user = userRepository.getById(userId);
         Agent agent = agentRepository.getByUserId(userId);
         Long agentId = agent.getId();
-        LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime today = now.withHour(0).withMinute(0).withSecond(0).withNano(0);
         List<Reservation> reservations = reservationRepository.findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(agentId, today);
 
         if (reservations.isEmpty()) {
             return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
         }
 
-        List<Reservation> updatedReservations = new ArrayList<>();
+        List<ReservationResponse> updatedReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {
+            boolean enstance = reservation.getReservationTime().minusMinutes(10).isBefore(now);
+
             if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
                 Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
                 if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED) {
                     Reservation updatedReservation = reservation.completeStatus();
                     updatedReservation = reservationRepository.save(updatedReservation);
-                    updatedReservations.add(updatedReservation);
+                    updatedReservations.add(ReservationResponse.from(updatedReservation, enstance));
                 } else {
-                    updatedReservations.add(reservation);
+                    updatedReservations.add(ReservationResponse.from(reservation, enstance));
                 }
             } else {
-                updatedReservations.add(reservation);
+                updatedReservations.add(ReservationResponse.from(reservation, enstance));
             }
         }
 
@@ -250,6 +262,35 @@ public class ReservationServiceImpl implements ReservationService {
             current = current.plusMinutes(30);
         }
         return slots;
+    }
+
+    // 예약 철회 시 사용
+    @Transactional
+    public SuccessResponse<NoneResponse> deleteStatusReservation(Long userId, Long id) {
+        Reservation reservation = vaildateReservation(id);
+        User user = userRepository.getById(userId);
+        Agent agent = agentRepository.getByUserId(userId);
+        Long agentId = agent.getId();
+        if(reservation.getRoom().getAgent().getId()!=agentId){
+            throw new AppException(ACCESS_DENIED);
+        }
+        // 이미 취소된 예약인지 확인
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            throw new AppException(RESERVATION_CANCELLED_DUPLICATED);
+        }
+
+        // 이미 확정된 예약인지 확인
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+            throw new AppException(RESERVATION_CANCELLED_UNAVAILABLE);
+        }
+
+        // 상태를 '예약취소'로 변경
+        Reservation updatedReservation = reservation.withStatus();
+
+        // 상태 변경된 예약 저장
+        reservationRepository.save(updatedReservation);
+
+        return new SuccessResponse<>(RESERVATION_UPDATE_STATUS_SUCCESS, NoneResponse.NONE);
     }
 
 }

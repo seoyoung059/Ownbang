@@ -16,9 +16,11 @@ import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.video.entity.Video;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
+import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import io.openvidu.java.client.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,7 @@ import java.util.Optional;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,6 +52,9 @@ class ReservationServiceImplTest {
 
     @Mock
     private ReservationRepository reservationRepository;
+
+    @Mock
+    private WebrtcSessionService webrtcSessionService;
 
     @Mock
     private AgentRepository agentRepository;
@@ -118,9 +124,10 @@ class ReservationServiceImplTest {
         assertThat(exception.getErrorCode()).isEqualTo(RESERVATION_DUPLICATED);
     }
 
+
     @Test
-    @DisplayName("예약 목록 조회 성공 (비디오 상태 포함)")
-    void getMyReservationList_SuccessWithVideoStatus() {
+    @DisplayName("예약 목록 조회 성공 (비디오 상태 및 enstance 포함)")
+    void getMyReservationList_SuccessWithVideoStatusAndEnstance() {
         Long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
         Agent agent = mock(Agent.class);
@@ -131,6 +138,9 @@ class ReservationServiceImplTest {
         when(videoRepository.findByReservationId(1L)).thenReturn(Optional.empty());
         when(videoRepository.findByReservationId(2L)).thenReturn(Optional.of(new Video(reservation2, "url", VideoStatus.RECORDED)));
 
+        when(webrtcSessionService.getSession(1L)).thenReturn(Optional.empty());
+        when(webrtcSessionService.getSession(2L)).thenReturn(Optional.of(mock(Session.class)));
+
         SuccessResponse<ReservationListResponse> response = reservationService.getMyReservationList(userId);
 
         assertThat(response).isNotNull();
@@ -138,8 +148,8 @@ class ReservationServiceImplTest {
         assertThat(response.data().reservations().size()).isEqualTo(2);
 
         List<ReservationResponse> expectedResponses = List.of(
-                ReservationResponse.from(reservation1),
-                ReservationResponse.from(reservation2.completeStatus())
+                ReservationResponse.from(reservation1, false),
+                ReservationResponse.from(reservation2.completeStatus(), true)
         );
 
         assertThat(response.data().reservations())
@@ -147,9 +157,11 @@ class ReservationServiceImplTest {
                 .ignoringFields("id")
                 .isEqualTo(expectedResponses);
 
-        // 추가적으로 상태 변경을 명시적으로 확인
+        // 추가적으로 상태 변경과 enstance를 명시적으로 확인
         assertThat(response.data().reservations().get(0).status()).isEqualTo(ReservationStatus.APPLYED);
+        assertThat(response.data().reservations().get(0).enstance()).isFalse();
         assertThat(response.data().reservations().get(1).status()).isEqualTo(ReservationStatus.COMPLETED);
+        assertThat(response.data().reservations().get(1).enstance()).isTrue();
     }
 
     @Test
@@ -211,89 +223,163 @@ class ReservationServiceImplTest {
     @Test
     @DisplayName("예약 확정 성공")
     void confirmStatusReservation_Success() {
+        // Given
         Long userId = 1L;
         Long reservationId = 1L;
-        User user = mock(User.class);
-        when(user.getId()).thenReturn(userId);
-        Reservation reservation = mock(Reservation.class);
-        when(reservation.getUser()).thenReturn(user);
-        when(reservation.getStatus()).thenReturn(ReservationStatus.APPLYED);
-        Reservation confirmedReservation = mock(Reservation.class);
+        Long agentId = 1L;
 
-        when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
+        User user = mock(User.class);
+        when(userRepository.getById(userId)).thenReturn(user);
+
+        Agent agent = mock(Agent.class);
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        Room room = mock(Room.class);
+        when(room.getAgent()).thenReturn(agent);
+
+        Reservation reservation = mock(Reservation.class);
+        when(reservation.getRoom()).thenReturn(room);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.APPLYED);
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        Reservation confirmedReservation = mock(Reservation.class);
         when(reservation.confirmStatus()).thenReturn(confirmedReservation);
-        when(reservationRepository.save(any(Reservation.class))).thenReturn(confirmedReservation);
+
         when(reservationRepository.existsByRoomAndReservationTimeAndStatus(any(), any(), any()))
                 .thenReturn(Optional.empty());
 
+        // When
         SuccessResponse<NoneResponse> response = reservationService.confirmStatusReservation(userId, reservationId);
 
+        // Then
         assertThat(response).isNotNull();
         assertThat(response.successCode()).isEqualTo(RESERVATION_CONFIRM_SUCCESS);
         assertThat(response.data()).isEqualTo(NoneResponse.NONE);
 
-        verify(reservationRepository, times(1)).save(any(Reservation.class));
+        verify(reservationRepository).save(confirmedReservation);
     }
+
     @Test
-    @DisplayName("예약 확정 실패 - 같은 시간, 같은 방에 이미 확정된 예약 존재")
-    void confirmStatusReservation_Fail_DuplicateTimeAndRoom() {
-        Long reservationId = 1L;
+    @DisplayName("예약 확정 실패 - 접근 권한 없음")
+    void confirmStatusReservation_Fail_AccessDenied() {
+        // Given
         Long userId = 1L;
+        Long reservationId = 1L;
+        Long agentId = 1L;
+        Long differentAgentId = 2L;
+
+        User user = mock(User.class);
+        when(userRepository.getById(userId)).thenReturn(user);
+
+        Agent agent = mock(Agent.class);
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        Agent differentAgent = mock(Agent.class);
+        when(differentAgent.getId()).thenReturn(differentAgentId);
+
         Room room = mock(Room.class);
-        User user = mock(User.class);
-        when(user.getId()).thenReturn(userId);
-        LocalDateTime reservationTime = LocalDateTime.now();
+        when(room.getAgent()).thenReturn(differentAgent);
+
         Reservation reservation = mock(Reservation.class);
-        when(reservation.getUser()).thenReturn(user);
-        when(reservation.getStatus()).thenReturn(ReservationStatus.APPLYED);
         when(reservation.getRoom()).thenReturn(room);
-        when(reservation.getReservationTime()).thenReturn(reservationTime);
-
-        Reservation existingReservation = mock(Reservation.class);
-        when(existingReservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
-
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
-        when(reservationRepository.existsByRoomAndReservationTimeAndStatus(room, reservationTime, ReservationStatus.CONFIRMED))
-                .thenReturn(Optional.of(existingReservation));
 
-        AppException exception = assertThrows(AppException.class,
-                () -> reservationService.confirmStatusReservation(userId, reservationId));
-        assertEquals(RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM, exception.getErrorCode());
-    }
-    @Test
-    @DisplayName("예약 확정 실패 - 이미 확정된 예약")
-    void confirmStatusReservation_Fail_AlreadyConfirmed() {
-        Long userId = 1L;
-        Long reservationId = 1L;
-        User user = mock(User.class);
-        when(user.getId()).thenReturn(userId);
-        Reservation reservation = mock(Reservation.class);
-        when(reservation.getUser()).thenReturn(user);
-        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
-
-        when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
-
-        AppException exception = assertThrows(AppException.class,
-                () -> reservationService.confirmStatusReservation(userId, reservationId));
-        assertThat(exception.getErrorCode()).isEqualTo(RESERVATION_CONFIRMED_DUPLICATED);
+        // When & Then
+        assertThatThrownBy(() -> reservationService.confirmStatusReservation(userId, reservationId))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ACCESS_DENIED);
     }
 
     @Test
     @DisplayName("예약 확정 실패 - 취소된 예약")
     void confirmStatusReservation_Fail_CancelledReservation() {
+        // Given
         Long userId = 1L;
         Long reservationId = 1L;
+        Long agentId = 1L;
+
         User user = mock(User.class);
-        when(user.getId()).thenReturn(userId);
+        when(userRepository.getById(userId)).thenReturn(user);
+
+        Agent agent = mock(Agent.class);
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        Room room = mock(Room.class);
+        when(room.getAgent()).thenReturn(agent);
+
         Reservation reservation = mock(Reservation.class);
-        when(reservation.getUser()).thenReturn(user);
+        when(reservation.getRoom()).thenReturn(room);
         when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELLED);
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 
-        when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
+        // When & Then
+        assertThatThrownBy(() -> reservationService.confirmStatusReservation(userId, reservationId))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_CONFIRMED_UNAVAILABLE);
+    }
 
-        AppException exception = assertThrows(AppException.class,
-                () -> reservationService.confirmStatusReservation(userId, reservationId));
-        assertThat(exception.getErrorCode()).isEqualTo(RESERVATION_CONFIRMED_UNAVAILABLE);
+    @Test
+    @DisplayName("예약 확정 실패 - 이미 확정된 예약")
+    void confirmStatusReservation_Fail_AlreadyConfirmed() {
+        // Given
+        Long userId = 1L;
+        Long reservationId = 1L;
+        Long agentId = 1L;
+
+        User user = mock(User.class);
+        when(userRepository.getById(userId)).thenReturn(user);
+
+        Agent agent = mock(Agent.class);
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        Room room = mock(Room.class);
+        when(room.getAgent()).thenReturn(agent);
+
+        Reservation reservation = mock(Reservation.class);
+        when(reservation.getRoom()).thenReturn(room);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        // When & Then
+        assertThatThrownBy(() -> reservationService.confirmStatusReservation(userId, reservationId))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_CONFIRMED_DUPLICATED);
+    }
+
+    @Test
+    @DisplayName("예약 확정 실패 - 같은 시간, 같은 방에 이미 확정된 예약 존재")
+    void confirmStatusReservation_Fail_DuplicateTimeAndRoom() {
+        // Given
+        Long userId = 1L;
+        Long reservationId = 1L;
+        Long agentId = 1L;
+
+        User user = mock(User.class);
+        when(userRepository.getById(userId)).thenReturn(user);
+
+        Agent agent = mock(Agent.class);
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        Room room = mock(Room.class);
+        when(room.getAgent()).thenReturn(agent);
+
+        Reservation reservation = mock(Reservation.class);
+        when(reservation.getRoom()).thenReturn(room);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.APPLYED);
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        when(reservationRepository.existsByRoomAndReservationTimeAndStatus(any(), any(), any()))
+                .thenReturn(Optional.of(mock(Reservation.class)));
+
+        // When & Then
+        assertThatThrownBy(() -> reservationService.confirmStatusReservation(userId, reservationId))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM);
     }
     @Test
     @DisplayName("중개인 예약 목록 조회 성공 - 시간순, ID순 정렬 및 상태 변경 확인")
@@ -457,6 +543,137 @@ class ReservationServiceImplTest {
         // When & Then
         assertThrows(AppException.class, () -> reservationService.getAvailableTimes(request));
     }
+    @Test
+    @DisplayName("중개인 예약 철회 성공")
+    void deleteStatusReservation_Success() {
+        // Given
+        Long userId = 1L;
+        Long reservationId = 1L;
+        Long agentId = 1L;
 
+        User user = mock(User.class);
+        when(user.getId()).thenReturn(userId);
+        when(userRepository.getById(userId)).thenReturn(user);
+
+        Agent agent = mock(Agent.class);
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        Room room = mock(Room.class);
+        when(room.getAgent()).thenReturn(agent);
+
+        Reservation reservation = mock(Reservation.class);
+        when(reservation.getRoom()).thenReturn(room);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.APPLYED);
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        Reservation updatedReservation = mock(Reservation.class);
+        when(reservation.withStatus()).thenReturn(updatedReservation);
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(updatedReservation);
+
+        // When
+        SuccessResponse<NoneResponse> response = reservationService.deleteStatusReservation(userId, reservationId);
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.successCode()).isEqualTo(RESERVATION_UPDATE_STATUS_SUCCESS);
+        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
+
+        verify(reservationRepository, times(1)).findById(reservationId);
+        verify(userRepository, times(1)).getById(userId);
+        verify(agentRepository, times(1)).getByUserId(userId);
+        verify(reservation, times(1)).withStatus();
+        verify(reservationRepository, times(1)).save(updatedReservation);
+    }
+
+    @Test
+    @DisplayName("중개인 예약 철회 실패 - 접근 권한 없음")
+    void deleteStatusReservation_Fail_AccessDenied() {
+        // Given
+        Long userId = 1L;
+        Long reservationId = 1L;
+        Long agentId = 1L;
+        Long differentAgentId = 2L;
+
+        User user = mock(User.class);
+        when(userRepository.getById(userId)).thenReturn(user);
+
+        Agent agent = mock(Agent.class);
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        Agent differentAgent = mock(Agent.class);
+        when(differentAgent.getId()).thenReturn(differentAgentId);
+
+        Room room = mock(Room.class);
+        when(room.getAgent()).thenReturn(differentAgent);
+
+        Reservation reservation = mock(Reservation.class);
+        when(reservation.getRoom()).thenReturn(room);
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        // When & Then
+        assertThatThrownBy(() -> reservationService.deleteStatusReservation(userId, reservationId))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ACCESS_DENIED);
+    }
+
+    @Test
+    @DisplayName("중개인 예약 철회 실패 - 이미 취소된 예약")
+    void deleteStatusReservation_Fail_AlreadyCancelled() {
+        // Given
+        Long userId = 1L;
+        Long reservationId = 1L;
+        Long agentId = 1L;
+
+        User user = mock(User.class);
+        when(userRepository.getById(userId)).thenReturn(user);
+
+        Agent agent = mock(Agent.class);
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        Room room = mock(Room.class);
+        when(room.getAgent()).thenReturn(agent);
+
+        Reservation reservation = mock(Reservation.class);
+        when(reservation.getRoom()).thenReturn(room);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CANCELLED);
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        // When & Then
+        assertThatThrownBy(() -> reservationService.deleteStatusReservation(userId, reservationId))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_CANCELLED_DUPLICATED);
+    }
+
+    @Test
+    @DisplayName("중개인 예약 철회 실패 - 이미 확정된 예약")
+    void deleteStatusReservation_Fail_AlreadyConfirmed() {
+        // Given
+        Long userId = 1L;
+        Long reservationId = 1L;
+        Long agentId = 1L;
+
+        User user = mock(User.class);
+        when(userRepository.getById(userId)).thenReturn(user);
+
+        Agent agent = mock(Agent.class);
+        when(agent.getId()).thenReturn(agentId);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        Room room = mock(Room.class);
+        when(room.getAgent()).thenReturn(agent);
+
+        Reservation reservation = mock(Reservation.class);
+        when(reservation.getRoom()).thenReturn(room);
+        when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
+        when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        // When & Then
+        assertThatThrownBy(() -> reservationService.deleteStatusReservation(userId, reservationId))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_CANCELLED_UNAVAILABLE);
+    }
 
 }

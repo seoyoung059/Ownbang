@@ -11,16 +11,18 @@ public record ReservationResponse(
         LocalDateTime reservationTime,
         ReservationStatus status,
         Long roomId,
-        Long userId
+        Long userId,
+        Boolean enstance
 ) {
-    public static ReservationResponse from(Reservation reservation) {
+    public static ReservationResponse from(Reservation reservation,Boolean enstance) {
         return new ReservationResponse(
                 reservation.getId(),
                 reservation.getRoom().getAgent().getOfficeName(),
                 reservation.getReservationTime(),
                 reservation.getStatus(),
                 reservation.getRoom().getId(),
-                reservation.getUser().getId()
+                reservation.getUser().getId(),
+                enstance
         );
     }
 }
