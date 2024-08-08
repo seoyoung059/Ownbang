@@ -17,6 +17,8 @@ public interface ReservationService {
 
     SuccessResponse<NoneResponse> updateStatusReservation(Long userId, Long id) ;
 
+    SuccessResponse<NoneResponse> deleteStatusReservation(Long userId, Long id) ;
+
     SuccessResponse<NoneResponse> confirmStatusReservation(Long userId, Long id);
 
     SuccessResponse<ReservationListResponse> getAgentReservations(Long userId);

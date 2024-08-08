@@ -4,6 +4,7 @@ import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationResponse;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
+import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
@@ -25,7 +26,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.bangguddle.ownbang.global.enums.ErrorCode.RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_EMPTY;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.RESERVATION_LIST_SUCCESS;
 import static org.mockito.ArgumentMatchers.*;
@@ -147,5 +148,76 @@ public class AgentReservationControllerTest {
                 .andExpect(jsonPath("$.data.reservations").isArray())
                 .andExpect(jsonPath("$.data.reservations").isEmpty());
     }
+    @Test
+    @DisplayName("예약 철회 성공")
+    @WithMockUser
+    void deleteStatusReservation_Success() throws Exception {
+        Long id = 1L;
 
+        SuccessResponse<NoneResponse> successResponse = new SuccessResponse<>(
+                SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS,
+                NoneResponse.NONE
+        );
+
+        when(reservationService.deleteStatusReservation(any(), anyLong())).thenReturn(successResponse);
+
+        mockMvc.perform(patch("/agents/reservations/delete/{id}", id)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.code").value(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value(SuccessCode.RESERVATION_UPDATE_STATUS_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.data").value("NONE"));
+    }
+
+    @Test
+    @DisplayName("예약 철회 실패 - 접근 권한 없음")
+    @WithMockUser
+    void deleteStatusReservation_Fail_AccessDenied() throws Exception {
+        Long id = 1L;
+
+        when(reservationService.deleteStatusReservation(any(), anyLong()))
+                .thenThrow(new AppException(ErrorCode.ACCESS_DENIED));
+
+        mockMvc.perform(patch("/agents/reservations/delete/{id}", id)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.code").value(ErrorCode.ACCESS_DENIED.name()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.ACCESS_DENIED.getMessage()));
+    }
+
+    @Test
+    @DisplayName("예약 철회 실패 - 이미 취소된 예약")
+    @WithMockUser
+    void deleteStatusReservation_Fail_AlreadyCancelled() throws Exception {
+        Long id = 1L;
+
+        when(reservationService.deleteStatusReservation(any(), anyLong()))
+                .thenThrow(new AppException(RESERVATION_CANCELLED_DUPLICATED));
+
+        mockMvc.perform(patch("/agents/reservations/delete/{id}", id)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.code").value(RESERVATION_CANCELLED_DUPLICATED.name()))
+                .andExpect(jsonPath("$.message").value(RESERVATION_CANCELLED_DUPLICATED.getMessage()));
+    }
+
+    @Test
+    @DisplayName("예약 철회 실패 - 이미 확정된 예약")
+    @WithMockUser
+    void deleteStatusReservation_Fail_AlreadyConfirmed() throws Exception {
+        Long id = 1L;
+
+        when(reservationService.deleteStatusReservation(any(), anyLong()))
+                .thenThrow(new AppException(RESERVATION_CANCELLED_UNAVAILABLE));
+
+        mockMvc.perform(patch("/agents/reservations/delete/{id}", id)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.code").value(RESERVATION_CANCELLED_UNAVAILABLE.name()))
+                .andExpect(jsonPath("$.message").value(RESERVATION_CANCELLED_UNAVAILABLE.getMessage()));
+    }
 }

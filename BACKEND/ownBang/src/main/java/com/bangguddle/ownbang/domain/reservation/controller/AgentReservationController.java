@@ -29,5 +29,13 @@ public class AgentReservationController {
         return Response.success(response);
     }
 
+    //예약 취소
+    @PatchMapping("/delete/{id}")
+    public ResponseEntity<Response<NoneResponse>> deleteStatusReservation(@PathVariable(name="id") Long id, @AuthenticationPrincipal Long userId) {
+        SuccessResponse<NoneResponse> response = reservationService.deleteStatusReservation(userId, id);
+        return Response.success(response);
+    }
+
+
 }
 

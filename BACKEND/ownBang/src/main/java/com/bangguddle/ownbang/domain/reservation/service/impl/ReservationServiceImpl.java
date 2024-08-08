@@ -148,7 +148,11 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public SuccessResponse<NoneResponse> confirmStatusReservation(Long userId, Long id) {
         Reservation reservation = vaildateReservation(id);
-        if(reservation.getUser().getId()!=userId){
+        User user = userRepository.getById(userId);
+        Agent agent = agentRepository.getByUserId(userId);
+        Long agentId = agent.getId();
+
+        if(reservation.getRoom().getAgent().getId()!=agentId){
             throw new AppException(ACCESS_DENIED);
         }
         // 취소된 예약이라면 확정할 수 없다.
@@ -258,6 +262,35 @@ public class ReservationServiceImpl implements ReservationService {
             current = current.plusMinutes(30);
         }
         return slots;
+    }
+
+    // 예약 철회 시 사용
+    @Transactional
+    public SuccessResponse<NoneResponse> deleteStatusReservation(Long userId, Long id) {
+        Reservation reservation = vaildateReservation(id);
+        User user = userRepository.getById(userId);
+        Agent agent = agentRepository.getByUserId(userId);
+        Long agentId = agent.getId();
+        if(reservation.getRoom().getAgent().getId()!=agentId){
+            throw new AppException(ACCESS_DENIED);
+        }
+        // 이미 취소된 예약인지 확인
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            throw new AppException(RESERVATION_CANCELLED_DUPLICATED);
+        }
+
+        // 이미 확정된 예약인지 확인
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+            throw new AppException(RESERVATION_CANCELLED_UNAVAILABLE);
+        }
+
+        // 상태를 '예약취소'로 변경
+        Reservation updatedReservation = reservation.withStatus();
+
+        // 상태 변경된 예약 저장
+        reservationRepository.save(updatedReservation);
+
+        return new SuccessResponse<>(RESERVATION_UPDATE_STATUS_SUCCESS, NoneResponse.NONE);
     }
 
 }
