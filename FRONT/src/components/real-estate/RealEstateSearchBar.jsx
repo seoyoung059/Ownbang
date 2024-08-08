@@ -15,24 +15,19 @@ import {
 import { useTheme } from "@mui/material";
 import { useBoundStore } from "../../store/store";
 
-const RealEstateSearchBar = ({ onSearch, isMain }) => {
+const RealEstateSearchBar = ({ isMain }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const [inputValue, setInputValue] = useState("");
-  const {
-    searchTerm,
-    getSearchTerm,
-    setSearchTerm,
-    searchList,
-    setSearchList,
-  } = useBoundStore((state) => ({
-    searchTerm: state.searchTerm,
-    searchList: state.searchList,
-    getSearchTerm: state.getSearchTerm,
-    setSearchTerm: state.setSearchTerm,
-    setSearchList: state.setSearchList,
-  }));
+  const { getSearchTerm, setSearchTerm, searchList, setSearchList } =
+    useBoundStore((state) => ({
+      searchTerm: state.searchTerm,
+      searchList: state.searchList,
+      getSearchTerm: state.getSearchTerm,
+      setSearchTerm: state.setSearchTerm,
+      setSearchList: state.setSearchList,
+    }));
 
   const onInputChange = (event) => {
     const value = event.target.value;
@@ -42,7 +37,6 @@ const RealEstateSearchBar = ({ onSearch, isMain }) => {
     } else {
       getSearchTerm(value);
     }
-    onSearch(value);
   };
 
   const onSearchInputValue = () => {
