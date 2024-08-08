@@ -43,7 +43,7 @@ export default function VideoChatPage() {
   };
 
   return (
-    <Container sx={{ mt: 8 }}>
+    <Container sx={{ mt: 12 }}>
       {!user.isAgent ? (
         <Grid
           container
@@ -85,7 +85,7 @@ export default function VideoChatPage() {
                 체크리스트
               </Button>
             </Box>
-            {tabValue === 0 ? <div>dd</div> : <CheckList />}
+            {tabValue === 0 ? <div>dd</div> : <CheckList canEdit={true} />}
           </Grid>
         </Grid>
       ) : (
@@ -98,9 +98,9 @@ export default function VideoChatPage() {
               fetchUser={fetchUser}
             />
           </Grid>
-          <Grid item xs={12} sx={{ mt: 12 }}>
+          {/* <Grid item xs={12} sx={{ mt: 12 }}>
             <Typography>채팅 컴퍼넌트</Typography>
-          </Grid>
+          </Grid> */}
         </Grid>
       )}
     </Container>

@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   IconButton,
+  InputBase,
 } from "@mui/material";
 import { useTheme } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -15,9 +16,12 @@ const CheckListTitle = ({
   setSelectedTitle,
   addTemplate,
   deleteTemplate,
+  modifyTemplateTitle,
 }) => {
   const theme = useTheme();
   const [newTemplateTitle, setNewTemplateTitle] = useState("");
+  const [editTitle, setEditTitle] = useState(null);
+  const [editValue, setEditValue] = useState("");
 
   const options = checklist
     ? checklist.map((el) => ({
@@ -48,7 +52,22 @@ const CheckListTitle = ({
   const handleDeleteTemplate = async (event, checklistId) => {
     event.stopPropagation();
     await deleteTemplate(checklistId);
-    setSelectedTitle(""); // 선택된 템플릿 초기화
+    setSelectedTitle("");
+  };
+
+  const handleTitleDoubleClick = (option) => {
+    setEditTitle(option.checklistId);
+    setEditValue(option.title);
+  };
+
+  const handleTitleChange = (e) => {
+    setEditValue(e.target.value);
+  };
+
+  const handleTitleBlur = async (option) => {
+    await modifyTemplateTitle(option.checklistId, editValue);
+    setEditTitle(null);
+    setSelectedTitle(editValue);
   };
 
   return (
@@ -61,9 +80,7 @@ const CheckListTitle = ({
           getOptionLabel={(option) => option.title}
           onInputChange={(event, value) => {
             setNewTemplateTitle(value);
-            if (!value) {
-              setSelectedTitle("");
-            }
+            if (!value) setSelectedTitle("");
           }}
           onChange={handleTemplateChange}
           inputValue={newTemplateTitle}
@@ -75,16 +92,10 @@ const CheckListTitle = ({
               placeholder="사용할 템플릿을 선택하거나 추가하세요"
               InputProps={{
                 ...params.InputProps,
-                sx: {
-                  padding: "10px",
-                  fontSize: "12px",
-                },
+                sx: { padding: "10px", fontSize: "12px" },
               }}
               sx={{
-                "& .MuiInputBase-root": {
-                  padding: "10px",
-                  fontSize: "12px",
-                },
+                "& .MuiInputBase-root": { padding: "10px", fontSize: "12px" },
               }}
             />
           )}
@@ -97,8 +108,19 @@ const CheckListTitle = ({
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
+              onDoubleClick={() => handleTitleDoubleClick(option)}
             >
-              {option.title}
+              {editTitle === option.checklistId ? (
+                <InputBase
+                  value={editValue}
+                  onChange={handleTitleChange}
+                  onBlur={() => handleTitleBlur(option)}
+                  autoFocus
+                  sx={{ fontSize: "12px" }}
+                />
+              ) : (
+                option.title
+              )}
               <IconButton
                 edge="end"
                 aria-label="delete"

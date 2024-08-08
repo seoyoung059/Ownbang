@@ -6,6 +6,7 @@ const CheckListItem = ({
   id,
   isDone,
   content,
+  timestamp, // 타임스탬프 prop 추가
   onUpdate,
   onDelete,
   canEdit,
@@ -64,6 +65,17 @@ const CheckListItem = ({
           gap: "10px",
         }}
       >
+        {canEdit &&
+          isDone && ( // isDone이 true일 때만 타임스탬프 표시
+            <Typography
+              sx={{
+                fontSize: "10px",
+                color: "gray",
+              }}
+            >
+              {timestamp}
+            </Typography>
+          )}
         <IconButton
           onClick={onClickDeleteButton}
           sx={{

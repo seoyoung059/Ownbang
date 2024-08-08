@@ -12,12 +12,14 @@ const CheckList = ({ canEdit }) => {
     addNewTemplate,
     modifyCheckLists,
     deleteTemplate,
+    stampCheckList,
   } = useBoundStore((state) => ({
     checklist: state.checklist,
     fetchCheckLists: state.fetchCheckLists,
     addNewTemplate: state.addNewTemplate,
     deleteTemplate: state.deleteTemplate,
     modifyCheckLists: state.modifyCheckLists,
+    stampCheckList: state.stampCheckList,
   }));
 
   const [selectedChecklist, setSelectedChecklist] = useState(null);
@@ -38,12 +40,33 @@ const CheckList = ({ canEdit }) => {
     }
   }, [selectedTitle, checklist]);
 
+  const updateChecklistAndFetch = async (updatedChecklist) => {
+    setSelectedChecklist(updatedChecklist);
+    await modifyCheckLists(updatedChecklist.checklistId, {
+      title: updatedChecklist.title,
+      contents: updatedChecklist.contents,
+    });
+    fetchCheckLists();
+  };
+
+  const formatTimeDiff = (timeDiffMinutes) => {
+    const minutes = Math.floor(timeDiffMinutes / 60);
+    const seconds = timeDiffMinutes % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+      2,
+      "0"
+    )}`;
+  };
+
   const onCreate = async (newKey) => {
     const updatedChecklist = {
       ...selectedChecklist,
       contents: { ...selectedChecklist.contents, [newKey]: "" },
     };
+
+    // contents를 업데이트하면서 새 항목을 마지막에 추가하도록 함
     setSelectedChecklist(updatedChecklist);
+
     await modifyCheckLists(updatedChecklist.checklistId, {
       title: updatedChecklist.title,
       contents: updatedChecklist.contents,
@@ -51,18 +74,27 @@ const CheckList = ({ canEdit }) => {
   };
 
   const onUpdate = async (key) => {
+    const createdAt = localStorage.getItem("createdAt");
+    if (!createdAt) {
+      console.error("createdAt 값이 로컬스토리지에 없습니다.");
+      return;
+    }
+
+    const createdAtDate = new Date(parseInt(createdAt));
+    const now = new Date().getTime();
+    const timeDiffSeconds = Math.floor((now - createdAtDate) / 1000);
+
     const updatedChecklist = {
       ...selectedChecklist,
       contents: {
         ...selectedChecklist.contents,
-        [key]: selectedChecklist.contents[key] === "" ? "Checked" : "",
+        [key]: formatTimeDiff(timeDiffSeconds),
       },
     };
-    setSelectedChecklist(updatedChecklist);
-    await modifyCheckLists(updatedChecklist.checklistId, {
-      title: updatedChecklist.title,
-      contents: updatedChecklist.contents,
-    });
+
+    console.log(formatTimeDiff(timeDiffSeconds));
+
+    await updateChecklistAndFetch(updatedChecklist);
   };
 
   const onDelete = async (key) => {
@@ -71,11 +103,7 @@ const CheckList = ({ canEdit }) => {
       ...selectedChecklist,
       contents: rest,
     };
-    setSelectedChecklist(updatedChecklist);
-    await modifyCheckLists(updatedChecklist.checklistId, {
-      title: updatedChecklist.title,
-      contents: updatedChecklist.contents,
-    });
+    await updateChecklistAndFetch(updatedChecklist);
   };
 
   const addTemplate = async (title) => {
@@ -87,6 +115,15 @@ const CheckList = ({ canEdit }) => {
     fetchCheckLists();
   };
 
+  const modifyTemplateTitle = async (newTitle) => {
+    await modifyCheckLists(selectedChecklist.id, {
+      title: newTitle,
+      contents: selectedChecklist.contents,
+    });
+    fetchCheckLists();
+    setSelectedTitle(newTitle);
+  };
+
   return (
     <Container
       sx={{
@@ -94,6 +131,7 @@ const CheckList = ({ canEdit }) => {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        height: "630px",
       }}
     >
       <Box
@@ -112,9 +150,11 @@ const CheckList = ({ canEdit }) => {
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <CheckListTitle
             checklist={checklist}
+            selectedTitle={selectedTitle}
             setSelectedTitle={setSelectedTitle}
             addTemplate={addTemplate}
             deleteTemplate={deleteTemplate}
+            modifyTemplateTitle={modifyTemplateTitle}
           />
         </Box>
 

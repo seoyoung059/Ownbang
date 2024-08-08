@@ -8,8 +8,8 @@ import { createAuthSlice } from "../slice/authSlice";
 import { createReservation } from "../slice/reservationSlice";
 import { createAgentSlice } from "../slice/agentSlice";
 import { createVideoSlice } from "../slice/videoSlice";
+import { createReviewSlice } from "../slice/reviewSlice";
 
-// zustand 전역 상태 관리 저장소 - 변수와 메서드 모두 객체의 속성으로 정의하듯이 만들면 됨
 export const useBoundStore = create((...a) => ({
   ...createCheckListSlice(...a),
   ...createRealEstateSlice(...a),
@@ -19,4 +19,5 @@ export const useBoundStore = create((...a) => ({
   ...createReservation(...a),
   ...createAgentSlice(...a),
   ...createVideoSlice(...a),
+  ...createReviewSlice(...a),
 }));

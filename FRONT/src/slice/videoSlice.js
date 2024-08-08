@@ -4,7 +4,7 @@ export const createVideoSlice = (set) => ({
   enterVideoRoom: async (id) => {
     const result = await getToken(id);
     console.log(result);
-    return result.data.token;
+    return result.data;
   },
   leaveVideoRoom: async (id, token) => {
     const result = await removeToken(id, token);

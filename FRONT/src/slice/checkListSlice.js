@@ -3,6 +3,7 @@ import {
   pathChecklists,
   addChecklist,
   deleteChecklist,
+  addChecklist_video,
 } from "../api/checklist";
 
 export const createCheckListSlice = (set) => ({
@@ -24,6 +25,11 @@ export const createCheckListSlice = (set) => ({
     set((state) => ({
       checklist: [...state.checklist, result.data],
     }));
+  },
+
+  stampCheckList: async (id, data) => {
+    const result = await addChecklist_video(id, data);
+    console.log(result);
   },
 
   deleteTemplate: async (id) => {

@@ -14,6 +14,7 @@ const CheckListList = ({ contents, onUpdate, onDelete, canEdit }) => {
           id={key}
           isDone={contents[key] !== ""}
           content={key}
+          timestamp={contents[key]} // 타임스탬프 전달
           onUpdate={onUpdate}
           onDelete={onDelete}
           canEdit={canEdit}

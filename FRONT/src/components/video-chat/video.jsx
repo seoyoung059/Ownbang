@@ -30,7 +30,7 @@ class Video extends Component {
     super(props);
 
     this.state = {
-      mySessionId: "16",
+      mySessionId: "73",
       myUserName: "",
       session: undefined,
       mainStreamManager: undefined,
@@ -140,8 +140,11 @@ class Video extends Component {
 
         mySession.on("streamDestroyed", (event) => {
           this.deleteSubscriber(event.stream.streamManager);
-          if (event.stream.streamManager === this.state.mainStreamManager) {
-            this.endSession(); // 메인 스트림이 나가면 세션 종료
+          if (
+            event.stream.streamManager === this.state.mainStreamManager &&
+            !this.props.user.isAgent
+          ) {
+            this.setState({ endSessionDialogOpen: true });
           }
         });
 
@@ -149,10 +152,13 @@ class Video extends Component {
           console.warn(exception);
         });
 
-        this.props.enterVideoRoom(this.state.mySessionId).then((token) => {
-          this.setState({ token: token }); // 토큰 상태 저장
+        this.props.enterVideoRoom(this.state.mySessionId).then((res) => {
+          this.setState({ token: res.token });
+          if (res.createdAt) {
+            localStorage.setItem("createdAt", res.createdAt);
+          }
           mySession
-            .connect(token, { clientData: this.state.myUserName })
+            .connect(res.token, { clientData: this.state.myUserName })
             .then(async () => {
               let publisher = await this.OV.initPublisherAsync(undefined, {
                 audioSource: undefined,
@@ -210,34 +216,36 @@ class Video extends Component {
     }
   }
 
-  async leaveSession() {
-    const mySession = this.state.session;
+  leaveSession() {
+    try {
+      const { mySessionId, token, session, mainStreamManager, publisher } =
+        this.state;
 
-    if (mySession) {
-      if (this.state.mainStreamManager === this.state.publisher) {
-        await this.props.leaveVideoRoom(
-          this.state.mySessionId,
-          this.state.token
-        );
-        mySession.streamManagers.forEach((streamManager) => {
-          mySession.forceUnpublish(streamManager);
-        });
+      if (session) {
+        this.props.leaveVideoRoom(mySessionId, token);
+        if (mainStreamManager === publisher) {
+          session.streamManagers.forEach((streamManager) => {
+            session.forceUnpublish(streamManager);
+          });
+        }
+
+        session.disconnect();
       }
-      mySession.disconnect();
+
+      this.setState({
+        session: undefined,
+        subscribers: [],
+        mySessionId: "",
+        myUserName: "",
+        mainStreamManager: undefined,
+        publisher: undefined,
+        isLeaveDialogOpen: false,
+      });
+
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error leaving the session:", error);
     }
-
-    this.OV = null;
-    this.setState({
-      session: undefined,
-      subscribers: [],
-      mySessionId: "SessionA",
-      myUserName: "Participant" + Math.floor(Math.random() * 100),
-      mainStreamManager: undefined,
-      publisher: undefined,
-      isLeaveDialogOpen: false,
-    });
-
-    window.location.href = "/";
   }
 
   handleOpenEndSessionDialog() {
@@ -317,7 +325,7 @@ class Video extends Component {
       subscribers,
       isLeaveDialogOpen,
       endSessionDialogOpen,
-      loading, // 로딩 상태 추가
+      loading,
     } = this.state;
 
     return (
@@ -325,7 +333,7 @@ class Video extends Component {
         <Grid container spacing={2} style={{ marginTop: 16 }}>
           <Grid item xs={12}>
             <Paper style={{ position: "relative", height: "80vh" }}>
-              {loading ? ( // 로딩 상태일 때 표시할 내용
+              {loading ? (
                 <Box
                   style={{
                     position: "absolute",

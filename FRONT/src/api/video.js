@@ -8,7 +8,7 @@ export const getToken = async (id) => {
 };
 
 export const removeToken = async (id, token) => {
-  const response = await Axios.delete("/webrtcs/remove-token", {
+  const response = await Axios.post("/webrtcs/remove-token", {
     reservationId: id,
     token: token,
   });
