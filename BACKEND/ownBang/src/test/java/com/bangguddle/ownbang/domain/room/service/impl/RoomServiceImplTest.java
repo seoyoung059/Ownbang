@@ -4,6 +4,7 @@ import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.bookmark.entity.Bookmark;
 import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
+import com.bangguddle.ownbang.domain.review.repository.ReviewRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
@@ -46,6 +47,8 @@ class RoomServiceImplTest {
     @Mock
     private BookmarkRepository bookmarkRepository;
 
+    @Mock
+    private ReviewRepository reviewRepository;
 
     @Mock
     private AgentRepository agentRepository;
@@ -168,10 +171,13 @@ class RoomServiceImplTest {
 //                .roomAppliances(RoomAppliances.builder().build())
 //                .build();
         Room room = mock(Room.class);
+        User user = mock(User.class);
         Agent agent = mock(Agent.class); RoomDetail roomDetail = mock(RoomDetail.class); RoomAppliances roomAppliances = mock(RoomAppliances.class);
         Long roomId = 1L, userId = 1L, agentId = 1L;
         when(room.getId()).thenReturn(roomId);
-        when(room.getAgent()).thenReturn(agent); when(room.getRoomDetail()).thenReturn(roomDetail);
+        when(room.getAgent()).thenReturn(agent);
+        when(agent.getUser()).thenReturn(user);
+        when(room.getRoomDetail()).thenReturn(roomDetail);
         when(room.getRoomAppliances()).thenReturn(roomAppliances);
         when(agent.getId()).thenReturn(agentId);
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));

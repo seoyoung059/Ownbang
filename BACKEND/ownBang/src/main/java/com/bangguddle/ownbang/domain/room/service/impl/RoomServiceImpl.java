@@ -1,8 +1,10 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
+import com.bangguddle.ownbang.domain.agent.dto.AgentResponse;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
+import com.bangguddle.ownbang.domain.review.repository.ReviewRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
@@ -35,6 +37,7 @@ public class RoomServiceImpl implements RoomService {
     private final RoomImageService roomImageService;
     private final AgentRepository agentRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final ReviewRepository reviewRepository;
 
     /**
      * 매물 생성 Service 메서드
@@ -124,7 +127,9 @@ public class RoomServiceImpl implements RoomService {
         if(userId!=null){
             isBookmarked = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId).isPresent();
         }
-        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room, isBookmarked));
+        Agent agent = room.getAgent();
+        AgentResponse agentResponse = AgentResponse.from(agent, reviewRepository.calculateAverageStarRatingByAgentId(agent.getId()));
+        return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room, agentResponse, isBookmarked));
     }
 
     /**
