@@ -250,11 +250,11 @@ class RoomControllerTest {
         SuccessResponse<RoomSearchResponse> successResponse = new SuccessResponse<>(ROOM_FIND_SUCCESS, roomSearchResponse);
 
         // when
-        when(roomServiceImpl.getRoom(anyLong())).thenReturn(successResponse);
+        when(roomServiceImpl.getRoom(any(), anyLong())).thenReturn(successResponse);
 
         //then
         mockMvc.perform(
-                        get("/rooms/{roomId}", String.valueOf(roomId))
+                        get("/rooms/search/{roomId}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
                 .andDo(print())
@@ -272,11 +272,11 @@ class RoomControllerTest {
         SuccessResponse<RoomSearchResponse> successResponse = new SuccessResponse<>(ROOM_FIND_SUCCESS, roomSearchResponse);
 
         // when
-        when(roomServiceImpl.getRoom(anyLong())).thenReturn(successResponse);
+        when(roomServiceImpl.getRoom(any(), anyLong())).thenReturn(successResponse);
 
         //then
         mockMvc.perform(
-                        get("/rooms/{roomId}", String.valueOf(roomId))
+                        get("/rooms/search/{roomId}", String.valueOf(roomId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf()
                                 ))
                 .andExpect(status().isBadRequest())
