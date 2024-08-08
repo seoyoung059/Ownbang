@@ -14,7 +14,7 @@ export const createRealEstateSlice = (set) => ({
   },
   getRoom: async (roomNum) => {
     const result = await getRealEstateDetail(roomNum);
-    console.log(result);
+    // console.log(result);
     set({ room: result.data });
   },
 });
