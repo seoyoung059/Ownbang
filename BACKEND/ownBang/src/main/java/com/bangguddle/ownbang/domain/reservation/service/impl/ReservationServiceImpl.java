@@ -16,10 +16,14 @@ import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.video.entity.Video;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
+import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
+import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcSessionServiceImpl;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import io.openvidu.java.client.Session;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +50,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final AgentWorkhourRepository agentWorkhourRepository;
     private final VideoRepository videoRepository;
     private final AgentRepository agentRepository;
+    private final WebrtcSessionService webrtcSessionService;
 
     @Override
     @Transactional
@@ -85,21 +90,23 @@ public class ReservationServiceImpl implements ReservationService {
             return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
         }
 
-        List<Reservation> updatedReservations = new ArrayList<>();
+        List<ReservationResponse> updatedReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {
+            boolean enstance = false;
             if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
                 Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
                 if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED) {
                     Reservation updatedReservation = reservation.completeStatus();
-                    reservationRepository.save(updatedReservation);  // 상태 변경을 데이터베이스에 반영
-                    updatedReservations.add(updatedReservation);
-                } else {
-                    updatedReservations.add(reservation);
+                    reservationRepository.save(updatedReservation);
+                    reservation = updatedReservation;
                 }
-            } else {
 
-                updatedReservations.add(reservation);
+                // 중개인이 세션을 생성했는지 확인
+                Optional<Session> session = webrtcSessionService.getSession(reservation.getId());
+                enstance = session.isPresent();
             }
+
+            updatedReservations.add(ReservationResponse.from(reservation, enstance));
         }
 
         ReservationListResponse reservationListResponse = ReservationListResponse.from(updatedReservations);

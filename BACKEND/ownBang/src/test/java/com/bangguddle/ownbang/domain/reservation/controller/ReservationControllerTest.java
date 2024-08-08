@@ -96,9 +96,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         LocalDateTime now = LocalDateTime.now();
         String officeName = "공인중개사 이름";
 
-        ReservationResponse reservation1 = new ReservationResponse(1L, officeName, now, ReservationStatus.APPLYED, 1L, userId);
-        ReservationResponse reservation2 = new ReservationResponse(2L, officeName, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId);
-        ReservationResponse reservation3 = new ReservationResponse(3L, officeName, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId);
+        ReservationResponse reservation1 = new ReservationResponse(1L, officeName, now, ReservationStatus.APPLYED, 1L, userId, false);
+        ReservationResponse reservation2 = new ReservationResponse(2L, officeName, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId, true);
+        ReservationResponse reservation3 = new ReservationResponse(3L, officeName, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId, false);
 
         List<ReservationResponse> reservations = List.of(reservation1, reservation2, reservation3);
         ReservationListResponse listResponse = new ReservationListResponse(reservations);
@@ -117,10 +117,51 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(jsonPath("$.data.reservations", hasSize(3)))
                 .andExpect(jsonPath("$.data.reservations[0].id").value(1))
                 .andExpect(jsonPath("$.data.reservations[0].status").value(ReservationStatus.APPLYED.toString()))
+                .andExpect(jsonPath("$.data.reservations[0].enstance").value(false))
                 .andExpect(jsonPath("$.data.reservations[1].id").value(2))
                 .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.CONFIRMED.toString()))
+                .andExpect(jsonPath("$.data.reservations[1].enstance").value(true))
                 .andExpect(jsonPath("$.data.reservations[2].id").value(3))
-                .andExpect(jsonPath("$.data.reservations[2].status").value(ReservationStatus.COMPLETED.toString()));
+                .andExpect(jsonPath("$.data.reservations[2].status").value(ReservationStatus.COMPLETED.toString()))
+                .andExpect(jsonPath("$.data.reservations[2].enstance").value(false));
+    }
+
+    @Test
+    @DisplayName("사용자 예약 목록 조회 성공 - COMPLETED 상태 포함")
+    @WithMockUser
+    void getReservationsByUserId_Success_WithCompletedStatus() throws Exception {
+        Long userId = 1L;
+        LocalDateTime now = LocalDateTime.now();
+        String officeName = "공인중개사 이름";
+
+        ReservationResponse reservation1 = new ReservationResponse(1L, officeName, now, ReservationStatus.APPLYED, 1L, userId, false);
+        ReservationResponse reservation2 = new ReservationResponse(2L, officeName, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId, true);
+        ReservationResponse reservation3 = new ReservationResponse(3L, officeName, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId, false);
+
+        List<ReservationResponse> reservations = List.of(reservation1, reservation2, reservation3);
+        ReservationListResponse listResponse = new ReservationListResponse(reservations);
+        SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);
+
+        when(reservationService.getMyReservationList(any())).thenReturn(successResponse);
+
+        mockMvc.perform(get("/reservations/list")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.code").value(RESERVATION_LIST_SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value(RESERVATION_LIST_SUCCESS.getMessage()))
+                .andExpect(jsonPath("$.data.reservations").isArray())
+                .andExpect(jsonPath("$.data.reservations", hasSize(3)))
+                .andExpect(jsonPath("$.data.reservations[0].id").value(1))
+                .andExpect(jsonPath("$.data.reservations[0].status").value(ReservationStatus.APPLYED.toString()))
+                .andExpect(jsonPath("$.data.reservations[0].enstance").value(false))
+                .andExpect(jsonPath("$.data.reservations[1].id").value(2))
+                .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.CONFIRMED.toString()))
+                .andExpect(jsonPath("$.data.reservations[1].enstance").value(true))
+                .andExpect(jsonPath("$.data.reservations[2].id").value(3))
+                .andExpect(jsonPath("$.data.reservations[2].status").value(ReservationStatus.COMPLETED.toString()))
+                .andExpect(jsonPath("$.data.reservations[2].enstance").value(false));
     }
 
 
@@ -163,43 +204,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(jsonPath("$.code").value(RESERVATION_UPDATE_STATUS_SUCCESS.name()))
                 .andExpect(jsonPath("$.data").value("NONE"))
                 .andDo(print());
-    }
-
-
-
-    @Test
-    @DisplayName("사용자 예약 목록 조회 성공 - COMPLETED 상태 포함")
-    @WithMockUser
-    void getReservationsByUserId_Success_WithCompletedStatus() throws Exception {
-        Long userId = 1L;
-        LocalDateTime now = LocalDateTime.now();
-        String officeName = "공인중개사 이름";
-
-        ReservationResponse reservation1 = new ReservationResponse(1L, officeName, now, ReservationStatus.APPLYED, 1L, userId);
-        ReservationResponse reservation2 = new ReservationResponse(2L, officeName, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId);
-        ReservationResponse reservation3 = new ReservationResponse(3L, officeName, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId);
-
-        List<ReservationResponse> reservations = List.of(reservation1, reservation2, reservation3);
-        ReservationListResponse listResponse = new ReservationListResponse(reservations);
-        SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);
-
-        when(reservationService.getMyReservationList(eq(userId))).thenReturn(successResponse);
-
-        mockMvc.perform(get("/reservations/list")
-                        .param("userId", String.valueOf(userId)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(jsonPath("$.code").value(RESERVATION_LIST_SUCCESS.name()))
-                .andExpect(jsonPath("$.message").value(RESERVATION_LIST_SUCCESS.getMessage()))
-                .andExpect(jsonPath("$.data.reservations").isArray())
-                .andExpect(jsonPath("$.data.reservations", hasSize(3)))
-                .andExpect(jsonPath("$.data.reservations[0].id").value(1))
-                .andExpect(jsonPath("$.data.reservations[0].status").value(ReservationStatus.APPLYED.toString()))
-                .andExpect(jsonPath("$.data.reservations[1].id").value(2))
-                .andExpect(jsonPath("$.data.reservations[1].status").value(ReservationStatus.CONFIRMED.toString()))
-                .andExpect(jsonPath("$.data.reservations[2].id").value(3))
-                .andExpect(jsonPath("$.data.reservations[2].status").value(ReservationStatus.COMPLETED.toString()));
     }
 
     @Test

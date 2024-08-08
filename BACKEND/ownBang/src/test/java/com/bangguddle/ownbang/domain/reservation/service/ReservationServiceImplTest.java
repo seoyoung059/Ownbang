@@ -16,9 +16,11 @@ import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.video.entity.Video;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
+import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import io.openvidu.java.client.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,6 +51,9 @@ class ReservationServiceImplTest {
 
     @Mock
     private ReservationRepository reservationRepository;
+
+    @Mock
+    private WebrtcSessionService webrtcSessionService;
 
     @Mock
     private AgentRepository agentRepository;
@@ -118,9 +123,10 @@ class ReservationServiceImplTest {
         assertThat(exception.getErrorCode()).isEqualTo(RESERVATION_DUPLICATED);
     }
 
+
     @Test
-    @DisplayName("예약 목록 조회 성공 (비디오 상태 포함)")
-    void getMyReservationList_SuccessWithVideoStatus() {
+    @DisplayName("예약 목록 조회 성공 (비디오 상태 및 enstance 포함)")
+    void getMyReservationList_SuccessWithVideoStatusAndEnstance() {
         Long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
         Agent agent = mock(Agent.class);
@@ -131,6 +137,9 @@ class ReservationServiceImplTest {
         when(videoRepository.findByReservationId(1L)).thenReturn(Optional.empty());
         when(videoRepository.findByReservationId(2L)).thenReturn(Optional.of(new Video(reservation2, "url", VideoStatus.RECORDED)));
 
+        when(webrtcSessionService.getSession(1L)).thenReturn(Optional.empty());
+        when(webrtcSessionService.getSession(2L)).thenReturn(Optional.of(mock(Session.class)));
+
         SuccessResponse<ReservationListResponse> response = reservationService.getMyReservationList(userId);
 
         assertThat(response).isNotNull();
@@ -138,8 +147,8 @@ class ReservationServiceImplTest {
         assertThat(response.data().reservations().size()).isEqualTo(2);
 
         List<ReservationResponse> expectedResponses = List.of(
-                ReservationResponse.from(reservation1),
-                ReservationResponse.from(reservation2.completeStatus())
+                ReservationResponse.from(reservation1, false),
+                ReservationResponse.from(reservation2.completeStatus(), true)
         );
 
         assertThat(response.data().reservations())
@@ -147,9 +156,11 @@ class ReservationServiceImplTest {
                 .ignoringFields("id")
                 .isEqualTo(expectedResponses);
 
-        // 추가적으로 상태 변경을 명시적으로 확인
+        // 추가적으로 상태 변경과 enstance를 명시적으로 확인
         assertThat(response.data().reservations().get(0).status()).isEqualTo(ReservationStatus.APPLYED);
+        assertThat(response.data().reservations().get(0).enstance()).isFalse();
         assertThat(response.data().reservations().get(1).status()).isEqualTo(ReservationStatus.COMPLETED);
+        assertThat(response.data().reservations().get(1).enstance()).isTrue();
     }
 
     @Test
