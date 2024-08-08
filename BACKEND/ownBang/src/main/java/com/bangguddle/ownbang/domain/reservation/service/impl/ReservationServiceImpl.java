@@ -1,7 +1,9 @@
 package com.bangguddle.ownbang.domain.reservation.service.impl;
 
-import com.bangguddle.ownbang.domain.agent.entity.AgentWorkhour;
-import com.bangguddle.ownbang.domain.agent.repository.AgentWorkhourRepository;
+import com.bangguddle.ownbang.domain.agent.entity.Agent;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
+import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
+import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
 import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeRequest;
 import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
@@ -46,12 +48,16 @@ public class ReservationServiceImpl implements ReservationService {
     private final UserRepository userRepository;
     private final AgentWorkhourRepository agentWorkhourRepository;
     private final VideoRepository videoRepository;
+    private final AgentRepository agentRepository;
 
     @Override
     @Transactional
-    public SuccessResponse<NoneResponse> createReservation(ReservationRequest reservationRequest) {
+    public SuccessResponse<NoneResponse> createReservation(Long userId, ReservationRequest reservationRequest) {
+
         Long roomId = reservationRequest.roomId();
-        Long userId = reservationRequest.userId();
+        // Room과 User 객체 조회
+        Room room = roomRepository.getById(roomId);
+        User user = userRepository.getById(userId);
         LocalDateTime reservationTime = reservationRequest.reservationTime();
 
         // 룸 ID와 시간이 일치하는 예약이 이미 존재하는지 확인
@@ -60,16 +66,11 @@ public class ReservationServiceImpl implements ReservationService {
         if (existingReservation.isPresent()) {
             throw new AppException(RESERVATION_DUPLICATED); // 이미 예약이 존재하는 경우
         }
-
         // 이미 내가 예약한 매물이라면,
         Optional<Reservation> completedReservation = reservationRepository.findByRoomIdAndUserIdAndStatusNot(roomId, userId, ReservationStatus.CANCELLED);
         if (completedReservation.isPresent()) {
             throw new AppException(RESERVATION_COMPLETED); // 이미 예약이 존재하는 경우
         }
-
-        // Room과 User 객체 조회
-        Room room = roomRepository.getById(roomId);
-        User user = userRepository.getById(userId);
 
         // 새 예약 저장
         Reservation reservation = reservationRequest.toEntity(room, user);
@@ -81,6 +82,7 @@ public class ReservationServiceImpl implements ReservationService {
     // 예약 목록 조회
     @Transactional
     public SuccessResponse<ReservationListResponse> getMyReservationList(Long userId) {
+        User user = userRepository.getById(userId);
         List<Reservation> reservations = reservationRepository.findByUserId(userId);
         if (reservations == null || reservations.isEmpty()) {
             return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
@@ -108,9 +110,11 @@ public class ReservationServiceImpl implements ReservationService {
 
     // 예약 철회 시 사용
     @Transactional
-    public SuccessResponse<NoneResponse> updateStatusReservation(Long id) {
+    public SuccessResponse<NoneResponse> updateStatusReservation(Long userId, Long id) {
         Reservation reservation = vaildateReservation(id);
-
+        if(reservation.getUser().getId()!=userId){
+            throw new AppException(ACCESS_DENIED);
+        }
         // 이미 취소된 예약인지 확인
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
             throw new AppException(RESERVATION_CANCELLED_DUPLICATED);
@@ -137,9 +141,11 @@ public class ReservationServiceImpl implements ReservationService {
 
     // 예약 확정 시 사용
     @Transactional
-    public SuccessResponse<NoneResponse> confirmStatusReservation(Long id) {
+    public SuccessResponse<NoneResponse> confirmStatusReservation(Long userId, Long id) {
         Reservation reservation = vaildateReservation(id);
-
+        if(reservation.getUser().getId()!=userId){
+            throw new AppException(ACCESS_DENIED);
+        }
         // 취소된 예약이라면 확정할 수 없다.
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
             throw new AppException(RESERVATION_CONFIRMED_UNAVAILABLE);
@@ -166,7 +172,10 @@ public class ReservationServiceImpl implements ReservationService {
     }
     // 중개인 예약 목록조회
     @Transactional
-    public SuccessResponse<ReservationListResponse> getAgentReservations(Long agentId) {
+    public SuccessResponse<ReservationListResponse> getAgentReservations(Long userId) {
+        User user = userRepository.getById(userId);
+        Agent agent = agentRepository.getByUserId(userId);
+        Long agentId = agent.getId();
         LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         List<Reservation> reservations = reservationRepository.findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(agentId, today);
 
@@ -200,11 +209,14 @@ public class ReservationServiceImpl implements ReservationService {
     public SuccessResponse<AvailableTimeResponse> getAvailableTimes(AvailableTimeRequest request) {
         Room room = roomRepository.findById(request.roomId())
                 .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
-
-        AgentWorkhour.Day dayOfWeek = getDayCategory(request.date());
-        AgentWorkhour workhour = agentWorkhourRepository.findByAgentAndDay(room.getAgent(), dayOfWeek);
-        LocalTime startTime = LocalTime.parse(workhour.getStartTime());
-        LocalTime endTime = LocalTime.parse(workhour.getEndTime());
+        AgentWorkhour workhour = agentWorkhourRepository.findByAgent(room.getAgent())
+                .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
+        LocalTime startTime = LocalTime.parse(workhour.getWeekdayStartTime());
+        LocalTime endTime = LocalTime.parse(workhour.getWeekdayEndTime() );
+        if (getDayCategory(request.date())=="WEEKEND"){
+            startTime = LocalTime.parse(workhour.getWeekendStartTime());
+            endTime = LocalTime.parse(workhour.getWeekendEndTime());
+        }
 
         List<LocalTime> allPossibleTimes = generateTimeSlots(startTime, endTime);
         List<LocalTime> bookedTimes = reservationRepository.findConfirmedReservationTimes(request.roomId(), request.date());
@@ -218,15 +230,15 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(AVAILABLE_TIMES_RETRIEVED, new AvailableTimeResponse(availableTimes));
     }
 
-    private AgentWorkhour.Day getDayCategory(LocalDate date) {
+    private String getDayCategory(LocalDate date) {
         // 날짜에 따라 주말, 주중인지 파악
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         switch (dayOfWeek) {
             case SATURDAY:
             case SUNDAY:
-                return AgentWorkhour.Day.WEEKEND;
+                return "WEEKEND";
             default:
-                return AgentWorkhour.Day.WEEKDAY;
+                return "WEEKDAY";
         }
     }
 

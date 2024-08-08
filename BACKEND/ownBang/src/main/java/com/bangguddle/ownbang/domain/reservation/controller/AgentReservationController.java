@@ -7,6 +7,7 @@ import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,14 +18,14 @@ public class AgentReservationController {
 
     // 예약 확정
     @PatchMapping("/{id}")
-    public ResponseEntity<Response<NoneResponse>> confirmStatusReservation(@PathVariable(name="id") Long id) {
-        SuccessResponse<NoneResponse> response = reservationService.confirmStatusReservation(id);
+    public ResponseEntity<Response<NoneResponse>> confirmStatusReservation(@AuthenticationPrincipal Long userId, @PathVariable(name="id") Long id) {
+        SuccessResponse<NoneResponse> response = reservationService.confirmStatusReservation(userId, id);
         return Response.success(response);
     }
     // 예약 조회
     @GetMapping
-    public ResponseEntity<Response<ReservationListResponse>> getAgentReservations(@RequestParam(name="agentId") Long agentId) {
-        SuccessResponse<ReservationListResponse> response = reservationService.getAgentReservations(agentId);
+    public ResponseEntity<Response<ReservationListResponse>> getAgentReservations(@AuthenticationPrincipal Long userId) {
+        SuccessResponse<ReservationListResponse> response = reservationService.getAgentReservations(userId);
         return Response.success(response);
     }
 

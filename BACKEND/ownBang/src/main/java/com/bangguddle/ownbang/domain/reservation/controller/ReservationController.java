@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,20 +25,21 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @PostMapping("/")
-    public ResponseEntity<Response<NoneResponse>> createReservation(@Valid @RequestBody ReservationRequest reservationRequest) {
-        SuccessResponse<NoneResponse> response = reservationService.createReservation(reservationRequest);
+    public ResponseEntity<Response<NoneResponse>> createReservation(@AuthenticationPrincipal Long userId,
+                                                                    @Valid @RequestBody ReservationRequest reservationRequest) {
+        SuccessResponse<NoneResponse> response = reservationService.createReservation(userId, reservationRequest);
         return Response.success(response);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Response<ReservationListResponse>> getMyReservationList (@RequestParam(name="userId") Long userId) {
+    public ResponseEntity<Response<ReservationListResponse>> getMyReservationList (@AuthenticationPrincipal Long userId) {
         SuccessResponse<ReservationListResponse> response = reservationService.getMyReservationList (userId);
         return Response.success(response);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Response<NoneResponse>> updateStatusReservation(@PathVariable(name="id") Long id) {
-        SuccessResponse<NoneResponse> response = reservationService.updateStatusReservation(id);
+    public ResponseEntity<Response<NoneResponse>> updateStatusReservation(@PathVariable(name="id") Long id, @AuthenticationPrincipal Long userId) {
+        SuccessResponse<NoneResponse> response = reservationService.updateStatusReservation(userId, id);
         return Response.success(response);
     }
 

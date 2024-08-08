@@ -35,6 +35,7 @@ public class SecurityConfig {
             "/videos",
             "/mypage",
             "/checklists/**",
+            "/reservations",
             "/auths/password-change",
             "/search/**"
     };
@@ -42,6 +43,8 @@ public class SecurityConfig {
             /* 중개인 권한 필요 URL */
             "/rooms/agents/**",
             "/agents/mypage",
+            "/agents/reservations",
+            "agents/workhour"
     };
     private final UserDetailsService userDetailsService;
     private final JwtTokenFilter jwtTokenFilter;
