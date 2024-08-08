@@ -47,7 +47,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             "/mypage",
             "/checklists",
             "/auths/password-change",
-            "/reviews"
+            "/reviews",
+            "/room",
             "/reservations"
     };
     private static final String[] REQUIRE_AGENT_ARRAY = {

@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 
 @Builder
 public record RoomSearchResponse(
-//        User agent,
+        Long id,
+        Long agentId,
         Float latitude,
         Float longitude,
         DealType dealType,
@@ -36,14 +37,17 @@ public record RoomSearchResponse(
         String road,
         String detailAddress,
         String profileImageUrl,
+        Boolean isBookmarked,
         RoomAppliancesSearchResponse roomAppliancesSearchResponse,
         RoomDetailSearchResponse roomDetailSearchResponse,
         @Valid
         List<RoomImageResponse> roomImageResponses
 ) {
 
-    static public RoomSearchResponse from(Room room) {
+    static public RoomSearchResponse from(Room room, Boolean isBookmarked) {
         return RoomSearchResponse.builder()
+                .id(room.getId())
+                .agentId(room.getAgent().getId())
                 .latitude(room.getLatitude())
                 .longitude(room.getLongitude())
                 .dealType(room.getDealType())
@@ -64,7 +68,8 @@ public record RoomSearchResponse(
                 .roomDetailSearchResponse(RoomDetailSearchResponse.from(room.getRoomDetail()))
                 .roomImageResponses(room.getRoomImages().stream()
                         .map(RoomImageResponse::from)
-                .collect(Collectors.toList()))
+                        .collect(Collectors.toList()))
+                .isBookmarked(isBookmarked)
                 .build();
     }
 }
