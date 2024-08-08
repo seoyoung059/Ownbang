@@ -36,6 +36,11 @@ public enum SuccessCode implements ResponseCode {
     ROOM_FIND_SUCCESS(HttpStatus.OK, "해당하는 ID의 매물을 찾았습니다."),
     SEARCH_ROOM_SUCCESS(HttpStatus.OK, "매물 검색에 성공했습니다."),
 
+    // Review API
+    REVIEW_FIND_SUCCESS(HttpStatus.OK, "해당 중개인의 리뷰 목록 조회가 성공적으로 완료되었습니다."),
+    REVIEW_CREATE_SUCCESS(HttpStatus.CREATED, "리뷰가 성공적으로 등록되었습니다."),
+    REVIEW_DELETE_SUCCESS(HttpStatus.OK, "리뷰가 성공적으로 삭제되었습니다."),
+
     // Bookmark API
     BOOKMARK_CREATE_SUCCESS(HttpStatus.CREATED, "북마크가 성공적으로 등록되었습니다."),
     BOOKMARK_DELETE_SUCCESS(HttpStatus.OK, "북마크가 성공적으로 삭제되었습니다."),
