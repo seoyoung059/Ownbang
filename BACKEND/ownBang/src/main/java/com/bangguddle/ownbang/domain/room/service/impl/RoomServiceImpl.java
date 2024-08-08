@@ -3,6 +3,8 @@ package com.bangguddle.ownbang.domain.room.service.impl;
 import com.bangguddle.ownbang.domain.agent.dto.AgentResponse;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
+import com.bangguddle.ownbang.domain.bookmark.repository.BookmarkRepository;
+import com.bangguddle.ownbang.domain.review.repository.ReviewRepository;
 import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
@@ -35,6 +37,7 @@ public class RoomServiceImpl implements RoomService {
     private final RoomImageService roomImageService;
     private final AgentRepository agentRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final ReviewRepository reviewRepository;
 
     /**
      * 매물 생성 Service 메서드
@@ -125,7 +128,7 @@ public class RoomServiceImpl implements RoomService {
             isBookmarked = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId).isPresent();
         }
         Agent agent = room.getAgent();
-        AgentResponse agentResponse = AgentResponse.from(agent, reviewReposiory.getRating(agent.getId()));
+        AgentResponse agentResponse = AgentResponse.from(agent, reviewRepository.calculateAverageStarRatingByAgentId(agent.getId()));
         return new SuccessResponse<>(ROOM_FIND_SUCCESS, RoomSearchResponse.from(room, agentResponse, isBookmarked));
     }
 
@@ -142,7 +145,7 @@ public class RoomServiceImpl implements RoomService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         List<RoomInfoSearchResponse> list = roomRepository.getByAgentId(agent.getId(), pageable).stream()
                 .map((room)->{
-                    RoomInfoSearchResponse.from(room, false);
+                    return RoomInfoSearchResponse.from(room, false);
                 })
                 .toList();
         return new SuccessResponse<>(ROOM_FIND_SUCCESS, list);
