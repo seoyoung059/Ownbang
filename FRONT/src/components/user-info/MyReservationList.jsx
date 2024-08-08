@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   TableContainer,
   Table,
@@ -7,43 +7,48 @@ import {
   TableCell,
   TableBody,
   Paper,
+  CircularProgress,
+  Typography,
 } from "@mui/material";
 import MyReservationItem from "./MyReservationItem";
 import { useMediaQuery, useTheme } from "@mui/material";
-
-const reservations = [
-  {
-    id: 1,
-    image: "https://via.placeholder.com/150",
-    date: "2024.06.26",
-    time: "16:00 ~ 16:30",
-    agent: "김준영 (행복덕방)",
-    status: "확정",
-    statusColor: "success",
-  },
-  {
-    id: 2,
-    image: "https://via.placeholder.com/150",
-    date: "2024.06.27",
-    time: "15:30 ~ 16:00",
-    agent: "이소희 (복덩이)",
-    status: "취소",
-    statusColor: "error",
-  },
-  {
-    id: 3,
-    image: "https://via.placeholder.com/150",
-    date: "2024.06.27",
-    time: "16:00 ~ 16:30",
-    agent: "김서영 (서영이네)",
-    status: "대기",
-    statusColor: "warning",
-  },
-];
+import { useBoundStore } from "../../store/store";
 
 function MyReservationList() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const { getReservationList, reservations } = useBoundStore((state) => ({
+    getReservationList: state.getReservationList,
+    reservations: state.reservations,
+  }));
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchReservations = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        await getReservationList();
+      } catch (error) {
+        setError("Failed to fetch reservations. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReservations();
+  }, [getReservationList]);
+
+  if (loading) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
 
   return (
     <TableContainer component={Paper}>
