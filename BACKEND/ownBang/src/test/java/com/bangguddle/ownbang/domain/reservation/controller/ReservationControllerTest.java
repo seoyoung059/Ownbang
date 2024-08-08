@@ -94,10 +94,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     void getMyReservationList_Success() throws Exception {
         Long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
+        String officeName = "공인중개사 이름";
 
-        ReservationResponse reservation1 = new ReservationResponse(1L, now, ReservationStatus.APPLYED, 1L, userId);
-        ReservationResponse reservation2 = new ReservationResponse(2L, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId);
-        ReservationResponse reservation3 = new ReservationResponse(3L, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId);
+        ReservationResponse reservation1 = new ReservationResponse(1L, officeName, now, ReservationStatus.APPLYED, 1L, userId);
+        ReservationResponse reservation2 = new ReservationResponse(2L, officeName, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId);
+        ReservationResponse reservation3 = new ReservationResponse(3L, officeName, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId);
 
         List<ReservationResponse> reservations = List.of(reservation1, reservation2, reservation3);
         ReservationListResponse listResponse = new ReservationListResponse(reservations);
@@ -172,10 +173,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     void getReservationsByUserId_Success_WithCompletedStatus() throws Exception {
         Long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
+        String officeName = "공인중개사 이름";
 
-        ReservationResponse reservation1 = new ReservationResponse(1L, now, ReservationStatus.APPLYED, 1L, userId);
-        ReservationResponse reservation2 = new ReservationResponse(2L, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId);
-        ReservationResponse reservation3 = new ReservationResponse(3L, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId);
+        ReservationResponse reservation1 = new ReservationResponse(1L, officeName, now, ReservationStatus.APPLYED, 1L, userId);
+        ReservationResponse reservation2 = new ReservationResponse(2L, officeName, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userId);
+        ReservationResponse reservation3 = new ReservationResponse(3L, officeName, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userId);
 
         List<ReservationResponse> reservations = List.of(reservation1, reservation2, reservation3);
         ReservationListResponse listResponse = new ReservationListResponse(reservations);

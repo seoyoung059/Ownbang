@@ -123,8 +123,9 @@ class ReservationServiceImplTest {
     void getMyReservationList_SuccessWithVideoStatus() {
         Long userId = 1L;
         LocalDateTime now = LocalDateTime.now();
-        Reservation reservation1 = Reservation.builder().id(1L).room(Room.builder().build()).user(User.builder().build()).reservationTime(now).status(ReservationStatus.APPLYED).build();
-        Reservation reservation2 = Reservation.builder().id(2L).room(Room.builder().build()).user(User.builder().build()).reservationTime(now.plusDays(1)).status(ReservationStatus.CONFIRMED).build();
+        Agent agent = mock(Agent.class);
+        Reservation reservation1 = Reservation.builder().id(1L).room(Room.builder().agent(agent).build()).user(User.builder().build()).reservationTime(now).status(ReservationStatus.APPLYED).build();
+        Reservation reservation2 = Reservation.builder().id(2L).room(Room.builder().agent(agent).build()).user(User.builder().build()).reservationTime(now.plusDays(1)).status(ReservationStatus.CONFIRMED).build();
 
         when(reservationRepository.findByUserId(anyLong())).thenReturn(List.of(reservation1, reservation2));
         when(videoRepository.findByReservationId(1L)).thenReturn(Optional.empty());
@@ -315,6 +316,9 @@ class ReservationServiceImplTest {
         when(room1.getId()).thenReturn(1L);
         when(room2.getId()).thenReturn(2L);
         when(room3.getId()).thenReturn(3L);
+        when(room1.getAgent()).thenReturn(agent);
+        when(room2.getAgent()).thenReturn(agent);
+        when(room3.getAgent()).thenReturn(agent);
 
         Reservation reservation1 = mock(Reservation.class);
         Reservation reservation2 = mock(Reservation.class);
