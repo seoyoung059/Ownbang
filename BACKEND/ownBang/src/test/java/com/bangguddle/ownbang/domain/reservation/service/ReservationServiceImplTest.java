@@ -510,9 +510,9 @@ class ReservationServiceImplTest {
 
         AgentWorkhour workhour = mock(AgentWorkhour.class);
         when(workhour.getWeekdayStartTime()).thenReturn("09:00");
-        when(workhour.getWeekdayEndTime()).thenReturn("18:00");
-        when(workhour.getWeekendStartTime()).thenReturn("10:30");
-        when(workhour.getWeekendEndTime()).thenReturn("17:00");
+        when(workhour.getWeekdayEndTime()).thenReturn("17:30");
+        when(workhour.getWeekendStartTime()).thenReturn("09:00");
+        when(workhour.getWeekendEndTime()).thenReturn("17:30");
 
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
         when(agentWorkhourRepository.findByAgent(any(Agent.class)))
@@ -525,9 +525,10 @@ class ReservationServiceImplTest {
 
         // Then
         assertThat(response.successCode()).isEqualTo(AVAILABLE_TIMES_RETRIEVED);
-        assertThat(response.data().availableTimes()).hasSize(16); // 9:00부터 17:30까지, 10:00와 14:30 제외
-        assertThat(response.data().availableTimes()).contains("09:00", "09:30", "11:00", "14:00", "15:00", "17:30");
-        assertThat(response.data().availableTimes()).doesNotContain("10:00", "14:30", "18:00");
+        assertThat(response.data().availableTimes()).hasSize(15); // 9:00부터 17:30까지, 10:00와 14:30 제외
+        assertThat(response.data().availableTimes()).contains("09:00", "09:30", "10:30", "11:00", "11:30","12:00", "12:30" , "13:00", "13:30", "14:00", "15:30" , "15:00", "16:00", "16:30", "17:00");
+
+        assertThat(response.data().availableTimes()).doesNotContain("10:00", "14:30");
     }
 
     @Test
