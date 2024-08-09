@@ -63,10 +63,25 @@ function MyReservationList() {
             <TableCell>화상 채팅</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody sx={{ bgcolor: theme.palette.common.white }}>
-          {reservations.map((reservation) => (
-            <MyReservationItem key={reservation.id} reservation={reservation} />
-          ))}
+        <TableBody sx={{ bgcolor: theme.palette.background.default }}>
+          {reservations.length > 0 ? (
+            reservations.map((reservation) => (
+              <MyReservationItem
+                key={reservation.id}
+                reservation={reservation}
+              />
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                align="center"
+                sx={{ bgcolor: theme.palette.background.default }}
+              >
+                <Typography variant="body1">예약이 없습니다.</Typography>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>

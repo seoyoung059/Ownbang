@@ -17,7 +17,11 @@ export const createReservation = (set) => ({
     try {
       const result = await myReservationList();
       console.log("reservation list:", result);
-      set({ reservations: Array.isArray(result) ? result : [] }); // Ensure reservations is always an array
+      set({
+        reservations: Array.isArray(result.data.reservations)
+          ? result.data.reservations
+          : [],
+      });
       return result;
     } catch (error) {
       console.error("Error getting reservation list:", error);

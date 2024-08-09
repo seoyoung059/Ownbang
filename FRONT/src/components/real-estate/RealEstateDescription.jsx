@@ -23,8 +23,8 @@ const InfoItem = ({ icon: Icon, text }) => (
 
 const RealEstateDescription = ({ item }) => {
   const theme = useTheme();
-  // const detailInfo = item.roomDetailSearchResponse;
-  // const appliancesInfo = item.roomAppliancesSearchResponse;
+  const detailInfo = item.roomDetailSearchResponse;
+  const appliancesInfo = item.roomAppliancesSearchResponse;
 
   console.log(item);
   if (!detailInfo) {
@@ -35,8 +35,8 @@ const RealEstateDescription = ({ item }) => {
     return null;
   }
 
-  console.log("Room Detail Info:", detailInfo);
-  console.log("Appliances Info:", appliancesInfo);
+  // console.log("Room Detail Info:", detailInfo);
+  // console.log("Appliances Info:", appliancesInfo);
 
   const infoItems = [
     {
