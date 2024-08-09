@@ -4,10 +4,10 @@ import CropIcon from "@mui/icons-material/Crop";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import DomainIcon from "@mui/icons-material/Domain";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import LaptopChromebookIcon from "@mui/icons-material/LaptopChromebook";
+import ElevatorIcon from "@mui/icons-material/Elevator";
 import { useTheme } from "@mui/material";
 
-const InfoItem = ({ icon: Icon, text, item }) => (
+const InfoItem = ({ icon: Icon, text }) => (
   <Box
     sx={{
       display: "flex",
@@ -23,6 +23,20 @@ const InfoItem = ({ icon: Icon, text, item }) => (
 
 const RealEstateDescription = ({ item }) => {
   const theme = useTheme();
+  const detailInfo = item.roomDetailSearchResponse;
+  const appliancesInfo = item.roomAppliancesSearchResponse;
+
+  console.log(item);
+  if (!detailInfo) {
+    return null;
+  }
+
+  if (!appliancesInfo) {
+    return null;
+  }
+
+  // console.log("Room Detail Info:", detailInfo);
+  // console.log("Appliances Info:", appliancesInfo);
 
   const infoItems = [
     {
@@ -31,19 +45,45 @@ const RealEstateDescription = ({ item }) => {
     },
     {
       icon: MeetingRoomIcon,
-      text: item.structure ? item.structure : "정보 없음",
+      text:
+        item.structure && item.roomType
+          ? `${item.structure} ${item.roomType}`
+          : "정보 없음",
     },
     {
       icon: DomainIcon,
-      // text:
-      //   item.roomFloor && item.totalFloors
-      //     ? `${item.roomFloor}층/${item.totalFloors}층`
-      //     : "정보 없음",
-      text: item.roomFloor ? `${item.roomFloor}층` : "정보 없음",
+      text:
+        item.roomFloor && detailInfo && detailInfo.buildingFloor
+          ? `${item.roomFloor}층/${detailInfo.buildingFloor}층`
+          : "정보 없음",
     },
-    { icon: DirectionsCarIcon, text: item.parking ? "주차 가능" : "주차 불가" },
-    { icon: LaptopChromebookIcon, text: "화상통화 즉시 예약 가능" },
+    {
+      icon: DirectionsCarIcon,
+      text: detailInfo.parking
+        ? `${detailInfo.totalParking}대 주차 가능`
+        : "주차 불가",
+    },
+    {
+      icon: ElevatorIcon,
+      text: detailInfo.elevator ? "엘레베이터 있음" : "엘레베이터 없음",
+    },
   ];
+
+  const applianceText = {
+    bed: "침대",
+    washingMachine: "세탁기",
+    airConditioner: "에어컨",
+    closet: "옷장",
+    desk: "책상",
+    microwave: "전자레인지",
+    refrigerator: "냉장고",
+    chair: "의자",
+  };
+
+  const appliances = Object.keys(appliancesInfo)
+    .filter((key) => appliancesInfo[key])
+    .map((key) => applianceText[key])
+    .join(" ");
 
   return (
     <Box>
@@ -77,6 +117,11 @@ const RealEstateDescription = ({ item }) => {
           <InfoItem key={index} icon={item.icon} text={item.text} />
         ))}
       </Box>
+      {appliances && (
+        <Box sx={{ padding: 2, marginTop: 2 }}>
+          <Typography sx={{}}>구비 완료 | {appliances}</Typography>
+        </Box>
+      )}
     </Box>
   );
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
 import RealEstateSearchBar from "../components/real-estate/RealEstateSearchBar";
 import RealEstateList from "../components/real-estate/RealEstateList";
@@ -15,7 +15,10 @@ const RealEstatePage = () => {
     searchTerm,
     setSearchTerm,
     makeReservation,
-
+    room,
+    getRoom,
+    realEstateData,
+    getAllRoom,
     bookmarkList,
     getBookmarks,
     toggleBookmarks,
@@ -23,7 +26,10 @@ const RealEstatePage = () => {
     searchTerm: state.searchTerm,
     setSearchTerm: state.setSearchTerm,
     makeReservation: state.makeReservation,
-
+    room: state.room,
+    getRoom: state.getRoom,
+    getAllRoom: state.getAllRoom,
+    realEstateData: state.realEstateData,
     bookmarkList: state.bookmarkList,
     getBookmarks: state.getBookmarks,
     toggleBookmarks: state.toggleBookmarks,
@@ -34,13 +40,26 @@ const RealEstatePage = () => {
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
   // const [bookmarkList, setBookmarkList] = React.useState([]);
 
-  // 검색어를 업데이트하는 함수
-  const onSearch = (term) => {
-    setSearchTerm(term);
-  };
+  // 초기 로드 시 전체 매물 불러오기
+  useEffect(() => {
+    getAllRoom();
+  }, [getAllRoom, searchTerm]);
+
+  // 전체 매물 데이터를 visibleMarkers로 설정
+  useEffect(() => {
+    if (realEstateData.data.length > 0) {
+      setVisibleMarkers(realEstateData.data);
+    }
+  }, [realEstateData.data]);
+
+  useEffect(() => {
+    if (selectedItem) {
+      getRoom(selectedItem.id);
+    }
+  }, [selectedItem, getRoom]);
 
   // 매물 리스트에서 선택하는 항목
-  const onSelectItem = (item) => {
+  const onSelectItem = async (item) => {
     setSelectedItem(item);
     setShowReservation(false); // 새로운 아이템 선택 시 예약 창 닫기
   };
@@ -158,7 +177,7 @@ const RealEstatePage = () => {
               <CloseIcon />
             </IconButton>
             <RealEstateDetail
-              item={selectedItem}
+              item={room}
               onOpenReservationCard={onOpenReservationCard}
             />
           </Box>

@@ -12,7 +12,7 @@ const RealEstateList = ({
   toggleBookmarks,
 }) => {
   const theme = useTheme();
-  const [displayedMarkers, setDisplayedMarkers] = useState([]);
+  const [displayedMarkers, setDisplayedMarkers] = useState();
 
   useEffect(() => {
     setDisplayedMarkers(markers);
@@ -40,16 +40,16 @@ const RealEstateList = ({
         bgcolor: theme.palette.background.default,
       }}
     >
-      {displayedMarkers.length > 0 ? (
-        displayedMarkers.map((marker) => (
+      {displayedMarkers &&
+        displayedMarkers.map((marker, index) => (
           <RealEstateItem
-            key={marker.id} // Using marker.id as key
+            key={index}
             marker={marker}
-            toggleFavorite={() => toggleFavorite(marker.id)}
+            toggleFavorite={() => toggleFavorite(index)}
             onClick={() => onSelectItem(marker)}
           />
-        ))
-      ) : (
+        ))}
+      {displayedMarkers && !displayedMarkers.length && (
         <Box
           sx={{
             display: "flex",

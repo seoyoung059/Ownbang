@@ -1,7 +1,7 @@
 import { OpenVidu } from "openvidu-browser";
-import axios from "axios";
 import React, { Component } from "react";
 import UserVideoComponent from "./UserVideoComponent";
+import VideoLoading from "./VideoLoading";
 
 import {
   Container,
@@ -9,9 +9,7 @@ import {
   Paper,
   IconButton,
   Box,
-  TextField,
   Button,
-  Typography,
   Dialog,
   DialogActions,
   DialogContent,
@@ -27,15 +25,13 @@ import {
   ExitToApp,
 } from "@mui/icons-material";
 
-const APPLICATION_SERVER_URL = import.meta.env.VITE_API_URL;
-
 class Video extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      mySessionId: "123",
-      myUserName: "Participant" + Math.floor(Math.random() * 100),
+      mySessionId: "73",
+      myUserName: "",
       session: undefined,
       mainStreamManager: undefined,
       publisher: undefined,
@@ -45,6 +41,7 @@ class Video extends Component {
       isLeaveDialogOpen: false,
       endSessionDialogOpen: false,
       token: undefined,
+      loading: true,
     };
 
     this.joinSession = this.joinSession.bind(this);
@@ -62,8 +59,20 @@ class Video extends Component {
       this.handleCloseEndSessionDialog.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     window.addEventListener("beforeunload", this.onbeforeunload);
+
+    try {
+      await this.props.fetchUser();
+      this.setState({
+        myUserName: this.props.user.isAgent ? "중개인" : "임차인",
+      });
+      if (!this.state.token) {
+        this.joinSession();
+      }
+    } catch (error) {
+      console.error("Failed to fetch user info:", error);
+    }
   }
 
   componentWillUnmount() {
@@ -87,7 +96,6 @@ class Video extends Component {
   }
 
   handleMainVideoStream(stream) {
-    z;
     if (this.state.mainStreamManager !== stream) {
       this.setState({
         mainStreamManager: stream,
@@ -121,7 +129,6 @@ class Video extends Component {
           var subscribers = this.state.subscribers;
           subscribers.push(subscriber);
 
-          // 첫 번째 스트림을 메인 스트림으로 설정
           if (!this.state.mainStreamManager) {
             this.setState({
               mainStreamManager: event.stream.streamManager,
@@ -133,8 +140,11 @@ class Video extends Component {
 
         mySession.on("streamDestroyed", (event) => {
           this.deleteSubscriber(event.stream.streamManager);
-          if (event.stream.streamManager === this.state.mainStreamManager) {
-            this.endSession(); // 메인 스트림이 나가면 세션 종료
+          if (
+            event.stream.streamManager === this.state.mainStreamManager &&
+            !this.props.user.isAgent
+          ) {
+            this.setState({ endSessionDialogOpen: true });
           }
         });
 
@@ -142,10 +152,13 @@ class Video extends Component {
           console.warn(exception);
         });
 
-        this.getToken().then((token) => {
-          this.setState({ token: token }); // 토큰 상태 저장
+        this.props.enterVideoRoom(this.state.mySessionId).then((res) => {
+          this.setState({ token: res.token });
+          if (res.createdAt) {
+            localStorage.setItem("createdAt", res.createdAt);
+          }
           mySession
-            .connect(token, { clientData: this.state.myUserName })
+            .connect(res.token, { clientData: this.state.myUserName })
             .then(async () => {
               let publisher = await this.OV.initPublisherAsync(undefined, {
                 audioSource: undefined,
@@ -176,6 +189,7 @@ class Video extends Component {
                 currentVideoDevice: currentVideoDevice,
                 publisher: publisher,
                 mainStreamManager: this.state.mainStreamManager || publisher,
+                loading: false,
               });
             })
             .catch((error) => {
@@ -202,39 +216,36 @@ class Video extends Component {
     }
   }
 
-  async leaveSession() {
-    const mySession = this.state.session;
+  leaveSession() {
+    try {
+      const { mySessionId, token, session, mainStreamManager, publisher } =
+        this.state;
 
-    if (mySession) {
-      if (this.state.mainStreamManager === this.state.publisher) {
-        await axios
-          .delete(APPLICATION_SERVER_URL + "/api/webrtcs/remove-token", {
-            data: {
-              reservationId: this.state.mySessionId,
-              token: this.state.token,
-            },
-          })
-          .then((res) => console.log(res))
-          .catch((err) => console.error(err));
-        mySession.streamManagers.forEach((streamManager) => {
-          mySession.forceUnpublish(streamManager);
-        });
+      if (session) {
+        this.props.leaveVideoRoom(mySessionId, token);
+        if (mainStreamManager === publisher) {
+          session.streamManagers.forEach((streamManager) => {
+            session.forceUnpublish(streamManager);
+          });
+        }
+
+        session.disconnect();
       }
-      mySession.disconnect();
+
+      this.setState({
+        session: undefined,
+        subscribers: [],
+        mySessionId: "",
+        myUserName: "",
+        mainStreamManager: undefined,
+        publisher: undefined,
+        isLeaveDialogOpen: false,
+      });
+
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error leaving the session:", error);
     }
-
-    this.OV = null;
-    this.setState({
-      session: undefined,
-      subscribers: [],
-      mySessionId: "SessionA",
-      myUserName: "Participant" + Math.floor(Math.random() * 100),
-      mainStreamManager: undefined,
-      publisher: undefined,
-      isLeaveDialogOpen: false,
-    });
-
-    window.location.href = "/";
   }
 
   handleOpenEndSessionDialog() {
@@ -243,7 +254,7 @@ class Video extends Component {
 
   handleCloseEndSessionDialog() {
     this.setState({ endSessionDialogOpen: false });
-    window.location.href = "/"; // 메인 페이지로 이동
+    window.location.href = "/";
   }
 
   endSession() {
@@ -309,137 +320,116 @@ class Video extends Component {
 
   render() {
     const {
-      mySessionId,
-      myUserName,
       mainStreamManager,
       publisher,
       subscribers,
       isLeaveDialogOpen,
       endSessionDialogOpen,
+      loading,
     } = this.state;
 
     return (
       <Container component="main" maxWidth="lg">
-        {this.state.session === undefined ? (
-          <Box mt={8} textAlign="center">
-            <Typography component="h1" variant="h5">
-              Join a video session
-            </Typography>
-            <Box component="form" mt={3} onSubmit={this.joinSession}>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="userName"
-                label="Participant"
-                name="userName"
-                value={myUserName}
-                onChange={this.handleChangeUserName}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="sessionId"
-                label="Session ID"
-                name="sessionId"
-                value={mySessionId}
-                onChange={this.handleChangeSessionId}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Join
-              </Button>
-            </Box>
-          </Box>
-        ) : (
-          <Grid container spacing={2} style={{ marginTop: 16 }}>
-            <Grid item xs={12}>
-              <Paper style={{ position: "relative", height: "80vh" }}>
-                {mainStreamManager && (
-                  <UserVideoComponent
-                    streamManager={mainStreamManager}
-                    isMain={true}
-                  />
-                )}
-                {publisher !== mainStreamManager && (
-                  <Box
-                    style={{
-                      position: "absolute",
-                      bottom: 16,
-                      right: 16,
-                      width: "20%",
-                      height: "26%",
-                      borderRadius: "8px",
-                      overflow: "hidden",
-                      border: "2px solid white",
-                    }}
-                  >
-                    <UserVideoComponent
-                      streamManager={publisher}
-                      isMain={false}
-                    />
-                  </Box>
-                )}
-                {subscribers[0] && subscribers[0] !== mainStreamManager && (
-                  <Box
-                    style={{
-                      position: "absolute",
-                      bottom: 16,
-                      right: 16,
-                      width: "20%",
-                      height: "26%",
-                      borderRadius: "8px",
-                      overflow: "hidden",
-                      border: "2px solid white",
-                    }}
-                  >
-                    <UserVideoComponent
-                      streamManager={subscribers[0]}
-                      isMain={false}
-                    />
-                  </Box>
-                )}
+        <Grid container spacing={2} style={{ marginTop: 16 }}>
+          <Grid item xs={12}>
+            <Paper style={{ position: "relative", height: "80vh" }}>
+              {loading ? (
                 <Box
-                  sx={{
-                    mt: 1,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: 2,
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    textAlign: "center",
                   }}
                 >
-                  <Box>
-                    <IconButton color="primary" onClick={this.toggleAudio}>
-                      {this.state.isAudioMuted ? (
-                        <MicOff sx={{ color: "red" }} />
-                      ) : (
-                        <Mic />
-                      )}
-                    </IconButton>
-                    <IconButton color="primary" onClick={this.toggleVideo}>
-                      {this.state.isVideoHidden ? (
-                        <VideocamOff sx={{ color: "red" }} />
-                      ) : (
-                        <Videocam />
-                      )}
-                    </IconButton>
-                  </Box>
-                  <Button onClick={this.handleOpenLeaveDialog}>
-                    <ExitToApp sx={{ mr: 1 }} />
-                    나가기
-                  </Button>
+                  <VideoLoading />
                 </Box>
-              </Paper>
-            </Grid>
+              ) : (
+                <>
+                  {mainStreamManager && (
+                    <UserVideoComponent
+                      streamManager={mainStreamManager}
+                      isMain={true}
+                    />
+                  )}
+                  {publisher !== mainStreamManager && (
+                    <Box
+                      style={{
+                        position: "absolute",
+                        bottom: 16,
+                        right: 16,
+                        width: "20%",
+                        height: "26%",
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        border: "2px solid white",
+                      }}
+                    >
+                      <UserVideoComponent
+                        streamManager={publisher}
+                        isMain={false}
+                      />
+                    </Box>
+                  )}
+                  {subscribers[0] && subscribers[0] !== mainStreamManager && (
+                    <Box
+                      style={{
+                        position: "absolute",
+                        bottom: 16,
+                        right: 16,
+                        width: "20%",
+                        height: "26%",
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        border: "2px solid white",
+                      }}
+                    >
+                      <UserVideoComponent
+                        streamManager={subscribers[0]}
+                        isMain={false}
+                      />
+                    </Box>
+                  )}
+                </>
+              )}
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: -62,
+                  left: 16,
+                  right: 16,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 2,
+                  borderRadius: "8px",
+                  padding: "8px",
+                }}
+              >
+                <Box>
+                  <IconButton color="primary" onClick={this.toggleAudio}>
+                    {this.state.isAudioMuted ? (
+                      <MicOff sx={{ color: "red" }} />
+                    ) : (
+                      <Mic />
+                    )}
+                  </IconButton>
+                  <IconButton color="primary" onClick={this.toggleVideo}>
+                    {this.state.isVideoHidden ? (
+                      <VideocamOff sx={{ color: "red" }} />
+                    ) : (
+                      <Videocam />
+                    )}
+                  </IconButton>
+                </Box>
+                <Button onClick={this.handleOpenLeaveDialog}>
+                  <ExitToApp sx={{ mr: 1 }} />
+                  나가기
+                </Button>
+              </Box>
+            </Paper>
           </Grid>
-        )}
+        </Grid>
         <Dialog
           open={isLeaveDialogOpen}
           onClose={() => this.handleCloseLeaveDialog(false)}
@@ -480,22 +470,6 @@ class Video extends Component {
         </Dialog>
       </Container>
     );
-  }
-
-  async getToken() {
-    const token = await this.createToken(this.state.mySessionId);
-    return token;
-  }
-
-  async createToken(mySessionId) {
-    const response = await axios.post(
-      APPLICATION_SERVER_URL + "/api/webrtcs/get-token",
-      { reservationId: mySessionId },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    return response.data.data.token;
   }
 }
 
