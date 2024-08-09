@@ -67,6 +67,7 @@ public enum ErrorCode implements ResponseCode {
     RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM(HttpStatus.CONFLICT, "예약 확정은 각 매물, 시간 당 한 건만 가능합니다."),
     WORKHOUR_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 날짜의 근무 시간 정보를 찾을 수 없습니다."),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 형식입니다."),
+    WORKHOUR_INAVAILABLE(HttpStatus.BAD_REQUEST, "시작시간이 마감시간보다 빠를 수 없습니다."),
 
     // Common Error Code
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부적 에러가 발생했습니다."),
@@ -74,7 +75,6 @@ public enum ErrorCode implements ResponseCode {
     NOT_FOUND(HttpStatus.NOT_FOUND, "해당 요청을 찾을 수 없습니다."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 HTTP 메소드 입니다"),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "권한이 없는 요청입니다.");
-
 
     private final HttpStatus httpStatus;
     private final String message;

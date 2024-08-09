@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bangguddle.ownbang.global.enums.ErrorCode.ACCESS_DENIED;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.WORKHOUR_INAVAILABLE;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.WORKHOUR_NOT_FOUND;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
@@ -33,6 +33,13 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
         Agent agent = agentRepository.getByUserId(userId);
 
         AgentWorkhour agentWorkhour = request.toEntity(agent);
+        int daystart= Integer.parseInt(agentWorkhour.getWeekdayStartTime());
+        int dayend= Integer.parseInt(agentWorkhour.getWeekdayEndTime());
+        int endstart= Integer.parseInt(agentWorkhour.getWeekendStartTime());
+        int end= Integer.parseInt(agentWorkhour.getWeekendEndTime());
+        if(dayend<daystart || endstart>end){
+            new AppException(WORKHOUR_INAVAILABLE);
+        }
         agentWorkhourRepository.save(agentWorkhour);
 
         return new SuccessResponse<>(AGENT_WORKHOUR_CREATE_SUCCESS, NoneResponse.NONE);
@@ -57,11 +64,17 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
         User user = userRepository.getById(userId);
         Agent agent = agentRepository.getByUserId(userId);
         Long agentId = agent.getId();
-        System.out.println(agentId);
 
         AgentWorkhour agentWorkhour = agentWorkhourRepository.findByAgent(agent)
                 .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
-        
+
+        int daystart= Integer.parseInt(agentWorkhour.getWeekdayStartTime());
+        int dayend= Integer.parseInt(agentWorkhour.getWeekdayEndTime());
+        int endstart= Integer.parseInt(agentWorkhour.getWeekendStartTime());
+        int end= Integer.parseInt(agentWorkhour.getWeekendEndTime());
+        if(dayend<daystart || endstart>end){
+            new AppException(WORKHOUR_INAVAILABLE);
+        }
         agentWorkhour.updateWorkhour(request.weekdayStartTime(), request.weekdayEndTime(), request.weekendStartTime(), request.weekendEndTime());
         agentWorkhourRepository.save(agentWorkhour);
 
