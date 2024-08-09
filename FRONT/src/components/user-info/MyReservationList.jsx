@@ -16,12 +16,13 @@ import { useBoundStore } from "../../store/store";
 
 function MyReservationList() {
   const theme = useTheme();
-
-  const { reservationAll, getReservationList } = useBoundStore((state) => ({
-    reservationAll: state.reservationAll,
-    getReservationList: state.getReservationList,
-  }));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const { getReservationList, reservations } = useBoundStore((state) => ({
+    getReservationList: state.getReservationList,
+    reservations: state.reservations,
+  }));
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
