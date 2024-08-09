@@ -6,8 +6,8 @@ export const reservation = async (reservationData) => {
   return response.data;
 };
 
-// 예약 리스트 조회 API 요청
-export const reservationList = async () => {
+// 예약 조회 API 요청
+export const myReservationList = async () => {
   const response = await Axios.get("/reservations/list");
   return response.data;
 };

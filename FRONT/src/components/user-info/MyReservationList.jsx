@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TableContainer,
   Table,
@@ -7,6 +7,8 @@ import {
   TableCell,
   TableBody,
   Paper,
+  CircularProgress,
+  Typography,
 } from "@mui/material";
 import MyReservationItem from "./MyReservationItem";
 import { useMediaQuery, useTheme } from "@mui/material";
@@ -14,28 +16,39 @@ import { useBoundStore } from "../../store/store";
 
 function MyReservationList() {
   const theme = useTheme();
-
-  const { reservationAll, getReservationList } = useBoundStore((state) => ({
-    reservationAll: state.reservationAll,
-    getReservationList: state.getReservationList,
-  }));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const reservations = [];
+  const { getReservationList, reservations } = useBoundStore((state) => ({
+    getReservationList: state.getReservationList,
+    reservations: state.reservations,
+  }));
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // 호출 후 예약 목록을 콘솔에 찍기
-    const fetchData = async () => {
+    const fetchReservations = async () => {
+      setLoading(true);
+      setError(null);
       try {
         await getReservationList();
-        console.log("예약 목록:", reservationAll);
       } catch (error) {
-        console.error("Error fetching reservation list:", error);
+        setError("Failed to fetch reservations. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchData();
-  }, [getReservationList, reservationAll]);
+    fetchReservations();
+  }, [getReservationList]);
+
+  if (loading) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -50,10 +63,25 @@ function MyReservationList() {
             <TableCell>화상 채팅</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody sx={{ bgcolor: theme.palette.common.white }}>
-          {reservations.map((reservation) => (
-            <MyReservationItem key={reservation.id} reservation={reservation} />
-          ))}
+        <TableBody sx={{ bgcolor: theme.palette.background.default }}>
+          {reservations.length > 0 ? (
+            reservations.map((reservation) => (
+              <MyReservationItem
+                key={reservation.id}
+                reservation={reservation}
+              />
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                align="center"
+                sx={{ bgcolor: theme.palette.background.default }}
+              >
+                <Typography variant="body1">예약이 없습니다.</Typography>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>
