@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import {
   CssBaseline,
   Button,
@@ -218,8 +220,8 @@ const SignUp = () => {
           progress: undefined,
           theme: "light",
         });
-        navigate("/login");
       }
+      navigate("/login");
     });
   };
 

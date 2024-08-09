@@ -21,13 +21,16 @@ export default function MyBookmarkItem({ bookmark }) {
         width: isMobile ? "100%" : "600px",
         heigth: isMobile && 140,
         bgcolor: theme.palette.common.white,
+        gap: 2,
       }}
     >
       <CardMedia
         component="img"
         sx={{ width: isMobile ? 140 : 160 }}
-        image={bookmark.image}
-        alt={bookmark.title}
+        image={bookmark.roomInfoSearchResponse.profileImage} // 실제 이미지 URL로 변경
+        alt={
+          bookmark.roomInfoSearchResponse.profileImage || "No image available"
+        }
       />
       <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
         <CardContent
@@ -41,7 +44,9 @@ export default function MyBookmarkItem({ bookmark }) {
               variant="h6"
               sx={{ fontSize: theme.fontSize.medium }}
             >
-              {bookmark.title}
+              {bookmark.roomInfoSearchResponse.dealType}{" "}
+              {bookmark.roomInfoSearchResponse.deposit}/
+              {bookmark.roomInfoSearchResponse.monthlyRent}
             </Typography>
             <IconButton aria-label="bookmark">
               <Bookmark sx={{ color: theme.palette.bookmark }} />
@@ -53,23 +58,25 @@ export default function MyBookmarkItem({ bookmark }) {
             component="div"
             sx={{ fontSize: theme.typography.fontSize }}
           >
-            {bookmark.size} · {bookmark.floor}
+            위치 : {bookmark.roomInfoSearchResponse.parcel}
           </Typography>
           <Typography
-            variant="body2"
+            variant="subtitle1"
             color="text.secondary"
             component="div"
             sx={{ fontSize: theme.typography.fontSize }}
           >
-            {bookmark.location}
+            {bookmark.roomInfoSearchResponse.roomType}·{" "}
+            {bookmark.roomInfoSearchResponse.structure}
           </Typography>
           <Typography
-            variant="body2"
+            variant="subtitle1"
             color="text.secondary"
             component="div"
             sx={{ fontSize: theme.typography.fontSize }}
           >
-            {bookmark.description}
+            {bookmark.roomInfoSearchResponse.supplyArea} m2 ·{" "}
+            {bookmark.roomInfoSearchResponse.roomFloor} 층
           </Typography>
         </CardContent>
       </Box>

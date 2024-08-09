@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   CssBaseline,
@@ -10,37 +10,43 @@ import {
   InputAdornment,
   Button,
   IconButton,
+  Avatar,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material";
 import StatusChangeForm from "./StatusChangeForm";
 import PasswordChangeForm from "./PasswordChangeForm";
 import { useNavigate } from "react-router-dom";
-
-/*
-일단 페이지 하나에 컴퍼넌트 전환으로 바꿨는데 뒤로가기 거슬린다면
-페이지 나눠야할수도 ?
-*/
-
-/*
-데이터를 가져오는 부분에서 zustand에 메서드를 정의하고 여기서 가져와야할듯 ?
-*/
-
-// 더미데이터 - 데이터 연결 필요
-const user = {
-  userName: "김일태",
-  phoneNumber: "010-1234-5678",
-  userId: "iltae94@gmail.com",
-  password: "password123",
-};
+import { useBoundStore } from "../../store/store";
 
 export default function UserInfoEditForm() {
+  const { user, fetchUser, modifyUser } = useBoundStore((state) => ({
+    user: state.user,
+    fetchUser: state.fetchUser,
+    modifyUser: state.modifyUser,
+  }));
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
   const navigate = useNavigate();
   const theme = useTheme();
   // 유저 정보
   const [userInfo, setUserInfo] = useState(user);
 
+  const [profileImage, setProfileImage] = useState(user.profileImageUrl);
+  const [selectedFile, setSelectedFile] = useState(null);
+
   const [forAgent, setForAgent] = useState(false);
   const [forPassChange, setForPassChange] = useState(false);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   // 입력창에 있는 정보들을 userInfo에 반영
   const handleInputChange = (e) => {
@@ -51,41 +57,44 @@ export default function UserInfoEditForm() {
     }));
   };
 
-  // 전화번호의 경우
-  const handlePhoneNumberChange = (event) => {
-    let formattedPhoneNumber = event.target.value.replace(/[^\d]/g, ""); // 숫자 이외의 문자 모두 제거
-
-    // 전화번호 형식에 맞춰 '-' 기호 삽입
-    if (formattedPhoneNumber.length > 3 && formattedPhoneNumber.length <= 7) {
-      formattedPhoneNumber = formattedPhoneNumber.replace(
-        /(\d{3})(\d{4})/,
-        "$1-$2"
-      );
-    } else if (formattedPhoneNumber.length > 7) {
-      formattedPhoneNumber = formattedPhoneNumber.replace(
-        /(\d{3})(\d{4})(\d{4})/,
-        "$1-$2-$3"
-      );
-    }
-
-    setUserInfo((prevUserInfo) => ({
-      ...prevUserInfo,
-      phoneNumber: formattedPhoneNumber,
-    }));
-  };
-
   const handleEdit = (props) => {
     setForAgent(props);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setProfileImage(URL.createObjectURL(file));
+    }
   };
 
   const handlePassChange = (props) => {
     setForPassChange(props);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // 일단 출력 - 나중엔 api post
-    console.log("유저 정보:", userInfo);
+    const data = { nickname: userInfo.nickname };
+
+    const formData = new FormData();
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
+    formData.append(
+      "data",
+      new Blob([JSON.stringify(data)], {
+        type: "application/json",
+      })
+    );
+    await modifyUser(formData).then((res) => {
+      if (res.resultCode === "SUCCESS") {
+        setSnackbarOpen(true);
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      }
+    });
   };
 
   const handleCancel = () => {
@@ -129,38 +138,45 @@ export default function UserInfoEditForm() {
             <Divider component="div" sx={{ mt: 1, width: "100%" }} />
             <Box component="form" noValidate sx={{ mt: 4 }}>
               <Grid container spacing={4}>
-                <Grid item xs={12}>
-                  <TextField
-                    label="이름"
-                    id="userName"
-                    name="userName"
-                    value={userInfo.userName}
-                    onChange={handleInputChange}
-                    fullWidth
+                <Grid item xs={12} sm={6}>
+                  <Avatar
+                    src={profileImage}
+                    alt="프로필 이미지"
+                    sx={{ width: 260, height: 260 }}
                   />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "end",
+                    alignItems: "end",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    component="label"
+                    sx={{ height: "20%", width: "60%" }}
+                  >
+                    이미지 찾기
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </Button>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    fullWidth
-                    label="휴대폰 번호"
-                    type="text"
-                    value={userInfo.phoneNumber}
-                    onChange={(handleInputChange, handlePhoneNumberChange)}
-                    placeholder="010-1234-5678"
-                    inputProps={{
-                      maxLength: 13, // 최대 입력 길이 설정 (예: 010-1234-5678)
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="아이디"
-                    id="userId"
-                    name="userId"
-                    type="email"
-                    fullWidth
-                    value={userInfo.userId}
+                    label="닉네임"
+                    id="nickname"
+                    name="nickname"
+                    value={userInfo.nickname}
                     onChange={handleInputChange}
+                    fullWidth
                   />
                 </Grid>
               </Grid>
@@ -222,6 +238,32 @@ export default function UserInfoEditForm() {
         ) : (
           <StatusChangeForm toggleEdit={handleEdit} />
         )}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={2000}
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          sx={{
+            mt: 2,
+            "& .MuiSnackbarContent-root": {
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: "center",
+              position: "fixed",
+              bottom: "50%",
+              transform: "translateY(50%)",
+            },
+          }}
+        >
+          <Alert
+            onClose={handleSnackbarClose}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
+            수정이 완료되었습니다!
+          </Alert>
+        </Snackbar>
       </Container>
     </>
   );

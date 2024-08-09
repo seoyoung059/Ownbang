@@ -4,7 +4,13 @@ import { useTheme } from "@mui/material";
 import { SearchOff } from "@mui/icons-material";
 import RealEstateItem from "./RealEstateItem";
 
-const RealEstateList = ({ markers, onSelectItem }) => {
+const RealEstateList = ({
+  markers,
+  onSelectItem,
+  bookmarkList,
+  getBookmarks,
+  toggleBookmarks,
+}) => {
   const theme = useTheme();
   const [displayedMarkers, setDisplayedMarkers] = useState([]);
 
@@ -12,16 +18,18 @@ const RealEstateList = ({ markers, onSelectItem }) => {
     setDisplayedMarkers(markers);
   }, [markers]);
 
-  const toggleFavorite = (index) => {
-    const newMarkers = displayedMarkers.map((marker, i) => {
-      if (i === index) {
-        const updatedMarker = { ...marker, favorite: !marker.favorite };
-        console.log(`${marker.title} - favorite: ${updatedMarker.favorite}`);
-        return updatedMarker;
-      }
-      return marker;
-    });
-    setDisplayedMarkers(newMarkers);
+  const toggleFavorite = async (id) => {
+    try {
+      await toggleBookmarks(id); // 북마크 API 호출
+      setDisplayedMarkers((prevMarkers) =>
+        prevMarkers.map((marker) =>
+          marker.id === id ? { ...marker, favorite: !marker.favorite } : marker
+        )
+      );
+      await getBookmarks(); // 업데이트된 북마크 리스트 가져오기
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
   };
 
   return (
@@ -32,15 +40,16 @@ const RealEstateList = ({ markers, onSelectItem }) => {
         bgcolor: theme.palette.background.default,
       }}
     >
-      {displayedMarkers.map((marker, index) => (
-        <RealEstateItem
-          key={index}
-          marker={marker}
-          toggleFavorite={() => toggleFavorite(index)}
-          onClick={() => onSelectItem(marker)}
-        />
-      ))}
-      {!displayedMarkers.length && (
+      {displayedMarkers &&
+        displayedMarkers.map((marker, index) => (
+          <RealEstateItem
+            key={marker.id}
+            marker={marker}
+            toggleFavorite={() => toggleFavorite(marker.id)}
+            onClick={() => onSelectItem(marker)}
+          />
+        ))}
+      {displayedMarkers && !displayedMarkers.length && (
         <Box
           sx={{
             display: "flex",

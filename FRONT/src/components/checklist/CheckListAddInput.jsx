@@ -1,16 +1,15 @@
-// 체크리스트에 있는 체크리스트 항목 추가 입력창
-
 import { Box, Button, Input } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { useState, useRef } from "react";
 
 const CheckListAddInput = ({ onCreate }) => {
   const theme = useTheme();
-  const contentRef = useRef();
+  const inputRef = useRef();
 
-  const [content, setContent] = useState();
-  const onChangeContent = (e) => {
-    setContent(e.target.value);
+  const [inputValue, setInputValue] = useState("");
+
+  const onChange = (e) => {
+    setInputValue(e.target.value);
   };
 
   const onKeyDown = (e) => {
@@ -18,21 +17,22 @@ const CheckListAddInput = ({ onCreate }) => {
       onSubmit();
     }
   };
+
   const onSubmit = () => {
-    // 빈 문자열은 추가할 수 없도록
-    if (content === "") {
-      contentRef.current.focus();
+    if (inputValue === "") {
+      inputRef.current.focus();
       return;
     }
-    onCreate(content);
-    setContent("");
+    onCreate(inputValue);
+    setInputValue("");
   };
+
   return (
     <Box sx={{ display: "flex", gap: "10px", justifyContent: "center" }}>
       <Input
-        ref={contentRef}
-        value={content}
-        onChange={onChangeContent}
+        ref={inputRef}
+        value={inputValue}
+        onChange={onChange}
         onKeyDown={onKeyDown}
         placeholder="새로운 항목을 입력하세요"
         sx={{

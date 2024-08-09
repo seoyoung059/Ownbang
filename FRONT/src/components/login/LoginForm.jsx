@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import KakaoLoginButton from "./KakaoLoginButton";
 
 import { useBoundStore } from "../../store/store";
@@ -48,8 +50,9 @@ const shake = keyframes`
 `;
 
 const LoginForm = () => {
-  const { loginUser } = useBoundStore((state) => ({
+  const { loginUser, fetchUser } = useBoundStore((state) => ({
     loginUser: state.loginUser,
+    fetchUser: state.fetchUser,
   }));
   const theme = useTheme();
   const navigate = useNavigate();
@@ -80,6 +83,7 @@ const LoginForm = () => {
             progress: undefined,
             theme: "light",
           });
+          fetchUser();
           navigate("/");
         }
       })

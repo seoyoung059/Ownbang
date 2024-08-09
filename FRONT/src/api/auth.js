@@ -25,3 +25,17 @@ export const login = async (loginData) => {
   const response = await Axios.post("/auths/login", loginData);
   return response.data;
 };
+
+// 비밀번호 확인 API 요청
+export const checkPassword = async (password) => {
+  const response = await Axios.post("/auths/password-check", {
+    password: password,
+  });
+  return response.data;
+};
+
+// 중개인 회원 전환 신청 API 요청
+export const toAgent = async (agentData) => {
+  const response = await Axios.post("/agents/auths/sign-up", agentData);
+  return response.data;
+};

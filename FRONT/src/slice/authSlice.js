@@ -1,11 +1,20 @@
-import { checkEmail, checkPhoneNumber, signUp, login } from "../api/auth";
+import { Upgrade } from "@mui/icons-material";
+import {
+  checkEmail,
+  checkPhoneNumber,
+  signUp,
+  login,
+  checkPassword,
+  toAgent,
+} from "../api/auth";
 import { Cookies } from "react-cookie";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const cookies = new Cookies();
 
 export const createAuthSlice = (set) => ({
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem("accessToken"),
   isDuplicatedEmail: false,
   isDuplicatedPhoneNumber: false,
 
@@ -49,5 +58,15 @@ export const createAuthSlice = (set) => ({
       progress: undefined,
       theme: "light",
     });
+  },
+
+  confirmPassword: async (password) => {
+    const result = await checkPassword(password);
+    return result.data.isCorrect;
+  },
+
+  upgradeAgent: async (agentData) => {
+    const result = await toAgent(agentData);
+    return result;
   },
 });
