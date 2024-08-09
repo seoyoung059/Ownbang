@@ -12,24 +12,24 @@ const RealEstateList = ({
   toggleBookmarks,
 }) => {
   const theme = useTheme();
-  const [displayedMarkers, setDisplayedMarkers] = useState();
+  const [displayedMarkers, setDisplayedMarkers] = useState([]);
 
   useEffect(() => {
     setDisplayedMarkers(markers);
   }, [markers]);
 
-  const toggleFavorite = (id) => {
-    setDisplayedMarkers((prevMarkers) =>
-      prevMarkers.map((marker) => {
-        if (marker.id === id) {
-          const updatedMarker = { ...marker, favorite: !marker.favorite };
-          toggleBookmarks(updatedMarker.id);
-          return updatedMarker;
-        }
-        return marker;
-      })
-    );
-    getBookmarks();
+  const toggleFavorite = async (id) => {
+    try {
+      await toggleBookmarks(id); // 북마크 API 호출
+      setDisplayedMarkers((prevMarkers) =>
+        prevMarkers.map((marker) =>
+          marker.id === id ? { ...marker, favorite: !marker.favorite } : marker
+        )
+      );
+      await getBookmarks(); // 업데이트된 북마크 리스트 가져오기
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
   };
 
   return (
@@ -43,9 +43,9 @@ const RealEstateList = ({
       {displayedMarkers &&
         displayedMarkers.map((marker, index) => (
           <RealEstateItem
-            key={index}
+            key={marker.id}
             marker={marker}
-            toggleFavorite={() => toggleFavorite(index)}
+            toggleFavorite={() => toggleFavorite(marker.id)}
             onClick={() => onSelectItem(marker)}
           />
         ))}

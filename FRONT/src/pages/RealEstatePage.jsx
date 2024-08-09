@@ -25,11 +25,14 @@ const RealEstatePage = () => {
   } = useBoundStore((state) => ({
     searchTerm: state.searchTerm,
     setSearchTerm: state.setSearchTerm,
+
     makeReservation: state.makeReservation,
+
     room: state.room,
     getRoom: state.getRoom,
     getAllRoom: state.getAllRoom,
     realEstateData: state.realEstateData,
+
     bookmarkList: state.bookmarkList,
     getBookmarks: state.getBookmarks,
     toggleBookmarks: state.toggleBookmarks,
