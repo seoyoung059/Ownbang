@@ -97,7 +97,6 @@ public class Room {
         this.agent = agent;
         this.roomAppliances = roomAppliances;
         this.roomDetail = roomDetail;
-//        this.roomImages.addAll(roomImages);
         this.latitude = latitude;
         this.longitude = longitude;
         this.dealType = dealType;
@@ -134,5 +133,9 @@ public class Room {
         this.parcel = roomUpdateRequest.parcel();
         this.road = roomUpdateRequest.road();
         this.detailAddress = roomUpdateRequest.detailAddress();
+    }
+
+    public void updateProfileImage(String profileImageUrl){
+        this.profileImageUrl = profileImageUrl;
     }
 }
