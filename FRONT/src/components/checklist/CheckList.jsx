@@ -5,7 +5,7 @@ import CheckListList from "./CheckListList";
 import CheckListAddInput from "./CheckListAddInput";
 import { useBoundStore } from "../../store/store";
 
-const CheckList = ({ canEdit, onTimestampClick }) => {
+const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
   const {
     checklist,
     fetchCheckLists,
@@ -182,6 +182,7 @@ const CheckList = ({ canEdit, onTimestampClick }) => {
               onDelete={onDelete}
               canEdit={canEdit}
               onTimestampClick={handleTimestampClick}
+              forReplay={forReplay}
             />
           </Box>
         )}

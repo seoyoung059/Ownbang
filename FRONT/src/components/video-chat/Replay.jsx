@@ -36,14 +36,14 @@ const Replay = ({ options, onReady, width = "50%", height = "50%" }) => {
   };
 
   return (
-    <div>
-      <div data-vjs-player style={{ width, height }}>
+    <div style={{ marginTop: "32px" }}>
+      <div
+        data-vjs-player
+        style={{ width, height, borderRadius: "8px", overflow: "hidden" }}
+      >
         <video ref={videoRef} className="video-js vjs-big-play-centered" />
       </div>
       {error && <div>Error: {error}</div>}
-      {/* <button onClick={() => seekTo(10)}>Skip to 0:10</button>
-      <button onClick={() => seekTo(20)}>Skip to 0:20</button>
-      <button onClick={() => seekTo(30)}>Skip to 0:30</button> */}
     </div>
   );
 };

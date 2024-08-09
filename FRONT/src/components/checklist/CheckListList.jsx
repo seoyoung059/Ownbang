@@ -7,6 +7,7 @@ const CheckListList = ({
   onDelete,
   canEdit,
   onTimestampClick,
+  forReplay,
 }) => {
   if (!contents) {
     return null;
@@ -25,6 +26,7 @@ const CheckListList = ({
           onDelete={onDelete}
           canEdit={canEdit}
           onTimestampClick={onTimestampClick}
+          forReplay={forReplay}
         />
       ))}
     </>
