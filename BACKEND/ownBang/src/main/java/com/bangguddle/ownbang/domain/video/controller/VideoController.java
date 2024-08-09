@@ -17,9 +17,9 @@ public class VideoController {
 
     private final VideoService videoService;
 
-    @GetMapping("/{videoId}")
+    @GetMapping("/{reservationId}")
     public ResponseEntity<Response<VideoSearchResponse>> getVideo(@AuthenticationPrincipal Long userId,
-                                                                  @PathVariable(name = "videoId") @Positive @Valid Long videoId){
-        return Response.success(videoService.getVideo(userId, videoId));
+                                                                  @PathVariable(name = "reservationId") @Positive @Valid Long reservationId){
+        return Response.success(videoService.getVideo(userId, reservationId));
     }
 }

@@ -44,10 +44,10 @@ public class VideoControllerTest {
                 new SuccessResponse<>(VIDEO_FIND_SUCCESS, response);
 
         // when
-        when(videoService.getVideo(userId, videoId)).thenReturn(success);
+        when(videoService.getVideo(userId, reservationId)).thenReturn(success);
 
         // then
-        assertThat(controller.getVideo(userId, videoId))
+        assertThat(controller.getVideo(userId, reservationId))
                 .isNotInstanceOf(AppException.class)
                 .isInstanceOf(ResponseEntity.class)
                 .hasFieldOrPropertyWithValue("statusCode", VIDEO_FIND_SUCCESS.getHttpStatus())
@@ -58,13 +58,13 @@ public class VideoControllerTest {
     @DisplayName("영상 단건 조회 실패 - 녹화_중인_영상")
     void 영상_단건_조회_실패__녹화_중인_영상() throws Exception {
         Long userId = 1L;
-        Long invalidVideoId = 2L;
+        Long invalidReservationId = 2L;
 
         // when
-        when(videoService.getVideo(userId, invalidVideoId)).thenThrow(new AppException(VIDEO_IS_BEING_RECORDED));
+        when(videoService.getVideo(userId, invalidReservationId)).thenThrow(new AppException(VIDEO_IS_BEING_RECORDED));
 
         // then
-        assertThatThrownBy(() -> controller.getVideo(userId, invalidVideoId))
+        assertThatThrownBy(() -> controller.getVideo(userId, invalidReservationId))
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", VIDEO_IS_BEING_RECORDED);
     }
@@ -73,13 +73,13 @@ public class VideoControllerTest {
     @DisplayName("영상 단건 조회 실패 - 권한 없는 유저")
     void 영상_단건_조회_실패__권한_없는_유저() throws Exception {
         Long userId = 1L;
-        Long invalidVideoId = 2L;
+        Long invalidReservationId = 2L;
 
         // when
-        when(videoService.getVideo(userId, invalidVideoId)).thenThrow(new AppException(ACCESS_DENIED));
+        when(videoService.getVideo(userId, invalidReservationId)).thenThrow(new AppException(ACCESS_DENIED));
 
         // then
-        assertThatThrownBy(() -> controller.getVideo(userId, invalidVideoId))
+        assertThatThrownBy(() -> controller.getVideo(userId, invalidReservationId))
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ACCESS_DENIED);
     }

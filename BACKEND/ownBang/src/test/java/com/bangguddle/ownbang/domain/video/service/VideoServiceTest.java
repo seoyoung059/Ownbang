@@ -210,7 +210,7 @@ public class VideoServiceTest {
         SuccessResponse success = new SuccessResponse<>(VIDEO_FIND_SUCCESS, result);
 
         // when
-        when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+        when(videoRepository.findByReservationId(reservationId)).thenReturn(Optional.of(video));
         when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDED);
         when(video.getId()).thenReturn(videoId);
         when(video.getReservation()).thenReturn(reservation);
@@ -220,7 +220,7 @@ public class VideoServiceTest {
         when(user.getId()).thenReturn(userId);
 
         // then
-        SuccessResponse response = videoService.getVideo(userId, videoId);
+        SuccessResponse response = videoService.getVideo(userId, reservationId);
 
         assertThat(response)
                 .isNotInstanceOf(AppException.class)
@@ -228,7 +228,7 @@ public class VideoServiceTest {
                 .isEqualTo(success);
 
         // verify
-        verify(videoRepository, times(1)).findById(any());
+        verify(videoRepository, times(1)).findByReservationId(any());
     }
 
     @Test
@@ -236,13 +236,13 @@ public class VideoServiceTest {
     void 영상_단건_조회_실패__유효하지_않은_ID() throws Exception {
         // given
         Long userId = 123L;
-        Long invalidVideoId = 1L;
+        Long invalidReservationId = 1L;
 
         // when
-        when(videoRepository.findById(invalidVideoId)).thenReturn(Optional.empty());
+        when(videoRepository.findByReservationId(invalidReservationId)).thenReturn(Optional.empty());
 
         // then
-        Throwable thrown = catchThrowable(() -> videoService.getVideo(userId, invalidVideoId));
+        Throwable thrown = catchThrowable(() -> videoService.getVideo(userId, invalidReservationId));
 
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
@@ -254,14 +254,14 @@ public class VideoServiceTest {
     void 영상_단건_조회_실패__녹화_중인_영상() throws Exception {
         // given
         Long userId = 123L;
-        Long invalidVideoId = 1L;
+        Long invalidReservationId = 1L;
 
         // when
-        when(videoRepository.findById(invalidVideoId)).thenReturn(Optional.of(video));
+        when(videoRepository.findByReservationId(invalidReservationId)).thenReturn(Optional.of(video));
         when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDING);
 
         // then
-        Throwable thrown = catchThrowable(() -> videoService.getVideo(userId, invalidVideoId));
+        Throwable thrown = catchThrowable(() -> videoService.getVideo(userId, invalidReservationId));
 
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
@@ -273,17 +273,17 @@ public class VideoServiceTest {
     void 영상_단건_조회_실패__권한이_없는_영상() throws Exception {
         // given
         Long invalidUserId = 123L;
-        Long videoId = 1L;
+        Long reservationId = 1L;
 
         // when
-        when(videoRepository.findById(videoId)).thenReturn(Optional.of(video));
+        when(videoRepository.findByReservationId(reservationId)).thenReturn(Optional.of(video));
         when(video.getVideoStatus()).thenReturn(VideoStatus.RECORDED);
         when(video.getReservation()).thenReturn(reservation);
         when(reservation.getUser()).thenReturn(user);
         when(user.getId()).thenReturn(1L);
 
         // then
-        Throwable thrown = catchThrowable(() -> videoService.getVideo(invalidUserId, videoId));
+        Throwable thrown = catchThrowable(() -> videoService.getVideo(invalidUserId, reservationId));
 
         assertThat(thrown)
                 .isInstanceOf(AppException.class)

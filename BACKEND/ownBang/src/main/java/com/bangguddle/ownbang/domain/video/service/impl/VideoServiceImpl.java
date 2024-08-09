@@ -34,15 +34,17 @@ public class VideoServiceImpl implements VideoService {
     /**
      * 녹화된 영상을 조회하는 메소드.<br/>
      * 영상 상태가 RECORDED 인 경우만 정상 반환
-     * @param videoId
+     * @param reservationId
      * @return VideoSearchResponse
      */
     @Override
     @Transactional(readOnly = true)
-    public SuccessResponse<VideoSearchResponse> getVideo(final Long userId, final Long videoId) {
+    public SuccessResponse<VideoSearchResponse> getVideo(final Long userId, final Long reservationId) {
         // 영상 및 유저 유효성 검사
-        Video video = validateVideo(videoId);
-        if(video.getVideoStatus() == VideoStatus.RECORDING){
+        Video video = videoRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new AppException(BAD_REQUEST));
+
+        if(equalToRecording(video.getVideoStatus())){
             throw new AppException(VIDEO_IS_BEING_RECORDED);
         }else if(video.getReservation().getUser().getId() != userId){
             throw new AppException(ACCESS_DENIED);
