@@ -28,4 +28,15 @@ export const createReservation = (set) => ({
       throw error;
     }
   },
+
+  reservationAll: [],
+  getReservationList: async () => {
+    try {
+      const response = await reservationList();
+      set({ reservationAll: response.data });
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching reservation list:", error);
+    }
+  },
 });

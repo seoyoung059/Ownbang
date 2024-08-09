@@ -15,6 +15,7 @@ const RealEstateRegisterPage = lazy(() =>
 );
 const VideoChat = lazy(() => import("../pages/VideoChatPage"));
 const AgentPage = lazy(() => import("../pages/AgentPage"));
+const ReplayPage = lazy(() => import("../pages/ReplayPage"));
 
 const RootRouter = () => {
   return (
@@ -39,11 +40,15 @@ const RootRouter = () => {
           />
           <Route
             path="/video-chat"
-            element={<UserRoute element={<VideoChat />} />}
+            element={<UserRoute element={<VideoChat />} allowAgents={true} />}
           />
           <Route
             path="/agent"
             element={<AgentRoute element={<AgentPage />} />}
+          />
+          <Route
+            path="/replay"
+            element={<UserRoute element={<ReplayPage />} />}
           />
         </Routes>
       </Suspense>
