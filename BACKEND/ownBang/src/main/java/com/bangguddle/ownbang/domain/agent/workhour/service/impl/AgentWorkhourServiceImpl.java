@@ -33,12 +33,9 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
         Agent agent = agentRepository.getByUserId(userId);
 
         AgentWorkhour agentWorkhour = request.toEntity(agent);
-        int daystart= Integer.parseInt(agentWorkhour.getWeekdayStartTime());
-        int dayend= Integer.parseInt(agentWorkhour.getWeekdayEndTime());
-        int endstart= Integer.parseInt(agentWorkhour.getWeekendStartTime());
-        int end= Integer.parseInt(agentWorkhour.getWeekendEndTime());
-        if(dayend<daystart || endstart>end){
-            new AppException(WORKHOUR_INAVAILABLE);
+        if (!isValidTimeRange(request.weekdayStartTime(), request.weekdayEndTime()) ||
+                !isValidTimeRange(request.weekendStartTime(), request.weekendEndTime())) {
+            throw new AppException(WORKHOUR_INAVAILABLE);
         }
         agentWorkhourRepository.save(agentWorkhour);
 
@@ -68,16 +65,16 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
         AgentWorkhour agentWorkhour = agentWorkhourRepository.findByAgent(agent)
                 .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
 
-        int daystart= Integer.parseInt(agentWorkhour.getWeekdayStartTime());
-        int dayend= Integer.parseInt(agentWorkhour.getWeekdayEndTime());
-        int endstart= Integer.parseInt(agentWorkhour.getWeekendStartTime());
-        int end= Integer.parseInt(agentWorkhour.getWeekendEndTime());
-        if(dayend<daystart || endstart>end){
-            new AppException(WORKHOUR_INAVAILABLE);
+        if (!isValidTimeRange(request.weekdayStartTime(), request.weekdayEndTime()) ||
+                !isValidTimeRange(request.weekendStartTime(), request.weekendEndTime())) {
+            throw new AppException(WORKHOUR_INAVAILABLE);
         }
         agentWorkhour.updateWorkhour(request.weekdayStartTime(), request.weekdayEndTime(), request.weekendStartTime(), request.weekendEndTime());
         agentWorkhourRepository.save(agentWorkhour);
 
         return new SuccessResponse<>(AGENT_WORKHOUR_UPDATE_SUCCESS, NoneResponse.NONE);
+    }
+    private boolean isValidTimeRange(String startTime, String endTime) {
+        return startTime.compareTo(endTime) < 0;
     }
 }
