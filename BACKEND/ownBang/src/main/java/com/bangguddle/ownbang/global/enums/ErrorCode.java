@@ -16,6 +16,7 @@ public enum ErrorCode implements ResponseCode {
     // Agent Auth API
     LICENSE_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "이미 가입한 자격번호입니다."),
     ALREADY_AGENT(HttpStatus.BAD_REQUEST, "이미 중개인 회원입니다"),
+    AGENT_INFO_NOT_EXIST(HttpStatus.BAD_REQUEST, "중개인 정보가 존재하지 않습니다."),
 
     // User API
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원이 존재하지 않습니다."),
