@@ -14,3 +14,8 @@ export const removeToken = async (id, token) => {
   });
   return response.data;
 };
+
+export const getVideo = async (id) => {
+  const response = await Axios.get(`/videos/${id}`);
+  return response.data;
+};
