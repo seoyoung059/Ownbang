@@ -34,7 +34,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
 
     Optional<Reservation> findById(Long id);
 
-    Optional<Reservation> existsByRoomAndReservationTimeAndStatus(Room room, LocalDateTime reservationTime, ReservationStatus status);
+    Optional<Reservation> findByRoomAndReservationTimeAndStatus(Room room, LocalDateTime reservationTime, ReservationStatus status);
 
     @Query("SELECT r FROM Reservation r WHERE r.room.agent.id = :agentId AND r.reservationTime >= :today ORDER BY r.reservationTime ASC, r.id ASC")
     List<Reservation> findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(
