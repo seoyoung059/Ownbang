@@ -1,8 +1,8 @@
 package com.bangguddle.ownbang.domain.reservation.service;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
-import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
 import com.bangguddle.ownbang.domain.reservation.dto.*;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
@@ -39,7 +39,6 @@ import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -496,6 +495,7 @@ class ReservationServiceImplTest {
         verify(agentRepository).getByUserId(userId);
         verify(reservationRepository).findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(eq(agentId), any(LocalDateTime.class));
     }
+
     @Test
     @DisplayName("예약 가능 시간 조회 성공")
     void getAvailableTimes_Success() {
@@ -510,9 +510,9 @@ class ReservationServiceImplTest {
 
         AgentWorkhour workhour = mock(AgentWorkhour.class);
         when(workhour.getWeekdayStartTime()).thenReturn("09:00");
-        when(workhour.getWeekdayEndTime()).thenReturn("18:00");
-        when(workhour.getWeekendStartTime()).thenReturn("10:30");
-        when(workhour.getWeekendEndTime()).thenReturn("17:00");
+        when(workhour.getWeekdayEndTime()).thenReturn("17:30");
+        when(workhour.getWeekendStartTime()).thenReturn("09:00");
+        when(workhour.getWeekendEndTime()).thenReturn("17:30");
 
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
         when(agentWorkhourRepository.findByAgent(any(Agent.class)))
@@ -525,9 +525,10 @@ class ReservationServiceImplTest {
 
         // Then
         assertThat(response.successCode()).isEqualTo(AVAILABLE_TIMES_RETRIEVED);
-        assertThat(response.data().availableTimes()).hasSize(16); // 9:00부터 17:30까지, 10:00와 14:30 제외
-        assertThat(response.data().availableTimes()).contains("09:00", "09:30", "11:00", "14:00", "15:00", "17:30");
-        assertThat(response.data().availableTimes()).doesNotContain("10:00", "14:30", "18:00");
+        assertThat(response.data().availableTimes()).hasSize(15); // 9:00부터 17:30까지, 10:00와 14:30 제외
+        assertThat(response.data().availableTimes()).contains("09:00", "09:30", "10:30", "11:00", "11:30","12:00", "12:30" , "13:00", "13:30", "14:00", "15:30" , "15:00", "16:00", "16:30", "17:00");
+
+        assertThat(response.data().availableTimes()).doesNotContain("10:00", "14:30");
     }
 
     @Test

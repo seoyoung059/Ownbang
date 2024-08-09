@@ -9,6 +9,7 @@ import com.bangguddle.ownbang.domain.room.dto.*;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
 import com.bangguddle.ownbang.domain.room.entity.RoomDetail;
+import com.bangguddle.ownbang.domain.room.entity.RoomImage;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.room.service.RoomImageService;
 import com.bangguddle.ownbang.domain.room.service.RoomService;
@@ -59,7 +60,9 @@ public class RoomServiceImpl implements RoomService {
                 roomImageService.uploadImageToS3(roomImageFile, room);
             }
         }
+        setRoomImage(room);
         roomRepository.save(room);
+
 
         return new SuccessResponse<>(ROOM_CREATE_SUCCESS, NoneResponse.NONE);
     }
@@ -81,10 +84,18 @@ public class RoomServiceImpl implements RoomService {
         existingRoom.updateFromDto(request);
 
         // 삭제할 이미지 처리
-        if(request.roomImageUpdateRequestList()!=null && !request.roomImageUpdateRequestList().isEmpty()) {
-            for (RoomImageUpdateRequest imageRequest : request.roomImageUpdateRequestList()) {
-                if (!imageRequest.isDeleted()) continue;
-                roomImageService.deleteImage(roomId, imageRequest.id());
+        List<RoomImageUpdateRequest> requestList = request.roomImageUpdateRequestList();
+        List<RoomImage> imageList = existingRoom.getRoomImages();
+        if(requestList!=null && !requestList.isEmpty()) {
+            int length = request.roomImageUpdateRequestList().size();
+            int j = 0;
+            for (int i = 0; i < length; i++) {
+                if(imageList.size() <= j) break;
+                if (!requestList.get(i).isDeleted()) {
+                    j++;
+                    continue;
+                }
+                imageList.remove(j);
             }
         }
 
@@ -94,8 +105,9 @@ public class RoomServiceImpl implements RoomService {
                 roomImageService.uploadImageToS3(roomImageFile, existingRoom);
             }
         }
-
+        setRoomImage(existingRoom);
         roomRepository.save(existingRoom);
+
         return new SuccessResponse<>(ROOM_UPDATE_SUCCESS, NoneResponse.NONE);
     }
 
@@ -171,5 +183,9 @@ public class RoomServiceImpl implements RoomService {
         Agent agent = agentRepository.getByUserId(userId);
         if(agent != existingRoom.getAgent())
             throw new AppException(ACCESS_DENIED);
+    }
+
+    private void setRoomImage(Room room){
+        if(!room.getRoomImages().isEmpty()) room.updateProfileImage(room.getRoomImages().get(0).getRoomImageUrl());
     }
 }
