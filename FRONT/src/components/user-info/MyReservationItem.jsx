@@ -45,14 +45,16 @@ export default function MyReservationItem({ reservation }) {
 
   const { icon, text } = getStatusIconAndText(reservation.status);
 
+  // 예약 날짜 데이터
   let reservationDate = new Date(
     reservation.reservationTime
   ).toLocaleDateString("ko-KR");
-  // 문자열의 마지막이 "."로 끝나면 이를 제거
+  // 문자열의 마지막이 "."로 끝나면 "." 제거
   if (reservationDate.endsWith(".")) {
     reservationDate = reservationDate.slice(0, -1);
   }
 
+  // 예약 시간 데이터
   const reservationTime = new Date(
     reservation.reservationTime
   ).toLocaleTimeString("ko-KR", {
@@ -63,8 +65,12 @@ export default function MyReservationItem({ reservation }) {
   return (
     <TableRow sx={{ bgcolor: theme.palette.background.default }}>
       {!isMobile && (
-        <TableCell>
-          <Avatar src={reservation.image} variant="rounded" />
+        <TableCell sx={{ padding: "4px 8px" }}>
+          <Avatar
+            src={reservation.image}
+            variant="rounded"
+            sx={{ width: "150px", height: "90px" }}
+          />
         </TableCell>
       )}
       <TableCell>
