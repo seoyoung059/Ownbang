@@ -9,6 +9,7 @@ import { createReservation } from "../slice/reservationSlice";
 import { createAgentSlice } from "../slice/agentSlice";
 import { createVideoSlice } from "../slice/videoSlice";
 import { createReviewSlice } from "../slice/reviewSlice";
+import { createBookmarks } from "../slice/bookmarksSlice";
 
 export const useBoundStore = create((...a) => ({
   ...createCheckListSlice(...a),
@@ -20,4 +21,5 @@ export const useBoundStore = create((...a) => ({
   ...createAgentSlice(...a),
   ...createVideoSlice(...a),
   ...createReviewSlice(...a),
+  ...createBookmarks(...a),
 }));

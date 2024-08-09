@@ -1,5 +1,5 @@
-// 리스트에 뿌려지는 매물 아이템 카드
-import React from "react";
+// RealEstateItem.jsx
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -13,6 +13,19 @@ import { useTheme } from "@mui/material/styles";
 
 const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
   const theme = useTheme();
+
+  // 서버에서 받은 isBookmarked 값을 클라이언트 favorite 상태로 설정
+  const [isFavorite, setIsFavorite] = useState(marker.isBookmarked);
+
+  useEffect(() => {
+    setIsFavorite(marker.isBookmarked);
+  }, [marker.isBookmarked]);
+
+  const handleToggleFavorite = (e) => {
+    e.stopPropagation(); // Prevent click event from bubbling up to Card
+    setIsFavorite(!isFavorite); // 클라이언트 상태 업데이트
+    toggleFavorite(); // 서버 상태 업데이트
+  };
 
   return (
     <Card
@@ -44,7 +57,6 @@ const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
       >
         <Box>
           <Typography component="div">
-            {/* 상가 원룸 투룸 등 */}
             {marker.dealType} {marker.deposit}/{marker.monthlyRent}
           </Typography>
           <Typography
@@ -58,10 +70,7 @@ const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
       </CardContent>
       <IconButton
         aria-label="bookmark"
-        onClick={(e) => {
-          e.stopPropagation(); // Prevent click event from bubbling up to Card
-          toggleFavorite();
-        }}
+        onClick={handleToggleFavorite}
         sx={{
           position: "absolute",
           top: 8,
@@ -69,7 +78,7 @@ const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
           color: theme.palette.bookmark,
         }}
       >
-        {marker.favorite ? <Bookmark /> : <BookmarkBorder />}
+        {isFavorite ? <Bookmark /> : <BookmarkBorder />}
       </IconButton>
     </Card>
   );

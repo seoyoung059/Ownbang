@@ -19,19 +19,29 @@ const RealEstatePage = () => {
     getRoom,
     realEstateData,
     getAllRoom,
+    bookmarkList,
+    getBookmarks,
+    toggleBookmarks,
   } = useBoundStore((state) => ({
     searchTerm: state.searchTerm,
     setSearchTerm: state.setSearchTerm,
+
     makeReservation: state.makeReservation,
+
     room: state.room,
     getRoom: state.getRoom,
     getAllRoom: state.getAllRoom,
     realEstateData: state.realEstateData,
+
+    bookmarkList: state.bookmarkList,
+    getBookmarks: state.getBookmarks,
+    toggleBookmarks: state.toggleBookmarks,
   }));
 
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showReservation, setShowReservation] = React.useState(false);
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
+  // const [bookmarkList, setBookmarkList] = React.useState([]);
 
   // 초기 로드 시 전체 매물 불러오기
   useEffect(() => {
@@ -98,7 +108,13 @@ const RealEstatePage = () => {
           position: "relative",
         }}
       >
-        <RealEstateList markers={visibleMarkers} onSelectItem={onSelectItem} />
+        <RealEstateList
+          markers={visibleMarkers}
+          onSelectItem={onSelectItem}
+          bookmarkList={bookmarkList}
+          getBookmarks={getBookmarks}
+          toggleBookmarks={toggleBookmarks}
+        />
       </Box>
 
       {/* 지도와 검색 바 */}
