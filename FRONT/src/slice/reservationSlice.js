@@ -1,4 +1,10 @@
-import { reservation, myReservationList } from "../api/reservation";
+import {
+  reservation,
+  myReservationList,
+  agentReservationList,
+  agentReservationConfirm,
+  agentReservationDeny,
+} from "../api/reservation";
 
 export const createReservation = (set) => ({
   makeReservation: async (reservationData) => {
@@ -25,6 +31,45 @@ export const createReservation = (set) => ({
       return result;
     } catch (error) {
       console.error("Error getting reservation list:", error);
+      throw error;
+    }
+  },
+
+  agentReservations: [],
+  getAgentReservationList: async () => {
+    try {
+      const result = await agentReservationList();
+      console.log("agent reservation list:", result);
+      set({
+        agentReservations: Array.isArray(result.data.reservations)
+          ? result.data.reservations
+          : [],
+      });
+      return result;
+    } catch (error) {
+      console.error("Error getting reservation list:", error);
+      throw error;
+    }
+  },
+
+  confirmReservation: async (reservationId) => {
+    try {
+      const result = await agentReservationConfirm(reservationId);
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error("Error making reservation:", error);
+      throw error;
+    }
+  },
+
+  denyReservation: async (reservationId) => {
+    try {
+      const result = await agentReservationDeny(reservationId);
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error("Error denying reservation:", error);
       throw error;
     }
   },
