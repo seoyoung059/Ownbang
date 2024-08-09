@@ -9,6 +9,7 @@ import com.bangguddle.ownbang.domain.search.repository.SearchRepository;
 import com.bangguddle.ownbang.domain.search.service.SearchService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private final ElasticsearchOperations elasticsearchOperations;
 
-//  @PostConstruct
+    @PostConstruct
     public SuccessResponse<NoneResponse> syncDataFromMySQLToElasticsearch() {
         int batchSize = 1000;
         long totalCount = (long) entityManager.createQuery("SELECT COUNT(s) FROM Search s").getSingleResult();
@@ -134,7 +135,7 @@ public class SearchServiceImpl implements SearchService {
                 searchRepository.save(search);
             }
         }
-        return new SuccessResponse<>(SEARCH_SUCCESS,NoneResponse.NONE);
+        return new SuccessResponse<>(SEARCH_SUCCESS, NoneResponse.NONE);
     }
 
 }
