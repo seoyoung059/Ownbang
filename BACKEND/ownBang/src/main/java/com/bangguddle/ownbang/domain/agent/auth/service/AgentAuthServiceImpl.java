@@ -3,6 +3,8 @@ package com.bangguddle.ownbang.domain.agent.auth.service;
 import com.bangguddle.ownbang.domain.agent.auth.dto.AgentSignUpRequest;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
+import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
@@ -21,14 +23,20 @@ public class AgentAuthServiceImpl implements AgentAuthService {
 
     private final AgentRepository agentRepository;
     private final UserRepository userRepository;
+    private final AgentWorkhourRepository agentWorkhourRepository;
     @Override
     public SuccessResponse<NoneResponse> signUp(Long id, AgentSignUpRequest request) {
         User user = userRepository.getById(id);
         validateByLicenseNumber(request.licenseNumber());
+
         if(user.isAgent()) throw new AppException(ALREADY_AGENT);
+
         user.updateIsAgent(true);
-        Agent agent = request.toEntity(user);
+        Agent agent = request.toAgentEntity(user);
+        AgentWorkhour agentWorkhour = request.toAgentWorkhourEntity(agent);
+
         agentRepository.save(agent);
+        agentWorkhourRepository.save(agentWorkhour);
         return new SuccessResponse<>(UPGRADE_SUCCESS, NoneResponse.NONE);
     }
 
