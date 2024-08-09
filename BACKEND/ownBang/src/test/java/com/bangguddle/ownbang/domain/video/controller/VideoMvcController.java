@@ -38,7 +38,7 @@ public class VideoMvcController {
     @DisplayName("영상 단건 조회 성공")
     void 영상_단건_조회_성공() throws Exception {
         // given
-        Long videoId = 1L;
+        Long reservationId = 1L;
         SuccessResponse<VideoSearchResponse> success =
                 new SuccessResponse<>(VIDEO_FIND_SUCCESS,
                         new VideoSearchResponse(1L, 1L, "url", VideoStatus.RECORDED));
@@ -48,7 +48,7 @@ public class VideoMvcController {
 
         // then
         mockMvc.perform(
-                        get("/videos/{videoId}", String.valueOf(videoId))
+                        get("/videos/{reservationId}", String.valueOf(reservationId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 )
                 .andExpect(status().isOk())
@@ -61,7 +61,7 @@ public class VideoMvcController {
     @DisplayName("영상 단건 조회 실패 - 유효하지 않은 ID")
     void 영상_단건_조회_실패__유효하지_않은_ID() throws Exception {
         // given
-        Long videoId = -1L;
+        Long invalidReservationId = -1L;
         SuccessResponse<VideoSearchResponse> success =
                 new SuccessResponse<>(VIDEO_FIND_SUCCESS,
                         new VideoSearchResponse(1L, 1L, "url", VideoStatus.RECORDED));
@@ -71,7 +71,7 @@ public class VideoMvcController {
 
         // then
         mockMvc.perform(
-                        get("/videos/{videoId}", String.valueOf(videoId))
+                        get("/videos/{reservationId}", String.valueOf(invalidReservationId))
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 )
                 .andExpect(status().isBadRequest());

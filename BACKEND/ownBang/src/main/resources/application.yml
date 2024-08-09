@@ -66,6 +66,9 @@ ffmpeg:
 ffprobe:
   path: ${FFPROBE_PATH}
 
+ELASTIC_SEARCH_HOST : ${ELASTIC_SEARCH_HOST}
+ELASTIC_SEARCH_PORT : ${ELASTIC_SEARCH_PORT}
+
 video:
   recordings:
     path: ${VIDEO_RECORDINGS_PATH}

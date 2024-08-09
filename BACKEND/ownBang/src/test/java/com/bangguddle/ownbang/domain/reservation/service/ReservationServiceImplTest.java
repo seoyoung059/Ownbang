@@ -1,8 +1,8 @@
 package com.bangguddle.ownbang.domain.reservation.service;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
-import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
 import com.bangguddle.ownbang.domain.reservation.dto.*;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
@@ -39,7 +39,6 @@ import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -246,7 +245,7 @@ class ReservationServiceImplTest {
         Reservation confirmedReservation = mock(Reservation.class);
         when(reservation.confirmStatus()).thenReturn(confirmedReservation);
 
-        when(reservationRepository.existsByRoomAndReservationTimeAndStatus(any(), any(), any()))
+        when(reservationRepository.findByRoomAndReservationTimeAndStatus(any(), any(), any()))
                 .thenReturn(Optional.empty());
 
         // When
@@ -373,7 +372,7 @@ class ReservationServiceImplTest {
         when(reservation.getStatus()).thenReturn(ReservationStatus.APPLYED);
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 
-        when(reservationRepository.existsByRoomAndReservationTimeAndStatus(any(), any(), any()))
+        when(reservationRepository.findByRoomAndReservationTimeAndStatus(any(), any(), any()))
                 .thenReturn(Optional.of(mock(Reservation.class)));
 
         // When & Then
@@ -496,6 +495,7 @@ class ReservationServiceImplTest {
         verify(agentRepository).getByUserId(userId);
         verify(reservationRepository).findByRoomAgentIdAndReservationTimeAfterOrderByReservationTimeAscIdAsc(eq(agentId), any(LocalDateTime.class));
     }
+
     @Test
     @DisplayName("예약 가능 시간 조회 성공")
     void getAvailableTimes_Success() {

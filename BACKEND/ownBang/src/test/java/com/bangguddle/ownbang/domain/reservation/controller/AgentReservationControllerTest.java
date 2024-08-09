@@ -4,6 +4,7 @@ import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
 import com.bangguddle.ownbang.domain.reservation.dto.ReservationResponse;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
+import com.bangguddle.ownbang.domain.user.dto.UserReservationInfoResponse;
 import com.bangguddle.ownbang.global.enums.ErrorCode;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
@@ -96,12 +97,13 @@ public class AgentReservationControllerTest {
     @DisplayName("중개인 예약 목록 조회 성공")
     @WithMockUser(username = "1") // userId를 1로 설정
     void getAgentReservations_Success() throws Exception {
-        Long userId = 1L;
+        UserReservationInfoResponse userInfo = UserReservationInfoResponse.builder().userId(1L).userName("사용자").nickname("용자123").phoneNumber("010-1234-5678").build();
         LocalDateTime now = LocalDateTime.now();
         String officeName = "공인중개사";
-        ReservationResponse reservation1 = new ReservationResponse(1L, officeName, now, ReservationStatus.APPLYED, 1L, 1L, false);
-        ReservationResponse reservation2 = new ReservationResponse(2L, officeName, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, 2L, true);
-        ReservationResponse reservation3 = new ReservationResponse(3L, officeName, now.plusDays(2), ReservationStatus.COMPLETED, 3L, 3L, false);
+        String profileUrl = "urlurl";
+        ReservationResponse reservation1 = new ReservationResponse(1L, officeName, now, ReservationStatus.APPLYED, 1L, userInfo, profileUrl, false);
+        ReservationResponse reservation2 = new ReservationResponse(2L, officeName, now.plusDays(1), ReservationStatus.CONFIRMED, 2L, userInfo, profileUrl, true);
+        ReservationResponse reservation3 = new ReservationResponse(3L, officeName, now.plusDays(2), ReservationStatus.COMPLETED, 3L, userInfo, profileUrl, false);
 
         ReservationListResponse listResponse = new ReservationListResponse(List.of(reservation1, reservation2, reservation3));
         SuccessResponse<ReservationListResponse> successResponse = new SuccessResponse<>(RESERVATION_LIST_SUCCESS, listResponse);

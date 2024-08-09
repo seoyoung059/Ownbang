@@ -2,6 +2,7 @@ package com.bangguddle.ownbang.domain.reservation.dto;
 
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
+import com.bangguddle.ownbang.domain.user.dto.UserReservationInfoResponse;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +12,8 @@ public record ReservationResponse(
         LocalDateTime reservationTime,
         ReservationStatus status,
         Long roomId,
-        Long userId,
+        UserReservationInfoResponse userReservationInfoResponse,
+        String roomProfileImage,
         Boolean enstance
 ) {
     public static ReservationResponse from(Reservation reservation,Boolean enstance) {
@@ -21,7 +23,8 @@ public record ReservationResponse(
                 reservation.getReservationTime(),
                 reservation.getStatus(),
                 reservation.getRoom().getId(),
-                reservation.getUser().getId(),
+                UserReservationInfoResponse.from(reservation.getUser()),
+                reservation.getRoom().getProfileImageUrl(),
                 enstance
         );
     }

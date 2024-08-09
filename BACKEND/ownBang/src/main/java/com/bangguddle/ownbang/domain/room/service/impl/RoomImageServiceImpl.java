@@ -15,13 +15,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.IMAGE_UPLOAD_FAILED;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.INVALID_IMAGE_FILE;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.ROOM_DELETE_SUCCESS;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS;
 
@@ -80,16 +77,16 @@ public class RoomImageServiceImpl implements RoomImageService {
         }
 
 
-        String dbFilePath = roomImage.getRoomImageUrl();
-        Path filePath = Paths.get("src/main/resources/static", dbFilePath);
-
-        try {
-            if (Files.exists(filePath)) {
-                Files.delete(filePath);
-            }
-        } catch (IOException e) {
-            throw new AppException(IMAGE_DELETE_FAILED);
-        }
+//        String dbFilePath = roomImage.getRoomImageUrl();
+//        Path filePath = Paths.get("src/main/resources/static", dbFilePath);
+//
+//        try {
+//            if (Files.exists(filePath)) {
+//                Files.delete(filePath);
+//            }
+//        } catch (IOException e) {
+//            throw new AppException(IMAGE_DELETE_FAILED);
+//        }
 
         roomImageRepository.delete(roomImage);
 
