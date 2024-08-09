@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import KakaoLoginButton from "./KakaoLoginButton";
 
 import { useBoundStore } from "../../store/store";
@@ -71,16 +73,16 @@ const LoginForm = () => {
     })
       .then((res) => {
         if (res.resultCode === "SUCCESS") {
-          // toast.success("로그인 성공", {
-          //   position: "bottom-left",
-          //   autoClose: 2000,
-          //   hideProgressBar: true,
-          //   closeOnClick: true,
-          //   pauseOnHover: true,
-          //   draggable: true,
-          //   progress: undefined,
-          //   theme: "light",
-          // });
+          toast.success("로그인 성공", {
+            position: "bottom-left",
+            autoClose: 2000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
           fetchUser();
           navigate("/");
         }
