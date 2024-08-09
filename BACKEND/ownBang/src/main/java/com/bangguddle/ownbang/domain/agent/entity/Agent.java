@@ -25,6 +25,8 @@ public class Agent {
 
     @Column(nullable = false)
     private String officeAddress;
+    @Column(nullable = false)
+    private String detailOfficeAddress;
 
     private String greetings;
 
@@ -36,10 +38,11 @@ public class Agent {
 
     @Builder
     public Agent(String officeNumber, String licenseNumber, String officeAddress,
-                 String greetings, String officeName, User user) {
+                 String greetings, String officeName, String detailOfficeAddress, User user) {
         this.officeNumber = officeNumber;
         this.licenseNumber = licenseNumber;
         this.officeAddress = officeAddress;
+        this.detailOfficeAddress = detailOfficeAddress;
         this.greetings = greetings;
         this.officeName = officeName;
         this.user = user;
@@ -50,5 +53,6 @@ public class Agent {
         this.officeAddress = request.officeAddress();
         this.greetings = request.greetings();
         this.officeName = request.officeName();
+        this.licenseNumber = request.licenseNumber();
     }
 }
