@@ -7,6 +7,8 @@ import {
   Button,
   IconButton,
   InputBase,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -22,6 +24,7 @@ const CheckListTitle = ({
   const [newTemplateTitle, setNewTemplateTitle] = useState("");
   const [editTitle, setEditTitle] = useState(null);
   const [editValue, setEditValue] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const options = checklist
     ? checklist.map((el) => ({
@@ -43,12 +46,19 @@ const CheckListTitle = ({
 
   const handleAddTemplate = async () => {
     if (newTemplateTitle.trim() !== "") {
-      const newChecklist = await addTemplate(newTemplateTitle);
-      setSelectedTitle(newTemplateTitle);
-      setNewTemplateTitle(newTemplateTitle);
+      try {
+        const result = await addTemplate(newTemplateTitle);
+        setSelectedTitle(newTemplateTitle);
+        setNewTemplateTitle(newTemplateTitle);
+      } catch (error) {
+        if (error.response && error.response.status === 409) {
+          setErrorMessage("이미 존재하는 체크리스트 템플릿입니다.");
+        } else {
+          setErrorMessage("템플릿을 추가하는 중 오류가 발생했습니다.");
+        }
+      }
     }
   };
-
   const handleDeleteTemplate = async (event, checklistId) => {
     event.stopPropagation();
     await deleteTemplate(checklistId);
@@ -68,6 +78,10 @@ const CheckListTitle = ({
     await modifyTemplateTitle(option.checklistId, editValue);
     setEditTitle(null);
     setSelectedTitle(editValue);
+  };
+
+  const handleCloseSnackbar = () => {
+    setErrorMessage(null);
   };
 
   return (
@@ -138,6 +152,21 @@ const CheckListTitle = ({
           추가
         </Button>
       </Box>
+      {errorMessage && (
+        <Snackbar
+          open={Boolean(errorMessage)}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {errorMessage}
+          </Alert>
+        </Snackbar>
+      )}
     </Stack>
   );
 };

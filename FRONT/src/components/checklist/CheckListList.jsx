@@ -1,7 +1,14 @@
 import React from "react";
 import CheckListItem from "./CheckListItem";
 
-const CheckListList = ({ contents, onUpdate, onDelete, canEdit }) => {
+const CheckListList = ({
+  contents,
+  onUpdate,
+  onDelete,
+  canEdit,
+  onTimestampClick,
+  forReplay,
+}) => {
   if (!contents) {
     return null;
   }
@@ -18,6 +25,8 @@ const CheckListList = ({ contents, onUpdate, onDelete, canEdit }) => {
           onUpdate={onUpdate}
           onDelete={onDelete}
           canEdit={canEdit}
+          onTimestampClick={onTimestampClick}
+          forReplay={forReplay}
         />
       ))}
     </>
