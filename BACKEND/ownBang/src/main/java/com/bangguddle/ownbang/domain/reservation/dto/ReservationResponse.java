@@ -12,6 +12,7 @@ public record ReservationResponse(
         ReservationStatus status,
         Long roomId,
         Long userId,
+        String roomProfileImage,
         Boolean enstance
 ) {
     public static ReservationResponse from(Reservation reservation,Boolean enstance) {
@@ -22,6 +23,7 @@ public record ReservationResponse(
                 reservation.getStatus(),
                 reservation.getRoom().getId(),
                 reservation.getUser().getId(),
+                reservation.getRoom().getProfileImageUrl(),
                 enstance
         );
     }
