@@ -1,4 +1,4 @@
-import { reservation } from "../api/reservation";
+import { reservation, reservationList } from "../api/reservation";
 
 export const createReservation = (set) => ({
   makeReservation: async (reservationData) => {
@@ -9,6 +9,17 @@ export const createReservation = (set) => ({
     } catch (error) {
       console.error("Error making reservation:", error);
       throw error;
+    }
+  },
+
+  reservationAll: [],
+  getReservationList: async () => {
+    try {
+      const response = await reservationList();
+      set({ reservationAll: response.data });
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching reservation list:", error);
     }
   },
 });
