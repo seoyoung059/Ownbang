@@ -245,7 +245,7 @@ class ReservationServiceImplTest {
         Reservation confirmedReservation = mock(Reservation.class);
         when(reservation.confirmStatus()).thenReturn(confirmedReservation);
 
-        when(reservationRepository.existsByRoomAndReservationTimeAndStatus(any(), any(), any()))
+        when(reservationRepository.findByRoomAndReservationTimeAndStatus(any(), any(), any()))
                 .thenReturn(Optional.empty());
 
         // When
@@ -372,7 +372,7 @@ class ReservationServiceImplTest {
         when(reservation.getStatus()).thenReturn(ReservationStatus.APPLYED);
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 
-        when(reservationRepository.existsByRoomAndReservationTimeAndStatus(any(), any(), any()))
+        when(reservationRepository.findByRoomAndReservationTimeAndStatus(any(), any(), any()))
                 .thenReturn(Optional.of(mock(Reservation.class)));
 
         // When & Then

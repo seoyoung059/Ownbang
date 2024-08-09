@@ -165,7 +165,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new AppException(RESERVATION_CONFIRMED_DUPLICATED);
         }
 
-        Optional<Reservation> existsConfirmedReservation = reservationRepository.existsByRoomAndReservationTimeAndStatus(
+        Optional<Reservation> existsConfirmedReservation = reservationRepository.findByRoomAndReservationTimeAndStatus(
                 reservation.getRoom(), reservation.getReservationTime(), ReservationStatus.CONFIRMED);
         if (existsConfirmedReservation.isPresent()) {
             throw new AppException(RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM);
