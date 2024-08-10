@@ -8,7 +8,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Avatar,
 } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { useBoundStore } from "../../store/store";
@@ -67,7 +66,7 @@ const MyRealEstate = () => {
                 )}
               </TableCell>
               <TableCell align="right">
-                {row.address ? row.address : "저장된 정보가 없습니다."}
+                {row.road ? row.road : "저장된 정보가 없습니다."}
               </TableCell>
               <TableCell align="right">
                 {row.roomType ? row.roomType : "저장된 정보가 없습니다."}
