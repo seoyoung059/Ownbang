@@ -87,9 +87,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         final String token = header.substring(TOKEN_SPLIT_INDEX);
         long userId = jwtProvider.parseUserId(token);
-        Tokens validTokens = redisRepository.getValidTokens(userId);
-        if (!validTokens.accessToken().equals(token)) throw new AppException(ErrorCode.TOKEN_INVALID);
-
+        if (!possibleNonAuthenticationUri(request.getRequestURI()))
+            redisRepository.getByToken(token);
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
             chain.doFilter(request, response);
             return;
