@@ -77,12 +77,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
 
-        if(header == null || !header.startsWith(HEADER_PREFIX)){
-            if(possibleNonAuthenticationUri(request.getRequestURI())){
+        if (header == null || !header.startsWith(HEADER_PREFIX)) {
+            if (possibleNonAuthenticationUri(request.getRequestURI())) {
                 chain.doFilter(request, response);
                 return;
             }
-                throw new AppException(ErrorCode.TOKEN_INVALID);
+            throw new AppException(ErrorCode.TOKEN_INVALID);
         }
 
         final String token = header.substring(TOKEN_SPLIT_INDEX);
