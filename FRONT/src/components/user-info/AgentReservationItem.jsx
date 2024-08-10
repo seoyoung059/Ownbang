@@ -3,13 +3,7 @@ import { TableRow, TableCell, Avatar, Typography, Box, Button } from '@mui/mater
 import { CheckCircleOutlined, CancelOutlined, PendingOutlined, HistoryOutlined } from '@mui/icons-material';
 import { useMediaQuery, useTheme } from '@mui/material';
 
-export default function AgentReservationItem({
-    reservation,
-    confirmReservation,
-    denyReservation,
-    enterVideoRoom,
-    setReservationId,
-}) {
+export default function AgentReservationItem({ reservation, confirmReservation, denyReservation, enterVideoRoom }) {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -98,7 +92,6 @@ export default function AgentReservationItem({
     const onStartVideo = async () => {
         console.log(`Reservation ID: ${reservation.id}`); // 예약 ID 로그
         try {
-            setReservationId(reservation.id); // reservationId 설정
             console.log(`Setting reservation ID to: ${reservation.id}`);
             await enterVideoRoom(reservation.id);
             console.log(`Reservation ID ${reservation.id} entered the video room.`);
