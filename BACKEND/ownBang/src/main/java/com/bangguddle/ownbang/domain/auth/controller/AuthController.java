@@ -66,6 +66,14 @@ public class AuthController {
         return Response.success(response);
     }
 
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PostMapping("/refresh")
+    public ResponseEntity<Response<Tokens>> refreshTokens(@RequestBody Tokens tokens) {
+        SuccessResponse<Tokens> response = authService.refreshTokens(tokens);
+        return Response.success(response);
+    }
+
+
 }
 
 
