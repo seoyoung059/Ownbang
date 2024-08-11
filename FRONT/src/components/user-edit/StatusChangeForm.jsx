@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   CssBaseline,
@@ -13,106 +13,182 @@ import {
 import AddressSearch from "../common/AddressSearch";
 import { useTheme } from "@mui/material";
 import { toast } from "react-toastify";
-
 import { useNavigate } from "react-router-dom";
-
 import { useBoundStore } from "../../store/store";
+import TimePicker from "./TimePicker";
 
-export default function UserInfoEditForm({ toggleEdit }) {
+export default function StatusChangeForm({ toggleEdit, isAgent }) {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const upgradeAgent = useBoundStore((state) => state.upgradeAgent);
+  const { upgradeAgent, getMyAgentInfo, modifyMyAgentInfo } = useBoundStore(
+    (state) => ({
+      upgradeAgent: state.upgradeAgent,
+      getMyAgentInfo: state.getMyAgentInfo,
+      modifyMyAgentInfo: state.modifyMyAgentInfo,
+    })
+  );
+
   // 유저 정보
   const [userInfo, setUserInfo] = useState({
     officeNumber: "",
     licenseNumber: "",
     officeAddress: "",
-    officeDetailAddress: "",
+    detailOfficeAddress: "",
     officeName: "",
+    weekendStartTime: "",
+    weekendEndTime: "",
+    weekdayStartTime: "",
+    weekdayEndTime: "",
   });
 
   const [open, setOpen] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const [greetings, setGreetings] = useState("");
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleAddress = (el) => {
-    setUserInfo(() => ({
-      ...userInfo,
-      officeAddress: el,
+    setUserInfo((prevUserInfo) => ({
+      ...prevUserInfo,
+      officeAddress: el || "",
     }));
     handleClose();
   };
 
-  // 입력창에 있는 정보들을 userInfo에 반영
-  // input의 name 속성과 value를 엮었기에 input의 name과 유저 정보 객체 키와 연결
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUserInfo((prevUserInfo) => ({
-      ...prevUserInfo,
-      [name]: value,
-    }));
-  };
+  // 전화번호 포맷팅 함수
+  const formatPhoneNumber = (phoneNumber) => {
+    let formattedPhoneNumber = phoneNumber.replace(/[^\d]/g, ""); // 숫자 이외의 문자 모두 제거
 
-  // 전화번호
-  const handleCallNumberChange = (event) => {
-    let formattedPhoneNumber = event.target.value.replace(/[^\d]/g, ""); // 숫자 이외의 문자 모두 제거
-
-    // '-' 기호 삽입
-    if (formattedPhoneNumber.length > 2 && formattedPhoneNumber.length <= 6) {
-      formattedPhoneNumber = formattedPhoneNumber.replace(
-        /(\d{3})(\d{4})/,
-        "$1-$2"
-      );
-    } else if (formattedPhoneNumber.length > 6) {
+    if (formattedPhoneNumber.startsWith("02")) {
+      // 02로 시작하는 경우 (02-XXXX-XXXX)
+      if (formattedPhoneNumber.length > 10) {
+        formattedPhoneNumber = formattedPhoneNumber.slice(0, 10); // 길이 제한
+      }
       formattedPhoneNumber = formattedPhoneNumber.replace(
         /(\d{2})(\d{4})(\d{4})/,
         "$1-$2-$3"
       );
+    } else {
+      // 그 외 지역번호 (XXX-XXXX-XXXX)
+      if (formattedPhoneNumber.length > 11) {
+        formattedPhoneNumber = formattedPhoneNumber.slice(0, 11); // 길이 제한
+      }
+      formattedPhoneNumber = formattedPhoneNumber.replace(
+        /(\d{3})(\d{4})(\d{4})/,
+        "$1-$2-$3"
+      );
     }
 
+    return formattedPhoneNumber;
+  };
+
+  useEffect(() => {
+    const fetchAgentInfo = async () => {
+      try {
+        const res = await getMyAgentInfo();
+        if (res) {
+          setUserInfo({
+            officeNumber: formatPhoneNumber(res.officeNumber || ""),
+            licenseNumber: res.licenseNumber || "",
+            officeAddress: res.officeAddress || "",
+            detailOfficeAddress: res.detailOfficeAddress || "",
+            officeName: res.officeName || "",
+            weekendStartTime: res.weekendStartTime || "",
+            weekendEndTime: res.weekendEndTime || "",
+            weekdayStartTime: res.weekdayStartTime || "",
+            weekdayEndTime: res.weekdayEndTime || "",
+          });
+          setGreetings(res.greetings || "");
+        }
+      } catch (err) {
+        console.error("Failed to load agent information", err);
+      }
+    };
+
+    if (isAgent) {
+      fetchAgentInfo();
+    }
+  }, [getMyAgentInfo, isAgent]);
+
+  // 입력창에 있는 정보들을 userInfo에 반영
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setUserInfo((prevUserInfo) => ({
       ...prevUserInfo,
-      officeNumber: formattedPhoneNumber,
+      [name]: value || "",
+    }));
+  };
+
+  // 전화번호 입력 시 포맷팅 적용
+  const handleCallNumberChange = (event) => {
+    const formattedPhoneNumber = formatPhoneNumber(event.target.value);
+    setUserInfo((prevUserInfo) => ({
+      ...prevUserInfo,
+      officeNumber: formattedPhoneNumber || "",
     }));
   };
 
   const handleNumberChange = (event) => {
     setUserInfo((prevUserInfo) => ({
       ...prevUserInfo,
-      licenseNumber: event.target.value.replace(/[^\d]/g, ""),
+      licenseNumber: event.target.value.replace(/[^\d]/g, "") || "",
     }));
+  };
+
+  const handleGreetingsChange = (event) => {
+    setGreetings(event.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await upgradeAgent({
-        officeNumber: userInfo.officeNumber.split("-").join(""),
-        licenseNumber: userInfo.licenseNumber,
-        officeAddress:
-          userInfo.officeAddress + " " + userInfo.officeDetailAddress,
-        officeName: userInfo.officeName,
-      });
+      let res;
+      if (isAgent) {
+        // 수정 기능 수행
+
+        const req = {
+          ...userInfo,
+          greetings: greetings, // 이 부분 수정
+          officeNumber: userInfo.officeNumber.split("-").join(""),
+        };
+
+        console.log(req);
+        res = await modifyMyAgentInfo(req)
+          .then()
+          .catch((err) => console.error(err));
+      } else {
+        // 중개인 회원 전환 신청
+        const req = {
+          ...userInfo,
+          officeNumber: userInfo.officeNumber.split("-").join(""),
+        };
+        console.log(req);
+        res = await upgradeAgent(req);
+      }
+
       if (res.resultCode === "SUCCESS") {
-        toast.info("중개인 회원전환 신청 완료.", {
-          position: "bottom-left",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.info(
+          isAgent ? "중개인 정보 수정 완료." : "중개인 회원전환 신청 완료.",
+          {
+            position: "bottom-left",
+            autoClose: 2000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }
+        );
         navigate("/");
       }
     } catch (err) {
-      setErrMsg(err.response.data.message || "An error occurred");
+      setErrMsg(err.response?.data?.message || "An error occurred");
     }
   };
+
   return (
     <>
       <Container component="main" maxWidth="xs">
@@ -129,7 +205,7 @@ export default function UserInfoEditForm({ toggleEdit }) {
             component="h1"
             variant="h5"
           >
-            중개인 회원 전환
+            {isAgent ? "중개인 정보 수정" : "중개인 회원 전환"}
           </Typography>
           <Divider component="div" sx={{ mt: 1, width: "100%" }} />
           <Box component="form" noValidate sx={{ mt: 4 }}>
@@ -143,7 +219,7 @@ export default function UserInfoEditForm({ toggleEdit }) {
                   onChange={(handleInputChange, handleCallNumberChange)}
                   fullWidth
                   inputProps={{
-                    maxLength: 12, // 최대 입력 길이 설정 (예: 02-1234-5678)
+                    maxLength: 13, // 최대 입력 길이 설정 (예: 02-1234-5678 또는 043-1234-5678)
                   }}
                   placeholder="02-1234-5678"
                 />
@@ -201,8 +277,8 @@ export default function UserInfoEditForm({ toggleEdit }) {
               <Grid item xs={12}>
                 <TextField
                   label="상세 주소"
-                  name="officeDetailAddress"
-                  value={userInfo.officeDetailAddress}
+                  name="detailOfficeAddress"
+                  value={userInfo.detailOfficeAddress}
                   onChange={handleInputChange}
                   fullWidth
                 />
@@ -216,6 +292,24 @@ export default function UserInfoEditForm({ toggleEdit }) {
                   fullWidth
                 />
               </Grid>
+              <Grid item alignItems="center" xs={12} sx={{ display: "flex" }}>
+                <TimePicker
+                  handleInputChange={handleInputChange}
+                  userInfo={userInfo}
+                />
+              </Grid>
+              {isAgent && (
+                <Grid item xs={12}>
+                  <TextField
+                    label="사무실 소개"
+                    name="greetings"
+                    value={greetings}
+                    onChange={handleGreetingsChange} // 이 부분 수정
+                    fullWidth
+                  />
+                </Grid>
+              )}
+
               <Grid item xs={12} sx={{ textAlign: "end" }}>
                 <Typography
                   sx={{
@@ -232,7 +326,6 @@ export default function UserInfoEditForm({ toggleEdit }) {
               xs={8}
               sx={{ display: "flex", justifyContent: "space-around" }}
             >
-              {/* 취소 버튼 클릭 시 어느 페이지로 이동할 지 */}
               <Button
                 variant="contained"
                 onClick={() => toggleEdit(false)}
@@ -258,7 +351,7 @@ export default function UserInfoEditForm({ toggleEdit }) {
                   backgroundColor: theme.palette.primary.main,
                 }}
               >
-                확인
+                {isAgent ? "수정" : "확인"}
               </Button>
             </Grid>
           </Box>

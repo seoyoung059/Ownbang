@@ -23,7 +23,7 @@ export default function MainPage() {
   }));
   const theme = useTheme();
   const isLg = useMediaQuery(theme.breakpoints.down("lg"));
-  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSm = useMediaQuery(theme.breakpoints.down("md"));
 
   const onSearch = (term) => {
     setSearchTerm(term);

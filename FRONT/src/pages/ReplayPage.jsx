@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useBoundStore } from "../store/store";
 import Replay from "../components/video-chat/Replay";
 import CheckList from "../components/checklist/CheckList";
 import VideoLoading from "../components/video-chat/VideoLoading";
-import { Container, Grid, Box, Typography } from "@mui/material";
+import { Container, Grid, Box, Typography, Button } from "@mui/material";
 import { useTheme } from "@emotion/react";
 
 const ReplayPage = () => {
   const theme = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [videoInfo, setVideoInfo] = useState(null);
   const [player, setPlayer] = useState(null);
@@ -18,9 +21,10 @@ const ReplayPage = () => {
   }));
 
   useEffect(() => {
+    console.log(location.state);
     const fetchVideoInfo = async () => {
       try {
-        const result = await enterReplayRoom(17); // Example ID
+        const result = await enterReplayRoom(location.state.reservationId);
         setVideoInfo(result);
         setIsDataLoaded(true);
       } catch (error) {
@@ -73,15 +77,30 @@ const ReplayPage = () => {
     }
   };
 
+  const handleExit = () => {
+    navigate("/mypage"); // Navigate to "mypage"
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ mt: 15 }}>
-      <Typography
-        variant="h5"
-        gutterBottom
-        sx={{ fontWeight: theme.fontWeight.bold }}
+    <Container maxWidth="lg" sx={{ mt: 16 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
       >
-        다시보기
-      </Typography>
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{ fontWeight: theme.fontWeight.bold }}
+        >
+          다시보기
+        </Typography>
+        <Button variant="contained" color="secondary" onClick={handleExit}>
+          나가기
+        </Button>
+      </Box>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           {isDataLoaded ? (
@@ -95,7 +114,7 @@ const ReplayPage = () => {
             <VideoLoading />
           )}
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4} sx={{ mt: 4 }}>
           <Box>
             <CheckList
               canEdit={true}

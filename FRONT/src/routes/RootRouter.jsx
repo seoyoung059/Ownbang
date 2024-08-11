@@ -39,7 +39,7 @@ const RootRouter = () => {
             element={<AgentRoute element={<RealEstateRegisterPage />} />}
           />
           <Route
-            path="/video-chat"
+            path="/video-chat/:reservationId"
             element={<UserRoute element={<VideoChat />} allowAgents={true} />}
           />
           <Route
@@ -47,7 +47,7 @@ const RootRouter = () => {
             element={<AgentRoute element={<AgentPage />} />}
           />
           <Route
-            path="/replay"
+            path="/replay/:reservationId"
             element={<UserRoute element={<ReplayPage />} />}
           />
         </Routes>
