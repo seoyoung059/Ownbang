@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: ownBang
+  datasource:
+    url: test
+    username: test
+    password: test
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
+server:
+  port: 1234
+  ssl:
+    enabled: false
+
+openvidu:
+  url: test
+  secret: test
