@@ -1,5 +1,4 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import {
   TableRow,
   TableCell,
@@ -15,11 +14,21 @@ import {
   HistoryOutlined,
 } from "@mui/icons-material";
 import { useMediaQuery, useTheme } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import ReviewModal from "./ReviewModal";
+import { useBoundStore } from "../../store/store";
 
 export default function MyReservationItem({ reservation }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const [isHovered, setIsHovered] = useState(false);
+  const [isReviewModalOpen, setReviewModalOpen] = useState(false);
+
+  const { writeReview } = useBoundStore((state) => ({
+    writeReview: state.writeReview,
+  }));
 
   const getStatusIconAndText = (status) => {
     switch (status) {
@@ -46,43 +55,18 @@ export default function MyReservationItem({ reservation }) {
           text: "완료",
         };
       default:
-        return {
-          icon: null,
-          text: "알 수 없음",
-        };
+        return { icon: null, text: "알 수 없음" };
     }
   };
 
   const { icon, text } = getStatusIconAndText(reservation.status);
 
-  // 예약 날짜 데이터
-  let reservationDate = new Date(
-    reservation.reservationTime
-  ).toLocaleDateString("ko-KR");
-  // 문자열의 마지막이 "."로 끝나면 "." 제거
-  if (reservationDate.endsWith(".")) {
-    reservationDate = reservationDate.slice(0, -1);
-  }
-
-  // 예약 시간 데이터
-  const reservationTime = new Date(
-    reservation.reservationTime
-  ).toLocaleTimeString("ko-KR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  const handleVideoRoom = () => {
-    navigate(`/video-chat/${reservation.id}`, {
-      state: { reservationId: reservation.id },
-    });
+  const handleReviewSubmit = (reviewData) => {
+    writeReview(reviewData);
+    console.log("Review submitted:", reviewData);
   };
 
-  const handleReplayRoom = () => {
-    navigate(`/replay/${reservation.id}`, {
-      state: { reservationId: reservation.id },
-    });
-  };
+  const reviewText = reservation.isReview ? "리뷰 작성" : "리뷰 수정";
 
   return (
     <TableRow sx={{ bgcolor: theme.palette.background.default }}>
@@ -97,12 +81,15 @@ export default function MyReservationItem({ reservation }) {
       )}
       <TableCell>
         <Typography variant={isMobile ? "body2" : "body1"}>
-          {reservationDate}
+          {new Date(reservation.reservationTime).toLocaleDateString("ko-KR")}
         </Typography>
       </TableCell>
       <TableCell>
         <Typography variant={isMobile ? "body2" : "body1"}>
-          {reservationTime}
+          {new Date(reservation.reservationTime).toLocaleTimeString("ko-KR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </Typography>
       </TableCell>
       {!isMobile && (
@@ -112,12 +99,44 @@ export default function MyReservationItem({ reservation }) {
           </Typography>
         </TableCell>
       )}
-      <TableCell>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {icon}
-          <Typography sx={{ ml: 1, whiteSpace: "nowrap" }} variant={"body1"}>
-            {text}
-          </Typography>
+      <TableCell sx={{ minWidth: 100, maxWidth: 100 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            cursor: reservation.status === "COMPLETED" ? "pointer" : "default",
+            color:
+              isHovered && reservation.status === "COMPLETED"
+                ? theme.palette.warning.main // Set the text color to yellow on hover
+                : "inherit",
+            transition: "color 0.3s ease",
+          }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onClick={
+            reservation.status === "COMPLETED"
+              ? () => setReviewModalOpen(true)
+              : undefined
+          }
+        >
+          {reservation.status === "COMPLETED" && isHovered ? (
+            <Typography
+              sx={{ ml: 1, whiteSpace: "nowrap", textAlign: "center" }}
+              variant={"body1"}
+            >
+              {reviewText}
+            </Typography>
+          ) : (
+            <>
+              {icon}
+              <Typography
+                sx={{ ml: 1, whiteSpace: "nowrap", textAlign: "center" }}
+                variant={"body1"}
+              >
+                {text}
+              </Typography>
+            </>
+          )}
         </Box>
       </TableCell>
       <TableCell>
@@ -126,7 +145,7 @@ export default function MyReservationItem({ reservation }) {
             variant="contained"
             disabled={reservation.status !== "CONFIRMED"}
             size={isMobile ? "small" : "medium"}
-            onClick={handleVideoRoom}
+            onClick={() => navigate(`/video-chat/${reservation.id}`)}
           >
             입장하기
           </Button>
@@ -140,12 +159,22 @@ export default function MyReservationItem({ reservation }) {
               },
             }}
             size={isMobile ? "small" : "medium"}
-            onClick={handleReplayRoom}
+            onClick={() => navigate(`/replay/${reservation.id}`)}
           >
             다시보기
           </Button>
         )}
       </TableCell>
+
+      {/* Review Modal */}
+      <ReviewModal
+        open={isReviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        onSubmit={handleReviewSubmit}
+        AgentOfficeName={reservation.AgentOfficeName}
+        reservationId={reservation.id}
+        agentId={reservation.agentId}
+      />
     </TableRow>
   );
 }

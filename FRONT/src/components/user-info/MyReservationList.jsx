@@ -9,6 +9,9 @@ import {
   Paper,
   CircularProgress,
   Typography,
+  TableFooter,
+  TablePagination,
+  Box,
 } from "@mui/material";
 import MyReservationItem from "./MyReservationItem";
 import { useMediaQuery, useTheme } from "@mui/material";
@@ -25,6 +28,8 @@ function MyReservationList() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -42,13 +47,36 @@ function MyReservationList() {
     fetchReservations();
   }, [getReservationList]);
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   if (loading) {
-    return <CircularProgress />;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          mt: 10,
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (error) {
     return <Typography color="error">{error}</Typography>;
   }
+
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - reservations.length) : 0;
 
   return (
     <TableContainer component={Paper}>
@@ -64,25 +92,36 @@ function MyReservationList() {
           </TableRow>
         </TableHead>
         <TableBody sx={{ bgcolor: theme.palette.background.default }}>
-          {reservations.length > 0 ? (
-            reservations.map((reservation) => (
+          {reservations
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((reservation) => (
               <MyReservationItem
                 key={reservation.id}
                 reservation={reservation}
               />
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={6}
-                align="center"
-                sx={{ bgcolor: theme.palette.background.default }}
-              >
-                <Typography variant="body1">예약이 없습니다.</Typography>
-              </TableCell>
+            ))}
+          {emptyRows > 0 && (
+            <TableRow style={{ height: 53 * emptyRows }}>
+              <TableCell colSpan={6} />
             </TableRow>
           )}
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              count={reservations.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="페이지당 행 수:"
+              labelDisplayedRows={({ from, to, count }) =>
+                `${from}-${to} / ${count !== -1 ? count : `more than ${to}`}`
+              }
+            />
+          </TableRow>
+        </TableFooter>
       </Table>
     </TableContainer>
   );
