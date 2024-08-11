@@ -2,9 +2,13 @@ package com.bangguddle.ownbang.domain.streaming.service.impl;
 
 
 import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
-import com.bangguddle.ownbang.global.enums.SuccessCode;
+import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
+import com.bangguddle.ownbang.domain.video.entity.Video;
+import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
+import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
+import com.bangguddle.ownbang.domain.video.service.VideoService;
+import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
 import com.bangguddle.ownbang.global.handler.AppException;
-import com.bangguddle.ownbang.global.response.SuccessResponse;
 import com.bangguddle.ownbang.global.service.impl.S3UploaderServiceImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +20,7 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.progress.Progress;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -25,6 +30,7 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -40,6 +46,9 @@ public class StreamingServiceImpl implements StreamingService {
     private final FFmpeg fFmpeg;
     private final FFprobe fFprobe;
     private final S3UploaderServiceImpl s3UploaderService;
+    private final VideoService videoService;
+    private final VideoRepository videoRepository;
+    private final WebrtcSessionService webrtcSessionService;
 
     private static final String zipExtend = ".zip";
     private static final String m3u8Extend = ".m3u8";
@@ -55,8 +64,9 @@ public class StreamingServiceImpl implements StreamingService {
      * @param sessionId
      * @return
      */
+    @Async
     @Override
-    public SuccessResponse<String> uploadStreaming(String sessionId){
+    public CompletableFuture<String> uploadStreaming(Long reservationId, String sessionId){
         log.info("uploadStreaming sessionId:{}", sessionId);
 
         Path outputPath = Paths.get(reocrdingPath, sessionId);
@@ -75,9 +85,25 @@ public class StreamingServiceImpl implements StreamingService {
         convertToHls(unzipFileName, sessionId);
 
         // s3에 업로드한다.
-        String uploadedUrl = s3UploaderService.uploadHlsFiles(Paths.get(outputPath.toString(),sessionId), sessionId);
+//        String uploadedUrl = s3UploaderService.uploadHlsFiles(Paths.get(outputPath.toString(),sessionId), sessionId);
 
-        return new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, uploadedUrl+"/"+sessionId+m3u8Extend);
+        // video 수정
+        Video video = videoRepository.findByReservationId(reservationId)
+                .orElseThrow(()->new AppException(INTERNAL_SERVER_ERROR));
+
+
+        VideoUpdateRequest videoUpdateRequest =
+                VideoUpdateRequest.builder()
+                        .videoUrl(outputPath+"/"+sessionId+m3u8Extend)
+                        .videoStatus(VideoStatus.RECORDED)
+                        .build();
+        videoService.modifyVideo(videoUpdateRequest, video.getId());
+
+
+        // record 제거
+        webrtcSessionService.deleteRecord(reservationId);
+
+        return  CompletableFuture.completedFuture("Uploaded successfully" +reservationId+", "+ sessionId);
     }
 
     /**
