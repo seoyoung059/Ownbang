@@ -16,8 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bangguddle.ownbang.global.enums.ErrorCode.WORKHOUR_INAVAILABLE;
-import static com.bangguddle.ownbang.global.enums.ErrorCode.WORKHOUR_NOT_FOUND;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 @Service
@@ -35,7 +34,7 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
         AgentWorkhour agentWorkhour = request.toEntity(agent);
         if (!isValidTimeRange(request.weekdayStartTime(), request.weekdayEndTime()) ||
                 !isValidTimeRange(request.weekendStartTime(), request.weekendEndTime())) {
-            throw new AppException(WORKHOUR_INAVAILABLE);
+            throw new AppException(WORKHOUR_UNAVAILABLE);
         }
         agentWorkhourRepository.save(agentWorkhour);
 
@@ -67,7 +66,7 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
 
         if (!isValidTimeRange(request.weekdayStartTime(), request.weekdayEndTime()) ||
                 !isValidTimeRange(request.weekendStartTime(), request.weekendEndTime())) {
-            throw new AppException(WORKHOUR_INAVAILABLE);
+            throw new AppException(WORKHOUR_UNAVAILABLE);
         }
         agentWorkhour.updateWorkhour(request.weekdayStartTime(), request.weekdayEndTime(), request.weekendStartTime(), request.weekendEndTime());
         agentWorkhourRepository.save(agentWorkhour);

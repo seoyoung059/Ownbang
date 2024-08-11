@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static com.bangguddle.ownbang.global.enums.ErrorCode.WORKHOUR_INAVAILABLE;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.WORKHOUR_UNAVAILABLE;
 import static com.bangguddle.ownbang.global.enums.ErrorCode.WORKHOUR_NOT_FOUND;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +80,7 @@ class AgentWorkhourServiceImplTest {
         // When & Then
         assertThatThrownBy(() -> agentWorkhourService.createAgentWorkhour(userId, request))
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", WORKHOUR_INAVAILABLE);
+                .hasFieldOrPropertyWithValue("errorCode", WORKHOUR_UNAVAILABLE);
     }
 
     @Test
@@ -166,7 +166,7 @@ class AgentWorkhourServiceImplTest {
         // When & Then
         assertThatThrownBy(() -> agentWorkhourService.updateAgentWorkhour(userId, request))
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", WORKHOUR_INAVAILABLE);
+                .hasFieldOrPropertyWithValue("errorCode", WORKHOUR_UNAVAILABLE);
     }
 
     @Test
