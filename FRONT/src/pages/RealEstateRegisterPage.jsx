@@ -255,6 +255,7 @@ export default function RealEstateRegisterPage() {
               <MenuItem value="원룸">원룸</MenuItem>
               <MenuItem value="투룸">투룸</MenuItem>
               <MenuItem value="쓰리룸">쓰리룸</MenuItem>
+              <MenuItem value="분리형">분리형</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={10}>
@@ -346,7 +347,7 @@ export default function RealEstateRegisterPage() {
                       name="exclusiveArea"
                       value={basicInfo.exclusiveArea}
                       onChange={handleBasicInfoChange}
-                      placeholder="㎡"
+                      placeholder="000.00㎡"
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -356,7 +357,7 @@ export default function RealEstateRegisterPage() {
                       name="supplyArea"
                       value={basicInfo.supplyArea}
                       onChange={handleBasicInfoChange}
-                      placeholder="㎡"
+                      placeholder="000.00㎡"
                     />
                   </Grid>
                 </Grid>
@@ -417,7 +418,7 @@ export default function RealEstateRegisterPage() {
                   name="exclusiveArea"
                   value={basicInfo.exclusiveArea}
                   onChange={handleBasicInfoChange}
-                  placeholder="㎡"
+                  placeholder="000.00㎡"
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -427,7 +428,7 @@ export default function RealEstateRegisterPage() {
                   name="supplyArea"
                   value={basicInfo.supplyArea}
                   onChange={handleBasicInfoChange}
-                  placeholder="㎡"
+                  placeholder="000.00㎡"
                 />
               </Grid>
             </>
@@ -544,6 +545,7 @@ export default function RealEstateRegisterPage() {
               name="roomCount"
               value={roomDetails.roomCount}
               onChange={handleRoomDetailChange}
+              placeholder=""
             />
           </Grid>
           <Grid item xs={12} sm={3}>

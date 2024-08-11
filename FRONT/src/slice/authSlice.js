@@ -1,4 +1,3 @@
-import { Upgrade } from "@mui/icons-material";
 import {
   checkEmail,
   checkPhoneNumber,
@@ -48,16 +47,16 @@ export const createAuthSlice = (set) => ({
   logout: () => {
     localStorage.removeItem("accessToken");
     set({ isAuthenticated: false });
-    toast.success("로그아웃 완료", {
-      position: "bottom-left",
-      autoClose: 2000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
+    // toast.success("로그아웃 완료", {
+    //   position: "bottom-left",
+    //   autoClose: 2000,
+    //   hideProgressBar: true,
+    //   closeOnClick: true,
+    //   pauseOnHover: true,
+    //   draggable: true,
+    //   progress: undefined,
+    //   theme: "light",
+    // });
   },
 
   confirmPassword: async (password) => {
