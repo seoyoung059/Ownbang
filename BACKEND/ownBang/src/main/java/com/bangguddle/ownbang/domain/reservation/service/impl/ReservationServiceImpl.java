@@ -52,6 +52,14 @@ public class ReservationServiceImpl implements ReservationService {
     private final AgentRepository agentRepository;
     private final WebrtcSessionService webrtcSessionService;
 
+    /**
+     * 예약 생성 Service 메서드
+     *
+     * @param reservationRequest 예약 생성 DTO
+     * @return SuccessResponse
+     * @throws AppException 특정 매물과, 시간대, 이미 확정된 예약이 존재하는 경우(RESERVATION_DUPLICATED) 발생
+     * @throws AppException 내가 이미 예약 신청/확정한 매물일 경우, RESERVATION_COMPLETED 발생
+     */
     @Override
     @Transactional
     public SuccessResponse<NoneResponse> createReservation(Long userId, ReservationRequest reservationRequest) {
@@ -62,16 +70,16 @@ public class ReservationServiceImpl implements ReservationService {
         User user = userRepository.getById(userId);
         LocalDateTime reservationTime = reservationRequest.reservationTime();
 
-        // 룸 ID와 시간이 일치하는 예약이 이미 존재하는지 확인
+        // 룸 ID와 시간이 일치하는 확정된 예약이 이미 존재하는지 확인
         Optional<Reservation> existingReservation = reservationRepository.findByRoomIdAndTimeWithLock(roomId, reservationTime);
 
         if (existingReservation.isPresent()) {
-            throw new AppException(RESERVATION_DUPLICATED); // 이미 예약이 존재하는 경우
+            throw new AppException(RESERVATION_DUPLICATED);
         }
-        // 이미 내가 예약한 매물이라면,
+        // 이미 내가 예약 신청/확정 한 매물이라면,
         Optional<Reservation> completedReservation = reservationRepository.findByRoomIdAndUserIdAndStatusNot(roomId, userId, ReservationStatus.CANCELLED);
         if (completedReservation.isPresent()) {
-            throw new AppException(RESERVATION_COMPLETED); // 이미 예약이 존재하는 경우
+            throw new AppException(RESERVATION_COMPLETED);
         }
 
         // 새 예약 저장
@@ -81,7 +89,12 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(RESERVATION_MAKE_SUCCESS, NoneResponse.NONE);
     }
 
-    // 예약 목록 조회
+    /**
+     * 임차인 예약 조회
+     *
+     * @return SuccessResponse - ReservationListResponse DTO
+     * @return SuccessResponse - 예약 목록이 없을 경우, RESERVATION_LIST_EMPTY
+     */
     @Transactional
     public SuccessResponse<ReservationListResponse> getMyReservationList(Long userId) {
         User user = userRepository.getById(userId);
@@ -101,7 +114,6 @@ public class ReservationServiceImpl implements ReservationService {
                     reservation = updatedReservation;
                 }
 
-                // 중개인이 세션을 생성했는지 확인
                 Optional<Session> session = webrtcSessionService.getSession(reservation.getId());
                 enstance = session.isPresent();
             }
@@ -113,7 +125,16 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
     }
 
-    // 예약 철회 시 사용
+    /**
+     * 임차인 예약 취소
+     *
+     * @param id 취소할 얘약 id
+     * @return SuccessResponse
+     * @throws AppException userid와 취소할 예약의 user id가 불일치시 ACCESS_DENIED 발생
+     * @throws AppException 이미 취소된 예약인데 취소 시 RESERVATION_CANCELLED_DUPLICATED 발생
+     * @throws AppException 이미 확정된 예약인데 취소 시 RESERVATION_CANCELLED_UNAVAILABLE 발생
+     * @throws AppException 없는 예약 id라면, BAD_REQUEST 발생
+     */
     @Transactional
     public SuccessResponse<NoneResponse> updateStatusReservation(Long userId, Long id) {
         Reservation reservation = vaildateReservation(id);
@@ -144,7 +165,17 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElseThrow(() -> new AppException(BAD_REQUEST));
     }
 
-    // 예약 확정 시 사용
+    /**
+     * 중개인 예약확정
+     *
+     * @param id 확정할 예약 id
+     * @return SuccessResponse
+     * @throws AppException agent id와 확정할 예약의 agent id가 불일치시 ACCESS_DENIED 발생
+     * @throws AppException 이미 확정된 예약인데 확정 시 RESERVATION_CANCELLED_DUPLICATED 발생
+     * @throws AppException 이미 취소된 예약인데 확정 시 RESERVATION_CONFIRMED_UNAVAILABLE 발생
+     * @throws AppException 없는 예약 id라면, BAD_REQUEST 발생
+     * @throws AppException 중개인이 동일매물, 같은 시간대 매물의 예약을 2개이상 확정 시 RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM 발생
+     */
     @Transactional
     public SuccessResponse<NoneResponse> confirmStatusReservation(Long userId, Long id) {
         Reservation reservation = vaildateReservation(id);
@@ -171,7 +202,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new AppException(RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM);
         }
 
-        // 상태를 '예약취소'로 변경
+        // 상태를 '예약확정'으로 변경
         Reservation confirmedReservation = reservation.confirmStatus();
 
         // 상태 변경된 예약 저장
@@ -179,7 +210,12 @@ public class ReservationServiceImpl implements ReservationService {
 
         return new SuccessResponse<>(RESERVATION_CONFIRM_SUCCESS, NoneResponse.NONE);
     }
-    // 중개인 예약 목록조회
+    /**
+     * 중개인 예약 목록 조회
+     *
+     * @return SuccessResponse - ReservationListResponse DTO
+     * @return SuccessResponse - 예약 목록이 없을 경우, RESERVATION_LIST_EMPTY
+     */
     @Transactional
     public SuccessResponse<ReservationListResponse> getAgentReservations(Long userId) {
         User user = userRepository.getById(userId);
@@ -215,7 +251,15 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
     }
 
-    //예약가능한 시간 조회
+    /**
+     * 매물, 날짜별 예약가능한 시간 조회
+     * 중개인 업무시간 내에서 예약 확정 시간대를 제외하고 반환
+     *
+     * @param request 매물과 날짜 DTO
+     * @return  SuccessResponse - AvailableTimeResponse DTO
+     * @throws AppException 매물을 못 찾을 시 ROOM_NOT_FOUND 발생
+     * @throws AppException 중개인 업무시간을 못 찾을 시 WORKHOUR_NOT_FOUND 발생
+     */
     @Override
     @Transactional(readOnly = true)
     public SuccessResponse<AvailableTimeResponse> getAvailableTimes(AvailableTimeRequest request) {
@@ -264,7 +308,16 @@ public class ReservationServiceImpl implements ReservationService {
         return slots;
     }
 
-    // 예약 철회 시 사용
+    /**
+     * 중개인 예약 취소
+     *
+     * @param id 취소할 예약 id
+     * @return SuccessResponse
+     * @throws AppException agent id와 취소할 예약의 agent id가 불일치시 ACCESS_DENIED 발생
+     * @throws AppException 이미 취소된 예약인데 취소 시 RESERVATION_CANCELLED_DUPLICATED 발생
+     * @throws AppException 이미 확정된 예약인데 취소 시 RESERVATION_CANCELLED_UNAVAILABLE 발생
+     * @throws AppException 없는 예약 id라면, BAD_REQUEST 발생
+     */
     @Transactional
     public SuccessResponse<NoneResponse> deleteStatusReservation(Long userId, Long id) {
         Reservation reservation = vaildateReservation(id);
