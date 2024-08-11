@@ -60,8 +60,10 @@ public class StreamingServiceImpl implements StreamingService {
 
 
     /**
-     * sessionId를 받아 zip 압축 해제 후 hls로 변환하여 S3에 올림
-     * @param sessionId
+     * [비동기]sessionId를 받아 zip 압축 해제 후 hls로 변환하여 S3에 올림
+     *
+     * @param reservationId 예약 ID
+     * @param sessionId 해당 예약에 대해 생성된 Openvidu Session Id
      * @return
      */
     @Async
@@ -73,7 +75,7 @@ public class StreamingServiceImpl implements StreamingService {
         log.info(outputPath.toAbsolutePath().toString());
 
         // json에서 publisher(중개인)의 녹화 파일명을 얻는다.
-        String jsonFile = unzipFile(outputPath.toString(), sessionId, sessionId);
+        unzipFile(outputPath.toString(), sessionId, sessionId);
 
         String filename = getPublisherFileName(outputPath.toString(), sessionId);
         if(filename == null) throw new AppException(RECORDING_ERROR);
@@ -85,7 +87,7 @@ public class StreamingServiceImpl implements StreamingService {
         convertToHls(unzipFileName, sessionId);
 
         // s3에 업로드한다.
-//        String uploadedUrl = s3UploaderService.uploadHlsFiles(Paths.get(outputPath.toString(),sessionId), sessionId);
+        String uploadedUrl = s3UploaderService.uploadHlsFiles(Paths.get(outputPath.toString(),sessionId), sessionId);
 
         // video 수정
         Video video = videoRepository.findByReservationId(reservationId)
