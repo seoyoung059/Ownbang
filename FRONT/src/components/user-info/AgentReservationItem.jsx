@@ -216,20 +216,7 @@ export default function AgentReservationItem({
         </Typography>
       </TableCell>
       <TableCell>
-        {reservation.status === "COMPLETED" ? (
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: theme.palette.primary.dark,
-              "&:hover": {
-                backgroundColor: theme.palette.primary.main,
-              },
-            }}
-            onClick={replayVideo}
-          >
-            다시보기
-          </Button>
-        ) : (
+        {reservation.status !== "COMPLETED" && (
           <Button
             variant="contained"
             sx={{
@@ -238,7 +225,7 @@ export default function AgentReservationItem({
                 backgroundColor: theme.palette.success.main,
               },
             }}
-            disabled={reservation.status !== "CONFIRMED"} // CONFIRMED 상태가 아니면 비활성화
+            disabled={!reservation.enstance}
             onClick={onStartVideo}
           >
             입장하기

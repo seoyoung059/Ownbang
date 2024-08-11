@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Container, Box } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Container, Box, CircularProgress } from "@mui/material";
 import CheckListTitle from "./CheckListTitle";
 import CheckListList from "./CheckListList";
 import CheckListAddInput from "./CheckListAddInput";
@@ -24,9 +24,19 @@ const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
 
   const [selectedChecklist, setSelectedChecklist] = useState(null);
   const [selectedTitle, setSelectedTitle] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCheckLists();
+    const fetchChecklists = async () => {
+      setLoading(true);
+      try {
+        await fetchCheckLists();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChecklists();
   }, [fetchCheckLists]);
 
   useEffect(() => {
@@ -129,6 +139,21 @@ const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
       onTimestampClick(timestamp); // 부모 컴포넌트의 핸들러 호출
     }
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          mt: 10,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Container
