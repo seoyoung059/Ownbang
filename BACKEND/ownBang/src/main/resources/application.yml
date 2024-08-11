@@ -1,0 +1,91 @@
+spring:
+  application:
+    name: ownBang
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+    elasticsearch:
+      rest:
+        uris: http://localhost:9200
+
+  main:
+    allow-bean-definition-overriding: true
+
+server:
+  port: ${PORT}
+  ssl:
+    enabled: true
+    key-store: ${KEY_STORE}
+    key-store-password: ${KEY_STORE_PASSWORD}
+    key-store-type: ${KEY_STORE_TYPE}
+    key-alias: ${KEY_ALIAS}
+  servlet:
+    context-path: /api/
+
+
+openvidu:
+  url: ${OPENVIDU_URL}
+  secret: ${OPENVIDU_SECRET}
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${aws_accessKey}
+      secretKey: ${aws_secretKey}
+    region:
+      static: ${aws_region}
+    s3:
+      bucket: ${aws_s3bucket}
+    cloudfront:
+      dns: ${aws_cloudfront}
+s3:
+  room-image:
+    path: ${S3_ROOMIMAGE_PATH}
+  hls:
+    path: ${S3_HLS_PATH}
+
+key:
+  secret : ${JWT_SECRET_KEY}
+
+ffmpeg:
+  path: ${FFMPEG_PATH}
+ffprobe:
+  path: ${FFPROBE_PATH}
+
+ELASTIC_SEARCH_HOST : ${ELASTIC_SEARCH_HOST}
+ELASTIC_SEARCH_PORT : ${ELASTIC_SEARCH_PORT}
+
+video:
+  recordings:
+    path: ${VIDEO_RECORDINGS_PATH}
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /api-docs
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+
+logging:
+  config: classpath:log4j2.xml
