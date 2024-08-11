@@ -16,26 +16,40 @@ import org.springframework.web.bind.annotation.*;
 public class AgentReservationController {
     private final ReservationService reservationService;
 
-    // 예약 확정
+    /**
+     * 예약 확정
+     *
+     * @param id 확정하고싶은 예약 ID
+     * @return Success Response, 실패 시 AppException Throw
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<Response<NoneResponse>> confirmStatusReservation(@AuthenticationPrincipal Long userId, @PathVariable(name="id") Long id) {
         SuccessResponse<NoneResponse> response = reservationService.confirmStatusReservation(userId, id);
         return Response.success(response);
     }
-    // 예약 조회
+
+    /**
+     * 중개인 예약 조회
+     *
+     * @return SuccessResponse, ReservationListResponse 실패 시 AppException Throw
+     */
     @GetMapping
     public ResponseEntity<Response<ReservationListResponse>> getAgentReservations(@AuthenticationPrincipal Long userId) {
         SuccessResponse<ReservationListResponse> response = reservationService.getAgentReservations(userId);
         return Response.success(response);
     }
 
-    //예약 취소
+    /**
+     * 예약 취소
+     *
+     * @param id 취소하고싶은 예약 ID
+     * @return Success Response, 실패 시 AppException Throw
+     */
     @PatchMapping("/delete/{id}")
     public ResponseEntity<Response<NoneResponse>> deleteStatusReservation(@PathVariable(name="id") Long id, @AuthenticationPrincipal Long userId) {
         SuccessResponse<NoneResponse> response = reservationService.deleteStatusReservation(userId, id);
         return Response.success(response);
     }
-
 
 }
 

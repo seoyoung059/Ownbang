@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class SearchController {
     private final SearchService searchService;
 
+    /**
+     * 연관검색어 자동완성
+     *
+     * @param name 검색어
+     * @return SuccessResponse SearchListResponse, 실패 시 AppException Throw
+     */
     @GetMapping
     public ResponseEntity<Response<SearchListResponse>> searchByName(@RequestParam(name="searchName") String name) {
         SuccessResponse<SearchListResponse> response = searchService.searchByName(name);

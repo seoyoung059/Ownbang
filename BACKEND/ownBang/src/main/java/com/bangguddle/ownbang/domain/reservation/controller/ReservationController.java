@@ -24,6 +24,12 @@ import java.time.LocalDate;
 public class ReservationController {
     private final ReservationService reservationService;
 
+    /**
+     * 예약 생성
+     *
+     * @param reservationRequest 예약 정보 JSON
+     * @return Success Response, 실패 시 AppException Throw
+     */
     @PostMapping("/")
     public ResponseEntity<Response<NoneResponse>> createReservation(@AuthenticationPrincipal Long userId,
                                                                     @Valid @RequestBody ReservationRequest reservationRequest) {
@@ -31,18 +37,36 @@ public class ReservationController {
         return Response.success(response);
     }
 
+    /**
+     * 임차인 예약 목록 조회
+     *
+     * @return Success Response, ReservationListResponse 실패 시 AppException Throw
+     */
     @GetMapping("/list")
     public ResponseEntity<Response<ReservationListResponse>> getMyReservationList (@AuthenticationPrincipal Long userId) {
         SuccessResponse<ReservationListResponse> response = reservationService.getMyReservationList (userId);
         return Response.success(response);
     }
 
+    /**
+     * 임차인 예약 철회
+     *
+     * @param id :철회할 예약 id
+     * @return Success Response, 실패 시 AppException Throw
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<Response<NoneResponse>> updateStatusReservation(@PathVariable(name="id") Long id, @AuthenticationPrincipal Long userId) {
         SuccessResponse<NoneResponse> response = reservationService.updateStatusReservation(userId, id);
         return Response.success(response);
     }
 
+    /**
+     * 예약 가능한 시간 조회
+     *
+     * @param roomId 조회하고 싶은 매물 ID
+     * @param date  조회를 하고 싶은 날짜
+     * @return SuccessResponse, AvailableTimeResponse 실패 시 AppException Throw
+     */
     @GetMapping("/available-times")
     public ResponseEntity<Response<AvailableTimeResponse>> getAvailableTimes(
             @RequestParam("roomId") Long roomId,
@@ -51,7 +75,6 @@ public class ReservationController {
         SuccessResponse<AvailableTimeResponse> response = reservationService.getAvailableTimes(request);
         return Response.success(response);
     }
-
 
 }
 
