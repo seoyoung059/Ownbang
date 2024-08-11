@@ -17,8 +17,12 @@ import { useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ReviewModal from "./ReviewModal";
 import { useBoundStore } from "../../store/store";
+import { toast } from "react-toastify";
 
-export default function MyReservationItem({ reservation }) {
+export default function MyReservationItem({
+  reservation,
+  refreshReservations,
+}) {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -26,8 +30,9 @@ export default function MyReservationItem({ reservation }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
 
-  const { writeReview } = useBoundStore((state) => ({
+  const { writeReview, killReview } = useBoundStore((state) => ({
     writeReview: state.writeReview,
+    killReview: state.killReview,
   }));
 
   const getStatusIconAndText = (status) => {
@@ -61,12 +66,37 @@ export default function MyReservationItem({ reservation }) {
 
   const { icon, text } = getStatusIconAndText(reservation.status);
 
-  const handleReviewSubmit = (reviewData) => {
-    writeReview(reviewData);
-    console.log("Review submitted:", reviewData);
+  const handleReviewSubmit = async (reviewData) => {
+    await writeReview(reviewData);
+    await toast.success("리뷰가 성공적으로 작성되었습니다!", {
+      position: "bottom-left",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+    await setTimeout(refreshReservations, 500);
   };
 
-  const reviewText = reservation.isReview ? "리뷰 작성" : "리뷰 수정";
+  const handleReviewDelete = async () => {
+    await killReview(reservation.id);
+    await toast.success("리뷰가 성공적으로 삭제되었습니다!", {
+      position: "bottom-left",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+    await setTimeout(refreshReservations, 500);
+  };
+
+  const reviewText = reservation.isReview ? "리뷰 작성" : "리뷰 삭제";
 
   return (
     <TableRow sx={{ bgcolor: theme.palette.background.default }}>
@@ -107,7 +137,9 @@ export default function MyReservationItem({ reservation }) {
             cursor: reservation.status === "COMPLETED" ? "pointer" : "default",
             color:
               isHovered && reservation.status === "COMPLETED"
-                ? theme.palette.warning.main // Set the text color to yellow on hover
+                ? reservation.isReview
+                  ? theme.palette.warning.main // Yellow color for "리뷰 수정"
+                  : theme.palette.error.main // Red color for "리뷰 삭제"
                 : "inherit",
             transition: "color 0.3s ease",
           }}
@@ -115,7 +147,9 @@ export default function MyReservationItem({ reservation }) {
           onMouseLeave={() => setIsHovered(false)}
           onClick={
             reservation.status === "COMPLETED"
-              ? () => setReviewModalOpen(true)
+              ? reservation.isReview
+                ? () => setReviewModalOpen(true) // Open modal for review update
+                : handleReviewDelete // Directly delete review
               : undefined
           }
         >
@@ -167,14 +201,16 @@ export default function MyReservationItem({ reservation }) {
       </TableCell>
 
       {/* Review Modal */}
-      <ReviewModal
-        open={isReviewModalOpen}
-        onClose={() => setReviewModalOpen(false)}
-        onSubmit={handleReviewSubmit}
-        AgentOfficeName={reservation.AgentOfficeName}
-        reservationId={reservation.id}
-        agentId={reservation.agentId}
-      />
+      {reservation.isReview && (
+        <ReviewModal
+          open={isReviewModalOpen}
+          onClose={() => setReviewModalOpen(false)}
+          onSubmit={handleReviewSubmit}
+          AgentOfficeName={reservation.AgentOfficeName}
+          reservationId={reservation.id}
+          agentId={reservation.agentId}
+        />
+      )}
     </TableRow>
   );
 }

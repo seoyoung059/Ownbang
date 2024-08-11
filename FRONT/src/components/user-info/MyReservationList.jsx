@@ -31,20 +31,21 @@ function MyReservationList() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  useEffect(() => {
-    const fetchReservations = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        await getReservationList();
-      } catch (error) {
-        setError("Failed to fetch reservations. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Function to refresh reservations
+  const refreshReservations = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await getReservationList();
+    } catch (error) {
+      setError("Failed to fetch reservations. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchReservations();
+  useEffect(() => {
+    refreshReservations(); // Fetch reservations on component mount
   }, [getReservationList]);
 
   const handleChangePage = (event, newPage) => {
@@ -98,6 +99,7 @@ function MyReservationList() {
               <MyReservationItem
                 key={reservation.id}
                 reservation={reservation}
+                refreshReservations={refreshReservations} // Pass the refresh function to each item
               />
             ))}
           {emptyRows > 0 && (
