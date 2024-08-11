@@ -1,9 +1,6 @@
 package com.bangguddle.ownbang.domain.reservation.controller;
 
-import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeRequest;
-import com.bangguddle.ownbang.domain.reservation.dto.AvailableTimeResponse;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationListResponse;
-import com.bangguddle.ownbang.domain.reservation.dto.ReservationRequest;
+import com.bangguddle.ownbang.domain.reservation.dto.*;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
@@ -40,11 +37,11 @@ public class ReservationController {
     /**
      * 임차인 예약 목록 조회
      *
-     * @return Success Response, ReservationListResponse 실패 시 AppException Throw
+     * @return Success Response, UserReservationListResponse 실패 시 AppException Throw
      */
     @GetMapping("/list")
-    public ResponseEntity<Response<ReservationListResponse>> getMyReservationList (@AuthenticationPrincipal Long userId) {
-        SuccessResponse<ReservationListResponse> response = reservationService.getMyReservationList (userId);
+    public ResponseEntity<Response<UserReservationListResponse>> getMyReservationList (@AuthenticationPrincipal Long userId) {
+        SuccessResponse<UserReservationListResponse> response = reservationService.getMyReservationList (userId);
         return Response.success(response);
     }
 

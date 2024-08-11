@@ -9,6 +9,8 @@ import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.reservation.service.ReservationService;
+import com.bangguddle.ownbang.domain.review.entity.Review;
+import com.bangguddle.ownbang.domain.review.repository.ReviewRepository;
 import com.bangguddle.ownbang.domain.room.entity.Room;
 import com.bangguddle.ownbang.domain.room.repository.RoomRepository;
 import com.bangguddle.ownbang.domain.user.entity.User;
@@ -51,7 +53,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final VideoRepository videoRepository;
     private final AgentRepository agentRepository;
     private final WebrtcSessionService webrtcSessionService;
-
+    private final ReviewRepository reviewRepository;
     /**
      * 예약 생성 Service 메서드
      *
@@ -92,18 +94,19 @@ public class ReservationServiceImpl implements ReservationService {
     /**
      * 임차인 예약 조회
      *
-     * @return SuccessResponse - ReservationListResponse DTO
+     * @return SuccessResponse - UserReservationListResponse DTO
      * @return SuccessResponse - 예약 목록이 없을 경우, RESERVATION_LIST_EMPTY
      */
     @Transactional
-    public SuccessResponse<ReservationListResponse> getMyReservationList(Long userId) {
+    public SuccessResponse<UserReservationListResponse> getMyReservationList(Long userId) {
         User user = userRepository.getById(userId);
         List<Reservation> reservations = reservationRepository.findByUserId(userId);
         if (reservations == null || reservations.isEmpty()) {
-            return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new ReservationListResponse(List.of()));
+            return new SuccessResponse<>(RESERVATION_LIST_EMPTY, new UserReservationListResponse(List.of()));
         }
 
-        List<ReservationResponse> updatedReservations = new ArrayList<>();
+        List<UserReservationResponse> userReservations = new ArrayList<>();
+
         for (Reservation reservation : reservations) {
             boolean enstance = false;
             if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
@@ -118,12 +121,22 @@ public class ReservationServiceImpl implements ReservationService {
                 enstance = session.isPresent();
             }
 
-            updatedReservations.add(ReservationResponse.from(reservation, enstance));
+            Long agentId = reservation.getRoom().getAgent().getId();
+            boolean isReview = false;
+
+            if (reservation.getStatus() == ReservationStatus.COMPLETED) {
+                Optional<Review> review = reviewRepository.findByReservationId(reservation.getId());
+                isReview = review.isEmpty();
+            }
+
+            userReservations.add(UserReservationResponse.from(reservation, enstance, agentId, isReview));
         }
 
-        ReservationListResponse reservationListResponse = ReservationListResponse.from(updatedReservations);
-        return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
+        UserReservationListResponse userReservationListResponse = UserReservationListResponse.from(userReservations);
+        return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, userReservationListResponse);
     }
+
+
 
     /**
      * 임차인 예약 취소
@@ -210,6 +223,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         return new SuccessResponse<>(RESERVATION_CONFIRM_SUCCESS, NoneResponse.NONE);
     }
+
     /**
      * 중개인 예약 목록 조회
      *
