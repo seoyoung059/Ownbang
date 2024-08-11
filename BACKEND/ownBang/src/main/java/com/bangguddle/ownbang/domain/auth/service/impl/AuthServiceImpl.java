@@ -16,8 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import static com.bangguddle.ownbang.global.enums.ErrorCode.EMAIL_DUPLICATED;
-import static com.bangguddle.ownbang.global.enums.ErrorCode.PHONE_NUMBER_DUPLICATED;
+import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
 import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
 
 @Service
@@ -62,7 +61,6 @@ public class AuthServiceImpl implements AuthService {
         Long userId = getByEmail(request.email()).getId();
         Tokens tokens = jwtProvider.generateTokens(userId);
         redisRepository.save(tokens);
-        redisRepository.saveValidTokens(tokens, userId);
         return new SuccessResponse<>(LOGIN_SUCCESS, tokens);
     }
 
@@ -78,7 +76,6 @@ public class AuthServiceImpl implements AuthService {
     public SuccessResponse<NoneResponse> logout(String header, Long id) {
         String accessToken = header.substring(TOKEN_SPLIT_INDEX);
         redisRepository.delete(accessToken);
-        redisRepository.deleteValidTokens(id);
         return new SuccessResponse<>(LOGOUT_SUCCESS, NoneResponse.NONE);
     }
 
@@ -88,6 +85,19 @@ public class AuthServiceImpl implements AuthService {
         user.updatePassword(passwordEncoder.encode(request.password()));
         userRepository.save(user);
         return new SuccessResponse<>(PASSWORD_CHANGE_SUCCESS, NoneResponse.NONE);
+    }
+
+    @Override
+    public SuccessResponse<Tokens> refreshTokens(Tokens tokens) {
+        String accessToken = tokens.accessToken();
+        String refreshToken = redisRepository.getByToken(accessToken);
+        if (!refreshToken.equals(tokens.refreshToken()))
+            throw new AppException(TOKEN_INVALID);
+        redisRepository.delete(accessToken);
+        long userId = jwtProvider.parseUserId(refreshToken);
+        Tokens refresh = jwtProvider.generateTokens(userId);
+        redisRepository.save(refresh);
+        return new SuccessResponse<>(AUTH_TOKEN_CHANGE_SUCCESS, refresh);
     }
 
 
