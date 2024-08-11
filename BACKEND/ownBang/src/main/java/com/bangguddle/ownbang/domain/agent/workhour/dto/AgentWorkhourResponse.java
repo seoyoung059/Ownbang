@@ -16,7 +16,7 @@ public record AgentWorkhourResponse(
                 agentWorkhour.getAgent().getId(),
                 agentWorkhour.getWeekdayStartTime(),
                 agentWorkhour.getWeekdayEndTime(),
-                agentWorkhour.getWeekdayStartTime(),
+                agentWorkhour.getWeekendStartTime(),
                 agentWorkhour.getWeekendEndTime()
         );
     }
