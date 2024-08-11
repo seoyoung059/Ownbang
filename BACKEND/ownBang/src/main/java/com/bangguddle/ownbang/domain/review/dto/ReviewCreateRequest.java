@@ -5,7 +5,9 @@ import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.review.entity.Review;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Builder;
 
+@Builder
 public record ReviewCreateRequest(
         Long reservationId,
         Long agentId,

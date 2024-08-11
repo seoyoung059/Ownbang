@@ -65,6 +65,7 @@ public class ReviewServiceImpl implements com.bangguddle.ownbang.domain.review.s
 
     @Override
     public SuccessResponse<Double> getAverageRating(Long agentId) {
+        agentRepository.getById(agentId);
         return new SuccessResponse<>(SuccessCode.REVIEW_FIND_SUCCESS, reviewRepository.calculateAverageStarRatingByAgentId(agentId));
     }
 }
