@@ -133,7 +133,7 @@ export default function UserInfoEditForm() {
               }}
               onClick={() => setForAgent((prev) => !prev)}
             >
-              중개인 회원 전환 신청
+              {user.isAgent ? "중개인 정보 수정" : "중개인 회원 전환 신청"}
             </Typography>
             <Divider component="div" sx={{ mt: 1, width: "100%" }} />
             <Box component="form" noValidate sx={{ mt: 4 }}>
@@ -236,7 +236,7 @@ export default function UserInfoEditForm() {
         ) : forPassChange ? (
           <PasswordChangeForm toggleEdit={handlePassChange} />
         ) : (
-          <StatusChangeForm toggleEdit={handleEdit} />
+          <StatusChangeForm toggleEdit={handleEdit} isAgent={user.isAgent} />
         )}
         <Snackbar
           open={snackbarOpen}

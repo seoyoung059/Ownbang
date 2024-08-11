@@ -135,7 +135,6 @@ const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center",
         height: "630px",
       }}

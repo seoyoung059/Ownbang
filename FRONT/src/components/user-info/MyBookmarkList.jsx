@@ -39,7 +39,7 @@ function MyBookmarkList() {
     >
       {bookmarks.length === 0 ? (
         <Typography variant="h6" color="text.secondary">
-          No bookmarks found.
+          찜 목록이 없습니다.
         </Typography>
       ) : (
         bookmarks.map((bookmark) => (

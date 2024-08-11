@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,39 +11,48 @@ export const AgentRoute = ({ element }) => {
     fetchUser: state.fetchUser,
   }));
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       await fetchUser();
+      setLoading(false);
     };
 
     fetchData();
   }, [fetchUser]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      toast.info("로그인이 필요합니다.", {
-        position: "bottom-left",
-        autoClose: 2000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    } else if (user && !user.isAgent) {
-      toast.info("중개인만 이용할 수 있습니다.", {
-        position: "bottom-left",
-        autoClose: 2000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+    if (!loading) {
+      if (!isAuthenticated) {
+        toast.info("로그인이 필요합니다.", {
+          position: "bottom-left",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      } else if (user && !user.isAgent) {
+        toast.info("중개인만 이용할 수 있습니다.", {
+          position: "bottom-left",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, loading]);
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -63,16 +72,19 @@ export const UserRoute = ({ element, allowAgents = false }) => {
     fetchUser: state.fetchUser,
   }));
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       await fetchUser();
+      setLoading(false);
     };
 
     fetchData();
   }, [fetchUser]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       toast.info("로그인이 필요합니다.", {
         position: "bottom-left",
         autoClose: 2000,
@@ -84,7 +96,11 @@ export const UserRoute = ({ element, allowAgents = false }) => {
         theme: "light",
       });
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, loading]);
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;

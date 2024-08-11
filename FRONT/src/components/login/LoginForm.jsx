@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import KakaoLoginButton from "./KakaoLoginButton";
-
 import { useBoundStore } from "../../store/store";
 
 import {
@@ -186,7 +184,6 @@ const LoginForm = () => {
             >
               로그인
             </Button>
-            <KakaoLoginButton />
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">

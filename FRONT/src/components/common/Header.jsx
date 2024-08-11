@@ -45,6 +45,10 @@ const Header = () => {
   const handleMenuOpen = (event) => setMenuAnchorEl(event.currentTarget);
   const handleMenuClose = () => setMenuAnchorEl(null);
 
+  const handleLogout = () => {
+    logout();
+  };
+
   const notificationCount = 1;
 
   const headerStyle = {
@@ -102,7 +106,7 @@ const Header = () => {
           <Box sx={navigationStyle}>
             <div>
               {isAuthenticated ? (
-                <Button onClick={logout}>로그아웃</Button>
+                <Button onClick={handleLogout}>로그아웃</Button>
               ) : (
                 <Button onClick={() => handleNavigation("/login")}>
                   로그인
