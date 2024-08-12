@@ -84,14 +84,12 @@ function MyReservationList() {
       <Table>
         <TableHead>
           <TableRow>
-            {!isMobile && <TableCell sx={{ minWidth: 80 }}>미리보기</TableCell>}
-            <TableCell sx={{ minWidth: 100 }}>예약일</TableCell>
-            <TableCell sx={{ minWidth: 100 }}>예약 시간</TableCell>
-            {!isMobile && (
-              <TableCell sx={{ minWidth: 100 }}>공인중개사명</TableCell>
-            )}
-            <TableCell sx={{ minWidth: 40 }}>예약 상태</TableCell>
-            <TableCell sx={{ minWidth: 90 }}>화상 채팅</TableCell>
+            {!isMobile && <TableCell>미리보기</TableCell>}
+            <TableCell>예약일</TableCell>
+            <TableCell>예약 시간</TableCell>
+            {!isMobile && <TableCell>공인중개사명</TableCell>}
+            <TableCell>예약 상태</TableCell>
+            <TableCell>화상 채팅</TableCell>
           </TableRow>
         </TableHead>
         <TableBody sx={{ bgcolor: theme.palette.background.default }}>

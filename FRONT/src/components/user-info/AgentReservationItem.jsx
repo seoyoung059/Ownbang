@@ -21,7 +21,6 @@ export default function AgentReservationItem({
   confirmReservation,
   denyReservation,
   enterVideoRoom,
-  getAgentReservationList,
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -111,7 +110,6 @@ export default function AgentReservationItem({
     try {
       await confirmReservation(reservation.id);
       console.log(`예약아이디 ${reservation.id}가 확정되었습니다.`);
-      getAgentReservationList();
     } catch (error) {
       console.error("Failed to confirm reservation:", error);
     }
@@ -122,7 +120,6 @@ export default function AgentReservationItem({
     try {
       await denyReservation(reservation.id);
       console.log(`예약아이디 ${reservation.id}가 거절되었습니다.`);
-      getAgentReservationList();
     } catch (error) {
       console.error("Failed to confirm reservation:", error);
     }

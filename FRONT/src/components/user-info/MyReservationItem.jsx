@@ -68,7 +68,7 @@ export default function MyReservationItem({
 
   const handleReviewSubmit = async (reviewData) => {
     await writeReview(reviewData);
-    await toast.success("리뷰 등록 완료", {
+    await toast.success("리뷰가 성공적으로 작성되었습니다!", {
       position: "bottom-left",
       autoClose: 2000,
       hideProgressBar: true,
@@ -83,7 +83,7 @@ export default function MyReservationItem({
 
   const handleReviewDelete = async () => {
     await killReview(reservation.id);
-    await toast.success("리뷰 삭제 완료", {
+    await toast.success("리뷰가 성공적으로 삭제되었습니다!", {
       position: "bottom-left",
       autoClose: 2000,
       hideProgressBar: true,

@@ -72,18 +72,8 @@ const ReplayPage = () => {
       const seconds =
         parseInt(timestamp.split(":")[0]) * 60 +
         parseInt(timestamp.split(":")[1]);
-
-      const videoDuration = player.duration();
-
-      if (seconds <= videoDuration) {
-        player.currentTime(seconds);
-        console.log(`Navigating to ${timestamp}`);
-      } else {
-        window.alert("잘못된 탬플릿을 선택하셨습니다.");
-        console.log(
-          `Timestamp ${timestamp} exceeds video duration. Navigation cancelled.`
-        );
-      }
+      player.currentTime(seconds);
+      console.log(timestamp);
     }
   };
 
