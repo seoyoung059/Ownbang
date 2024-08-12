@@ -245,7 +245,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         List<ReservationResponse> updatedReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {
-            boolean enstance = reservation.getReservationTime().minusMinutes(10).isBefore(now);
+            boolean enstance = reservation.getStatus() == ReservationStatus.CONFIRMED
+                    && reservation.getReservationTime().minusMinutes(30).isBefore(now)
+                    && reservation.getReservationTime().plusHours(1).isAfter(now);;
 
             if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
                 Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
@@ -265,15 +267,6 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
     }
 
-    /**
-     * 매물, 날짜별 예약가능한 시간 조회
-     * 중개인 업무시간 내에서 예약 확정 시간대를 제외하고 반환
-     *
-     * @param request 매물과 날짜 DTO
-     * @return  SuccessResponse - AvailableTimeResponse DTO
-     * @throws AppException 매물을 못 찾을 시 ROOM_NOT_FOUND 발생
-     * @throws AppException 중개인 업무시간을 못 찾을 시 WORKHOUR_NOT_FOUND 발생
-     */
     @Override
     @Transactional(readOnly = true)
     public SuccessResponse<AvailableTimeResponse> getAvailableTimes(AvailableTimeRequest request) {
@@ -282,14 +275,23 @@ public class ReservationServiceImpl implements ReservationService {
         AgentWorkhour workhour = agentWorkhourRepository.findByAgent(room.getAgent())
                 .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
         LocalTime startTime = LocalTime.parse(workhour.getWeekdayStartTime());
-        LocalTime endTime = LocalTime.parse(workhour.getWeekdayEndTime() );
-        if (getDayCategory(request.date())=="WEEKEND"){
+        LocalTime endTime = LocalTime.parse(workhour.getWeekdayEndTime());
+
+        if (getDayCategory(request.date()) == "WEEKEND") {
             startTime = LocalTime.parse(workhour.getWeekendStartTime());
             endTime = LocalTime.parse(workhour.getWeekendEndTime());
         }
 
         List<LocalTime> allPossibleTimes = generateTimeSlots(startTime, endTime);
         List<LocalTime> bookedTimes = reservationRepository.findConfirmedReservationTimes(request.roomId(), request.date());
+
+        // 현재 날짜와 요청된 날짜가 같은 경우에만 현재 시간 이후의 시간대만 포함
+        if (request.date().isEqual(LocalDate.now())) {
+            LocalTime now = LocalTime.now();
+            allPossibleTimes = allPossibleTimes.stream()
+                    .filter(time -> !time.isBefore(now))
+                    .collect(Collectors.toList());
+        }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         List<String> availableTimes = allPossibleTimes.stream()
@@ -299,6 +301,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         return new SuccessResponse<>(AVAILABLE_TIMES_RETRIEVED, new AvailableTimeResponse(availableTimes));
     }
+
 
     private String getDayCategory(LocalDate date) {
         // 날짜에 따라 주말, 주중인지 파악
