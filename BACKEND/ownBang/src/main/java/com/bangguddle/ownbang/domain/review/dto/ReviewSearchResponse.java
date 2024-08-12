@@ -10,8 +10,7 @@ public record ReviewSearchResponse(
         UserBasicInfoResponse userInfo,
         Long reservationId,
         Long agentId,
-        Integer starRating,
-        String content
+        Integer starRating
 ) {
 
     static public ReviewSearchResponse from(Review review) {
@@ -21,7 +20,6 @@ public record ReviewSearchResponse(
                 .reservationId(review.getReservation().getId())
                 .agentId(review.getAgent().getId())
                 .starRating(review.getStarRating())
-                .content(review.getContent())
                 .build();
     }
 }
