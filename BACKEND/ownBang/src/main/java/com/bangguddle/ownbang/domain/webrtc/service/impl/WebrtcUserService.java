@@ -44,6 +44,14 @@ public class WebrtcUserService implements WebrtcService {
         // session 유효성 검사
         validateSession(reservationId);
 
+        // 기존 토큰 유무 확인 및 삭제
+        webrtcSessionService.getToken(reservationId, UserType.ROLE_USER)
+                .ifPresent(token -> {
+                    System.out.println("기존 토큰 존재: " + token);
+                    webrtcSessionService.removeToken(reservationId, token, UserType.ROLE_USER)
+                            .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
+                });
+
         // token 생성
         String token = webrtcSessionService.createToken(reservationId, UserType.ROLE_USER)
                 .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
