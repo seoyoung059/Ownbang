@@ -11,7 +11,7 @@ const Reservation = ({ onClose, makeReservation, item, getAgentAvailable }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [availableTimes, setAvailableTimes] = useState([]); // 가능한 시간 목록 상태 추가
+  const [availableTimes, setAvailableTimes] = useState([]);
 
   const reservationTime =
     selectedDate && selectedTime
@@ -20,7 +20,6 @@ const Reservation = ({ onClose, makeReservation, item, getAgentAvailable }) => {
         )}.000Z`
       : "";
 
-  // 날짜와 시간 선택 후 예약 처리
   const onDateCheck = useCallback(async () => {
     if (!selectedDate || !selectedTime) {
       setShowAlert(true);
@@ -54,7 +53,6 @@ const Reservation = ({ onClose, makeReservation, item, getAgentAvailable }) => {
     onClose,
   ]);
 
-  // 날짜 변경 핸들러
   const handleDateChange = (date) => {
     setSelectedDate(date);
     if (showAlert) {
@@ -62,7 +60,6 @@ const Reservation = ({ onClose, makeReservation, item, getAgentAvailable }) => {
     }
   };
 
-  // 시간 변경 핸들러
   const handleTimeChange = (time) => {
     setSelectedTime(time);
     if (showAlert) {
@@ -70,30 +67,27 @@ const Reservation = ({ onClose, makeReservation, item, getAgentAvailable }) => {
     }
   };
 
-  // 성공 메시지 닫기 핸들러
   const handleSuccessClose = () => {
     setShowSuccess(false);
   };
 
-  // 에러 메시지 닫기 핸들러
   const handleErrorClose = () => {
     setErrorMessage("");
   };
 
-  // 컴포넌트가 로드될 때 getAgentAvailable 호출
   useEffect(() => {
     if (selectedDate) {
       const fetchAvailableTimes = async () => {
         const requiredData = {
           roomId: item.id,
-          date: selectedDate.format("YYYY-MM-DD"), // 날짜를 문자열 형식으로 변환
+          date: selectedDate.format("YYYY-MM-DD"),
         };
 
         try {
           const data = await getAgentAvailable(requiredData);
           console.log("Available times data:", data);
           if (data.resultCode === "SUCCESS") {
-            setAvailableTimes(data.data.availableTimes); // 가능한 시간 목록 저장
+            setAvailableTimes(data.data.availableTimes);
           }
         } catch (error) {
           console.error("Error fetching available times:", error);
@@ -142,7 +136,7 @@ const Reservation = ({ onClose, makeReservation, item, getAgentAvailable }) => {
         <ReservationClock
           value={selectedTime}
           onChange={handleTimeChange}
-          availableTimes={availableTimes} // 가능한 시간 목록 전달
+          availableTimes={availableTimes}
         />
         <Typography
           sx={{

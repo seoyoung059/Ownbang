@@ -26,7 +26,8 @@ export default function ReservationClock({ value, onChange, availableTimes }) {
             display: "flex",
             flexWrap: "wrap",
             gap: 1,
-            width: "100%", // Adjust width to fit 3 buttons per row
+            width: "100%",
+            justifyContent: "flex-start",
           }}
         >
           {availableTimes.map((time, index) => (
@@ -39,7 +40,7 @@ export default function ReservationClock({ value, onChange, availableTimes }) {
               }
               onClick={() => handleTimeChange(time)}
               sx={{
-                flex: "1 1 30%", // Adjust button size to fit 3 per row
+                width: "calc(33.33% - 8px)",
                 marginBottom: 1,
               }}
             >
