@@ -17,7 +17,9 @@ const InfoItem = ({ icon: Icon, text }) => (
     }}
   >
     <Icon />
-    <Typography>{text}</Typography>
+    <Typography variant="caption" sx={{ fontSize: "0.8rem" }}>
+      {text}
+    </Typography>
   </Box>
 );
 
@@ -34,9 +36,6 @@ const RealEstateDescription = ({ item }) => {
   if (!appliancesInfo) {
     return null;
   }
-
-  // console.log("Room Detail Info:", detailInfo);
-  // console.log("Appliances Info:", appliancesInfo);
 
   const infoItems = [
     {
@@ -87,11 +86,11 @@ const RealEstateDescription = ({ item }) => {
 
   return (
     <Box>
-      <Typography variant="h6" sx={{ marginBottom: 1 }}>
+      <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
         이 집을 소개합니다.
       </Typography>
       <Typography
-        variant="body2"
+        variant="subtitle2"
         sx={{
           fontWeight: 300,
           color: theme.palette.text.secondary,
@@ -106,7 +105,7 @@ const RealEstateDescription = ({ item }) => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          gap: 3,
+          gap: 2,
           backgroundColor: theme.palette.background.paper,
           padding: 3,
           borderRadius: 1,
@@ -119,7 +118,7 @@ const RealEstateDescription = ({ item }) => {
       </Box>
       {appliances && (
         <Box sx={{ padding: 2, marginTop: 2 }}>
-          <Typography sx={{}}>구비 완료 | {appliances}</Typography>
+          <Typography variant="subtitle2">구비 완료 | {appliances}</Typography>
         </Box>
       )}
     </Box>
