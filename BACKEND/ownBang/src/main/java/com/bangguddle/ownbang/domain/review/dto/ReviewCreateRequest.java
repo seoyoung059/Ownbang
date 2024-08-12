@@ -12,9 +12,7 @@ public record ReviewCreateRequest(
         Long reservationId,
         Long agentId,
         @PositiveOrZero
-        Integer starRating,
-        @NotBlank
-        String content
+        Integer starRating
 ) {
 
     public Review toEntity(Reservation reservation, Agent agent) {
@@ -22,7 +20,6 @@ public record ReviewCreateRequest(
                 .reservation(reservation)
                 .agent(agent)
                 .starRating(starRating)
-                .content(content)
                 .build();
     }
 }
