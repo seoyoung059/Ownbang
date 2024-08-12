@@ -17,9 +17,10 @@ const AgentInfo = ({ item }) => {
           display: "flex",
           flexDirection: "column",
           padding: 1,
+          gap: 1,
         }}
       >
-        <Typography variant="h6">중개인 정보</Typography>
+        <Typography variant="subtitle1">중개인 정보</Typography>
         <Box
           title="info"
           sx={{
@@ -53,7 +54,9 @@ const AgentInfo = ({ item }) => {
             </ImageListItem>
 
             <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <Typography>{agentResponse.officeName}</Typography>
+              <Typography variant="subtitle1" sx={{ padding: 1 }}>
+                {agentResponse.officeName}
+              </Typography>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Rating
                   name="read-only-rating"

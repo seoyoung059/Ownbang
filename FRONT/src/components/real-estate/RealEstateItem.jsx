@@ -43,7 +43,7 @@ const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
     >
       <CardMedia
         component="img"
-        sx={{ width: "150px", height: "150px" }}
+        sx={{ width: "110px", height: "110px" }}
         image={marker.profileImageUrl}
         alt={marker.profileImageUrl}
       />
@@ -52,15 +52,15 @@ const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
           display: "flex",
           flexDirection: "row",
           alignItems: "flex-start",
-          paddingRight: "40px",
+          paddingRight: "20px",
         }}
       >
         <Box>
-          <Typography component="div">
+          <Typography variant="subtitle2" component="div">
             {marker.dealType} {marker.deposit}/{marker.monthlyRent}
           </Typography>
           <Typography
-            variant="subtitle1"
+            variant="subtitle2"
             color="text.secondary"
             component="div"
           >
@@ -73,8 +73,8 @@ const RealEstateItem = ({ marker, toggleFavorite, onClick }) => {
         onClick={handleToggleFavorite}
         sx={{
           position: "absolute",
-          top: 8,
-          right: 8,
+          top: 5,
+          right: 0,
           color: theme.palette.bookmark,
         }}
       >
