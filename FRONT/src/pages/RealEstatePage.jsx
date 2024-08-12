@@ -13,7 +13,6 @@ const RealEstatePage = () => {
   const theme = useTheme();
   const {
     searchTerm,
-    setSearchTerm,
     makeReservation,
     room,
     getRoom,
@@ -24,15 +23,11 @@ const RealEstatePage = () => {
     toggleBookmarks,
   } = useBoundStore((state) => ({
     searchTerm: state.searchTerm,
-    setSearchTerm: state.setSearchTerm,
-
     makeReservation: state.makeReservation,
-
     room: state.room,
     getRoom: state.getRoom,
     getAllRoom: state.getAllRoom,
     realEstateData: state.realEstateData,
-
     bookmarkList: state.bookmarkList,
     getBookmarks: state.getBookmarks,
     toggleBookmarks: state.toggleBookmarks,
@@ -41,7 +36,6 @@ const RealEstatePage = () => {
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showReservation, setShowReservation] = React.useState(false);
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
-  // const [bookmarkList, setBookmarkList] = React.useState([]);
 
   // 초기 로드 시 전체 매물 불러오기
   useEffect(() => {
@@ -97,15 +91,22 @@ const RealEstatePage = () => {
   };
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", position: "relative" }}>
+    <Box
+      sx={{
+        display: "flex",
+        height: "98vh",
+        overflow: "hidden",
+        position: "relative",
+      }}
+    >
       {/* 리스트 */}
       <Box
         sx={{
-          paddingTop: "80px",
-          width: "20%",
-          height: "100vh",
+          width: "22%",
+          height: "100%",
           overflow: "auto", // RealEstateList에만 스크롤 적용
-          position: "relative",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <RealEstateList
@@ -118,7 +119,7 @@ const RealEstatePage = () => {
       </Box>
 
       {/* 지도와 검색 바 */}
-      <Box sx={{ paddingTop: "80px", width: "80%" }}>
+      <Box sx={{ width: "80%", height: "100%" }}>
         {/* 검색 바 오른쪽에 위치 */}
         <Box
           sx={{
@@ -131,11 +132,18 @@ const RealEstatePage = () => {
         >
           <RealEstateSearchBar />
         </Box>
-        <RealEstateMap
-          searchTerm={searchTerm}
-          onBoundsChange={onBoundsChange}
-          onSelectMarker={onSelectMarker} // 마커 클릭 시 호출될 핸들러
-        />
+        <Box
+          sx={{
+            height: "100%",
+            overflow: "hidden", // 지도 부분의 스크롤을 숨김
+          }}
+        >
+          <RealEstateMap
+            searchTerm={searchTerm}
+            onBoundsChange={onBoundsChange}
+            onSelectMarker={onSelectMarker}
+          />
+        </Box>
       </Box>
 
       {/* List에서 Item을 누르면 Detail 카드가 뜹니다 */}
@@ -154,15 +162,15 @@ const RealEstatePage = () => {
         >
           <Box
             sx={{
-              position: "absolute",
-              top: "10%",
-              right: "79.7%",
+              position: "fixed",
+              top: "12%",
+              right: "78.2%",
               transform: "translateX(101%)",
               backgroundColor: theme.palette.background.default,
               padding: 3,
               borderRadius: 1,
               boxShadow: 3,
-              width: "400px",
+              width: "350px",
               height: "80%",
               overflow: "auto",
               zIndex: 50,
@@ -189,14 +197,14 @@ const RealEstatePage = () => {
             <Box
               sx={{
                 position: "absolute",
-                top: "10%",
-                right: "56%",
+                top: "12%",
+                right: "53%",
                 transform: "translateX(101%)",
                 backgroundColor: theme.palette.background.default,
                 padding: 3,
                 borderRadius: 1,
                 boxShadow: 3,
-                width: "400px",
+                width: "350px",
                 height: "80%",
                 overflow: "auto",
                 zIndex: 50,

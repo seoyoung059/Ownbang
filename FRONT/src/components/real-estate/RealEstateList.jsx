@@ -33,45 +33,55 @@ const RealEstateList = ({
   };
 
   return (
-    <List
+    <Box
       sx={{
-        width: "100%",
-        maxWidth: 360,
+        height: "100%",
+        overflowY: "auto", // 스크롤을 이 곳에서만 발생
         bgcolor: theme.palette.background.default,
+        paddingTop: 10,
       }}
     >
-      {displayedMarkers &&
-        displayedMarkers.map((marker, index) => (
-          <RealEstateItem
-            key={marker.id}
-            marker={marker}
-            toggleFavorite={() => toggleFavorite(marker.id)}
-            onClick={() => onSelectItem(marker)}
-          />
-        ))}
-      {displayedMarkers && !displayedMarkers.length && (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            mt: 12,
-            height: "100vh",
-            textAlign: "center",
-            p: 3,
-          }}
-        >
-          <SearchOff sx={{ fontSize: 60, color: "gray", mb: 2 }} />
-          <Typography variant="h5" component="div" gutterBottom>
-            찾는 매물이 없습니다.
-          </Typography>
-          <Typography variant="body1" component="div" gutterBottom>
-            현재 지역에 매물이 없습니다. <br />
-            다른 지역을 찾아보세요.
-          </Typography>
-        </Box>
-      )}
-    </List>
+      <List
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        {displayedMarkers &&
+          displayedMarkers.map((marker) => (
+            <RealEstateItem
+              key={marker.id}
+              marker={marker}
+              toggleFavorite={() => toggleFavorite(marker.id)}
+              onClick={() => onSelectItem(marker)}
+            />
+          ))}
+        {displayedMarkers && !displayedMarkers.length && (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mt: 12,
+              height: "100%",
+              textAlign: "center",
+              p: 3,
+            }}
+          >
+            <SearchOff sx={{ fontSize: 60, color: "gray", mb: 2 }} />
+            <Typography variant="h5" component="div" gutterBottom>
+              찾는 매물이 없습니다.
+            </Typography>
+            <Typography variant="body1" component="div" gutterBottom>
+              현재 지역에 매물이 없습니다. <br />
+              다른 지역을 찾아보세요.
+            </Typography>
+          </Box>
+        )}
+      </List>
+    </Box>
   );
 };
 
