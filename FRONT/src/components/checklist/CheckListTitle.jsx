@@ -36,9 +36,10 @@ const CheckListTitle = ({
   const handleTemplateChange = (event, value) => {
     if (value && typeof value === "string") {
       setNewTemplateTitle(value);
+      setSelectedTitle("");
     } else if (value && value.title) {
       setSelectedTitle(value.title);
-      setNewTemplateTitle("");
+      setNewTemplateTitle(value.title);
     } else {
       setSelectedTitle("");
     }
@@ -47,7 +48,7 @@ const CheckListTitle = ({
   const handleAddTemplate = async () => {
     if (newTemplateTitle.trim() !== "") {
       try {
-        const result = await addTemplate(newTemplateTitle);
+        await addTemplate(newTemplateTitle);
         setSelectedTitle(newTemplateTitle);
         setNewTemplateTitle(newTemplateTitle);
       } catch (error) {
@@ -59,6 +60,7 @@ const CheckListTitle = ({
       }
     }
   };
+
   const handleDeleteTemplate = async (event, checklistId) => {
     event.stopPropagation();
     await deleteTemplate(checklistId);
@@ -84,6 +86,12 @@ const CheckListTitle = ({
     setErrorMessage(null);
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleAddTemplate();
+    }
+  };
+
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>
       <Box sx={{ display: "flex", alignItems: "end" }}>
@@ -91,19 +99,19 @@ const CheckListTitle = ({
           freeSolo
           id="templateChoice"
           options={options}
-          getOptionLabel={(option) => option.title}
+          getOptionLabel={(option) => option.title || ""}
+          inputValue={newTemplateTitle}
           onInputChange={(event, value) => {
-            setNewTemplateTitle(value);
-            if (!value) setSelectedTitle("");
+            setNewTemplateTitle(value || "");
           }}
           onChange={handleTemplateChange}
-          inputValue={newTemplateTitle}
           renderInput={(params) => (
             <TextField
               {...params}
               variant="standard"
               label="탬플릿"
               placeholder="사용할 템플릿을 선택하거나 추가하세요"
+              onKeyDown={handleKeyDown}
               InputProps={{
                 ...params.InputProps,
                 sx: { padding: "10px", fontSize: "12px" },
