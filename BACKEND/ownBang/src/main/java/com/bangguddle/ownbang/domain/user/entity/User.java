@@ -45,17 +45,21 @@ public class User {
     private boolean isAgent;
 
     @Builder
-    public User(String name, String email, String password, String phoneNumber, String nickname) {
+    public User(String name, String email, String password, String phoneNumber,
+                String nickname, String profileImageUrl) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
         this.oauthGoogle = false;
         this.oauthKakao = false;
         this.oauthNaver = false;
         this.isAgent = false;
     }
+
+
 
     public void updateIsAgent(boolean isAgent) {
         this.isAgent = isAgent;
