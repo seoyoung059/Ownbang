@@ -23,6 +23,7 @@ import {
   Videocam,
   VideocamOff,
   ExitToApp,
+  SwitchCamera,
 } from "@mui/icons-material";
 
 class Video extends Component {
@@ -306,6 +307,7 @@ class Video extends Component {
           });
         }
       }
+      console.log("전환");
     } catch (e) {
       console.error(e);
     }
@@ -404,6 +406,19 @@ class Video extends Component {
                         streamManager={subscribers[0]}
                         isMain={false}
                       />
+                    </Box>
+                  )}
+                  {this.props.user.isAgent && (
+                    <Box
+                      style={{
+                        position: "absolute",
+                        top: 16,
+                        right: 16,
+                      }}
+                    >
+                      <IconButton color="primary" onClick={this.switchCamera}>
+                        <SwitchCamera />
+                      </IconButton>
                     </Box>
                   )}
                 </>

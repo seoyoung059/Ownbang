@@ -38,6 +38,7 @@ export default function RealEstateRegisterPage() {
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const [errMsg, setErrMsg] = useState("");
 
@@ -93,11 +94,21 @@ export default function RealEstateRegisterPage() {
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
-    const newFiles = files.filter(
-      (file) =>
-        !selectedFiles.some((selectedFile) => selectedFile.name === file.name)
+    const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+    const invalidFiles = files.filter(
+      (file) => !validImageTypes.includes(file.type)
     );
-    setSelectedFiles([...selectedFiles, ...newFiles]);
+
+    if (invalidFiles.length > 0) {
+      setSnackbarMessage("jpg, jpeg, png 파일만 업로드 가능합니다.");
+      setSnackbarOpen(true);
+    } else {
+      const newFiles = files.filter(
+        (file) =>
+          !selectedFiles.some((selectedFile) => selectedFile.name === file.name)
+      );
+      setSelectedFiles([...selectedFiles, ...newFiles]);
+    }
   };
 
   const handleFileRemove = (fileName) => {
@@ -178,6 +189,7 @@ export default function RealEstateRegisterPage() {
     try {
       await makeRoom(formData);
       setErrMsg("");
+      setSnackbarMessage("등록이 완료되었습니다!");
       setSnackbarOpen(true);
       setTimeout(() => {
         navigate("/");
@@ -817,7 +829,7 @@ export default function RealEstateRegisterPage() {
           severity="success"
           sx={{ width: "100%" }}
         >
-          등록이 완료되었습니다!
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </Container>

@@ -7,9 +7,7 @@ import {
   Divider,
   Grid,
   TextField,
-  InputAdornment,
   Button,
-  IconButton,
   Avatar,
   Snackbar,
   Alert,
@@ -33,9 +31,8 @@ export default function UserInfoEditForm() {
 
   const navigate = useNavigate();
   const theme = useTheme();
-  // 유저 정보
-  const [userInfo, setUserInfo] = useState(user);
 
+  const [userInfo, setUserInfo] = useState(user);
   const [profileImage, setProfileImage] = useState(user.profileImageUrl);
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -43,12 +40,12 @@ export default function UserInfoEditForm() {
   const [forPassChange, setForPassChange] = useState(false);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
 
-  // 입력창에 있는 정보들을 userInfo에 반영
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUserInfo((prevUserInfo) => ({
@@ -63,9 +60,14 @@ export default function UserInfoEditForm() {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+
+    if (file && validImageTypes.includes(file.type)) {
       setSelectedFile(file);
       setProfileImage(URL.createObjectURL(file));
+    } else {
+      setSnackbarMessage("올바른 이미지 파일을 선택하세요 (jpeg, jpg, png).");
+      setSnackbarOpen(true);
     }
   };
 
@@ -90,12 +92,15 @@ export default function UserInfoEditForm() {
 
     const res = await modifyUser(formData);
     if (res.resultCode === "SUCCESS") {
-      // Update the user state in the global store directly
-      await fetchUser(); // This will trigger an update in the store
+      await fetchUser();
+      setSnackbarMessage("수정이 완료되었습니다!");
       setSnackbarOpen(true);
       setTimeout(() => {
         navigate("/");
       }, 1000);
+    } else {
+      setSnackbarMessage("수정에 실패했습니다. 다시 시도해주세요.");
+      setSnackbarOpen(true);
     }
   };
 
@@ -142,7 +147,7 @@ export default function UserInfoEditForm() {
               <Grid container spacing={4}>
                 <Grid item xs={12} sm={6}>
                   <Avatar
-                    src={profileImage}
+                    src={profileImage} // 수정된 부분
                     alt="프로필 이미지"
                     sx={{ width: 260, height: 260 }}
                   />
@@ -204,7 +209,6 @@ export default function UserInfoEditForm() {
                 xs={8}
                 sx={{ display: "flex", justifyContent: "space-around" }}
               >
-                {/* 취소 버튼 클릭 시 어느 페이지로 이동할 지 */}
                 <Button
                   variant="contained"
                   onClick={handleCancel}
@@ -260,10 +264,10 @@ export default function UserInfoEditForm() {
         >
           <Alert
             onClose={handleSnackbarClose}
-            severity="success"
+            severity={snackbarMessage.includes("완료") ? "success" : "error"}
             sx={{ width: "100%" }}
           >
-            수정이 완료되었습니다!
+            {snackbarMessage}
           </Alert>
         </Snackbar>
       </Container>
