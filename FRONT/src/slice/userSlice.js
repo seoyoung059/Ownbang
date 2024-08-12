@@ -6,6 +6,7 @@ export const createUserSlice = (set) => ({
     try {
       const response = await getUserInfo(token);
       set({ user: response.data });
+      console.log(response);
     } catch (error) {
       set({ user: {} });
     }
