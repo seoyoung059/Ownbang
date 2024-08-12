@@ -196,6 +196,9 @@ const SignUp = () => {
     setUserData((prevUserData) => ({
       ...prevUserData,
       userPhoneNumber: formattedPhoneNumber,
+      profileImageUrl: `https://api.multiavatar.com/${
+        Math.floor(Math.random() * 1000) + 1
+      }`,
     }));
   };
 

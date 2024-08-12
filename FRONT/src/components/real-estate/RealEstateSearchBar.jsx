@@ -82,8 +82,8 @@ const RealEstateSearchBar = ({ isMain }) => {
               type="text"
               placeholder={
                 isMain
-                  ? "원하시는 원룸의 지역명, 지하철역, 단지명(아파트명)을 입력해주세요"
-                  : "지역명 + 역명으로 검색하세요"
+                  ? "원하시는 원룸의 지역명, 지하철역, 학교명을 입력해주세요"
+                  : "지역명, 학교명, 역명으로 검색하세요"
               }
               value={inputValue}
               onChange={onInputChange}
