@@ -30,16 +30,10 @@ public class Review {
     @Column(name = "star_rating", nullable = false, columnDefinition = "TINYINT(5)")
     private int starRating;
 
-    @Column(name="content")
-    private String content;
-
     @Builder
-    public Review(Reservation reservation, Agent agent, int starRating, String content) {
+    public Review(Reservation reservation, Agent agent, int starRating) {
         this.reservation = reservation;
         this.agent = agent;
         this.starRating = starRating;
-        this.content = content;
     }
-
-
 }
