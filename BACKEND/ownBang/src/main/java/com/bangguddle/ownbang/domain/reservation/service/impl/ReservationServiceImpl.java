@@ -245,7 +245,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         List<ReservationResponse> updatedReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {
-            boolean enstance = reservation.getReservationTime().minusMinutes(10).isBefore(now);
+            boolean enstance = reservation.getStatus() == ReservationStatus.CONFIRMED
+                    && reservation.getReservationTime().minusMinutes(10).isBefore(now)
+                    && reservation.getReservationTime().plusHours(1).isAfter(now);;
 
             if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
                 Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
