@@ -62,9 +62,7 @@ public class WebrtcUserService implements WebrtcService {
         // video 저장
         VideoRecordRequest videoRecordRequest = VideoRecordRequest.builder()
                 .reservationId(reservationId)
-                .videoUrl("/openvidu/recordings/" +
-                        recording.getSessionId() + "/" +
-                        recording.getSessionId() + ".zip"
+                .videoUrl(recording.getSessionId()
                         )
                 .videoStatus(VideoStatus.RECORDING)
                 .build();

@@ -21,9 +21,11 @@ public class StreamController {
     private final StreamingService streamingService;
 
     @GetMapping
-    public ResponseEntity<Response<NoneResponse>> getStreamingConvert(@RequestBody StreamingConvertRequest request) {
+    public ResponseEntity<Response<NoneResponse>> getStreamingConvert(/*@AuthenticationPrincipal Long userId, */ @RequestBody StreamingConvertRequest request) {
         streamingService.uploadStreaming(request.reservationId(), request.sessionId());
-        return Response.success(new SuccessResponse<NoneResponse>(SuccessCode.BOOKMARK_CREATE_SUCCESS, NoneResponse.NONE));
+        return Response.success(new SuccessResponse<NoneResponse>(SuccessCode.VIDEO_PROCESS_SUCCESS, NoneResponse.NONE));
+
+//        streamingService.retryStreaming(userId, request.reservationId());
     }
 
 }

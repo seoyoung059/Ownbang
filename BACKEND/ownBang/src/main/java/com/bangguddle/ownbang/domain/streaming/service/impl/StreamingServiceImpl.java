@@ -1,14 +1,21 @@
 package com.bangguddle.ownbang.domain.streaming.service.impl;
 
 
+import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
+import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
+import com.bangguddle.ownbang.domain.user.entity.User;
+import com.bangguddle.ownbang.domain.user.repository.UserRepository;
 import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
 import com.bangguddle.ownbang.domain.video.entity.Video;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
 import com.bangguddle.ownbang.domain.video.service.VideoService;
 import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
+import com.bangguddle.ownbang.global.enums.NoneResponse;
+import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
+import com.bangguddle.ownbang.global.response.SuccessResponse;
 import com.bangguddle.ownbang.global.service.impl.S3UploaderServiceImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,10 +61,26 @@ public class StreamingServiceImpl implements StreamingService {
     private static final String m3u8Extend = ".m3u8";
     private static final String tsExtend = "_%08d.ts";
     private static final String jsonExtend = ".json";
+    private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
 
     @Value("${video.recordings.path}")
     private String reocrdingPath;
 
+    @Override
+    public SuccessResponse<NoneResponse> retryStreaming(Long userId, Long reservationId) {
+       User user =  userRepository.getById(userId);
+       Reservation reservation = reservationRepository.getById(reservationId);
+
+       if(!user.getId().equals(reservation.getUser().getId())) throw new AppException(BAD_REQUEST);
+
+       Video video = videoRepository.findByReservationId(reservationId)
+               .orElseThrow(()->new AppException(INTERNAL_SERVER_ERROR));
+
+       uploadStreaming(reservationId, video.getVideoUrl());
+
+       return new SuccessResponse<>(SuccessCode.VIDEO_PROCESS_SUCCESS, NoneResponse.NONE);
+    }
 
     /**
      * [비동기]sessionId를 받아 zip 압축 해제 후 hls로 변환하여 S3에 올림
