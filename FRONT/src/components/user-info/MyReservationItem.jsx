@@ -193,7 +193,11 @@ export default function MyReservationItem({
               },
             }}
             size={isMobile ? "small" : "medium"}
-            onClick={() => navigate(`/replay/${reservation.id}`)}
+            onClick={() =>
+              navigate(`/replay/${reservation.id}`, {
+                state: { reservationId: reservation.id },
+              })
+            }
           >
             다시보기
           </Button>

@@ -115,7 +115,10 @@ function AgentReservationList() {
             ))}
           {emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
+              <TableCell
+                colSpan={isMobile ? 6 : 8}
+                sx={{ bgcolor: theme.palette.background.default }}
+              />
             </TableRow>
           )}
         </TableBody>

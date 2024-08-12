@@ -23,7 +23,7 @@ export default function MainPage() {
   }));
   const theme = useTheme();
   const isLg = useMediaQuery(theme.breakpoints.down("lg"));
-  const isSm = useMediaQuery(theme.breakpoints.down("md"));
+  const isMd = useMediaQuery(theme.breakpoints.down("md"));
 
   const onSearch = (term) => {
     setSearchTerm(term);
@@ -93,7 +93,7 @@ export default function MainPage() {
           ref={leftSection}
           sx={{
             flex: 1,
-            textAlign: isSm ? "center" : "left",
+            textAlign: isMd ? "center" : "left",
             mb: isLg ? 12 : 28,
             mt: 16,
             ml: !isLg && 24,
@@ -107,7 +107,7 @@ export default function MainPage() {
           }}
         >
           <Typography
-            variant="h4"
+            variant="h5"
             component="div"
             sx={{ fontWeight: "bold", mb: 6, ml: 2 }}
           >
@@ -117,13 +117,13 @@ export default function MainPage() {
           <Box
             sx={{
               display: "flex",
-              flexDirection: isSm ? "column" : "row",
-              alignItems: isSm ? "center" : "flex-start",
+              flexDirection: isMd ? "column" : "row",
+              alignItems: isMd ? "center" : "flex-start",
               mb: 4,
               gap: 4,
             }}
           >
-            <Card sx={{ width: 360, bgcolor: "transparent" }}>
+            <Card sx={{ width: 320, bgcolor: "transparent" }}>
               <CardContent>
                 <Typography
                   gutterBottom
@@ -141,7 +141,7 @@ export default function MainPage() {
                 />
               </CardContent>
             </Card>
-            <Card sx={{ width: 360, bgcolor: "transparent" }}>
+            <Card sx={{ width: 320, bgcolor: "transparent" }}>
               <CardContent>
                 <Typography
                   gutterBottom
@@ -159,7 +159,7 @@ export default function MainPage() {
                 />
               </CardContent>
             </Card>
-            <Card sx={{ width: 360, bgcolor: "transparent" }}>
+            <Card sx={{ width: 320, bgcolor: "transparent" }}>
               <CardContent>
                 <Typography
                   gutterBottom
@@ -194,7 +194,7 @@ export default function MainPage() {
           ref={rightSection}
           sx={{
             flex: 1,
-            textAlign: isSm ? "center" : "right",
+            textAlign: isMd ? "center" : "right",
             mb: isLg ? 12 : 28,
             mt: 16,
             mr: !isLg && 24,
@@ -208,7 +208,7 @@ export default function MainPage() {
           }}
         >
           <Typography
-            variant="h4"
+            variant="h5"
             component="div"
             sx={{ fontWeight: "bold", mb: 6, mr: 2 }}
           >
@@ -219,14 +219,14 @@ export default function MainPage() {
           <Box
             sx={{
               display: "flex",
-              flexDirection: isSm ? "column" : "row",
-              alignItems: isSm ? "center" : "flex-start",
-              justifyContent: isSm ? "center" : "right",
+              flexDirection: isMd ? "column" : "row",
+              alignItems: isMd ? "center" : "flex-start",
+              justifyContent: isMd ? "center" : "right",
               mb: 4,
               gap: 4,
             }}
           >
-            <Card sx={{ width: 360, bgcolor: theme.palette.common.white }}>
+            <Card sx={{ width: 320, bgcolor: theme.palette.common.white }}>
               <CardMedia
                 component="img"
                 height="280"
@@ -247,7 +247,7 @@ export default function MainPage() {
               </CardContent>
             </Card>
 
-            <Card sx={{ width: 360, bgcolor: theme.palette.common.white }}>
+            <Card sx={{ width: 320, bgcolor: theme.palette.common.white }}>
               <CardMedia
                 component="img"
                 height="280"
@@ -267,7 +267,7 @@ export default function MainPage() {
                 </Typography>
               </CardContent>
             </Card>
-            <Card sx={{ width: 360, bgcolor: theme.palette.common.white }}>
+            <Card sx={{ width: 320, bgcolor: theme.palette.common.white }}>
               <CardMedia
                 component="img"
                 height="280"

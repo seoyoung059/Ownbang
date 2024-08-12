@@ -19,7 +19,7 @@ export default function MyBookmarkItem({ bookmark }) {
         display: "flex",
         mb: 2,
         width: "100%",
-        heigth: isMobile && 140,
+        height: 140,
         bgcolor: theme.palette.common.white,
         gap: 2,
       }}
@@ -27,7 +27,7 @@ export default function MyBookmarkItem({ bookmark }) {
       <CardMedia
         component="img"
         sx={{ width: isMobile ? 140 : 160 }}
-        image={bookmark.roomInfoSearchResponse.profileImageUrl} // 실제 이미지 URL로 변경
+        image={bookmark.roomInfoSearchResponse.profileImageUrl}
         alt={
           bookmark.roomInfoSearchResponse.profileImageUrl ||
           "No image available"

@@ -5,14 +5,13 @@ import {
   Button,
   Typography,
   IconButton,
-  Badge,
   Menu,
   MenuItem,
+  Backdrop,
 } from "@mui/material";
-import { Notifications, MenuOutlined } from "@mui/icons-material";
+import { MenuOutlined, MapOutlined } from "@mui/icons-material";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Notification from "./Notification";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -37,19 +36,20 @@ const Header = () => {
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const [open, setOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const handleMenuOpen = (event) => setMenuAnchorEl(event.currentTarget);
+  const handleMenuOpen = (event) => {
+    if (isAuthenticated) {
+      setMenuAnchorEl(event.currentTarget);
+    }
+  };
+
   const handleMenuClose = () => setMenuAnchorEl(null);
 
   const handleLogout = () => {
     logout();
+    handleMenuClose();
   };
-
-  const notificationCount = 1;
 
   const headerStyle = {
     position: "fixed",
@@ -86,7 +86,7 @@ const Header = () => {
 
   const handleNavigation = (path) => {
     navigate(path);
-    handleMenuClose(); // 메뉴를 닫기 위해 추가
+    handleMenuClose();
   };
 
   return (
@@ -106,18 +106,30 @@ const Header = () => {
           <Box sx={navigationStyle}>
             <div>
               {isAuthenticated ? (
-                <Button onClick={handleLogout}>로그아웃</Button>
+                <>
+                  <Button onClick={handleLogout}>로그아웃</Button>
+                  <IconButton
+                    color="inherit"
+                    onClick={() => handleNavigation("/estate")}
+                    title="지도 검색"
+                  >
+                    <MapOutlined />
+                  </IconButton>
+                </>
               ) : (
-                <Button onClick={() => handleNavigation("/login")}>
-                  로그인
-                </Button>
+                <>
+                  <Button onClick={() => handleNavigation("/login")}>
+                    로그인
+                  </Button>
+                  <IconButton
+                    color="inherit"
+                    onClick={() => handleNavigation("/estate")}
+                    title="지도 검색"
+                  >
+                    <MapOutlined />
+                  </IconButton>
+                </>
               )}
-
-              <IconButton color="inherit" onClick={handleOpen}>
-                <Badge badgeContent={notificationCount} color="error">
-                  <Notifications />
-                </Badge>
-              </IconButton>
               <IconButton color="inherit" onClick={handleMenuOpen}>
                 <MenuOutlined />
               </IconButton>
@@ -125,7 +137,17 @@ const Header = () => {
           </Box>
         </Box>
       </Box>
-      <Notification open={open} handleClose={handleClose} />
+
+      {/* Backdrop 추가 */}
+      <Backdrop
+        sx={{
+          backgroundColor: "transparent",
+          color: "#fff",
+          zIndex: theme.zIndex.drawer - 1,
+        }}
+        open={Boolean(menuAnchorEl)}
+        onClick={handleMenuClose}
+      />
 
       <Menu
         sx={{ mt: 4 }}
@@ -138,12 +160,10 @@ const Header = () => {
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "left",
+          horizontal: "center",
         }}
+        disableScrollLock={true}
       >
-        <MenuItem onClick={() => handleNavigation("/estate")}>
-          지도 검색
-        </MenuItem>
         {isAuthenticated && user && !user.isAgent && (
           <MenuItem onClick={() => handleNavigation("/mypage")}>
             정보 관리
