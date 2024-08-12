@@ -48,6 +48,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
 
 
     default Reservation getById(Long id) {
-        return this.findById(id).orElseThrow(()->new AppException(ErrorCode.BAD_REQUEST));
+        return this.findById(id).orElseThrow(()->new AppException(ErrorCode.RESERVATION_NOT_FOUND));
     }
 }

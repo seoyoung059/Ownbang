@@ -54,5 +54,6 @@ public class Agent {
         this.greetings = request.greetings();
         this.officeName = request.officeName();
         this.licenseNumber = request.licenseNumber();
+        this.detailOfficeAddress = request.detailOfficeAddress();
     }
 }

@@ -10,7 +10,7 @@ public enum ErrorCode implements ResponseCode {
     // Auth API
     EMAIL_DUPLICATED(HttpStatus.CONFLICT, "이미 가입한 이메일입니다."),
     PHONE_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "이미 가입한 전화번호 입니다."),
-    BAD_CREDENTIAL(HttpStatus.UNAUTHORIZED, "이메일 또는 패스워드 오류입니다."),
+    BAD_CREDENTIAL(HttpStatus.BAD_REQUEST, "이메일 또는 패스워드 오류입니다."),
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다."),
 
     // Agent Auth API
@@ -68,7 +68,7 @@ public enum ErrorCode implements ResponseCode {
     RESERVATION_CONFIRMED_DUPLICATED_TIME_ROOM(HttpStatus.CONFLICT, "예약 확정은 각 매물, 시간 당 한 건만 가능합니다."),
     WORKHOUR_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 날짜의 근무 시간 정보를 찾을 수 없습니다."),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 형식입니다."),
-    WORKHOUR_INAVAILABLE(HttpStatus.BAD_REQUEST, "시작시간이 마감시간보다 늦을 수 없습니다."),
+    WORKHOUR_UNAVAILABLE(HttpStatus.BAD_REQUEST, "시작시간이 마감시간보다 늦을 수 없습니다."),
 
     // Common Error Code
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부적 에러가 발생했습니다."),

@@ -51,6 +51,10 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private final ElasticsearchOperations elasticsearchOperations;
 
+    /**
+     * mysql 데이터를 일라스틱서치에 동기화
+     * @return SuccessResponse
+     */
     @PostConstruct
     public SuccessResponse<NoneResponse> syncDataFromMySQLToElasticsearch() {
         int batchSize = 1000;
@@ -81,6 +85,12 @@ public class SearchServiceImpl implements SearchService {
                 .build();
     }
 
+    /**
+     * 연관검색어 자동완성 API
+     *
+     * @param name 검색어
+     * @return  SuccessResponse SearchListResponse
+     */
     @Override
     public SuccessResponse<SearchListResponse> searchByName(String name) {
 
@@ -114,6 +124,10 @@ public class SearchServiceImpl implements SearchService {
         return Integer.compare(order.indexOf(a), order.indexOf(b));
     }
 
+    /**
+     * 데이터 추가를 위해 excel을 mysql로 저장
+     * @return SuccessResponse
+     */
     public SuccessResponse<NoneResponse> importExcelData() throws IOException {
         try (FileInputStream file = new FileInputStream(new File("C:\\Users\\SSAFY\\Downloads\\지하철데이터.xlsx"));
              Workbook workbook = new XSSFWorkbook(file)) {

@@ -39,4 +39,5 @@ public class AgentWorkhour {
         this.weekendStartTime = weekendStartTime;
         this.weekendEndTime = weekendEndTime;
     }
+
 }
