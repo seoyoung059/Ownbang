@@ -28,4 +28,6 @@ public interface RoomService {
     SuccessResponse<List<RoomInfoSearchResponse>> getAgentRooms(Long userId, int page, int size);
 
     SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId);
+
+    SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId, Float lat, Float lon);
 }
