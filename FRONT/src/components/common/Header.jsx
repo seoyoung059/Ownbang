@@ -5,25 +5,25 @@ import {
   Button,
   Typography,
   IconButton,
-  Badge,
   Menu,
   MenuItem,
+  Backdrop,
+  Avatar,
 } from "@mui/material";
-import { Notifications, MenuOutlined } from "@mui/icons-material";
+import { MenuOutlined, MapOutlined } from "@mui/icons-material";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Notification from "./Notification";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, logout, user, fetchUser } = useBoundStore(
-    (state) => ({
+  const { isAuthenticated, logout, user, fetchUser, modifyUser } =
+    useBoundStore((state) => ({
       isAuthenticated: state.isAuthenticated,
       logout: state.logout,
       user: state.user,
       fetchUser: state.fetchUser,
-    })
-  );
+      modifyUser: state.modifyUser,
+    }));
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -32,24 +32,30 @@ const Header = () => {
       };
       fetchData();
     }
-  }, [isAuthenticated, fetchUser]);
+  }, [isAuthenticated, fetchUser, modifyUser, user]);
 
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const [open, setOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [avatarMenuAnchorEl, setAvatarMenuAnchorEl] = useState(null);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const handleMenuOpen = (event) => setMenuAnchorEl(event.currentTarget);
+  const handleMenuOpen = (event) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
   const handleMenuClose = () => setMenuAnchorEl(null);
+
+  const handleAvatarMenuOpen = (event) => {
+    setAvatarMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleAvatarMenuClose = () => setAvatarMenuAnchorEl(null);
 
   const handleLogout = () => {
     logout();
+    handleAvatarMenuClose();
   };
-
-  const notificationCount = 1;
 
   const headerStyle = {
     position: "fixed",
@@ -86,7 +92,7 @@ const Header = () => {
 
   const handleNavigation = (path) => {
     navigate(path);
-    handleMenuClose(); // 메뉴를 닫기 위해 추가
+    handleMenuClose();
   };
 
   return (
@@ -106,18 +112,36 @@ const Header = () => {
           <Box sx={navigationStyle}>
             <div>
               {isAuthenticated ? (
-                <Button onClick={handleLogout}>로그아웃</Button>
+                <>
+                  <IconButton onClick={handleAvatarMenuOpen}>
+                    <Avatar
+                      alt={user.name}
+                      src={user.profileImageUrl}
+                      sx={{ width: 40, height: 40 }}
+                    />
+                  </IconButton>
+                  <IconButton
+                    color="inherit"
+                    onClick={() => handleNavigation("/estate")}
+                    title="지도 검색"
+                  >
+                    <MapOutlined />
+                  </IconButton>
+                </>
               ) : (
-                <Button onClick={() => handleNavigation("/login")}>
-                  로그인
-                </Button>
+                <>
+                  <Button onClick={() => handleNavigation("/login")}>
+                    로그인
+                  </Button>
+                  <IconButton
+                    color="inherit"
+                    onClick={() => handleNavigation("/estate")}
+                    title="지도 검색"
+                  >
+                    <MapOutlined />
+                  </IconButton>
+                </>
               )}
-
-              <IconButton color="inherit" onClick={handleOpen}>
-                <Badge badgeContent={notificationCount} color="error">
-                  <Notifications />
-                </Badge>
-              </IconButton>
               <IconButton color="inherit" onClick={handleMenuOpen}>
                 <MenuOutlined />
               </IconButton>
@@ -125,46 +149,71 @@ const Header = () => {
           </Box>
         </Box>
       </Box>
-      <Notification open={open} handleClose={handleClose} />
 
+      {/* Backdrop 추가 */}
+      <Backdrop
+        sx={{ backgroundColor: "transparent", zIndex: theme.zIndex.drawer - 1 }}
+        open={Boolean(menuAnchorEl) || Boolean(avatarMenuAnchorEl)}
+        onClick={() => {
+          handleMenuClose();
+          handleAvatarMenuClose();
+        }}
+      />
+
+      {/* 아바타 클릭 시 나오는 메뉴 */}
       <Menu
-        sx={{ mt: 4 }}
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={handleMenuClose}
+        anchorEl={avatarMenuAnchorEl}
+        open={Boolean(avatarMenuAnchorEl)}
+        onClose={handleAvatarMenuClose}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "left",
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "left",
+          horizontal: "center",
         }}
+        disableScrollLock={true}
       >
-        <MenuItem onClick={() => handleNavigation("/estate")}>
-          지도 검색
-        </MenuItem>
-        {isAuthenticated && user && !user.isAgent && (
-          <MenuItem onClick={() => handleNavigation("/mypage")}>
-            정보 관리
-          </MenuItem>
-        )}
-        {isAuthenticated && (
+        <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
+      </Menu>
+
+      {/* 햄버거 메뉴 클릭 시 나오는 메뉴 */}
+      {isAuthenticated && (
+        <Menu
+          anchorEl={menuAnchorEl}
+          open={Boolean(menuAnchorEl)}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+          disableScrollLock={true}
+        >
+          {user && !user.isAgent && (
+            <MenuItem onClick={() => handleNavigation("/mypage")}>
+              정보 관리
+            </MenuItem>
+          )}
           <MenuItem onClick={() => handleNavigation("/user-edit")}>
             유저 수정
           </MenuItem>
-        )}
-        {isAuthenticated && user && user.isAgent && (
-          <MenuItem onClick={() => handleNavigation("/agent")}>
-            내 사무소
-          </MenuItem>
-        )}
-        {isAuthenticated && user && user.isAgent && (
-          <MenuItem onClick={() => handleNavigation("/estate-register")}>
-            매물 등록
-          </MenuItem>
-        )}
-      </Menu>
+          {user && user.isAgent && (
+            <>
+              <MenuItem onClick={() => handleNavigation("/agent")}>
+                내 사무소
+              </MenuItem>
+              <MenuItem onClick={() => handleNavigation("/estate-register")}>
+                매물 등록
+              </MenuItem>
+            </>
+          )}
+        </Menu>
+      )}
     </>
   );
 };

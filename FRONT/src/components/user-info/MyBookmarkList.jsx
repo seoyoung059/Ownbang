@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Grid,
+  CircularProgress,
+  Box,
+} from "@mui/material";
 import MyBookmarkItem from "./MyBookmarkItem";
 import { useBoundStore } from "../../store/store";
 
@@ -10,23 +16,39 @@ function MyBookmarkList() {
   }));
 
   const [bookmarks, setBookmarks] = useState(bookmarkList);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBookmarks = async () => {
-      await getBookmarks();
+      setLoading(true);
+      try {
+        await getBookmarks();
+      } finally {
+        setLoading(false);
+      }
     };
     fetchBookmarks();
-  }, [getBookmarks]); // getBookmarks는 의존성 배열에 포함
+  }, [getBookmarks]); // getBookmarks is included in the dependency array
 
   useEffect(() => {
-    // bookmarkList가 업데이트될 때만 상태 업데이트
+    // Update state only when bookmarkList is updated
     setBookmarks(bookmarkList);
   }, [bookmarkList]);
 
-  // 콘솔 로그는 상태 업데이트 후에만 출력
-  useEffect(() => {
-    console.log(bookmarks);
-  }, [bookmarks]);
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          mt: 10,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Container
@@ -42,9 +64,13 @@ function MyBookmarkList() {
           찜 목록이 없습니다.
         </Typography>
       ) : (
-        bookmarks.map((bookmark) => (
-          <MyBookmarkItem key={bookmark.id} bookmark={bookmark} />
-        ))
+        <Grid container spacing={2}>
+          {bookmarks.map((bookmark) => (
+            <Grid item xs={12} sm={6} key={bookmark.id}>
+              <MyBookmarkItem bookmark={bookmark} />
+            </Grid>
+          ))}
+        </Grid>
       )}
     </Container>
   );
