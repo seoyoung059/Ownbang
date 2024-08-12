@@ -25,41 +25,30 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response && error.response.status === 401) {
-      const userConfirmed = window.confirm(
-        "세션이 만료되었습니다. 세션을 연장하시겠습니까?"
-      );
+      try {
+        const refreshToken = cookies.get("refreshToken");
+        const accessToken = localStorage.getItem("accessToken");
 
-      if (userConfirmed) {
-        try {
-          const refreshToken = cookies.get("refreshToken");
-          const accessToken = localStorage.getItem("accessToken");
+        if (refreshToken && accessToken) {
+          const { data } = await axios.post(
+            `${import.meta.env.VITE_API_URL}/api/auths/refresh`,
+            { accessToken: accessToken, refreshToken: refreshToken }
+          );
 
-          if (refreshToken && accessToken) {
-            const { data } = await axios.post(
-              `${import.meta.env.VITE_API_URL}/api/auths/refresh`,
-              { accessToken, refreshToken }
-            );
+          localStorage.setItem("accessToken", data.data.accessToken);
+          cookies.set("refreshToken", data.data.refreshToken);
 
-            localStorage.setItem("accessToken", data.data.accessToken);
-            cookies.set("refreshToken", data.data.refreshToken, {
-              path: "/",
-            });
+          originalRequest.headers["Authorization"] =
+            "Bearer " + data.data.accessToken;
 
-            originalRequest.headers["Authorization"] =
-              "Bearer " + data.data.accessToken;
-
-            return axiosInstance(originalRequest);
-          }
-        } catch (refreshError) {
-          console.error("토큰 갱신 실패:", refreshError);
-          localStorage.removeItem("accessToken");
-          cookies.remove("refreshToken");
-          window.location.href = "/login";
+          return axiosInstance(originalRequest);
         }
-      } else {
+      } catch (refreshError) {
+        console.error("토큰 갱신 실패:", refreshError);
         localStorage.removeItem("accessToken");
         cookies.remove("refreshToken");
         window.location.href = "/login";
+        window.alert("토큰 갱신에 실패했습니다.");
       }
 
       return new Promise(() => {}); // 대기 상태 유지

@@ -184,18 +184,11 @@ const LoginForm = () => {
             >
               로그인
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  비밀번호 찾기
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="/signup" variant="body2">
-                  아직 계정이 없으신가요?
-                </Link>
-              </Grid>
-            </Grid>
+            <Box sx={{ textAlign: "end" }}>
+              <Link href="/signup" variant="body2">
+                아직 계정이 없으신가요?
+              </Link>
+            </Box>
           </Box>
         </Box>
         {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
