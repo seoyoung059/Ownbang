@@ -245,7 +245,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         List<ReservationResponse> updatedReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {
-            boolean enstance =  reservation.getStatus() == ReservationStatus.CONFIRMED
+            boolean enstance = reservation.getStatus() == ReservationStatus.CONFIRMED
                     && reservation.getReservationTime().minusMinutes(10).isBefore(now)
                     && reservation.getReservationTime().plusHours(1).isAfter(now);;
 
