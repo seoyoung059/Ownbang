@@ -179,7 +179,11 @@ export default function MyReservationItem({
             variant="contained"
             disabled={reservation.status !== "CONFIRMED"}
             size={isMobile ? "small" : "medium"}
-            onClick={() => navigate(`/video-chat/${reservation.id}`)}
+            onClick={() =>
+              navigate(`/video-chat/${reservation.id}`, {
+                state: { reservationId: reservation.id },
+              })
+            }
           >
             입장하기
           </Button>
