@@ -17,7 +17,6 @@ import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcTokenResponse;
 import com.bangguddle.ownbang.domain.webrtc.enums.UserType;
 import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcAgentService;
 import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcSessionServiceImpl;
-
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -36,8 +35,10 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
-import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCESS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -253,16 +254,13 @@ public class WebrtcAgentServiceTest {
         // given
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
         when(reservation.getStatus()).thenReturn(ReservationStatus.CONFIRMED);
-        when(videoRepository.findByReservationId(reservationId)).thenReturn(Optional.of(video));
-        when(videoService.modifyVideo(any(), any()))
-                .thenReturn((mock(SuccessResponse.class)));
         when(webrtcSessionService.getSession(reservationId)).thenReturn(Optional.of(mockSession));
         when(webrtcSessionService.stopRecord(reservationId)).thenReturn(Optional.of(recording));
         when(webrtcSessionService.getRecord(reservationId)).thenReturn(Optional.of(recording));
         when(webrtcSessionService.removeToken(reservationId, "test-token", AGENT))
                 .thenReturn(Optional.of("test-token"));
         when(webrtcSessionService.removeSession(reservationId)).thenReturn(Optional.of(mockSession));
-        when(streamingService.uploadStreaming(any())).thenReturn(mock(SuccessResponse.class));
+//        when(streamingService.uploadStreaming(any(), any())).thenReturn(void);
         when(reservation.getRoom()).thenReturn(room);
         when(room.getAgent()).thenReturn(agent);
         when(agent.getUser()).thenReturn(user);
