@@ -123,7 +123,7 @@ export default function MainPage() {
               gap: 4,
             }}
           >
-            <Card sx={{ width: 320, bgcolor: "transparent" }}>
+            <Card sx={{ width: 310, bgcolor: "transparent" }}>
               <CardContent>
                 <Typography
                   gutterBottom
@@ -141,7 +141,7 @@ export default function MainPage() {
                 />
               </CardContent>
             </Card>
-            <Card sx={{ width: 320, bgcolor: "transparent" }}>
+            <Card sx={{ width: 310, bgcolor: "transparent" }}>
               <CardContent>
                 <Typography
                   gutterBottom
@@ -159,7 +159,7 @@ export default function MainPage() {
                 />
               </CardContent>
             </Card>
-            <Card sx={{ width: 320, bgcolor: "transparent" }}>
+            <Card sx={{ width: 310, bgcolor: "transparent" }}>
               <CardContent>
                 <Typography
                   gutterBottom
@@ -226,7 +226,7 @@ export default function MainPage() {
               gap: 4,
             }}
           >
-            <Card sx={{ width: 320, bgcolor: theme.palette.common.white }}>
+            <Card sx={{ width: 310, bgcolor: theme.palette.common.white }}>
               <CardMedia
                 component="img"
                 height="280"
@@ -247,7 +247,7 @@ export default function MainPage() {
               </CardContent>
             </Card>
 
-            <Card sx={{ width: 320, bgcolor: theme.palette.common.white }}>
+            <Card sx={{ width: 310, bgcolor: theme.palette.common.white }}>
               <CardMedia
                 component="img"
                 height="280"
@@ -267,7 +267,7 @@ export default function MainPage() {
                 </Typography>
               </CardContent>
             </Card>
-            <Card sx={{ width: 320, bgcolor: theme.palette.common.white }}>
+            <Card sx={{ width: 310, bgcolor: theme.palette.common.white }}>
               <CardMedia
                 component="img"
                 height="280"
