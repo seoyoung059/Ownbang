@@ -402,8 +402,77 @@ class ReservationServiceImplTest {
     }
 
     @Test
-    @DisplayName("예약 가능 시간 조회 성공")
-    void getAvailableTimes_Success() {
+    @DisplayName("평일 예약 가능 시간 조회 성공")
+    void getAvailableTimes_Weekday_Success() {
+        // Given
+        Long roomId = 1L;
+        LocalDate date = LocalDate.of(2024, 8, 9); // Friday
+        AvailableTimeRequest request = new AvailableTimeRequest(roomId, date);
+
+        Room room = mock(Room.class);
+        Agent agent = mock(Agent.class);
+        AgentWorkhour workhour = mock(AgentWorkhour.class);
+
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(room.getAgent()).thenReturn(agent);
+        when(agentWorkhourRepository.findByAgent(agent)).thenReturn(Optional.of(workhour));
+        when(workhour.getWeekdayStartTime()).thenReturn("09:00");
+        when(workhour.getWeekdayEndTime()).thenReturn("18:00");
+        when(reservationRepository.findConfirmedReservationDateTimes(eq(roomId), eq(date)))
+                .thenReturn(List.of(
+                        LocalDateTime.of(2024, 8, 9, 10, 0),
+                        LocalDateTime.of(2024, 8, 9, 14, 30)
+                ));
+
+        // When
+        SuccessResponse<AvailableTimeResponse> response = reservationService.getAvailableTimes(request);
+
+        // Then
+        assertThat(response.successCode()).isEqualTo(AVAILABLE_TIMES_RETRIEVED);
+        assertThat(response.data().availableTimes()).hasSize(16);
+        assertThat(response.data().availableTimes()).contains(
+                "09:00", "09:30", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00",
+                "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"
+        );
+        assertThat(response.data().availableTimes()).doesNotContain("10:00","14:30", "18:00");
+    }
+
+    @Test
+    @DisplayName("주말 예약 가능 시간 조회 성공")
+    void getAvailableTimes_Weekend_Success() {
+        // Given
+        Long roomId = 1L;
+        LocalDate date = LocalDate.of(2024, 8, 10); // Saturday
+        AvailableTimeRequest request = new AvailableTimeRequest(roomId, date);
+
+        Room room = mock(Room.class);
+        Agent agent = mock(Agent.class);
+        AgentWorkhour workhour = mock(AgentWorkhour.class);
+
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(room.getAgent()).thenReturn(agent);
+        when(agentWorkhourRepository.findByAgent(agent)).thenReturn(Optional.of(workhour));
+        when(workhour.getWeekendStartTime()).thenReturn("10:00");
+        when(workhour.getWeekendEndTime()).thenReturn("16:00");
+        when(reservationRepository.findConfirmedReservationDateTimes(eq(roomId), eq(date)))
+                .thenReturn(List.of(LocalDateTime.of(2024, 8, 10, 12, 0)));
+
+        // When
+        SuccessResponse<AvailableTimeResponse> response = reservationService.getAvailableTimes(request);
+
+        // Then
+        assertThat(response.successCode()).isEqualTo(AVAILABLE_TIMES_RETRIEVED);
+        assertThat(response.data().availableTimes()).hasSize(11);
+        assertThat(response.data().availableTimes()).contains(
+                "10:00", "10:30", "11:00", "11:30", "12:30", "13:00", "13:30",
+                "14:00", "14:30", "15:00", "15:30"
+        );
+        assertThat(response.data().availableTimes()).doesNotContain("12:00", "16:00");
+    }
+
+    @Test
+    @DisplayName("예약 가능 시간 조회 실패 - 근무 시간을 찾을 수 없음")
+    void getAvailableTimes_WorkhourNotFound() {
         // Given
         Long roomId = 1L;
         LocalDate date = LocalDate.of(2024, 8, 9);
@@ -411,29 +480,16 @@ class ReservationServiceImplTest {
 
         Room room = mock(Room.class);
         Agent agent = mock(Agent.class);
-        when(room.getAgent()).thenReturn(agent);
-
-        AgentWorkhour workhour = mock(AgentWorkhour.class);
-        when(workhour.getWeekdayStartTime()).thenReturn("09:00");
-        when(workhour.getWeekdayEndTime()).thenReturn("17:30");
 
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
-        when(agentWorkhourRepository.findByAgent(any(Agent.class)))
-                .thenReturn(Optional.of(workhour));
-        when(reservationRepository.findConfirmedReservationTimes(eq(roomId), eq(date)))
-                .thenReturn(List.of(LocalTime.of(10, 0), LocalTime.of(14, 30)));
+        when(room.getAgent()).thenReturn(agent);
+        when(agentWorkhourRepository.findByAgent(agent)).thenReturn(Optional.empty());
 
-        // When
-        SuccessResponse<AvailableTimeResponse> response = reservationService.getAvailableTimes(request);
-
-        // Then
-        assertThat(response.successCode()).isEqualTo(AVAILABLE_TIMES_RETRIEVED);
-        assertThat(response.data().availableTimes()).hasSize(15); // 9:00부터 17:30까지, 10:00와 14:30 제외
-        assertThat(response.data().availableTimes()).contains("09:00", "09:30", "10:30", "11:00", "11:30","12:00", "12:30" , "13:00", "13:30", "14:00", "15:30" , "15:00", "16:00", "16:30", "17:00");
-
-        assertThat(response.data().availableTimes()).doesNotContain("10:00", "14:30");
+        // When & Then
+        assertThatThrownBy(() -> reservationService.getAvailableTimes(request))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", WORKHOUR_NOT_FOUND);
     }
-
     @Test
     @DisplayName("존재하지 않는 매물로 조회 시 실패")
     void getAvailableTimes_RoomNotFound() {

@@ -267,6 +267,12 @@ public class ReservationServiceImpl implements ReservationService {
         return new SuccessResponse<>(RESERVATION_LIST_SUCCESS, reservationListResponse);
     }
 
+    /**
+     * 예약 가능 시간 조회
+     *
+     * @param request 매물Id와 Date
+     * @return AvailableTimeResponse 가능한 시간 반환
+     */
     @Override
     @Transactional(readOnly = true)
     public SuccessResponse<AvailableTimeResponse> getAvailableTimes(AvailableTimeRequest request) {
@@ -274,56 +280,61 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElseThrow(() -> new AppException(ROOM_NOT_FOUND));
         AgentWorkhour workhour = agentWorkhourRepository.findByAgent(room.getAgent())
                 .orElseThrow(() -> new AppException(WORKHOUR_NOT_FOUND));
-        LocalTime startTime = LocalTime.parse(workhour.getWeekdayStartTime());
-        LocalTime endTime = LocalTime.parse(workhour.getWeekdayEndTime());
 
-        if (getDayCategory(request.date()) == "WEEKEND") {
-            startTime = LocalTime.parse(workhour.getWeekendStartTime());
-            endTime = LocalTime.parse(workhour.getWeekendEndTime());
+        LocalTime startTime;
+        LocalTime endTime;
+
+        if (getDayCategory(request.date()).equals("WEEKEND")) {
+            startTime = LocalTime.parse(Optional.ofNullable(workhour.getWeekendStartTime()).orElse("09:00"));
+            endTime = LocalTime.parse(Optional.ofNullable(workhour.getWeekendEndTime()).orElse("18:00"));
+        } else {
+            startTime = LocalTime.parse(Optional.ofNullable(workhour.getWeekdayStartTime()).orElse("09:00"));
+            endTime = LocalTime.parse(Optional.ofNullable(workhour.getWeekdayEndTime()).orElse("18:00"));
         }
 
         List<LocalTime> allPossibleTimes = generateTimeSlots(startTime, endTime);
-        List<LocalTime> bookedTimes = reservationRepository.findConfirmedReservationTimes(request.roomId(), request.date());
+        List<LocalDateTime> bookedDateTimes = reservationRepository.findConfirmedReservationDateTimes(request.roomId(), request.date());
 
-        // 현재 날짜와 요청된 날짜가 같은 경우에만 현재 시간 이후의 시간대만 포함
-        if (request.date().isEqual(LocalDate.now())) {
-            LocalTime now = LocalTime.now();
-            allPossibleTimes = allPossibleTimes.stream()
-                    .filter(time -> !time.isBefore(now))
-                    .collect(Collectors.toList());
-        }
+        List<LocalTime> bookedTimes = bookedDateTimes.stream()
+                .map(LocalDateTime::toLocalTime)
+                .collect(Collectors.toList());
+
+        LocalTime now = LocalTime.now();
+        boolean isToday = request.date().isEqual(LocalDate.now());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         List<String> availableTimes = allPossibleTimes.stream()
-                .filter(time -> !bookedTimes.contains(time))
+                .filter(time -> (!isToday || !time.isBefore(now)) && !bookedTimes.contains(time))
                 .map(time -> time.format(formatter))
                 .collect(Collectors.toList());
+
+        if (availableTimes.isEmpty()) {
+            return new SuccessResponse<>(AVAILABLE_TIMES_EMPTY, new AvailableTimeResponse(availableTimes));
+        }
 
         return new SuccessResponse<>(AVAILABLE_TIMES_RETRIEVED, new AvailableTimeResponse(availableTimes));
     }
 
-
     private String getDayCategory(LocalDate date) {
         // 날짜에 따라 주말, 주중인지 파악
         DayOfWeek dayOfWeek = date.getDayOfWeek();
-        switch (dayOfWeek) {
-            case SATURDAY:
-            case SUNDAY:
-                return "WEEKEND";
-            default:
-                return "WEEKDAY";
-        }
+        return (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) ? "WEEKEND" : "WEEKDAY";
     }
+
 
     private List<LocalTime> generateTimeSlots(LocalTime start, LocalTime end) {
         List<LocalTime> slots = new ArrayList<>();
         LocalTime current = start;
-        while (current.isBefore(end)) {
+        LocalTime lastSlot = end.minusMinutes(30);  // 마지막 예약 가능 시간은 영업 종료 30분 전
+
+        while (!current.isAfter(lastSlot)) {
             slots.add(current);
             current = current.plusMinutes(30);
         }
         return slots;
     }
+
+
 
     /**
      * 중개인 예약 취소
