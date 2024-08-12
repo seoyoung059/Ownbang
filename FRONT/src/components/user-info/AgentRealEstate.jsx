@@ -75,17 +75,39 @@ const MyRealEstate = () => {
       <Table sx={{ minWidth: 500 }}>
         <TableHead>
           <TableRow>
-            <TableCell align="center">매물 사진</TableCell>
-            <TableCell align="center">매물 주소지</TableCell>
-            <TableCell align="center">방 종류</TableCell>
-            <TableCell align="center">구조</TableCell>
-            <TableCell align="center">거래 종류</TableCell>
-            <TableCell align="center">전용 면적</TableCell>
-            <TableCell align="center">공급 면적</TableCell>
-            <TableCell align="center">층수</TableCell>
-            <TableCell align="center">보증금</TableCell>
-            <TableCell align="center">월세</TableCell>
-            <TableCell align="center">관리비</TableCell>
+            <TableCell align="center" sx={{ minWidth: 90 }}>
+              매물 사진
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 200 }}>
+              매물 주소지
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 60 }}>
+              방 종류
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 60 }}>
+              구조
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 60 }}>
+              거래 종류
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 60 }}>
+              전용 면적
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 60 }}>
+              공급 면적
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 30 }}>
+              층수
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 50 }}>
+              보증금
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 30 }}>
+              월세
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 50 }}>
+              관리비
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody sx={{ backgroundColor: theme.palette.background.default }}>
@@ -109,37 +131,31 @@ const MyRealEstate = () => {
                   )}
                 </TableCell>
                 <TableCell align="center">
-                  {row.road ? row.road : "저장된 정보가 없습니다."}
+                  {row.road ? row.road : "없음"}
                 </TableCell>
                 <TableCell align="center">
-                  {row.roomType ? row.roomType : "저장된 정보가 없습니다."}
+                  {row.roomType ? row.roomType : "없음"}
                 </TableCell>
                 <TableCell align="center">
-                  {row.structure ? row.structure : "저장된 정보가 없습니다."}
+                  {row.structure ? row.structure : "없음"}
                 </TableCell>
                 <TableCell align="center">
-                  {row.dealType ? row.dealType : "저장된 정보가 없습니다."}
+                  {row.dealType ? row.dealType : "없음"}
                 </TableCell>
                 <TableCell align="center">
-                  {row.exclusiveArea
-                    ? row.exclusiveArea
-                    : "저장된 정보가 없습니다."}
+                  {row.exclusiveArea ? row.exclusiveArea : "없음"}
                 </TableCell>
                 <TableCell align="center">
-                  {row.supplyArea ? row.supplyArea : "저장된 정보가 없습니다."}
+                  {row.supplyArea ? row.supplyArea : "없음"}
                 </TableCell>
                 <TableCell align="center">
-                  {row.roomFloor ? row.roomFloor : "저장된 정보가 없습니다."}
+                  {row.roomFloor ? row.roomFloor : "없음"}
                 </TableCell>
                 <TableCell align="center">
-                  {row.deposit
-                    ? formatCurrency(row.deposit)
-                    : "저장된 정보가 없습니다."}
+                  {row.deposit ? formatCurrency(row.deposit) : "없음"}
                 </TableCell>
                 <TableCell align="center">
-                  {row.monthlyRent
-                    ? formatCurrency(row.monthlyRent)
-                    : "저장된 정보가 없습니다."}
+                  {row.monthlyRent ? formatCurrency(row.monthlyRent) : "없음"}
                 </TableCell>
                 <TableCell align="center">
                   {row.maintenanceFee
