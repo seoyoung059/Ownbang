@@ -4,7 +4,6 @@ import {
   Button,
   Modal,
   Typography,
-  TextField,
   Rating,
   IconButton,
 } from "@mui/material";
@@ -67,7 +66,7 @@ export default function ReviewModal({
             setStarRating(newValue);
           }}
         />
-        <TextField
+        {/* <TextField
           fullWidth
           id="review-content"
           label="리뷰 내용"
@@ -77,10 +76,19 @@ export default function ReviewModal({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           sx={{ mt: 2 }}
-        />
-        <Button variant="contained" onClick={handleSubmit} sx={{ mt: 2 }}>
-          제출하기
-        </Button>
+        /> */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column", // 세로 정렬로 변경
+            gap: 2, // 버튼 사이 간격 조정
+            mt: 2,
+          }}
+        >
+          <Button variant="contained" onClick={handleSubmit}>
+            제출하기
+          </Button>
+        </Box>
       </Box>
     </Modal>
   );
