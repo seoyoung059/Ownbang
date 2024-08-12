@@ -36,6 +36,7 @@ const Header = () => {
 
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMd = useMediaQuery(theme.breakpoints.down("md"));
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [avatarMenuAnchorEl, setAvatarMenuAnchorEl] = useState(null);
@@ -120,26 +121,30 @@ const Header = () => {
                       sx={{ width: 40, height: 40 }}
                     />
                   </IconButton>
-                  <IconButton
-                    color="inherit"
-                    onClick={() => handleNavigation("/estate")}
-                    title="지도 검색"
-                  >
-                    <MapOutlined />
-                  </IconButton>
+                  {user.isAgent && isMd ? null : (
+                    <IconButton
+                      color="inherit"
+                      onClick={() => handleNavigation("/estate")}
+                      title="지도 검색"
+                    >
+                      <MapOutlined />
+                    </IconButton>
+                  )}
                 </>
               ) : (
                 <>
                   <Button onClick={() => handleNavigation("/login")}>
                     로그인
                   </Button>
-                  <IconButton
-                    color="inherit"
-                    onClick={() => handleNavigation("/estate")}
-                    title="지도 검색"
-                  >
-                    <MapOutlined />
-                  </IconButton>
+                  {user.isAgent && isMd ? null : (
+                    <IconButton
+                      color="inherit"
+                      onClick={() => handleNavigation("/estate")}
+                      title="지도 검색"
+                    >
+                      <MapOutlined />
+                    </IconButton>
+                  )}
                 </>
               )}
               <IconButton color="inherit" onClick={handleMenuOpen}>
