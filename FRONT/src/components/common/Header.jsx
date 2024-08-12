@@ -32,7 +32,7 @@ const Header = () => {
       };
       fetchData();
     }
-  }, [isAuthenticated, fetchUser, modifyUser, user]);
+  }, [isAuthenticated, fetchUser]);
 
   const theme = useTheme();
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
