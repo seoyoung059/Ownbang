@@ -42,9 +42,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
             @Param("today") LocalDateTime today
     );
 
-    @Query("SELECT TIME(r.reservationTime) FROM Reservation r WHERE r.room.id = :roomId AND DATE(r.reservationTime) = :date AND r.status = 'CONFIRMED'")
-    List<LocalTime> findConfirmedReservationTimes(@Param("roomId") Long roomId, @Param("date") LocalDate date);
-
+    @Query("SELECT r.reservationTime FROM Reservation r WHERE r.room.id = :roomId AND DATE(r.reservationTime) = :date AND r.status = 'CONFIRMED'")
+    List<LocalDateTime> findConfirmedReservationDateTimes(@Param("roomId") Long roomId, @Param("date") LocalDate date);
 
 
     default Reservation getById(Long id) {
