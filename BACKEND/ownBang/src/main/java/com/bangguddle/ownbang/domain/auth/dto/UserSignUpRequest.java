@@ -9,7 +9,8 @@ public record UserSignUpRequest(
         String email,
         String password,
         String phoneNumber,
-        String nickname
+        String nickname,
+        String profileImageUrl
 ) {
     public User toEntity(String hashedPassword) {
         return User.builder()
@@ -18,6 +19,7 @@ public record UserSignUpRequest(
                 .nickname(nickname)
                 .password(hashedPassword)
                 .phoneNumber(phoneNumber)
+                .profileImageUrl(profileImageUrl)
                 .build();
     }
 }
