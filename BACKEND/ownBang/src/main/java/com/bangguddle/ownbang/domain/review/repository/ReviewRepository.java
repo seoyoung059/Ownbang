@@ -20,9 +20,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Optional<Review> findByReservationId(Long reservationId);
 
-//    @Query("SELECT AVG(r.star_rating) From Review r where r.agent_id = :agentId")
-//    Double findAverageStarRatingByAgentId(@Param("agentId") Long agentId);
-
     @Query("SELECT AVG(r.starRating) FROM Review r WHERE r.agent.id = :agentId")
     Double calculateAverageStarRatingByAgentId(@Param("agentId") Long agentId);
 

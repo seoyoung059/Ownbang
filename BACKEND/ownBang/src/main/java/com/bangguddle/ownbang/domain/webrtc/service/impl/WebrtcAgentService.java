@@ -5,9 +5,6 @@ import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
-import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
-import com.bangguddle.ownbang.domain.video.entity.Video;
-import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
 import com.bangguddle.ownbang.domain.video.service.VideoService;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
@@ -24,7 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
-import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -103,21 +101,7 @@ public class WebrtcAgentService implements WebrtcService {
         webrtcSessionService.removeSession(reservationId);
 
         // record hls 변환
-        SuccessResponse<String> uploadSuccess = streamingService.uploadStreaming(recording.getSessionId());
-
-        // video 수정
-        Video video = videoRepository.findByReservationId(reservationId)
-                .orElseThrow(()->new AppException(INTERNAL_SERVER_ERROR));
-        VideoUpdateRequest videoUpdateRequest =
-                VideoUpdateRequest.builder()
-                                .videoUrl(uploadSuccess.data())
-                                .videoStatus(VideoStatus.RECORDED)
-                                .build();
-        videoService.modifyVideo(videoUpdateRequest, video.getId());
-
-
-        // record 제거
-        webrtcSessionService.deleteRecord(reservationId);
+        streamingService.uploadStreaming(reservationId, recording.getSessionId());
 
         // response 반환
         return new SuccessResponse<>(REMOVE_TOKEN_SUCCESS, NoneResponse.NONE);
