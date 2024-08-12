@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Box, Button, Typography, Alert, Snackbar } from "@mui/material";
+import { Box, Button, Typography, Alert } from "@mui/material";
 import ReservationCalendar from "./ReservationCalendar";
 import ReservationClock from "./ReservationClock";
 import { useTheme } from "@mui/material/styles";
@@ -10,6 +10,7 @@ const Reservation = ({ onClose, makeReservation, item }) => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false); // 성공 메시지 상태
+  const [errorMessage, setErrorMessage] = useState(""); // 에러 메시지 상태
 
   const reservationTime =
     selectedDate && selectedTime
@@ -25,6 +26,7 @@ const Reservation = ({ onClose, makeReservation, item }) => {
       return;
     }
     setShowAlert(false);
+    setErrorMessage(""); // 에러 메시지 초기화
 
     const reservationData = {
       roomId: item.id,
@@ -40,8 +42,18 @@ const Reservation = ({ onClose, makeReservation, item }) => {
       setTimeout(onClose, 2000); // Optionally close the reservation after a delay
     } catch (error) {
       console.error("Reservation failed:", error);
+
+      // 에러 메시지를 설정
+      setErrorMessage(error.response?.data?.message || "예약에 실패했습니다.");
     }
-  }, [selectedDate, selectedTime, makeReservation, reservationTime, onClose]);
+  }, [
+    selectedDate,
+    selectedTime,
+    makeReservation,
+    reservationTime,
+    item.id,
+    onClose,
+  ]);
 
   // 날짜 변경 핸들러
   const handleDateChange = (date) => {
@@ -62,6 +74,11 @@ const Reservation = ({ onClose, makeReservation, item }) => {
   // 성공 메시지 닫기 핸들러
   const handleSuccessClose = () => {
     setShowSuccess(false);
+  };
+
+  // 에러 메시지 닫기 핸들러
+  const handleErrorClose = () => {
+    setErrorMessage("");
   };
 
   return (
@@ -124,6 +141,15 @@ const Reservation = ({ onClose, makeReservation, item }) => {
             sx={{ marginBottom: 2 }}
           >
             예약이 완료되었습니다.
+          </Alert>
+        )}
+        {errorMessage && (
+          <Alert
+            severity="error"
+            onClose={handleErrorClose}
+            sx={{ marginBottom: 2 }}
+          >
+            {errorMessage}
           </Alert>
         )}
         <Button

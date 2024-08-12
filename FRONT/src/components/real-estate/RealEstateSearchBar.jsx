@@ -41,22 +41,23 @@ const RealEstateSearchBar = ({ isMain }) => {
 
   const onSearchInputValue = () => {
     setSearchTerm(inputValue);
+    setSearchList([]); // 검색 실행 후 리스트를 즉시 비워줍니다.
     navigate(`/estate?search=${inputValue}`, { replace: true });
     setInputValue("");
-    setSearchList([]);
   };
 
   const onKeyDown = (event) => {
     if (event.key === "Enter") {
       onSearchInputValue();
     }
+    setSearchList([]);
   };
 
   const handleSuggestionClick = (suggestion) => {
     setInputValue(suggestion.searchName);
     setSearchTerm(suggestion.searchName);
+    setSearchList([]); // 리스트를 비웁니다.
     navigate(`/estate?search=${suggestion.searchName}`, { replace: true });
-    setSearchList([]);
   };
 
   return (

@@ -92,14 +92,34 @@ function AgentReservationList() {
       <Table>
         <TableHead>
           <TableRow>
-            {!isMobile && <TableCell align="center">미리보기</TableCell>}
-            <TableCell align="center">예약일</TableCell>
-            <TableCell align="center">예약 시간</TableCell>
-            {!isMobile && <TableCell align="center">예약자명</TableCell>}
-            <TableCell align="center">예약 상태</TableCell>
-            <TableCell align="center">예약 상태 변경</TableCell>
-            <TableCell align="center">예약자 번호</TableCell>
-            <TableCell align="center">화상 채팅</TableCell>
+            {!isMobile && (
+              <TableCell align="center" sx={{ minWidth: 150 }}>
+                미리보기
+              </TableCell>
+            )}
+            <TableCell align="center" sx={{ minWidth: 100 }}>
+              예약일
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 100 }}>
+              예약 시간
+            </TableCell>
+            {!isMobile && (
+              <TableCell align="center" sx={{ minWidth: 60 }}>
+                예약자명
+              </TableCell>
+            )}
+            <TableCell align="center" sx={{ minWidth: 110 }}>
+              예약 상태
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 100 }}>
+              예약 상태 변경
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 140 }}>
+              예약자 번호
+            </TableCell>
+            <TableCell align="center" sx={{ minWidth: 100 }}>
+              화상 채팅
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody sx={{ bgcolor: theme.palette.background.default }}>
@@ -111,6 +131,7 @@ function AgentReservationList() {
                 reservation={reservation}
                 confirmReservation={confirmReservation}
                 denyReservation={denyReservation}
+                getAgentReservationList={getAgentReservationList}
               />
             ))}
           {emptyRows > 0 && (
