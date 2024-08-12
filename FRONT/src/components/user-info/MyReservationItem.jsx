@@ -177,7 +177,7 @@ export default function MyReservationItem({
         {reservation.status !== "COMPLETED" ? (
           <Button
             variant="contained"
-            disabled={reservation.status !== "CONFIRMED"}
+            disabled={!reservation.enstance}
             size={isMobile ? "small" : "medium"}
             onClick={() =>
               navigate(`/video-chat/${reservation.id}`, {
