@@ -66,6 +66,7 @@ public enum SuccessCode implements ResponseCode {
     VIDEO_RECORD_SUCCESS(HttpStatus.CREATED, "영상 녹화가 성공적으로 시작되었습니다."),
     VIDEO_FIND_SUCCESS(HttpStatus.OK, "영상 녹화 단건 조회가 성공적으로 완료되었습니다."),
     VIDEO_UPDATE_SUCCESS(HttpStatus.OK, "영상 링크 수정이 성공적으로 완료되었습니다."),
+    VIDEO_PROCESS_SUCCESS(HttpStatus.OK, "영상 인코딩 및 업로드 요청이 완료되었습니다."),
 
     //Reservation API
     RESERVATION_MAKE_SUCCESS(HttpStatus.CREATED, "예약 신청이 성공적으로 완료되었습니다."),
@@ -77,6 +78,9 @@ public enum SuccessCode implements ResponseCode {
     RESERVATION_LIST_EMPTY(HttpStatus.OK, " 예약한 목록이 없습니다. "),
 
     AVAILABLE_TIMES_RETRIEVED(HttpStatus.OK, "예약 가능한 시간 목록을 성공적으로 조회했습니다."),
+    AVAILABLE_TIMES_EMPTY(HttpStatus.OK, "오늘은 예약 가능한 시간이 없습니다."),
+
+
     // ElasticSearch API
     SEARCH_SUCCESS (HttpStatus.CREATED, "데이터가 성공적으로 입력되었습니다. "),
     SEARCH_LIST_SUCEESS(HttpStatus.OK ,"검색 목록을 조회할 수 있습니다."),
