@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
 import { useBoundStore } from "../../store/store";
 
@@ -6,10 +6,14 @@ const RealEstateMap = ({
   searchTerm,
   mark,
   onBoundsChange,
+  onIdle,
   onSelectMarker,
   size,
 }) => {
-  const realEstateData = useBoundStore((state) => state.realEstateData);
+  const { realEstateData, getAllRoom } = useBoundStore((state) => ({
+    realEstateData : state.realEstateData,
+    getAllRoom : state.getAllRoom
+  }));
   const [map, setMap] = useState(null);
 
   useEffect(() => {
@@ -47,19 +51,67 @@ const RealEstateMap = ({
   const onBoundsChange2 = () => {
     if (!map) return;
     const bounds = map.getBounds();
+    console.log(realEstateData)
     const visiblePositions =
-      realEstateData.data &&
-      realEstateData.data.filter((pos) =>
+      realEstateData&&
+      realEstateData.filter((pos) =>
         bounds.contain(new kakao.maps.LatLng(pos.latitude, pos.longitude))
       );
-    onBoundsChange(visiblePositions);
+    console.log(visiblePositions)
+    onIdle(visiblePositions)
   };
 
-  useEffect(() => {
-    if (map) {
-      onBoundsChange2();
+  const handleGetRoom = async () => {
+    if (!map) return;
+    try {
+      const center = map.getCenter();
+      console.log(center.getLat(), center.getLng())
+
+      // console.log("위", realEstateData);
+      const rooms = await getAllRoom(center.getLat(), center.getLng());
+      // setRealEstateData(rooms)
+      // console.log("아래", rooms )
+
+    } catch (error) {
+      console.log(error)
     }
-  }, [map, realEstateData]);
+  };
+
+  const handleIdle = async() => {
+    if (map) {
+      debouncedHandleGetRoom();
+      onBoundsChange2()
+      // console.log("함수")
+    }
+  };
+
+  // useEffect(() => {
+  //   if (map) {
+  //     onBoundsChange2();
+  //   }
+  // }, [map, realEstateData]);
+
+  const debounce = (func, delay) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), delay);
+    };
+  };
+
+
+  const debouncedHandleGetRoom = useCallback(debounce(async () => {
+    if (!map) return;
+    try {
+      const center = map.getCenter();
+      console.log(center.getLat(), center.getLng());
+
+      await getAllRoom(center.getLat(), center.getLng());
+      // setRealEstateData(rooms);
+    } catch (error) {
+      console.log(error);
+    }
+  }, 300), [map]);
 
   return (
     <Map
@@ -72,13 +124,15 @@ const RealEstateMap = ({
         height: size ? size : "900px",
       }}
       level={7}
+      maxLevel={3}
+      minLevel={6}
       onCreate={setMap}
-      onBoundsChanged={onBoundsChange2}
+      onIdle={handleIdle}
     >
       {!mark ? (
         <MarkerClusterer averageCenter={true} minLevel={5}>
-          {realEstateData.data &&
-            realEstateData.data.map((pos) => (
+          {realEstateData&&
+            realEstateData.map((pos) => (
               <MapMarker
                 key={pos.id}
                 position={{
