@@ -87,14 +87,16 @@ export default function UserInfoEditForm() {
         type: "application/json",
       })
     );
-    await modifyUser(formData).then((res) => {
-      if (res.resultCode === "SUCCESS") {
-        setSnackbarOpen(true);
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
-      }
-    });
+
+    const res = await modifyUser(formData);
+    if (res.resultCode === "SUCCESS") {
+      // Update the user state in the global store directly
+      await fetchUser(); // This will trigger an update in the store
+      setSnackbarOpen(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    }
   };
 
   const handleCancel = () => {
