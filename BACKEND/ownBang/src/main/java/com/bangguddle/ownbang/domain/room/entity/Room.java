@@ -1,6 +1,5 @@
 package com.bangguddle.ownbang.domain.room.entity;
 
-import ch.hsr.geohash.GeoHash;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.room.dto.RoomUpdateRequest;
 import com.bangguddle.ownbang.domain.room.enums.DealType;
@@ -31,7 +30,7 @@ public class Room {
     private Agent agent;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "room_appliances_id", nullable = false)
+    @JoinColumn(name="room_appliances_id", nullable = false)
     private RoomAppliances roomAppliances;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -71,13 +70,13 @@ public class Room {
     @Column(nullable = false)
     private byte roomFloor;
 
-    @Column(columnDefinition = "INT UNSIGNED")
+    @Column( columnDefinition = "INT UNSIGNED")
     private Long deposit;
 
     @Column(columnDefinition = "INT UNSIGNED")
     private Long monthlyRent;
 
-    @Column(nullable = false, columnDefinition = "INT UNSIGNED")
+    @Column( nullable = false, columnDefinition = "INT UNSIGNED")
     private Long maintenanceFee;
 
     @Column(nullable = false)
@@ -91,14 +90,6 @@ public class Room {
 
     @Column(nullable = false)
     private String detailAddress;
-
-    private String geoHash;
-
-    @PrePersist
-    @PreUpdate
-    public void updateGeoHash() {
-        this.geoHash = GeoHash.geoHashStringWithCharacterPrecision(latitude, longitude, 9);
-    }
 
 
     @Builder
@@ -124,7 +115,7 @@ public class Room {
         this.detailAddress = detailAddress;
     }
 
-    public void updateFromDto(RoomUpdateRequest roomUpdateRequest) {
+    public void updateFromDto (RoomUpdateRequest roomUpdateRequest) {
         this.roomAppliances.updateFromDto(roomUpdateRequest.roomAppliancesUpdateRequest());
         this.roomDetail.updateFromDto(roomUpdateRequest.roomDetailUpdateRequest());
         this.latitude = roomUpdateRequest.latitude();
@@ -144,7 +135,7 @@ public class Room {
         this.detailAddress = roomUpdateRequest.detailAddress();
     }
 
-    public void updateProfileImage(String profileImageUrl) {
+    public void updateProfileImage(String profileImageUrl){
         this.profileImageUrl = profileImageUrl;
     }
 }

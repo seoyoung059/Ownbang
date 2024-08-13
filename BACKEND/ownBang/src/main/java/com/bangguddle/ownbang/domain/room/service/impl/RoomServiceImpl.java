@@ -1,6 +1,5 @@
 package com.bangguddle.ownbang.domain.room.service.impl;
 
-import ch.hsr.geohash.GeoHash;
 import com.bangguddle.ownbang.domain.agent.dto.AgentResponse;
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
@@ -165,18 +164,19 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId, Float lat, Float lon) {
-        String geoHashPrefix = GeoHash.geoHashStringWithCharacterPrecision(lat, lon, 3);
-        List<Room> rooms = roomRepository.findByGeoHashStartsWith(geoHashPrefix);
-        List<RoomInfoSearchResponse> response = rooms.stream()
-                .map(room -> {
-                    boolean isBookmarked = userId != null && bookmarkRepository
-                            .findBookmarkByRoomIdAndUserId(room.getId(), userId).isPresent();
+    public SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId) {
+        List<RoomInfoSearchResponse> list = roomRepository.findAll().stream()
+                .map((room)->{
+                    boolean isBookmarked = false;
+                    if(userId!=null){
+                        isBookmarked = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId).isPresent();
+                    }
                     return RoomInfoSearchResponse.from(room, isBookmarked);
                 })
                 .toList();
-        return new SuccessResponse<>(SEARCH_ROOM_SUCCESS, response);
-
+        SuccessResponse<List<RoomInfoSearchResponse>> response =
+                new SuccessResponse<>(SEARCH_ROOM_SUCCESS, list);
+        return response;
     }
 
     private void validateAgent(Long userId, Room existingRoom) {
