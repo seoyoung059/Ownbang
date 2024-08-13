@@ -9,10 +9,26 @@ import {
 } from "@mui/material";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { Bookmark } from "@mui/icons-material";
+import { useBoundStore } from "../../store/store";
 
 export default function MyBookmarkItem({ bookmark }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const { toggleBookmarks, getBookmarks } = useBoundStore((state) => ({
+    toggleBookmarks: state.toggleBookmarks,
+    getBookmarks: state.getBookmarks,
+  }));
+
+  const handleToggleBookmark = async () => {
+    try {
+      await toggleBookmarks(bookmark.roomInfoSearchResponse.id); // 북마크를 토글
+      await getBookmarks();
+    } catch (error) {
+      console.error("북마크 토글 실패:", error);
+    }
+  };
+
   return (
     <Card
       sx={{
@@ -30,7 +46,7 @@ export default function MyBookmarkItem({ bookmark }) {
         image={bookmark.roomInfoSearchResponse.profileImageUrl}
         alt={
           bookmark.roomInfoSearchResponse.profileImageUrl ||
-          "No image available"
+          "이미지를 불러올 수 없습니다"
         }
       />
       <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
@@ -49,7 +65,7 @@ export default function MyBookmarkItem({ bookmark }) {
               {bookmark.roomInfoSearchResponse.deposit}/
               {bookmark.roomInfoSearchResponse.monthlyRent}
             </Typography>
-            <IconButton aria-label="bookmark">
+            <IconButton aria-label="bookmark" onClick={handleToggleBookmark}>
               <Bookmark sx={{ color: theme.palette.bookmark }} />
             </IconButton>
           </Box>
