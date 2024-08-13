@@ -69,7 +69,7 @@ public enum ErrorCode implements ResponseCode {
     WORKHOUR_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 날짜의 근무 시간 정보를 찾을 수 없습니다."),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜 형식입니다."),
     WORKHOUR_UNAVAILABLE(HttpStatus.BAD_REQUEST, "시작시간이 마감시간보다 늦을 수 없습니다."),
-
+    RESERVATION_UNAVAILABLE (HttpStatus.BAD_REQUEST, "중개인은 예약을 신청할 수 없습니다."),
     // Common Error Code
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부적 에러가 발생했습니다."),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 요청입니다."),

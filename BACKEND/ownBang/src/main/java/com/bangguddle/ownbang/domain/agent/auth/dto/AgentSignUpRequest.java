@@ -24,13 +24,13 @@ public record AgentSignUpRequest(
         @NotNull(message = "사무실 이름을 입력해 주세요.")
         @Length(max = 255, message = "적절한 사무실 이름를 입력해 주세요. (최대 255자)")
         String officeName,
-        @NotNull(message = "주말 영업 시작시간을 입력해 주세요.")
+
         String weekendStartTime,
-        @NotNull(message = "주말 영업 종료시간을 입력해 주세요.")
+
         String weekendEndTime,
-        @NotNull(message = "평일 영업 시작시간을 입력해 주세요.")
+
         String weekdayStartTime,
-        @NotNull(message = "평일 영업 종료시간을 입력해 주세요.")
+
         String weekdayEndTime
 ) {
     public Agent toAgentEntity(User user) {

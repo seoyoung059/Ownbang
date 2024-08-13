@@ -6,16 +6,12 @@ import jakarta.validation.constraints.NotNull;
 
 public record AgentWorkhourRequest(
 
-        @NotNull
         String weekendStartTime,
 
-        @NotNull
         String weekendEndTime,
 
-        @NotNull
         String weekdayStartTime,
 
-        @NotNull
         String weekdayEndTime
 
 ) {
