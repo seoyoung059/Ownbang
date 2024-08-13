@@ -92,15 +92,10 @@ public class VideoServiceImpl implements VideoService {
     public SuccessResponse<NoneResponse> modifyVideo(
             @Valid final VideoUpdateRequest request, final Long videoId
     ) {
-        // 영상 유효성 검사
+        // 유효성 검사
         Video video = validateVideo(videoId);
-        if(!equalToRecording(video.getVideoStatus())){
+        if(video.getVideoStatus() == request.videoStatus()){
             throw new AppException(VIDEO_DUPLICATE);
-        }
-
-        // request 유효성 검사
-        if(equalToRecording(request.videoStatus())){
-            throw new AppException(BAD_REQUEST);
         }
 
         // 업데이트

@@ -18,6 +18,8 @@ import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import io.openvidu.java.client.Recording;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,6 +31,8 @@ import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCE
 @Service
 @RequiredArgsConstructor
 public class WebrtcUserService implements WebrtcService {
+
+    private static final Logger log = LoggerFactory.getLogger(WebrtcUserService.class);
 
     private final VideoService videoService;
     private final WebrtcSessionService webrtcSessionService;
@@ -43,6 +47,14 @@ public class WebrtcUserService implements WebrtcService {
 
         // session 유효성 검사
         validateSession(reservationId);
+
+        // 기존 토큰 유무 확인 및 삭제
+        webrtcSessionService.getToken(reservationId, UserType.ROLE_USER)
+                .ifPresent(token -> {
+                    log.info("기존 토큰 존재: ", token);
+                    webrtcSessionService.removeToken(reservationId, token, UserType.ROLE_USER)
+                            .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
+                });
 
         // token 생성
         String token = webrtcSessionService.createToken(reservationId, UserType.ROLE_USER)
