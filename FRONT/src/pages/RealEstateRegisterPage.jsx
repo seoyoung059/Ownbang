@@ -22,7 +22,7 @@ import AddressSearch from "../components/common/AddressSearch";
 import RealEstateMap from "../components/real-estate/RealEstateMap";
 import { useBoundStore } from "../store/store";
 import { useNavigate } from "react-router-dom";
-import KakaoMapSearch from '../components/real-estate/KakaoMapsearch';
+import KakaoMapSearch from "../components/real-estate/KakaoMapsearch";
 
 export default function RealEstateRegisterPage() {
   const navigate = useNavigate();
@@ -38,6 +38,8 @@ export default function RealEstateRegisterPage() {
   const [open, setOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -45,6 +47,12 @@ export default function RealEstateRegisterPage() {
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
+    // 스낵바가 닫힐 때 페이지 이동
+    if (snackbarMessage === "등록이 완료되었습니다!") {
+      navigate("/");
+    } else {
+      setIsSubmitting(false);
+    }
   };
 
   const [basicInfo, setBasicInfo] = useState({
@@ -162,6 +170,8 @@ export default function RealEstateRegisterPage() {
   const handleClose = () => setOpen(false);
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     const formData = new FormData();
 
     const roomDetailCreateRequest = { ...roomDetails };
@@ -192,9 +202,6 @@ export default function RealEstateRegisterPage() {
       setErrMsg("");
       setSnackbarMessage("등록이 완료되었습니다!");
       setSnackbarOpen(true);
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
     } catch (error) {
       console.log(error);
       if (error.response.data.status === 413) {
@@ -202,6 +209,7 @@ export default function RealEstateRegisterPage() {
       } else if (error.response.data.status === 400) {
         setErrMsg("잘못된 입력이 있습니다. 수정하고 다시 시도하세요.");
       }
+      setIsSubmitting(false); // 실패 시 버튼 활성화
     }
   };
 
@@ -298,7 +306,7 @@ export default function RealEstateRegisterPage() {
             <>
               <Grid item xs={12} sm={6}>
                 <Box sx={{ width: "100%", height: "280px" }}>
-                <KakaoMapSearch
+                  <KakaoMapSearch
                     searchTerm={address}
                     mark={coordinates}
                     onBoundsChange={onBoundsChange}
@@ -784,6 +792,7 @@ export default function RealEstateRegisterPage() {
           size="large"
           color="primary"
           onClick={handleSubmit}
+          disabled={isSubmitting}
         >
           등록
         </Button>

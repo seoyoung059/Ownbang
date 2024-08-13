@@ -72,8 +72,6 @@ export const UserRoute = ({ element, allowAgents = false }) => {
     fetchUser: state.fetchUser,
   }));
 
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchData = async () => {
       await fetchUser();
@@ -84,7 +82,7 @@ export const UserRoute = ({ element, allowAgents = false }) => {
   }, [fetchUser]);
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    if (!isAuthenticated) {
       toast.info("로그인이 필요합니다.", {
         position: "bottom-left",
         autoClose: 2000,
@@ -96,11 +94,7 @@ export const UserRoute = ({ element, allowAgents = false }) => {
         theme: "light",
       });
     }
-  }, [isAuthenticated, loading]);
-
-  if (loading) {
-    return null; // Or a loading spinner
-  }
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
