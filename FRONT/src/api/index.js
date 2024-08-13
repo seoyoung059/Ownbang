@@ -48,7 +48,7 @@ axiosInstance.interceptors.response.use(
         localStorage.removeItem("accessToken");
         cookies.remove("refreshToken");
         window.location.href = "/login";
-        window.alert("토큰 갱신에 실패했습니다.");
+        window.alert("토큰 갱신에 실패했습니다. 다시 로그인해주세요.");
       }
 
       return new Promise(() => {}); // 대기 상태 유지
