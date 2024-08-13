@@ -97,7 +97,7 @@ public class Room {
     @PrePersist
     @PreUpdate
     public void updateGeoHash() {
-        this.geoHash = GeoHash.geoHashStringWithCharacterPrecision(latitude, longitude, 3);
+        this.geoHash = GeoHash.geoHashStringWithCharacterPrecision(latitude, longitude, 9);
     }
 
 
