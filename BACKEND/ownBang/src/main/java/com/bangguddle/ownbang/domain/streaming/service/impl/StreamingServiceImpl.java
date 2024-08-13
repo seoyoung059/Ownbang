@@ -64,7 +64,7 @@ public class StreamingServiceImpl implements StreamingService {
     private final ReservationRepository reservationRepository;
 
     @Value("${video.recordings.path}")
-    private String reocrdingPath;
+    private String recordingPath;
 
     @Override
     public SuccessResponse<NoneResponse> retryStreaming(Long userId, Long reservationId) {
@@ -92,7 +92,7 @@ public class StreamingServiceImpl implements StreamingService {
     @Override
     public void uploadStreaming(Long reservationId, String sessionId) {
         log.info("uploadStreaming sessionId:{}", sessionId);
-        Path outputPath = Paths.get(reocrdingPath, sessionId);
+        Path outputPath = Paths.get(recordingPath, sessionId);
         if (!Files.exists(outputPath)) throw new AppException(RECORDING_ERROR);
         log.info(outputPath.toAbsolutePath().toString());
 
@@ -205,8 +205,8 @@ public class StreamingServiceImpl implements StreamingService {
      */
     private String convertToHls(String filename, String sessionId) {
         try {
-            String inputFilePath = Paths.get(reocrdingPath, sessionId, filename).toAbsolutePath().toString();
-            File output = new File(Paths.get(reocrdingPath, sessionId, sessionId).toAbsolutePath().toString());
+            String inputFilePath = Paths.get(recordingPath, sessionId, filename).toAbsolutePath().toString();
+            File output = new File(Paths.get(recordingPath, sessionId, sessionId).toAbsolutePath().toString());
 
             // 파일 없을 때
             if (!(new File(inputFilePath)).exists()) throw new FileNotFoundException(filename);
