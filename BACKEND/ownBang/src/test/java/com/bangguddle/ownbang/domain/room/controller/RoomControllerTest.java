@@ -176,7 +176,7 @@ class RoomControllerTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 )
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.resultCode").value("ERROR"));
     }
 
