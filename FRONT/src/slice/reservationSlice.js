@@ -4,6 +4,7 @@ import {
   agentReservationList,
   agentReservationConfirm,
   agentReservationDeny,
+  agentAvailable,
 } from "../api/reservation";
 
 export const createReservation = (set) => ({
@@ -70,6 +71,17 @@ export const createReservation = (set) => ({
       return result;
     } catch (error) {
       console.error("Error denying reservation:", error);
+      throw error;
+    }
+  },
+
+  getAgentAvailable: async (requiredData) => {
+    try {
+      const result = await agentAvailable(requiredData);
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error("Error getting available Time:", error);
       throw error;
     }
   },

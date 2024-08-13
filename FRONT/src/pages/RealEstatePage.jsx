@@ -22,6 +22,7 @@ const RealEstatePage = () => {
     getBookmarks,
     toggleBookmarks,
     getAvailableTime,
+    getAgentAvailable,
     isAuthenticated,
   } = useBoundStore((state) => ({
     searchTerm: state.searchTerm,
@@ -34,6 +35,7 @@ const RealEstatePage = () => {
     getBookmarks: state.getBookmarks,
     toggleBookmarks: state.toggleBookmarks,
     getAvailableTime: state.getAvailableTime,
+    getAgentAvailable: state.getAgentAvailable,
     isAuthenticated: state.isAuthenticated,
   }));
 
@@ -232,6 +234,7 @@ const RealEstatePage = () => {
                 makeReservation={makeReservation}
                 item={selectedItem}
                 getAvailableTime={getAvailableTime}
+                getAgentAvailable={getAgentAvailable}
               />
             </Box>
           )}
