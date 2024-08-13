@@ -118,7 +118,8 @@ const ReplayPage = () => {
               options={videoJsOptions}
               onReady={handlePlayerReady}
               width="100%"
-              height="auto"
+              height="500px"
+              maxHeight="200px"
             />
           ) : (
             <VideoLoading />
