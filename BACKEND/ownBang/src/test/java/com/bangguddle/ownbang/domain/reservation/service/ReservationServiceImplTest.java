@@ -103,17 +103,28 @@ class ReservationServiceImplTest {
     @Test
     @DisplayName("예약 신청 실패 - 중복된 예약")
     void createReservation_Fail_DuplicatedReservation() {
+        // Given
         Long userId = 1L;
-        LocalDateTime now = LocalDateTime.now();
-        ReservationRequest request = new ReservationRequest(1L, now, ReservationStatus.APPLYED);
+        Long roomId = 1L;
+        LocalDateTime reservationTime = LocalDateTime.now();
+        ReservationRequest request = new ReservationRequest(roomId, reservationTime, ReservationStatus.APPLYED);
+
+        User user = mock(User.class);
+        Room room = mock(Room.class);
         Reservation existingReservation = mock(Reservation.class);
 
-        when(reservationRepository.findByRoomIdAndTimeWithLock(anyLong(), any(LocalDateTime.class)))
+        when(userRepository.getById(userId)).thenReturn(user);
+        when(roomRepository.getById(roomId)).thenReturn(room);
+        when(reservationRepository.findByRoomIdAndTimeWithLock(roomId, reservationTime))
                 .thenReturn(Optional.of(existingReservation));
 
+        // When & Then
         assertThatThrownBy(() -> reservationService.createReservation(userId, request))
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", RESERVATION_DUPLICATED);
+
+        verify(reservationRepository).findByRoomIdAndTimeWithLock(roomId, reservationTime);
+        verify(reservationRepository, never()).save(any(Reservation.class));
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.bangguddle.ownbang.domain.agent.auth.service.AgentAuthService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +23,7 @@ public class AgentAuthController {
     @PostMapping("/sign-up")
     public ResponseEntity<Response<NoneResponse>> signUp(
             @AuthenticationPrincipal Long id,
-            @RequestBody AgentSignUpRequest request) {
+            @RequestBody @Valid AgentSignUpRequest request) {
         SuccessResponse<NoneResponse> response = agentAuthService.signUp(id, request);
         return Response.success(response);
     }

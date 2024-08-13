@@ -71,7 +71,9 @@ public class ReservationServiceImpl implements ReservationService {
         Room room = roomRepository.getById(roomId);
         User user = userRepository.getById(userId);
         LocalDateTime reservationTime = reservationRequest.reservationTime();
-
+        if(user.isAgent()){
+            throw new AppException(RESERVATION_UNAVAILABLE);
+        }
         // 룸 ID와 시간이 일치하는 확정된 예약이 이미 존재하는지 확인
         Optional<Reservation> existingReservation = reservationRepository.findByRoomIdAndTimeWithLock(roomId, reservationTime);
 
@@ -128,6 +130,17 @@ public class ReservationServiceImpl implements ReservationService {
 
                 Optional<Session> session = webrtcSessionService.getSession(reservation.getId());
                 enstance = session.isPresent();
+            }
+
+            if (reservation.getStatus() == ReservationStatus.ENCODING) {
+                Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
+
+                // 인코딩 완료 상태
+                if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED){
+                    Reservation updatedReservation = reservation.completeStatus();
+                    reservationRepository.save(updatedReservation);
+                    reservation = updatedReservation;
+                }
             }
 
             Long agentId = reservation.getRoom().getAgent().getId();

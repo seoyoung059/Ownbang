@@ -119,7 +119,7 @@ public class StreamingServiceImpl implements StreamingService {
 
         VideoUpdateRequest videoUpdateRequest =
                 VideoUpdateRequest.builder()
-                        .videoUrl(outputPath + "/" + sessionId + m3u8Extend)
+                        .videoUrl(uploadedUrl + "/" + sessionId + m3u8Extend)
                         .videoStatus(VideoStatus.RECORDED)
                         .build();
         videoService.modifyVideo(videoUpdateRequest, video.getId());
