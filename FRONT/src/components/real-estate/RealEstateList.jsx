@@ -12,6 +12,7 @@ const RealEstateList = ({
   getBookmarks,
   toggleBookmarks,
   isAuthenticated,
+  user,
 }) => {
   const theme = useTheme();
   const [displayedMarkers, setDisplayedMarkers] = useState([]);
@@ -90,6 +91,7 @@ const RealEstateList = ({
                 onClick={() => onSelectItem(marker)}
                 selected={selectedItem && selectedItem.id === marker.id} // 선택된 항목 강조
                 isAuthenticated={isAuthenticated}
+                user={user}
               />
             </div>
           ))}

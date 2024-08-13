@@ -16,6 +16,7 @@ const RealEstateItem = ({
   onClick,
   selected,
   isAuthenticated,
+  user,
 }) => {
   // selected prop 추가
   const theme = useTheme();
@@ -79,7 +80,7 @@ const RealEstateItem = ({
           </Typography>
         </Box>
       </CardContent>
-      {isAuthenticated && (
+      {isAuthenticated && !user.isAgent && (
         <IconButton
           aria-label="bookmark"
           onClick={handleToggleFavorite}
