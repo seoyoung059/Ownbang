@@ -45,18 +45,6 @@ const RealEstatePage = () => {
   const [showReservation, setShowReservation] = React.useState(false);
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
 
-  // 초기 로드 시 전체 매물 불러오기
-  // useEffect(() => {
-  //   getAllRoom();
-  // }, [getAllRoom, searchTerm]);
-
-  // 전체 매물 데이터를 visibleMarkers로 설정
-  // useEffect(() => {
-  //   if (realEstateData.length > 0) {
-  //     // console.log("data", realEstateData.length)
-  //     setVisibleMarkers(realEstateData);
-  //   }
-  // }, [realEstateData]);
 
   useEffect(() => {
     if (selectedItem) {
@@ -93,7 +81,6 @@ const RealEstatePage = () => {
 
   const onIdle = (marker) => {
     setVisibleMarkers(marker);
-    // console.log("visiblemarkers-> visitblepositions", marker)
   };
 
   // 마커 클릭 시 디테일 표시
@@ -157,7 +144,6 @@ const RealEstatePage = () => {
         >
           <RealEstateMap
             searchTerm={searchTerm}
-            // onBoundsChange={onBoundsChange}
             onIdle={onIdle}
             onSelectMarker={onSelectMarker}
           />

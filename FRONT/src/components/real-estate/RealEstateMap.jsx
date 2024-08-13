@@ -17,6 +17,10 @@ const RealEstateMap = ({
   const [map, setMap] = useState(null);
 
   useEffect(() => {
+    handleGetRoom();
+  }, [map]);
+
+  useEffect(() => {
     if (!map || !searchTerm) return;
 
     const searchInput = new kakao.maps.services.Places();
@@ -51,13 +55,11 @@ const RealEstateMap = ({
   const onBoundsChange2 = () => {
     if (!map) return;
     const bounds = map.getBounds();
-    console.log(realEstateData)
     const visiblePositions =
       realEstateData&&
       realEstateData.filter((pos) =>
         bounds.contain(new kakao.maps.LatLng(pos.latitude, pos.longitude))
       );
-    console.log(visiblePositions)
     onIdle(visiblePositions)
   };
 
@@ -66,30 +68,22 @@ const RealEstateMap = ({
     try {
       const center = map.getCenter();
       console.log(center.getLat(), center.getLng())
-
-      // console.log("위", realEstateData);
       const rooms = await getAllRoom(center.getLat(), center.getLng());
-      // setRealEstateData(rooms)
-      // console.log("아래", rooms )
-
     } catch (error) {
       console.log(error)
     }
   };
 
   const handleIdle = async() => {
-    if (map) {
       debouncedHandleGetRoom();
       onBoundsChange2()
-      // console.log("함수")
-    }
   };
 
-  // useEffect(() => {
-  //   if (map) {
-  //     onBoundsChange2();
-  //   }
-  // }, [map, realEstateData]);
+  useEffect(() => {
+    if (map) {
+      onBoundsChange2();
+    }
+  }, [map, realEstateData]);
 
   const debounce = (func, delay) => {
     let timeout;
@@ -107,11 +101,10 @@ const RealEstateMap = ({
       console.log(center.getLat(), center.getLng());
 
       await getAllRoom(center.getLat(), center.getLng());
-      // setRealEstateData(rooms);
     } catch (error) {
       console.log(error);
     }
-  }, 300), [map]);
+  }, 250), [map]);
 
   return (
     <Map
