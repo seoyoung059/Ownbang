@@ -193,12 +193,6 @@ public class RoomServiceImpl implements RoomService {
                 .toList();
         return new SuccessResponse<>(SEARCH_ROOM_SUCCESS, response);
 
-//        List<Room> rooms =roomRepository.findAll();
-//        for (Room room : rooms) {
-//            room.updateGeoHash();
-//            roomRepository.save(room);
-//        }
-//        return new SuccessResponse<>(SEARCH_ROOM_SUCCESS, null);
     }
 
     private void validateAgent(Long userId, Room existingRoom) {
