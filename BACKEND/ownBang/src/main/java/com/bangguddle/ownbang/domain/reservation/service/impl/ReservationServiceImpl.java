@@ -252,7 +252,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(confirmedReservation);
 
         //TODO: Checklist 생성 로직 추가
-        checklistServiceImpl.registerChecklist(userId, new ChecklistCreateRequest(reservation.getId(),
+        checklistServiceImpl.registerChecklist(reservation.getUser().getId(), new ChecklistCreateRequest(reservation.getId(),
                 "예약번호 "+reservation.getId()+"의 체크리스트", new HashMap<>()));
 
         return new SuccessResponse<>(RESERVATION_CONFIRM_SUCCESS, NoneResponse.NONE);
