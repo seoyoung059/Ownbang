@@ -71,7 +71,9 @@ public class ReservationServiceImpl implements ReservationService {
         Room room = roomRepository.getById(roomId);
         User user = userRepository.getById(userId);
         LocalDateTime reservationTime = reservationRequest.reservationTime();
-
+        if(user.isAgent()){
+            throw new AppException(RESERVATION_UNAVAILABLE);
+        }
         // 룸 ID와 시간이 일치하는 확정된 예약이 이미 존재하는지 확인
         Optional<Reservation> existingReservation = reservationRepository.findByRoomIdAndTimeWithLock(roomId, reservationTime);
 
