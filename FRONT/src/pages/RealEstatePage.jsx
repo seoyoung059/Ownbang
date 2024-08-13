@@ -21,6 +21,10 @@ const RealEstatePage = () => {
     bookmarkList,
     getBookmarks,
     toggleBookmarks,
+    getAvailableTime,
+    getAgentAvailable,
+    isAuthenticated,
+    user,
   } = useBoundStore((state) => ({
     searchTerm: state.searchTerm,
     makeReservation: state.makeReservation,
@@ -31,6 +35,10 @@ const RealEstatePage = () => {
     bookmarkList: state.bookmarkList,
     getBookmarks: state.getBookmarks,
     toggleBookmarks: state.toggleBookmarks,
+    getAvailableTime: state.getAvailableTime,
+    getAgentAvailable: state.getAgentAvailable,
+    isAuthenticated: state.isAuthenticated,
+    user: state.user,
   }));
 
   const [selectedItem, setSelectedItem] = React.useState(null);
@@ -112,9 +120,12 @@ const RealEstatePage = () => {
         <RealEstateList
           markers={visibleMarkers}
           onSelectItem={onSelectItem}
+          selectedItem={selectedItem}
           bookmarkList={bookmarkList}
           getBookmarks={getBookmarks}
           toggleBookmarks={toggleBookmarks}
+          isAuthenticated={isAuthenticated}
+          user={user}
         />
       </Box>
 
@@ -190,6 +201,8 @@ const RealEstatePage = () => {
             <RealEstateDetail
               item={room}
               onOpenReservationCard={onOpenReservationCard}
+              isAuthenticated={isAuthenticated}
+              user={user}
             />
           </Box>
 
@@ -224,6 +237,8 @@ const RealEstatePage = () => {
               <Reservation
                 makeReservation={makeReservation}
                 item={selectedItem}
+                getAvailableTime={getAvailableTime}
+                getAgentAvailable={getAgentAvailable}
               />
             </Box>
           )}

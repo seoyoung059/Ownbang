@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { List, Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { SearchOff } from "@mui/icons-material";
@@ -7,16 +7,46 @@ import RealEstateItem from "./RealEstateItem";
 const RealEstateList = ({
   markers,
   onSelectItem,
+  selectedItem, // 추가: 선택된 아이템을 표시하기 위한 prop
   bookmarkList,
   getBookmarks,
   toggleBookmarks,
+  isAuthenticated,
+  user,
 }) => {
   const theme = useTheme();
   const [displayedMarkers, setDisplayedMarkers] = useState([]);
 
+  // 각 아이템의 참조를 저장하기 위한 객체
+  const itemRefs = useRef({});
+
   useEffect(() => {
     setDisplayedMarkers(markers);
   }, [markers]);
+
+  // 선택된 아이템이 리스트에 있을 경우 스크롤 이동
+  useEffect(() => {
+    if (selectedItem && itemRefs.current[selectedItem.id]) {
+      const element = itemRefs.current[selectedItem.id];
+
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "nearest",
+      });
+
+      // 추가적인 오프셋을 적용하여 헤더에 가려지지 않도록 조정
+      const offset = 10; // 원하는 오프셋 값, 헤더 높이만큼 조정
+      const scrolledY = window.scrollY;
+
+      if (scrolledY) {
+        window.scroll({
+          top: scrolledY - offset,
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [selectedItem]);
 
   const toggleFavorite = async (id) => {
     try {
@@ -46,17 +76,24 @@ const RealEstateList = ({
           width: "100%",
           display: "flex",
           flexDirection: "column",
-          gap: 2,
+          gap: 1,
         }}
       >
         {displayedMarkers &&
           displayedMarkers.map((marker) => (
-            <RealEstateItem
+            <div
               key={marker.id}
-              marker={marker}
-              toggleFavorite={() => toggleFavorite(marker.id)}
-              onClick={() => onSelectItem(marker)}
-            />
+              ref={(el) => (itemRefs.current[marker.id] = el)} // 각 아이템의 ref 저장
+            >
+              <RealEstateItem
+                marker={marker}
+                toggleFavorite={() => toggleFavorite(marker.id)}
+                onClick={() => onSelectItem(marker)}
+                selected={selectedItem && selectedItem.id === marker.id} // 선택된 항목 강조
+                isAuthenticated={isAuthenticated}
+                user={user}
+              />
+            </div>
           ))}
         {displayedMarkers && !displayedMarkers.length && (
           <Box
