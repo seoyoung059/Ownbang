@@ -27,6 +27,9 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
     private final AgentRepository agentRepository;
     private final UserRepository userRepository;
 
+    private static final String DEFAULT_START_TIME = "09:00";
+    private static final String DEFAULT_END_TIME = "18:00";
+
     /**
      * 중개인 업무시간 생성 메서드
      *
@@ -40,14 +43,31 @@ public class AgentWorkhourServiceImpl implements AgentWorkhourService {
         User user = userRepository.getById(userId);
         Agent agent = agentRepository.getByUserId(userId);
 
-        AgentWorkhour agentWorkhour = request.toEntity(agent);
-        if (!isValidTimeRange(request.weekdayStartTime(), request.weekdayEndTime()) ||
-                !isValidTimeRange(request.weekendStartTime(), request.weekendEndTime())) {
+        String weekdayStartTime = getDefaultIfNull(request.weekdayStartTime(), DEFAULT_START_TIME);
+        String weekdayEndTime = getDefaultIfNull(request.weekdayEndTime(), DEFAULT_END_TIME);
+        String weekendStartTime = getDefaultIfNull(request.weekendStartTime(), DEFAULT_START_TIME);
+        String weekendEndTime = getDefaultIfNull(request.weekendEndTime(), DEFAULT_END_TIME);
+
+        if (!isValidTimeRange(weekdayStartTime, weekdayEndTime) ||
+                !isValidTimeRange(weekendStartTime, weekendEndTime)) {
             throw new AppException(WORKHOUR_UNAVAILABLE);
         }
+
+        AgentWorkhour agentWorkhour = AgentWorkhour.builder()
+                .agent(agent)
+                .weekdayStartTime(weekdayStartTime)
+                .weekdayEndTime(weekdayEndTime)
+                .weekendStartTime(weekendStartTime)
+                .weekendEndTime(weekendEndTime)
+                .build();
+
         agentWorkhourRepository.save(agentWorkhour);
 
         return new SuccessResponse<>(AGENT_WORKHOUR_CREATE_SUCCESS, NoneResponse.NONE);
+    }
+
+    private String getDefaultIfNull(String time, String defaultTime) {
+        return time == null ? defaultTime : time;
     }
 
     /**
