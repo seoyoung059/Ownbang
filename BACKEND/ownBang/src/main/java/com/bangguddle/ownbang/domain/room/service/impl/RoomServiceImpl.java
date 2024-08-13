@@ -165,22 +165,6 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId) {
-        List<RoomInfoSearchResponse> list = roomRepository.findAll().stream()
-                .map((room)->{
-                    boolean isBookmarked = false;
-                    if(userId!=null){
-                        isBookmarked = bookmarkRepository.findBookmarkByRoomIdAndUserId(room.getId(), userId).isPresent();
-                    }
-                    return RoomInfoSearchResponse.from(room, isBookmarked);
-                })
-                .toList();
-        SuccessResponse<List<RoomInfoSearchResponse>> response =
-                new SuccessResponse<>(SEARCH_ROOM_SUCCESS, list);
-        return response;
-    }
-
-    @Override
     public SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId, Float lat, Float lon) {
         String geoHashPrefix = GeoHash.geoHashStringWithCharacterPrecision(lat, lon, 3);
         List<Room> rooms = roomRepository.findByGeoHashStartsWith(geoHashPrefix);
