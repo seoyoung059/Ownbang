@@ -34,6 +34,14 @@ export const checkPassword = async (password) => {
   return response.data;
 };
 
+// 비밀번호 변경 요청
+export const changePassword = async (password) => {
+  const response = await Axios.patch("/auths/password-change", {
+    password: password,
+  });
+  return response.data;
+};
+
 // 중개인 회원 전환 신청 API 요청
 export const toAgent = async (agentData) => {
   const response = await Axios.post("/agents/auths/sign-up", agentData);
