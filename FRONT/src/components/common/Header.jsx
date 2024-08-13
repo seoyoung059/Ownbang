@@ -147,9 +147,11 @@ const Header = () => {
                   )}
                 </>
               )}
-              <IconButton color="inherit" onClick={handleMenuOpen}>
-                <MenuOutlined />
-              </IconButton>
+              {isAuthenticated && (
+                <IconButton color="inherit" onClick={handleMenuOpen}>
+                  <MenuOutlined />
+                </IconButton>
+              )}
             </div>
           </Box>
         </Box>
