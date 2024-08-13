@@ -132,6 +132,17 @@ public class ReservationServiceImpl implements ReservationService {
                 enstance = session.isPresent();
             }
 
+            if (reservation.getStatus() == ReservationStatus.ENCODING) {
+                Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
+
+                // 인코딩 완료 상태
+                if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED){
+                    Reservation updatedReservation = reservation.completeStatus();
+                    reservationRepository.save(updatedReservation);
+                    reservation = updatedReservation;
+                }
+            }
+
             Long agentId = reservation.getRoom().getAgent().getId();
             boolean isReview = false;
 
