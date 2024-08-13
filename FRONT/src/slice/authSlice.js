@@ -5,6 +5,7 @@ import {
   login,
   checkPassword,
   toAgent,
+  changePassword,
 } from "../api/auth";
 import { Cookies } from "react-cookie";
 import { toast } from "react-toastify";
@@ -62,6 +63,11 @@ export const createAuthSlice = (set) => ({
   confirmPassword: async (password) => {
     const result = await checkPassword(password);
     return result.data.isCorrect;
+  },
+
+  newPassword: async (password) => {
+    const result = await changePassword(password);
+    return result;
   },
 
   upgradeAgent: async (agentData) => {
