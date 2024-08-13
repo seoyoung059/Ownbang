@@ -265,6 +265,7 @@ public class WebrtcAgentServiceTest {
         when(room.getAgent()).thenReturn(agent);
         when(agent.getUser()).thenReturn(user);
         when(user.getId()).thenReturn(userId);
+        when(videoRepository.findByReservationId(reservationId)).thenReturn(Optional.of(video));
 
         WebrtcRemoveTokenRequest request = WebrtcRemoveTokenRequest.builder()
                 .reservationId(reservationId)
