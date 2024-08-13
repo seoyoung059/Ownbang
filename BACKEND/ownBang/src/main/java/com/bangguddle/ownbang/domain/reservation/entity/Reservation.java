@@ -64,4 +64,13 @@ public class Reservation {
                 ReservationStatus.CONFIRMED
         );
     }
+    public Reservation encodingStatus() {
+        return new Reservation(
+                this.id,
+                this.room,
+                this.user,
+                this.reservationTime,
+                ReservationStatus.ENCODING
+        );
+    }
 }

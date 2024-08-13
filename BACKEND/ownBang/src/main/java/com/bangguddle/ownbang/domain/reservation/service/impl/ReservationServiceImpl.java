@@ -118,14 +118,34 @@ public class ReservationServiceImpl implements ReservationService {
             boolean enstance = false;
             if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
                 Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
+                
+                // 녹화 및 인코딩 완료 상태
                 if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED) {
                     Reservation updatedReservation = reservation.completeStatus();
                     reservationRepository.save(updatedReservation);
                     reservation = updatedReservation;
                 }
 
+                // 인코딩 진행 중 상태
+                if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.ENCODING) {
+                    Reservation updatedReservation = reservation.encodingStatus();
+                    reservationRepository.save(updatedReservation);
+                    reservation = updatedReservation;
+                }
+
                 Optional<Session> session = webrtcSessionService.getSession(reservation.getId());
                 enstance = session.isPresent();
+            }
+
+            if (reservation.getStatus() == ReservationStatus.ENCODING) {
+                Optional<Video> videoOptional = videoRepository.findByReservationId(reservation.getId());
+
+                // 인코딩 완료 상태
+                if (videoOptional.isPresent() && videoOptional.get().getVideoStatus() == VideoStatus.RECORDED){
+                    Reservation updatedReservation = reservation.completeStatus();
+                    reservationRepository.save(updatedReservation);
+                    reservation = updatedReservation;
+                }
             }
 
             Long agentId = reservation.getRoom().getAgent().getId();

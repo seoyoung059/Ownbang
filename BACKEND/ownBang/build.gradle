@@ -69,6 +69,9 @@ dependencies {
 	// log 관련 의존성 추가
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
+	// 지오 해시 관련 의존성 추가
+	implementation 'ch.hsr:geohash:1.4.0'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.h2database:h2'

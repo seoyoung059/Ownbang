@@ -1,17 +1,26 @@
 package com.bangguddle.ownbang.domain.room.dto;
 
 import com.bangguddle.ownbang.domain.room.entity.RoomAppliances;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
 public record RoomAppliancesCreateRequest(
+        @NotNull
         Boolean refrigerator,
+        @NotNull
         Boolean washingMachine,
+        @NotNull
         Boolean airConditioner,
+        @NotNull
         Boolean bed,
+        @NotNull
         Boolean desk,
+        @NotNull
         Boolean microwave,
+        @NotNull
         Boolean closet,
+        @NotNull
         Boolean chair
 ) {
 

@@ -389,7 +389,7 @@ public class VideoServiceTest {
 
         assertThat(thrown)
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", BAD_REQUEST);
+                .hasFieldOrPropertyWithValue("errorCode", VIDEO_DUPLICATE);
 
         // verify
         verify(videoRepository, times(1)).findById(any());

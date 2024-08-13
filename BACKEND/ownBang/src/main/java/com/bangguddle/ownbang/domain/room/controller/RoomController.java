@@ -93,8 +93,9 @@ public class RoomController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getRooms(@AuthenticationPrincipal Long userId) {
-        SuccessResponse<List<RoomInfoSearchResponse>> response = roomService.search(userId);
+    public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getRooms(@AuthenticationPrincipal Long userId, @RequestParam(name = "lat")
+                                                                           Float lat, @RequestParam(name = "lon") Float lon ) {
+        SuccessResponse<List<RoomInfoSearchResponse>> response = roomService.search(userId, lat, lon);
         return Response.success(response);
     }
 }
