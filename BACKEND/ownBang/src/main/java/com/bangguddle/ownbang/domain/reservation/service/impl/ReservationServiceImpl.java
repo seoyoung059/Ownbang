@@ -1,9 +1,11 @@
 package com.bangguddle.ownbang.domain.reservation.service.impl;
 
 import com.bangguddle.ownbang.domain.agent.entity.Agent;
-import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.repository.AgentRepository;
+import com.bangguddle.ownbang.domain.agent.workhour.entity.AgentWorkhour;
 import com.bangguddle.ownbang.domain.agent.workhour.repository.AgentWorkhourRepository;
+import com.bangguddle.ownbang.domain.checklist.dto.ChecklistCreateRequest;
+import com.bangguddle.ownbang.domain.checklist.service.impl.ChecklistServiceImpl;
 import com.bangguddle.ownbang.domain.reservation.dto.*;
 import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
 import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
@@ -19,13 +21,11 @@ import com.bangguddle.ownbang.domain.video.entity.Video;
 import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
 import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
-import com.bangguddle.ownbang.domain.webrtc.service.impl.WebrtcSessionServiceImpl;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
 import io.openvidu.java.client.Session;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +35,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,6 +55,8 @@ public class ReservationServiceImpl implements ReservationService {
     private final AgentRepository agentRepository;
     private final WebrtcSessionService webrtcSessionService;
     private final ReviewRepository reviewRepository;
+    private final ChecklistServiceImpl checklistServiceImpl;
+
     /**
      * 예약 신청 Service 메서드
      *
@@ -247,6 +250,10 @@ public class ReservationServiceImpl implements ReservationService {
 
         // 상태 변경된 예약 저장
         reservationRepository.save(confirmedReservation);
+
+        //TODO: Checklist 생성 로직 추가
+        checklistServiceImpl.registerChecklist(userId, new ChecklistCreateRequest(reservation.getId(),
+                "예약번호 "+reservation.getId()+"의 체크리스트", new HashMap<>()));
 
         return new SuccessResponse<>(RESERVATION_CONFIRM_SUCCESS, NoneResponse.NONE);
     }
