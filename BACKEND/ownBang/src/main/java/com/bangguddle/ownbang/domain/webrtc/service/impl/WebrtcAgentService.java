@@ -5,6 +5,9 @@ import com.bangguddle.ownbang.domain.reservation.entity.ReservationStatus;
 import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
 import com.bangguddle.ownbang.domain.user.repository.UserRepository;
+import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
+import com.bangguddle.ownbang.domain.video.entity.Video;
+import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
 import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
 import com.bangguddle.ownbang.domain.video.service.VideoService;
 import com.bangguddle.ownbang.domain.webrtc.dto.WebrtcCreateTokenRequest;
@@ -99,6 +102,16 @@ public class WebrtcAgentService implements WebrtcService {
 
         // session 제거
         webrtcSessionService.removeSession(reservationId);
+
+        // 녹화 상태 저장: 인코딩
+        Video video = videoRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
+        VideoUpdateRequest videoUpdateRequest =
+                VideoUpdateRequest.builder()
+                        .videoUrl(video.getVideoUrl())
+                        .videoStatus(VideoStatus.ENCODING)
+                        .build();
+        videoService.modifyVideo(videoUpdateRequest, video.getId());
 
         // record hls 변환
         streamingService.uploadStreaming(reservationId, recording.getSessionId());
