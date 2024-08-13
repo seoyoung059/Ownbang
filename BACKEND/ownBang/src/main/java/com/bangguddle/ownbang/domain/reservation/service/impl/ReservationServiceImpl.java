@@ -55,12 +55,13 @@ public class ReservationServiceImpl implements ReservationService {
     private final WebrtcSessionService webrtcSessionService;
     private final ReviewRepository reviewRepository;
     /**
-     * 예약 생성 Service 메서드
+     * 예약 신청 Service 메서드
      *
      * @param reservationRequest 예약 생성 DTO
      * @return SuccessResponse
      * @throws AppException 특정 매물과, 시간대, 이미 확정된 예약이 존재하는 경우(RESERVATION_DUPLICATED) 발생
      * @throws AppException 내가 이미 예약 신청/확정한 매물일 경우, RESERVATION_COMPLETED 발생
+     * @throws AppException 내가 다른 매물을 동일시간에 예약했을 경우
      */
     @Override
     @Transactional
@@ -84,6 +85,10 @@ public class ReservationServiceImpl implements ReservationService {
         Optional<Reservation> completedReservation = reservationRepository.findByRoomIdAndUserIdAndStatusNot(roomId, userId, ReservationStatus.CANCELLED);
         if (completedReservation.isPresent()) {
             throw new AppException(RESERVATION_COMPLETED);
+        }
+        // 동시간 대 예약이 이미 있다면
+        if (reservationRepository.existsByUserIdAndReservationTimeAndStatusNot(userId, reservationTime, ReservationStatus.CANCELLED)) {
+            throw new AppException(RESERVATION_UNAVAILABLE);
         }
 
         // 새 예약 저장

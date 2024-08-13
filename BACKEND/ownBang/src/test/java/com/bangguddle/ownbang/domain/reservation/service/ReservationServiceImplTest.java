@@ -128,6 +128,37 @@ class ReservationServiceImplTest {
     }
 
     @Test
+    @DisplayName("동시간대 다른 매물 예약 시 실패")
+    void createReservation_Fail_ConcurrentReservation() {
+        // Given
+        Long userId = 1L;
+        LocalDateTime reservationTime = LocalDateTime.of(2024, 8, 13, 15, 0);
+        ReservationRequest request = new ReservationRequest(2L, reservationTime, ReservationStatus.APPLYED);
+
+        User user = mock(User.class);
+        Room room = mock(Room.class);
+
+        when(userRepository.getById(userId)).thenReturn(user);
+        when(roomRepository.getById(2L)).thenReturn(room);
+        when(reservationRepository.findByRoomIdAndTimeWithLock(2L, reservationTime))
+                .thenReturn(Optional.empty());
+        when(reservationRepository.findByRoomIdAndUserIdAndStatusNot(2L, userId, ReservationStatus.CANCELLED))
+                .thenReturn(Optional.empty());
+        when(reservationRepository.existsByUserIdAndReservationTimeAndStatusNot(userId, reservationTime, ReservationStatus.CANCELLED))
+                .thenReturn(true);
+
+        // When & Then
+        assertThatThrownBy(() -> reservationService.createReservation(userId, request))
+                .isInstanceOf(AppException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RESERVATION_UNAVAILABLE);
+
+        verify(reservationRepository).findByRoomIdAndTimeWithLock(2L, reservationTime);
+        verify(reservationRepository).findByRoomIdAndUserIdAndStatusNot(2L, userId, ReservationStatus.CANCELLED);
+        verify(reservationRepository).existsByUserIdAndReservationTimeAndStatusNot(userId, reservationTime, ReservationStatus.CANCELLED);
+        verify(reservationRepository, never()).save(any(Reservation.class));
+    }
+
+    @Test
     @DisplayName("임차인 예약 목록 조회 성공 (isReview, Entrance, agentId 포함)")
     void getMyReservationList_Success() {
         Long userId = 1L;
