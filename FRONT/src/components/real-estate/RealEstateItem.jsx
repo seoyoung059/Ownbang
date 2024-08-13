@@ -10,7 +10,13 @@ import {
 import { Bookmark, BookmarkBorder } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 
-const RealEstateItem = ({ marker, toggleFavorite, onClick, selected }) => {
+const RealEstateItem = ({
+  marker,
+  toggleFavorite,
+  onClick,
+  selected,
+  isAuthenticated,
+}) => {
   // selected prop 추가
   const theme = useTheme();
 
@@ -73,18 +79,20 @@ const RealEstateItem = ({ marker, toggleFavorite, onClick, selected }) => {
           </Typography>
         </Box>
       </CardContent>
-      <IconButton
-        aria-label="bookmark"
-        onClick={handleToggleFavorite}
-        sx={{
-          position: "absolute",
-          top: 5,
-          right: 0,
-          color: theme.palette.bookmark,
-        }}
-      >
-        {isFavorite ? <Bookmark /> : <BookmarkBorder />}
-      </IconButton>
+      {isAuthenticated && (
+        <IconButton
+          aria-label="bookmark"
+          onClick={handleToggleFavorite}
+          sx={{
+            position: "absolute",
+            top: 5,
+            right: 0,
+            color: theme.palette.bookmark,
+          }}
+        >
+          {isFavorite ? <Bookmark /> : <BookmarkBorder />}
+        </IconButton>
+      )}
     </Card>
   );
 };

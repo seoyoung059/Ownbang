@@ -5,7 +5,7 @@ import AgentInfo from "./AgentInfo";
 import { Button, Typography, Box, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-const RealEstateDetail = ({ item, onOpenReservationCard }) => {
+const RealEstateDetail = ({ item, onOpenReservationCard, isAuthenticated }) => {
   const theme = useTheme();
 
   // item과 item.roomImageResponses가 존재하는지 확인 후, 이미지 URL 배열 생성
@@ -45,15 +45,17 @@ const RealEstateDetail = ({ item, onOpenReservationCard }) => {
         <AgentInfo item={item} />
       </Box>
 
-      <Box sx={{ display: "flex", flexDirection: "column" }}>
-        <Button
-          variant="contained"
-          sx={styles.button}
-          onClick={onOpenReservationCard}
-        >
-          예약하기
-        </Button>
-      </Box>
+      {isAuthenticated && (
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Button
+            variant="contained"
+            sx={styles.button}
+            onClick={onOpenReservationCard}
+          >
+            예약하기
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };
