@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, IconButton, Card, CardMedia, CardContent } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 
-const RealEstateImages = ({ images }) => {
+const RealEstateImages = ({ images, user }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const onPrevImg = () => {
@@ -29,14 +29,14 @@ const RealEstateImages = ({ images }) => {
       }}
     >
       <Card sx={{ position: "relative", overflow: "hidden" }}>
-        {showArrows && (
+        {!user.isAgent && showArrows && (
           <>
             {/* 이전 이미지 버튼 */}
             <IconButton
               onClick={onPrevImg}
               sx={{
                 position: "fixed",
-                left: 16,
+                left: "3%",
                 top: "25%",
                 transform: "translateY(-50%)",
                 zIndex: 1,

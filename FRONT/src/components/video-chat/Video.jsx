@@ -2,6 +2,7 @@ import { OpenVidu } from "openvidu-browser";
 import React, { Component } from "react";
 import UserVideoComponent from "./UserVideoComponent";
 import VideoLoading from "./VideoLoading";
+import withNavigation from "./withNavigation";
 
 import {
   Container,
@@ -26,6 +27,13 @@ import {
   SwitchCamera,
 } from "@mui/icons-material";
 
+const withNavigate = (Component) => {
+  return function WrappedComponent(props) {
+    const navigate = useNavigate();
+    return <Component {...props} navigate={navigate} />;
+  };
+};
+
 class Video extends Component {
   constructor(props) {
     super(props);
@@ -43,7 +51,7 @@ class Video extends Component {
       endSessionDialogOpen: false,
       token: undefined,
       loading: true,
-      isLeaving: false,
+      isScreenSmall: window.innerWidth < 1024,
     };
 
     this.joinSession = this.joinSession.bind(this);
@@ -59,10 +67,15 @@ class Video extends Component {
     this.handleCloseLeaveDialog = this.handleCloseLeaveDialog.bind(this);
     this.handleCloseEndSessionDialog =
       this.handleCloseEndSessionDialog.bind(this);
+    this.handlePopState = this.handlePopState.bind(this);
+    this.updateScreenSize = this.updateScreenSize.bind(this);
   }
 
   async componentDidMount() {
     window.addEventListener("beforeunload", this.onbeforeunload);
+    window.addEventListener("resize", this.updateScreenSize);
+    window.history.pushState(null, "", location.href);
+    window.onpopstate = this.handlePopState;
 
     try {
       await this.props.fetchUser();
@@ -76,14 +89,28 @@ class Video extends Component {
     } catch (error) {
       console.error("Failed to fetch user info:", error);
     }
+
+    if (this.state.session) {
+      this.state.session.on("sessionDisconnected", (event) => {
+        if (!this.props.user.isAgent) {
+          this.handleOpenEndSessionDialog();
+        }
+      });
+    }
   }
 
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.onbeforeunload);
+    window.removeEventListener("resize", this.updateScreenSize);
+    window.onpopstate = null;
   }
 
   onbeforeunload(event) {
     this.leaveSession();
+  }
+
+  updateScreenSize() {
+    this.setState({ isScreenSmall: window.innerWidth < 768 });
   }
 
   handleChangeSessionId(e) {
@@ -98,8 +125,14 @@ class Video extends Component {
     });
   }
 
+  handlePopState = (event) => {
+    event.preventDefault();
+    this.setState({ isLeaveDialogOpen: true });
+    window.history.pushState(null, "", location.href);
+  };
+
   handleMainVideoStream(stream) {
-    if (this.state.mainStreamManager !== stream) {
+    if (!this.state.mainStreamManager) {
       this.setState({
         mainStreamManager: stream,
       });
@@ -214,39 +247,59 @@ class Video extends Component {
   handleCloseLeaveDialog(confirm) {
     if (confirm) {
       this.leaveSession();
+      this.setState({ isLeaveDialogOpen: false }, () => {
+        setTimeout(() => {
+          window.history.back();
+        }, 0);
+      });
     } else {
       this.setState({ isLeaveDialogOpen: false });
     }
   }
 
   async leaveSession() {
-    if (!this.state.session || this.state.isLeaving) {
-      return; // 이미 세션이 종료된 경우 또는 세션 종료 중인 경우
-    }
+    const { session, token, mySessionId } = this.state;
 
-    this.setState({ isLeaving: true }); // 세션 종료 중으로 설정
-
-    try {
-      const { mySessionId, token, session, mainStreamManager, publisher } =
-        this.state;
-
-      if (session) {
-        await this.props.leaveVideoRoom(mySessionId, token);
-
-        if (mainStreamManager === publisher) {
-          await Promise.all(
-            session.streamManagers.map((streamManager) => {
-              return session.forceUnpublish(streamManager);
-            })
-          );
+    if (session) {
+      try {
+        // WebSocket이 이미 닫혀 있지 않은 경우에만 leaveVideoRoom 요청
+        if (session.connection && session.connection.rpcBuilder) {
+          const wsState = session.connection.rpcBuilder.websocket.readyState;
+          if (wsState === WebSocket.OPEN) {
+            await this.props
+              .leaveVideoRoom(mySessionId, token)
+              .catch((error) => {
+                console.error("Error while leaving video room:", error);
+              });
+          } else {
+            console.warn(
+              "WebSocket is already closing or closed. Skipping leaveRoom request."
+            );
+          }
         }
 
+        // 여기에서 removeToken 요청을 전송
+        await this.props.leaveVideoRoom(mySessionId, token).catch((error) => {
+          console.error("Error while removing token:", error);
+        });
+
         await session.disconnect();
+        console.log("Disconnected from the session");
+      } catch (error) {
+        console.error("Error during session disconnection:", error);
+      } finally {
+        this.cleanupSessionState();
       }
+    } else {
+      console.warn("You were not connected to the session");
+      this.cleanupSessionState();
+    }
+  }
+  cleanupSessionState = () => {
+    localStorage.removeItem("createdAt");
 
-      localStorage.removeItem("createdAt");
-
-      this.setState({
+    this.setState(
+      {
         session: undefined,
         subscribers: [],
         mySessionId: "",
@@ -254,15 +307,13 @@ class Video extends Component {
         mainStreamManager: undefined,
         publisher: undefined,
         isLeaveDialogOpen: false,
-        isLeaving: false, // 세션 종료 완료 후 플래그를 리셋
-      });
-
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Error leaving the session:", error);
-      this.setState({ isLeaving: false }); // 오류 발생 시에도 플래그를 리셋
-    }
-  }
+      },
+      () => {
+        const { navigate } = this.props;
+        navigate("/mypage", { replace: true });
+      }
+    );
+  };
 
   handleOpenEndSessionDialog() {
     this.setState({ endSessionDialogOpen: true });
@@ -270,46 +321,47 @@ class Video extends Component {
 
   handleCloseEndSessionDialog() {
     this.setState({ endSessionDialogOpen: false });
-    window.location.href = "/";
-  }
-
-  endSession() {
-    console.log("endSession called");
-    this.setState({ endSessionDialogOpen: true });
+    const { navigate } = this.props;
+    navigate("/mypage", { replace: true });
   }
 
   async switchCamera() {
     try {
       const devices = await this.OV.getDevices();
-      var videoDevices = devices.filter(
+      const videoDevices = devices.filter(
         (device) => device.kind === "videoinput"
       );
 
-      if (videoDevices && videoDevices.length > 1) {
-        var newVideoDevice = videoDevices.filter(
-          (device) => device.deviceId !== this.state.currentVideoDevice.deviceId
+      if (videoDevices.length > 1) {
+        const currentVideoDeviceIndex = videoDevices.findIndex(
+          (device) => device.deviceId === this.state.currentVideoDevice.deviceId
         );
 
-        if (newVideoDevice.length > 0) {
-          var newPublisher = this.OV.initPublisher(undefined, {
-            videoSource: newVideoDevice[0].deviceId,
-            publishAudio: true,
-            publishVideo: true,
-            mirror: false,
-          });
+        const newVideoDevice =
+          videoDevices[(currentVideoDeviceIndex + 1) % videoDevices.length];
 
-          await this.state.session.unpublish(this.state.mainStreamManager);
-          await this.state.session.publish(newPublisher);
-          this.setState({
-            currentVideoDevice: newVideoDevice[0],
-            mainStreamManager: newPublisher,
-            publisher: newPublisher,
-          });
-        }
+        const newPublisher = this.OV.initPublisher(undefined, {
+          videoSource: newVideoDevice.deviceId,
+          publishAudio: true,
+          publishVideo: true,
+          mirror: false,
+        });
+
+        await this.state.session.unpublish(this.state.publisher);
+        await this.state.session.publish(newPublisher);
+
+        this.setState({
+          currentVideoDevice: newVideoDevice,
+          publisher: newPublisher,
+          mainStreamManager: newPublisher,
+        });
+      } else {
+        console.log(
+          "Alternative video devices not found or only one device available."
+        );
       }
-      console.log("전환");
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error("Error switching camera:", error);
     }
   }
 
@@ -343,7 +395,10 @@ class Video extends Component {
       isLeaveDialogOpen,
       endSessionDialogOpen,
       loading,
+      isScreenSmall,
     } = this.state;
+
+    const isAgent = this.props.user.isAgent;
 
     return (
       <Container component="main" maxWidth="lg">
@@ -408,7 +463,7 @@ class Video extends Component {
                       />
                     </Box>
                   )}
-                  {this.props.user.isAgent && (
+                  {mainStreamManager && isAgent && isScreenSmall && (
                     <Box
                       style={{
                         position: "absolute",
@@ -416,7 +471,11 @@ class Video extends Component {
                         right: 16,
                       }}
                     >
-                      <IconButton color="primary" onClick={this.switchCamera}>
+                      <IconButton
+                        color="primary"
+                        onClick={this.switchCamera}
+                        disabled={!mainStreamManager}
+                      >
                         <SwitchCamera />
                       </IconButton>
                     </Box>
@@ -503,4 +562,4 @@ class Video extends Component {
   }
 }
 
-export default Video;
+export default withNavigation(Video);

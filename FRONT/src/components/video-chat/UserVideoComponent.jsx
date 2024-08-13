@@ -13,6 +13,9 @@ const UserVideoComponent = ({ streamManager }) => {
         borderRadius: "8px",
         overflow: "hidden",
         background: "black",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <video
@@ -21,7 +24,7 @@ const UserVideoComponent = ({ streamManager }) => {
         style={{
           width: "100%",
           height: "100%",
-          objectFit: "cover",
+          objectFit: "contain",
           transform: "scaleX(-1)",
         }}
         ref={(vid) => {

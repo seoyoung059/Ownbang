@@ -174,7 +174,11 @@ export default function MyReservationItem({
         </Box>
       </TableCell>
       <TableCell>
-        {reservation.status !== "COMPLETED" ? (
+        {reservation.status === "ENCODING" ? (
+          <Typography variant="body1" color="textSecondary">
+            녹화중
+          </Typography>
+        ) : reservation.status !== "COMPLETED" ? (
           <Button
             variant="contained"
             disabled={!reservation.enstance}
