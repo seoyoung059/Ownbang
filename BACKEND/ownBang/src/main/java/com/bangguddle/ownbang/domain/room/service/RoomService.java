@@ -27,7 +27,5 @@ public interface RoomService {
     // 중개인의 매물 목록 조회
     SuccessResponse<List<RoomInfoSearchResponse>> getAgentRooms(Long userId, int page, int size);
 
-    SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId);
-
     SuccessResponse<List<RoomInfoSearchResponse>> search(Long userId, Float lat, Float lon);
 }
