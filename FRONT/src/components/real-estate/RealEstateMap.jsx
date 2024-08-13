@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Map, MapMarker, MarkerClusterer } from "react-kakao-maps-sdk";
 import { useBoundStore } from "../../store/store";
 
@@ -6,11 +6,19 @@ const RealEstateMap = ({
   searchTerm,
   mark,
   onBoundsChange,
+  onIdle,
   onSelectMarker,
   size,
 }) => {
-  const realEstateData = useBoundStore((state) => state.realEstateData);
+  const { realEstateData, getAllRoom } = useBoundStore((state) => ({
+    realEstateData : state.realEstateData,
+    getAllRoom : state.getAllRoom
+  }));
   const [map, setMap] = useState(null);
+
+  useEffect(() => {
+    handleGetRoom();
+  }, [map]);
 
   useEffect(() => {
     if (!map || !searchTerm) return;
@@ -48,11 +56,27 @@ const RealEstateMap = ({
     if (!map) return;
     const bounds = map.getBounds();
     const visiblePositions =
-      realEstateData.data &&
-      realEstateData.data.filter((pos) =>
+      realEstateData&&
+      realEstateData.filter((pos) =>
         bounds.contain(new kakao.maps.LatLng(pos.latitude, pos.longitude))
       );
-    onBoundsChange(visiblePositions);
+    onIdle(visiblePositions)
+  };
+
+  const handleGetRoom = async () => {
+    if (!map) return;
+    try {
+      const center = map.getCenter();
+      console.log(center.getLat(), center.getLng())
+      const rooms = await getAllRoom(center.getLat(), center.getLng());
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  const handleIdle = async() => {
+      debouncedHandleGetRoom();
+      onBoundsChange2()
   };
 
   useEffect(() => {
@@ -60,6 +84,27 @@ const RealEstateMap = ({
       onBoundsChange2();
     }
   }, [map, realEstateData]);
+
+  const debounce = (func, delay) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), delay);
+    };
+  };
+
+
+  const debouncedHandleGetRoom = useCallback(debounce(async () => {
+    if (!map) return;
+    try {
+      const center = map.getCenter();
+      console.log(center.getLat(), center.getLng());
+
+      await getAllRoom(center.getLat(), center.getLng());
+    } catch (error) {
+      console.log(error);
+    }
+  }, 250), [map]);
 
   return (
     <Map
@@ -72,13 +117,15 @@ const RealEstateMap = ({
         height: size ? size : "900px",
       }}
       level={7}
+      maxLevel={3}
+      minLevel={6}
       onCreate={setMap}
-      onBoundsChanged={onBoundsChange2}
+      onIdle={handleIdle}
     >
       {!mark ? (
         <MarkerClusterer averageCenter={true} minLevel={5}>
-          {realEstateData.data &&
-            realEstateData.data.map((pos) => (
+          {realEstateData&&
+            realEstateData.map((pos) => (
               <MapMarker
                 key={pos.id}
                 position={{

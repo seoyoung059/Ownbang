@@ -22,6 +22,7 @@ export default function AgentReservationItem({
   denyReservation,
   enterVideoRoom,
   getAgentReservationList,
+  onSelectItem,
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -29,7 +30,6 @@ export default function AgentReservationItem({
 
   const userInfo = reservation.userReservationInfoResponse;
 
-  console.log(reservation);
   if (!userInfo) {
     return null;
   }
@@ -89,16 +89,13 @@ export default function AgentReservationItem({
 
   const { icon, text } = getStatusIconAndText(reservation.status);
 
-  // 예약 날짜 데이터
   let reservationDate = new Date(
     reservation.reservationTime
   ).toLocaleDateString("ko-KR");
-
   if (reservationDate.endsWith(".")) {
     reservationDate = reservationDate.slice(0, -1);
   }
 
-  // 예약 시간 데이터
   const reservationTime = new Date(
     reservation.reservationTime
   ).toLocaleTimeString("ko-KR", {
@@ -106,46 +103,34 @@ export default function AgentReservationItem({
     minute: "2-digit",
   });
 
-  // 예약 확정 핸들러
   const onConfirm = async () => {
     try {
       await confirmReservation(reservation.id);
-      console.log(`예약아이디 ${reservation.id}가 확정되었습니다.`);
       getAgentReservationList();
     } catch (error) {
       console.error("Failed to confirm reservation:", error);
     }
   };
 
-  // 예약 거절 핸들러
   const onDeny = async () => {
     try {
       await denyReservation(reservation.id);
-      console.log(`예약아이디 ${reservation.id}가 거절되었습니다.`);
       getAgentReservationList();
     } catch (error) {
-      console.error("Failed to confirm reservation:", error);
+      console.error("Failed to deny reservation:", error);
     }
   };
 
-  // 화상통화 생성 핸들러
   const onStartVideo = async () => {
-    console.log(`Reservation ID: ${reservation.id}`); // 예약 ID 로그
-    try {
-      console.log(`Setting reservation ID to: ${reservation.id}`);
-      navigate(`/video-chat/${reservation.id}`, {
-        state: { reservationId: reservation.id },
-      });
-      console.log(`Reservation ID ${reservation.id} entered the video room.`);
-    } catch (error) {
-      console.error("Failed to start video room:", error);
-    }
-  };
-
-  const replayVideo = async () => {
-    navigate(`/replay/${reservation.id}`, {
+    navigate(`/video-chat/${reservation.id}`, {
       state: { reservationId: reservation.id },
     });
+  };
+
+  const onViewDetail = () => {
+    if (onSelectItem) {
+      onSelectItem(reservation);
+    }
   };
 
   return (
@@ -155,7 +140,8 @@ export default function AgentReservationItem({
           <Avatar
             src={reservation.roomProfileImage}
             variant="rounded"
-            sx={{ width: "150px", height: "90px" }}
+            sx={{ width: "150px", height: "90px", cursor: "pointer" }}
+            onClick={onViewDetail}
           />
         </TableCell>
       )}
@@ -186,7 +172,7 @@ export default function AgentReservationItem({
         <Button
           color="primary"
           onClick={onConfirm}
-          disabled={reservation.status !== "APPLYED"} // Applyed 상태일 때만 활성화
+          disabled={reservation.status !== "APPLYED"}
           sx={{
             px: 0,
             py: 0,
@@ -201,7 +187,7 @@ export default function AgentReservationItem({
         <Button
           color="primary"
           onClick={onDeny}
-          disabled={reservation.status !== "APPLYED"} // Applyed 상태일 때만 활성화
+          disabled={reservation.status !== "APPLYED"}
           sx={{
             px: 0,
             py: 0,

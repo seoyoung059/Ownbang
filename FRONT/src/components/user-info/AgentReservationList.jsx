@@ -12,9 +12,12 @@ import {
   Box,
   TableFooter,
   TablePagination,
+  IconButton,
 } from "@mui/material";
 import AgentReservationItem from "./AgentReservationItem";
 import { useMediaQuery, useTheme } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import RealEstateDetail from "../real-estate/RealEstateDetail";
 import { useBoundStore } from "../../store/store";
 
 function AgentReservationList() {
@@ -26,17 +29,23 @@ function AgentReservationList() {
     agentReservations,
     confirmReservation,
     denyReservation,
+    getRoom,
+    room,
   } = useBoundStore((state) => ({
     getAgentReservationList: state.getAgentReservationList,
     agentReservations: state.agentReservations,
     confirmReservation: state.confirmReservation,
     denyReservation: state.denyReservation,
+    getRoom: state.getRoom,
+    room: state.room,
   }));
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showDetail, setShowDetail] = useState(false);
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -63,6 +72,17 @@ function AgentReservationList() {
     setPage(0);
   };
 
+  const handleSelectItem = async (item) => {
+    setSelectedItem(item);
+    setShowDetail(true);
+    await getRoom(item.roomId);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedItem(null);
+    setShowDetail(false);
+  };
+
   if (loading) {
     return (
       <Box
@@ -79,7 +99,11 @@ function AgentReservationList() {
   }
 
   if (error) {
-    return <Typography color="error">{error}</Typography>;
+    return (
+      <Typography variant="h6" color="error">
+        {error}
+      </Typography>
+    );
   }
 
   const emptyRows =
@@ -88,79 +112,108 @@ function AgentReservationList() {
       : 0;
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            {!isMobile && (
-              <TableCell align="center" sx={{ minWidth: 150 }}>
-                미리보기
-              </TableCell>
+    <Box sx={{ width: "100%", height: "100%" }}>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {!isMobile && (
+                <TableCell sx={{ minWidth: 150 }}>매물 사진</TableCell>
+              )}
+              <TableCell sx={{ minWidth: 100 }}>예약 날짜</TableCell>
+              <TableCell sx={{ minWidth: 90 }}>예약 시간</TableCell>
+              {!isMobile && (
+                <TableCell sx={{ minWidth: 80 }}>예약자명</TableCell>
+              )}
+              <TableCell sx={{ minWidth: 100 }}>예약 상태</TableCell>
+              <TableCell sx={{ minWidth: 80 }}>상태 변경</TableCell>
+              <TableCell sx={{ minWidth: 130 }}>전화번호</TableCell>
+              <TableCell sx={{ minWidth: 100 }}>통화</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody sx={{ bgcolor: theme.palette.background.default }}>
+            {agentReservations
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((reservation) => (
+                <AgentReservationItem
+                  key={reservation.id}
+                  reservation={reservation}
+                  confirmReservation={confirmReservation}
+                  denyReservation={denyReservation}
+                  getAgentReservationList={getAgentReservationList}
+                  onSelectItem={handleSelectItem}
+                />
+              ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: `calc(53px * ${emptyRows})` }}>
+                <TableCell colSpan={8} />
+              </TableRow>
             )}
-            <TableCell align="center" sx={{ minWidth: 100 }}>
-              예약일
-            </TableCell>
-            <TableCell align="center" sx={{ minWidth: 100 }}>
-              예약 시간
-            </TableCell>
-            {!isMobile && (
-              <TableCell align="center" sx={{ minWidth: 60 }}>
-                예약자명
-              </TableCell>
-            )}
-            <TableCell align="center" sx={{ minWidth: 110 }}>
-              예약 상태
-            </TableCell>
-            <TableCell align="center" sx={{ minWidth: 100 }}>
-              예약 상태 변경
-            </TableCell>
-            <TableCell align="center" sx={{ minWidth: 140 }}>
-              예약자 번호
-            </TableCell>
-            <TableCell align="center" sx={{ minWidth: 100 }}>
-              화상 채팅
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody sx={{ bgcolor: theme.palette.background.default }}>
-          {agentReservations
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((reservation) => (
-              <AgentReservationItem
-                key={reservation.id}
-                reservation={reservation}
-                confirmReservation={confirmReservation}
-                denyReservation={denyReservation}
-                getAgentReservationList={getAgentReservationList}
-              />
-            ))}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell
-                colSpan={isMobile ? 6 : 8}
-                sx={{ bgcolor: theme.palette.background.default }}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[10, 25, 50]}
+                count={agentReservations.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
               />
             </TableRow>
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              count={agentReservations.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="페이지당 행 수:"
-              labelDisplayedRows={({ from, to, count }) =>
-                `${from}-${to} / ${count !== -1 ? count : `more than ${to}`}`
-              }
+          </TableFooter>
+        </Table>
+      </TableContainer>
+
+      {showDetail && selectedItem && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            right: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 1000,
+          }}
+          onClick={handleCloseDetail}
+        >
+          <Box
+            sx={{
+              position: "fixed",
+              top: "10%",
+              right: "10%",
+              backgroundColor: theme.palette.background.default,
+              padding: 3,
+              borderRadius: 1,
+              boxShadow: 3,
+              width: "60%",
+              height: "80%",
+              overflow: "auto",
+              zIndex: 1001,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <IconButton
+              onClick={handleCloseDetail}
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+            <RealEstateDetail
+              item={room}
+              onOpenReservationCard={() => {}}
+              isAuthenticated={true}
+              user={{ isAgent: true }}
             />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+          </Box>
+        </Box>
+      )}
+    </Box>
   );
 }
 

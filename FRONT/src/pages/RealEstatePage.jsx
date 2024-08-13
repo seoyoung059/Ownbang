@@ -23,6 +23,8 @@ const RealEstatePage = () => {
     toggleBookmarks,
     getAvailableTime,
     getAgentAvailable,
+    isAuthenticated,
+    user,
   } = useBoundStore((state) => ({
     searchTerm: state.searchTerm,
     makeReservation: state.makeReservation,
@@ -35,23 +37,14 @@ const RealEstatePage = () => {
     toggleBookmarks: state.toggleBookmarks,
     getAvailableTime: state.getAvailableTime,
     getAgentAvailable: state.getAgentAvailable,
+    isAuthenticated: state.isAuthenticated,
+    user: state.user,
   }));
 
   const [selectedItem, setSelectedItem] = React.useState(null);
   const [showReservation, setShowReservation] = React.useState(false);
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
 
-  // 초기 로드 시 전체 매물 불러오기
-  useEffect(() => {
-    getAllRoom();
-  }, [getAllRoom, searchTerm]);
-
-  // 전체 매물 데이터를 visibleMarkers로 설정
-  useEffect(() => {
-    if (realEstateData.data.length > 0) {
-      setVisibleMarkers(realEstateData.data);
-    }
-  }, [realEstateData.data]);
 
   useEffect(() => {
     if (selectedItem) {
@@ -84,6 +77,10 @@ const RealEstatePage = () => {
   // 지도 경계 변경 시 호출되는 함수
   const onBoundsChange = (markers) => {
     setVisibleMarkers(markers);
+  };
+
+  const onIdle = (marker) => {
+    setVisibleMarkers(marker);
   };
 
   // 마커 클릭 시 디테일 표시
@@ -120,6 +117,8 @@ const RealEstatePage = () => {
           bookmarkList={bookmarkList}
           getBookmarks={getBookmarks}
           toggleBookmarks={toggleBookmarks}
+          isAuthenticated={isAuthenticated}
+          user={user}
         />
       </Box>
 
@@ -145,7 +144,7 @@ const RealEstatePage = () => {
         >
           <RealEstateMap
             searchTerm={searchTerm}
-            onBoundsChange={onBoundsChange}
+            onIdle={onIdle}
             onSelectMarker={onSelectMarker}
           />
         </Box>
@@ -195,6 +194,8 @@ const RealEstatePage = () => {
             <RealEstateDetail
               item={room}
               onOpenReservationCard={onOpenReservationCard}
+              isAuthenticated={isAuthenticated}
+              user={user}
             />
           </Box>
 
