@@ -96,7 +96,6 @@ public class RoomController {
     public ResponseEntity<Response<List<RoomInfoSearchResponse>>> getRooms(@AuthenticationPrincipal Long userId, @RequestParam(name = "lat")
                                                                            Float lat, @RequestParam(name = "lon") Float lon ) {
         SuccessResponse<List<RoomInfoSearchResponse>> response = roomService.search(userId, lat, lon);
-        System.out.println(response.data());
         return Response.success(response);
     }
 }
