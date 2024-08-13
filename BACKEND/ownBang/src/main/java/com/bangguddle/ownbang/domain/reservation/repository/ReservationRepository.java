@@ -44,7 +44,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>{
 
     @Query("SELECT r.reservationTime FROM Reservation r WHERE r.room.id = :roomId AND DATE(r.reservationTime) = :date AND r.status = 'CONFIRMED'")
     List<LocalDateTime> findConfirmedReservationDateTimes(@Param("roomId") Long roomId, @Param("date") LocalDate date);
-
+    boolean existsByUserIdAndReservationTimeAndStatusNot(Long userId, LocalDateTime reservationTime, ReservationStatus status);
 
     default Reservation getById(Long id) {
         return this.findById(id).orElseThrow(()->new AppException(ErrorCode.RESERVATION_NOT_FOUND));
