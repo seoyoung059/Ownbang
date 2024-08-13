@@ -8,30 +8,45 @@ import com.bangguddle.ownbang.domain.room.enums.DealType;
 import com.bangguddle.ownbang.domain.room.enums.RoomType;
 import com.bangguddle.ownbang.domain.room.enums.Structure;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
+import org.hibernate.validator.constraints.Range;
 
 @Builder
 public record RoomCreateRequest(
+        @NotNull(message = "주소를 다시 검색하여 입력해 주세요.")
         Float latitude,
+        @NotNull(message = "주소를 다시 검색하여 입력해 주세요.")
         Float longitude,
+        @NotNull(message = "거래 종류를 선택해주세요.")
         DealType dealType,
+        @NotNull(message = "매물 종류를 선택해주세요.")
         RoomType roomType,
+        @NotNull(message = "구조를 선택해주세요.")
         Structure structure,
         Boolean isLoft,
-        @Positive
+        @NotNull(message = "전용 면적을 입력해주세요.")
+        @Digits(integer = 3, fraction = 2, message = "적절한 값을 입력해 주세요. (1000 미만, 소숫점 두자리 수 까지 가능)")
+        @Positive(message = "양수만 입력 가능합니다.")
         Float exclusiveArea,
-        @Positive
+        @NotNull(message = "전용 면적을 입력해주세요.")
+        @Digits(integer = 3, fraction = 2, message = "적절한 값을 입력해 주세요. (1000 미만, 소숫점 두자리 수 까지 가능)")
+        @Positive(message = "양수만 입력 가능합니다.")
         Float supplyArea,
+        @NotNull(message = "매물 층을 입력해 주세요.")
+        @Range(min=-128, max=127, message = "적절한 값을 입력해 주세요. (-128 이상, 127 미만의 수)")
         Byte roomFloor,
-        @PositiveOrZero
+        @NotNull(message = "보증금(또는 전세금)을 입력해주세요. (없을 경우 0을 입력해 주세요.)")
+        @PositiveOrZero(message = "적절한 값을 입력해주세요.")
         Long deposit,
-        @PositiveOrZero
+        @NotNull(message = "월세를 입력해주세요. (없을 경우 0을 입력해 주세요.)")
+        @PositiveOrZero(message = "적절한 값을 입력해 주세요.")
         Long monthlyRent,
-        @PositiveOrZero
+        @NotNull(message = "보증금을 입력해주세요. (없을 경우 0을 입력해 주세요.")
+        @PositiveOrZero(message = "적절한 값을 입력해 주세요.")
         Long maintenanceFee,
         String parcel,
+        @NotBlank(message = "도로명 주소를 입력해 주세요.")
         String road,
         String detailAddress,
         @Valid
