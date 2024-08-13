@@ -47,9 +47,11 @@ const RealEstateDetail = ({
         <RealEstateDescription item={item} />
       </Box>
 
-      <Box>
-        <AgentInfo item={item} />
-      </Box>
+      {!user.isAgent && (
+        <Box>
+          <AgentInfo item={item} />
+        </Box>
+      )}
 
       {showReservationButton && isAuthenticated && !user.isAgent && (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
