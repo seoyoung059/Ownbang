@@ -44,3 +44,17 @@ export const agentReservationDeny = async (reservationId) => {
     throw error;
   }
 };
+
+// 중개인 가능 시간 조회 API 요청
+export const agentAvailable = async (requiredData) => {
+  try {
+    // URL에 쿼리 파라미터를 params 옵션으로 전달
+    const response = await Axios.get(`/reservations/available-times`, {
+      params: requiredData,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in agentAvailable API:", error);
+    throw error;
+  }
+};
