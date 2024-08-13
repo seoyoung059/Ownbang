@@ -8,8 +8,9 @@ import { useTheme } from "@mui/material/styles";
 const RealEstateDetail = ({
   item,
   onOpenReservationCard,
-  isAuthenticated, // Correct prop name
+  isAuthenticated,
   user,
+  showReservationButton = true,
 }) => {
   const theme = useTheme();
 
@@ -35,7 +36,7 @@ const RealEstateDetail = ({
     <Box sx={styles.container}>
       <Box sx={{ marginTop: 2 }}>
         {/* RealEstateImages에 이미지 배열 전달 */}
-        <RealEstateImages images={images} />
+        <RealEstateImages images={images} user={user} />
         <Typography variant="h5" sx={styles.title}>
           {item.dealType} {item.deposit}/{item.monthlyRent}
           <Typography variant="subtitle2" color="text.secondary">
@@ -50,7 +51,7 @@ const RealEstateDetail = ({
         <AgentInfo item={item} />
       </Box>
 
-      {isAuthenticated && !user.isAgent && (
+      {showReservationButton && isAuthenticated && !user.isAgent && (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <Button
             variant="contained"
