@@ -15,6 +15,7 @@ import com.bangguddle.ownbang.global.response.SuccessResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -187,4 +188,64 @@ class AgentWorkhourServiceImplTest {
                 .isInstanceOf(AppException.class)
                 .hasFieldOrPropertyWithValue("errorCode", WORKHOUR_NOT_FOUND);
     }
+
+    @Test
+    @DisplayName("근무 시간 생성 성공 - null 값 입력 시 기본 시간 설정")
+    void createAgentWorkhour_Success_WithNullValues() {
+        // Given
+        Long userId = 1L;
+        AgentWorkhourRequest request = new AgentWorkhourRequest(null, null, null, null);
+        User user = mock(User.class);
+        Agent agent = mock(Agent.class);
+
+        when(userRepository.getById(userId)).thenReturn(user);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        ArgumentCaptor<AgentWorkhour> agentWorkhourCaptor = ArgumentCaptor.forClass(AgentWorkhour.class);
+
+        // When
+        SuccessResponse<NoneResponse> response = agentWorkhourService.createAgentWorkhour(userId, request);
+
+        // Then
+        assertThat(response.successCode()).isEqualTo(AGENT_WORKHOUR_CREATE_SUCCESS);
+        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
+
+        verify(agentWorkhourRepository).save(agentWorkhourCaptor.capture());
+        AgentWorkhour savedAgentWorkhour = agentWorkhourCaptor.getValue();
+
+        assertThat(savedAgentWorkhour.getWeekdayStartTime()).isEqualTo("09:00");
+        assertThat(savedAgentWorkhour.getWeekdayEndTime()).isEqualTo("18:00");
+        assertThat(savedAgentWorkhour.getWeekendStartTime()).isEqualTo("09:00");
+        assertThat(savedAgentWorkhour.getWeekendEndTime()).isEqualTo("18:00");
+    }
+    @Test
+    @DisplayName("근무 시간 생성 성공 - 일부 값 null")
+    void createAgentWorkhour_Success_SomeNullValues() {
+        // Given
+        Long userId = 1L;
+        AgentWorkhourRequest request = new AgentWorkhourRequest(null, "18:00", "10:00", null);
+        User user = mock(User.class);
+        Agent agent = mock(Agent.class);
+
+        when(userRepository.getById(userId)).thenReturn(user);
+        when(agentRepository.getByUserId(userId)).thenReturn(agent);
+
+        ArgumentCaptor<AgentWorkhour> agentWorkhourCaptor = ArgumentCaptor.forClass(AgentWorkhour.class);
+
+        // When
+        SuccessResponse<NoneResponse> response = agentWorkhourService.createAgentWorkhour(userId, request);
+
+        // Then
+        assertThat(response.successCode()).isEqualTo(AGENT_WORKHOUR_CREATE_SUCCESS);
+        assertThat(response.data()).isEqualTo(NoneResponse.NONE);
+
+        verify(agentWorkhourRepository).save(agentWorkhourCaptor.capture());
+        AgentWorkhour savedAgentWorkhour = agentWorkhourCaptor.getValue();
+
+        assertThat(savedAgentWorkhour.getWeekdayStartTime()).isEqualTo("09:00"); // Default value
+        assertThat(savedAgentWorkhour.getWeekdayEndTime()).isEqualTo("18:00");
+        assertThat(savedAgentWorkhour.getWeekendStartTime()).isEqualTo("10:00");
+        assertThat(savedAgentWorkhour.getWeekendEndTime()).isEqualTo("18:00"); // Default value
+    }
+
 }
