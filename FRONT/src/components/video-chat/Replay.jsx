@@ -7,8 +7,7 @@ const Replay = ({
   options,
   onReady,
   width = "100%",
-  height = "auto",
-  maxHeight = "500px",
+  height = "100%", // 컨테이너의 높이를 부모와 동일하게 설정
 }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
@@ -35,19 +34,20 @@ const Replay = ({
   }, [options, onReady]);
 
   return (
-    <div style={{ marginTop: "32px" }}>
+    <div style={{ height: height }}>
+      {" "}
+      {/* 부모 높이를 100%로 설정 */}
       <div
         data-vjs-player
         style={{
-          width,
-          height,
-          maxHeight,
+          width: width,
+          height: "100%", // 부모의 높이를 100%로 유지
           borderRadius: "8px",
           overflow: "hidden",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          position: "relative",
+          backgroundColor: "black", // 검은색 배경 추가
         }}
       >
         <video
@@ -56,8 +56,7 @@ const Replay = ({
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "contain",
-            maxHeight: "100%",
+            objectFit: "contain", // 비율을 유지하며 컨테이너에 맞게 조정
           }}
         />
       </div>

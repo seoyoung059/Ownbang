@@ -103,6 +103,10 @@ class Video extends Component {
     window.removeEventListener("beforeunload", this.onbeforeunload);
     window.removeEventListener("resize", this.updateScreenSize);
     window.onpopstate = null;
+
+    if (this.state.session) {
+      this.state.session.off("sessionDisconnected"); // 이벤트 핸들러 제거
+    }
   }
 
   onbeforeunload(event) {
@@ -186,8 +190,13 @@ class Video extends Component {
 
         mySession.on("exception", (exception) => {
           console.warn(exception);
+          if (
+            exception.name === "disconnect" ||
+            exception.name === "networkDisconnect"
+          ) {
+            this.handleOpenEndSessionDialog();
+          }
         });
-
         this.props.enterVideoRoom(this.state.mySessionId).then((res) => {
           this.setState({ token: res.token });
           if (res.createdAt) {
@@ -310,7 +319,7 @@ class Video extends Component {
       },
       () => {
         const { navigate } = this.props;
-        navigate("/mypage", { replace: true });
+        navigate("/", { replace: true });
       }
     );
   };
@@ -322,7 +331,7 @@ class Video extends Component {
   handleCloseEndSessionDialog() {
     this.setState({ endSessionDialogOpen: false });
     const { navigate } = this.props;
-    navigate("/mypage", { replace: true });
+    navigate("/", { replace: true });
   }
 
   async switchCamera() {
@@ -340,14 +349,24 @@ class Video extends Component {
         const newVideoDevice =
           videoDevices[(currentVideoDeviceIndex + 1) % videoDevices.length];
 
-        const newPublisher = this.OV.initPublisher(undefined, {
+        // 기존 퍼블리셔의 스트림을 안전하게 중지
+        if (this.state.publisher) {
+          this.state.publisher.stream
+            .getTracks()
+            .forEach((track) => track.stop());
+        }
+
+        const newPublisher = await this.OV.initPublisherAsync(undefined, {
           videoSource: newVideoDevice.deviceId,
           publishAudio: true,
           publishVideo: true,
           mirror: false,
         });
 
+        // 기존 퍼블리셔를 비동기적으로 언퍼블리시
         await this.state.session.unpublish(this.state.publisher);
+
+        // 새 퍼블리셔를 비동기적으로 퍼블리시
         await this.state.session.publish(newPublisher);
 
         this.setState({
@@ -362,6 +381,11 @@ class Video extends Component {
       }
     } catch (error) {
       console.error("Error switching camera:", error);
+
+      // 오류가 발생하면 기존 스트림으로 돌아가기 위한 복구 로직
+      if (this.state.publisher) {
+        await this.state.session.publish(this.state.publisher);
+      }
     }
   }
 

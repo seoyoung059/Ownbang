@@ -118,7 +118,7 @@ const ReplayPage = () => {
               options={videoJsOptions}
               onReady={handlePlayerReady}
               width="100%"
-              height="500px"
+              height="100%"
               maxHeight="200px"
             />
           ) : (
