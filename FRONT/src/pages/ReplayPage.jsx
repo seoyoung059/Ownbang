@@ -128,6 +128,7 @@ const ReplayPage = () => {
         <Grid item xs={12} md={4} sx={{ mt: 4 }}>
           <Box>
             <CheckList
+              reservationId={location.state.reservationId}
               canEdit={true}
               forReplay={true}
               onTimestampClick={handleTimestampClick}

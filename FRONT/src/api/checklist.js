@@ -5,7 +5,12 @@ export const getChecklists = async () => {
   return response.data;
 };
 
-export const pathChecklists = async (id, data) => {
+export const getChecklist = async (id) => {
+  const response = await Axios.get(`/checklists/${id}`)
+  return response.data;
+}
+
+export const patchChecklists = async (id, data) => {
   const response = await Axios.patch(`/checklists/${id}`, data);
   return response.data;
 };
