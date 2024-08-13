@@ -1,7 +1,18 @@
 package com.bangguddle.ownbang.domain.streaming.service.impl;
 
 
+import com.bangguddle.ownbang.domain.reservation.entity.Reservation;
+import com.bangguddle.ownbang.domain.reservation.repository.ReservationRepository;
 import com.bangguddle.ownbang.domain.streaming.service.StreamingService;
+import com.bangguddle.ownbang.domain.user.entity.User;
+import com.bangguddle.ownbang.domain.user.repository.UserRepository;
+import com.bangguddle.ownbang.domain.video.dto.VideoUpdateRequest;
+import com.bangguddle.ownbang.domain.video.entity.Video;
+import com.bangguddle.ownbang.domain.video.entity.VideoStatus;
+import com.bangguddle.ownbang.domain.video.repository.VideoRepository;
+import com.bangguddle.ownbang.domain.video.service.VideoService;
+import com.bangguddle.ownbang.domain.webrtc.service.WebrtcSessionService;
+import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.enums.SuccessCode;
 import com.bangguddle.ownbang.global.handler.AppException;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
@@ -16,6 +27,7 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.progress.Progress;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -40,48 +52,86 @@ public class StreamingServiceImpl implements StreamingService {
     private final FFmpeg fFmpeg;
     private final FFprobe fFprobe;
     private final S3UploaderServiceImpl s3UploaderService;
+    private final VideoService videoService;
+    private final VideoRepository videoRepository;
+    private final WebrtcSessionService webrtcSessionService;
 
     private static final String zipExtend = ".zip";
     private static final String m3u8Extend = ".m3u8";
     private static final String tsExtend = "_%08d.ts";
     private static final String jsonExtend = ".json";
+    private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
 
     @Value("${video.recordings.path}")
-    private String reocrdingPath;
+    private String recordingPath;
 
+    @Override
+    public SuccessResponse<NoneResponse> retryStreaming(Long userId, Long reservationId) {
+        User user = userRepository.getById(userId);
+        Reservation reservation = reservationRepository.getById(reservationId);
+
+        if (!user.getId().equals(reservation.getUser().getId())) throw new AppException(BAD_REQUEST);
+
+        Video video = videoRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
+
+        uploadStreaming(reservationId, video.getVideoUrl());
+
+        return new SuccessResponse<>(SuccessCode.VIDEO_PROCESS_SUCCESS, NoneResponse.NONE);
+    }
 
     /**
-     * sessionId를 받아 zip 압축 해제 후 hls로 변환하여 S3에 올림
-     * @param sessionId
+     * [비동기]sessionId를 받아 zip 압축 해제 후 hls로 변환하여 S3에 올림
+     *
+     * @param reservationId 예약 ID
+     * @param sessionId     해당 예약에 대해 생성된 Openvidu Session Id
      * @return
      */
+    @Async
     @Override
-    public SuccessResponse<String> uploadStreaming(String sessionId){
+    public void uploadStreaming(Long reservationId, String sessionId) {
         log.info("uploadStreaming sessionId:{}", sessionId);
-
-        Path outputPath = Paths.get(reocrdingPath, sessionId);
+        Path outputPath = Paths.get(recordingPath, sessionId);
+        if (!Files.exists(outputPath)) throw new AppException(RECORDING_ERROR);
         log.info(outputPath.toAbsolutePath().toString());
 
         // json에서 publisher(중개인)의 녹화 파일명을 얻는다.
-        String jsonFile = unzipFile(outputPath.toString(), sessionId, sessionId);
+        unzipFile(outputPath.toString(), sessionId, sessionId);
 
         String filename = getPublisherFileName(outputPath.toString(), sessionId);
-        if(filename == null) throw new AppException(RECORDING_ERROR);
+        if (filename == null) throw new AppException(RECORDING_ERROR);
 
         // 압축 해제한 파일이 zip파일과 같은 위치여야 openvidu의 delete기능을 사용할 수 있다.
         String unzipFileName = unzipFile(outputPath.toString(), sessionId, filename);
+
 
         // 압축 파일들을 hls로 변환한다.
         convertToHls(unzipFileName, sessionId);
 
         // s3에 업로드한다.
-        String uploadedUrl = s3UploaderService.uploadHlsFiles(Paths.get(outputPath.toString(),sessionId), sessionId);
+        String uploadedUrl = s3UploaderService.uploadHlsFiles(Paths.get(outputPath.toString(), sessionId), sessionId);
 
-        return new SuccessResponse<>(SuccessCode.ROOM_IMAGE_UPLOAD_SUCCESS, uploadedUrl+"/"+sessionId+m3u8Extend);
+        // video 수정
+        Video video = videoRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
+
+
+        VideoUpdateRequest videoUpdateRequest =
+                VideoUpdateRequest.builder()
+                        .videoUrl(outputPath + "/" + sessionId + m3u8Extend)
+                        .videoStatus(VideoStatus.RECORDED)
+                        .build();
+        videoService.modifyVideo(videoUpdateRequest, video.getId());
+
+
+        // record 제거
+        webrtcSessionService.deleteRecord(reservationId);
     }
 
     /**
      * Openvidu 녹화 시 함께 생성되는 json파일을 파싱하여 publisher(중개인)의 녹화 파일명을 얻는 메서드
+     *
      * @param outputPath
      * @param sessionId
      * @return publisher(중개인)의 녹화 파일명
@@ -92,14 +142,14 @@ public class StreamingServiceImpl implements StreamingService {
             JsonNode filesNode = objectMapper.readTree(jsonString).path("files");
 
             if (filesNode.isArray() && !filesNode.isEmpty()) {
-                JsonNode firstFile = filesNode.get(0);
-                return firstFile.path("name").asText();
+                for (JsonNode file : filesNode) {
+                    if ("ROLE_AGENT".equals(file.path("serverData").asText()))
+                        return file.path("name").asText();
+                }
             }
-
             return null; // 파일이 없거나 name 필드가 없는 경우
         } catch (Exception e) {
             // 예외 처리: 로깅을 하거나 사용자 정의 예외를 던질 수 있습니다.
-            System.out.println(e.getMessage());
             throw new AppException(RECORDING_ERROR);
         }
     }
@@ -107,6 +157,7 @@ public class StreamingServiceImpl implements StreamingService {
 
     /**
      * 압축 파일에서 publisher(중개인)의 녹화영상만을 sessionId를 파일명으로 압축 해제합니다.
+     *
      * @param outputPath
      * @param sessionId
      * @param publisherFileName 중개인 녹화영상 파일명(확장자 포함)
@@ -114,7 +165,7 @@ public class StreamingServiceImpl implements StreamingService {
      */
     private String unzipFile(String outputPath, String sessionId, String publisherFileName) {
         try {
-            File zipFile = new File(outputPath , sessionId + zipExtend);
+            File zipFile = new File(outputPath, sessionId + zipExtend);
             ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
             ZipEntry ze = zis.getNextEntry();
             while (ze != null) {
@@ -123,7 +174,7 @@ public class StreamingServiceImpl implements StreamingService {
                     continue;
                 }
 
-                String recordFileName = sessionId + "."+ze.getName().split("\\.")[1];
+                String recordFileName = sessionId + "." + ze.getName().split("\\.")[1];
                 File recordFile = new File(outputPath, recordFileName);
 
                 recordFile.getParentFile().mkdirs();
@@ -147,24 +198,25 @@ public class StreamingServiceImpl implements StreamingService {
 
     /**
      * fileName의 녹화영상을 HLS 포맷으로 sessionId 폴더에 압축 해제한다.
-     * @param filename 변환할 녹화영상의 파일명 (sessionId+확장자)
+     *
+     * @param filename  변환할 녹화영상의 파일명 (sessionId+확장자)
      * @param sessionId
      * @return m3u8 파일의 파일명
      */
     private String convertToHls(String filename, String sessionId) {
         try {
-            String inputFilePath = Paths.get(reocrdingPath, sessionId, filename).toAbsolutePath().toString();
-            File output = new File(Paths.get(reocrdingPath, sessionId,sessionId).toAbsolutePath().toString());
+            String inputFilePath = Paths.get(recordingPath, sessionId, filename).toAbsolutePath().toString();
+            File output = new File(Paths.get(recordingPath, sessionId, sessionId).toAbsolutePath().toString());
 
             // 파일 없을 때
-            if(!(new File(inputFilePath)).exists()) throw new FileNotFoundException(filename);
+            if (!(new File(inputFilePath)).exists()) throw new FileNotFoundException(filename);
             // 경로 생성
-            if(!output.exists()) output.mkdirs();
+            if (!output.exists()) output.mkdirs();
 
             FFmpegBuilder builder = new FFmpegBuilder()
                     .setInput(inputFilePath)
                     .overrideOutputFiles(true)
-                    .addOutput(Paths.get(output.getAbsolutePath() ,sessionId+m3u8Extend).toAbsolutePath().toString())
+                    .addOutput(Paths.get(output.getAbsolutePath(), sessionId + m3u8Extend).toAbsolutePath().toString())
                     .setFormat("hls")
                     .addExtraArgs("-hls_time", "10")
                     .addExtraArgs("-hls_list_size", "0")
@@ -178,7 +230,7 @@ public class StreamingServiceImpl implements StreamingService {
 
             run(builder, filename);
             return filename + m3u8Extend;
-        } catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             throw new AppException(HLS_CONVERTING_ERROR);
         }
 
@@ -186,7 +238,8 @@ public class StreamingServiceImpl implements StreamingService {
 
     /**
      * HLS 변환 수행 메서드
-     * @param builder FFMPEG Builder
+     *
+     * @param builder  FFMPEG Builder
      * @param filename hls 변환 결과의 파일명
      */
     private void run(FFmpegBuilder builder, String filename) {

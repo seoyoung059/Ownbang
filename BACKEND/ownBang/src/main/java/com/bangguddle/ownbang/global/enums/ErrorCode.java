@@ -33,7 +33,7 @@ public enum ErrorCode implements ResponseCode {
     VIDEO_IS_BEING_RECORDED(HttpStatus.BAD_REQUEST, "영상이 녹화 중입니다."),
 
     // Streaming API
-    RECORDING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "녹화 영상 처리 중 문제가 발생했습니다."),
+    RECORDING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "화상 통화 녹화 중 문제가 발생했습니다."),
     HLS_CONVERTING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "영상 변환 중 문제가 발생했습니다."),
 
     // Room API

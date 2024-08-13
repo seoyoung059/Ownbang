@@ -24,7 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import static com.bangguddle.ownbang.global.enums.ErrorCode.*;
-import static com.bangguddle.ownbang.global.enums.SuccessCode.*;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.GET_TOKEN_SUCCESS;
+import static com.bangguddle.ownbang.global.enums.SuccessCode.REMOVE_TOKEN_SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -102,22 +103,18 @@ public class WebrtcAgentService implements WebrtcService {
         // session 제거
         webrtcSessionService.removeSession(reservationId);
 
-        // record hls 변환
-        SuccessResponse<String> uploadSuccess = streamingService.uploadStreaming(recording.getSessionId());
-
-        // video 수정
+        // 녹화 상태 저장: 인코딩
         Video video = videoRepository.findByReservationId(reservationId)
-                .orElseThrow(()->new AppException(INTERNAL_SERVER_ERROR));
+                .orElseThrow(() -> new AppException(INTERNAL_SERVER_ERROR));
         VideoUpdateRequest videoUpdateRequest =
                 VideoUpdateRequest.builder()
-                                .videoUrl(uploadSuccess.data())
-                                .videoStatus(VideoStatus.RECORDED)
-                                .build();
+                        .videoUrl(video.getVideoUrl())
+                        .videoStatus(VideoStatus.ENCODING)
+                        .build();
         videoService.modifyVideo(videoUpdateRequest, video.getId());
 
-
-        // record 제거
-        webrtcSessionService.deleteRecord(reservationId);
+        // record hls 변환
+        streamingService.uploadStreaming(reservationId, recording.getSessionId());
 
         // response 반환
         return new SuccessResponse<>(REMOVE_TOKEN_SUCCESS, NoneResponse.NONE);

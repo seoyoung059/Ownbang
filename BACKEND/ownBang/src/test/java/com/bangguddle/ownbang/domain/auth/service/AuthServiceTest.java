@@ -210,7 +210,7 @@ class AuthServiceTest {
         when(mockUser.getId()).thenReturn(userId);
         when(jwtProvider.generateTokens(userId)).thenReturn(tokens);
         doNothing().when(redisRepository).save(tokens);
-        doNothing().when(redisRepository).saveValidTokens(tokens, userId);
+//        doNothing().when(redisRepository).saveValidTokens(tokens, userId);
 
 
         // then

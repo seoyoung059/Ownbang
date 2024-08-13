@@ -6,6 +6,7 @@ import com.bangguddle.ownbang.domain.agent.service.AgentService;
 import com.bangguddle.ownbang.global.enums.NoneResponse;
 import com.bangguddle.ownbang.global.response.Response;
 import com.bangguddle.ownbang.global.response.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,7 @@ public class AgentMyPageController {
     @PatchMapping("")
     public ResponseEntity<Response<NoneResponse>> modifyMyPage(
             @AuthenticationPrincipal Long id,
-            @RequestBody AgentMyPageModifyRequest request) {
+            @RequestBody @Valid AgentMyPageModifyRequest request) {
         SuccessResponse<NoneResponse> response = agentService.modifyMyPage(id, request);
         return Response.success(response);
     }
