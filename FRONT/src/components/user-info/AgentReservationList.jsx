@@ -20,11 +20,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import RealEstateDetail from "../real-estate/RealEstateDetail";
 import { useBoundStore } from "../../store/store";
 
-// Custom pagination actions component
-const CustomPaginationActions = () => {
-  return null; // Return null to hide the pagination controls
-};
-
 function AgentReservationList() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -80,7 +75,7 @@ function AgentReservationList() {
   const handleSelectItem = async (item) => {
     setSelectedItem(item);
     setShowDetail(true);
-    await getRoom(item.roomId); // Fetch room details when an item is selected
+    await getRoom(item.roomId);
   };
 
   const handleCloseDetail = () => {
@@ -111,23 +106,32 @@ function AgentReservationList() {
     );
   }
 
+  const emptyRows =
+    page > 0
+      ? Math.max(0, (1 + page) * rowsPerPage - agentReservations.length)
+      : 0;
+
   return (
     <Box sx={{ width: "100%", height: "100%" }}>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              {!isMobile && <TableCell>Room Image</TableCell>}
-              <TableCell>예약 날짜</TableCell>
-              <TableCell>예약 시간</TableCell>
-              {!isMobile && <TableCell>사용자 이름</TableCell>}
-              <TableCell>상태</TableCell>
-              <TableCell>Actions</TableCell>
-              <TableCell>전화번호</TableCell>
-              <TableCell>통화</TableCell>
+              {!isMobile && (
+                <TableCell sx={{ minWidth: 150 }}>매물 사진</TableCell>
+              )}
+              <TableCell sx={{ minWidth: 100 }}>예약 날짜</TableCell>
+              <TableCell sx={{ minWidth: 90 }}>예약 시간</TableCell>
+              {!isMobile && (
+                <TableCell sx={{ minWidth: 80 }}>예약자명</TableCell>
+              )}
+              <TableCell sx={{ minWidth: 100 }}>예약 상태</TableCell>
+              <TableCell sx={{ minWidth: 80 }}>상태 변경</TableCell>
+              <TableCell sx={{ minWidth: 130 }}>전화번호</TableCell>
+              <TableCell sx={{ minWidth: 100 }}>통화</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody sx={{ bgcolor: theme.palette.background.default }}>
             {agentReservations
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((reservation) => (
@@ -137,9 +141,14 @@ function AgentReservationList() {
                   confirmReservation={confirmReservation}
                   denyReservation={denyReservation}
                   getAgentReservationList={getAgentReservationList}
-                  onSelectItem={handleSelectItem} // Pass the callback
+                  onSelectItem={handleSelectItem}
                 />
               ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: `calc(53px * ${emptyRows})` }}>
+                <TableCell colSpan={8} />
+              </TableRow>
+            )}
           </TableBody>
           <TableFooter>
             <TableRow>
@@ -150,7 +159,6 @@ function AgentReservationList() {
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-                ActionsComponent={CustomPaginationActions} // Use custom actions component
               />
             </TableRow>
           </TableFooter>
@@ -165,7 +173,7 @@ function AgentReservationList() {
             right: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Slightly dark background
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             zIndex: 1000,
           }}
           onClick={handleCloseDetail}
