@@ -6,17 +6,29 @@ import {
   Box,
   Divider,
   Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material";
+import { useBoundStore } from "../../store/store";
+import { useNavigate } from "react-router-dom";
 
 export default function PasswordChangeForm({ toggleEdit }) {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [passwordFormatError, setPasswordFormatError] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [passwordCheckTouched, setPasswordCheckTouched] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("error");
+
+  const { newPassword } = useBoundStore((state) => ({
+    newPassword: state.newPassword,
+  }));
 
   const passwordRegex =
     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{9,16}$/;
@@ -54,11 +66,31 @@ export default function PasswordChangeForm({ toggleEdit }) {
     }
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   const handleSubmit = () => {
     if (!passwordFormatError && !passwordError && password && passwordCheck) {
-      console.log("새 비밀번호:", password);
+      newPassword(password)
+        .then(() => {
+          setSnackbarMessage("비밀번호 변경에 성공했습니다.");
+          setSnackbarSeverity("success");
+          setSnackbarOpen(true);
+
+          setTimeout(() => {
+            navigate("/mypage");
+          }, 2000);
+        })
+        .catch(() => {
+          setSnackbarMessage("비밀번호 변경에 실패했습니다.");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
+        });
     } else {
-      alert("비밀번호를 확인해주세요."); // toast로 대체
+      setSnackbarMessage("비밀번호를 확인해주세요.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -145,6 +177,20 @@ export default function PasswordChangeForm({ toggleEdit }) {
           </Grid>
         </Grid>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
