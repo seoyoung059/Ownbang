@@ -18,13 +18,13 @@ public record AgentSignUpRequest(
         String detailOfficeAddress,
         @NotNull
         String officeName,
-        @NotNull
+
         String weekendStartTime,
-        @NotNull
+
         String weekendEndTime,
-        @NotNull
+
         String weekdayStartTime,
-        @NotNull
+
         String weekdayEndTime
 ) {
     public Agent toAgentEntity(User user) {
