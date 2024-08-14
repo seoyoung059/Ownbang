@@ -2,17 +2,39 @@ import React from "react";
 import RealEstateImages from "./RealEstateImages";
 import RealEstateDescription from "./RealEstateDescription";
 import AgentInfo from "./AgentInfo";
-import { Button, Typography, Box, Divider } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Box,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 const RealEstateDetail = ({
   item,
+  loading, // 로딩 상태 추가
   onOpenReservationCard,
   isAuthenticated,
   user,
   showReservationButton = true,
 }) => {
   const theme = useTheme();
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   // item과 item.roomImageResponses가 존재하는지 확인 후, 이미지 URL 배열 생성
   const images =
@@ -35,7 +57,6 @@ const RealEstateDetail = ({
   return (
     <Box sx={styles.container}>
       <Box sx={{ marginTop: 2 }}>
-        {/* RealEstateImages에 이미지 배열 전달 */}
         <RealEstateImages images={images} user={user} />
         <Typography variant="h5" sx={styles.title}>
           {item.dealType} {item.deposit}/{item.monthlyRent}
