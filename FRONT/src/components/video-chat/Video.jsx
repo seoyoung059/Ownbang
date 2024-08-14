@@ -336,12 +336,7 @@ class Video extends Component {
   }
 
   async switchCamera() {
-    const { selectedVideoDevice, session, publisher } = this.state;
-
-    if (!selectedVideoDevice || !session) {
-      console.error("No selected video device or session.");
-      return;
-    }
+    const { selectedVideoDevice, publisher } = this.state;
 
     try {
       // 기존 퍼블리셔의 스트림을 안전하게 중지
@@ -349,33 +344,34 @@ class Video extends Component {
         publisher.stream.getTracks().forEach((track) => track.stop());
       }
 
-      // 새 퍼블리셔 생성
+      // 새로 선택된 비디오 디바이스로 퍼블리셔 생성
       const newPublisher = await this.OV.initPublisherAsync(undefined, {
-        videoSource: selectedVideoDevice, // 선택한 비디오 디바이스
+        videoSource: selectedVideoDevice, // 이 부분에서 선택된 비디오 디바이스를 사용합니다.
         publishAudio: true,
         publishVideo: true,
         mirror: false,
       });
 
-      // 기존 퍼블리셔를 언퍼블리시
-      if (publisher) {
-        await session.unpublish(publisher);
-      }
+      // 기존 퍼블리셔 언퍼블리시
+      await this.state.session.unpublish(this.state.publisher);
 
-      // 새 퍼블리셔를 퍼블리시
-      await session.publish(newPublisher);
+      // 새 퍼블리셔 퍼블리시
+      await this.state.session.publish(newPublisher);
 
-      // 상태 업데이트
+      // 상태 업데이트: 새로운 퍼블리셔와 현재 사용 중인 비디오 디바이스 업데이트
       this.setState({
         publisher: newPublisher,
         mainStreamManager: newPublisher,
+        currentVideoDevice: this.state.videoDevices.find(
+          (device) => device.deviceId === selectedVideoDevice
+        ),
       });
     } catch (error) {
       console.error("Error switching camera:", error);
 
       // 오류가 발생하면 기존 스트림으로 돌아가기 위한 복구 로직
-      if (publisher) {
-        await session.publish(publisher);
+      if (this.state.publisher) {
+        await this.state.session.publish(this.state.publisher);
       }
     }
   }
