@@ -35,13 +35,18 @@ const RealEstateImages = ({ images, user }) => {
             <IconButton
               onClick={onPrevImg}
               sx={{
-                position: "fixed",
-                left: "3%",
-                top: "25%",
+                position: "absolute",
+                left: "0%", // 사진의 왼쪽 끝에 배치
+                top: "50%",
                 transform: "translateY(-50%)",
                 zIndex: 1,
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
                 color: "white",
+                height: "50px",
+                width: "50px",
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                },
               }}
             >
               <ChevronLeft />
@@ -51,13 +56,18 @@ const RealEstateImages = ({ images, user }) => {
             <IconButton
               onClick={onNextImg}
               sx={{
-                position: "fixed",
-                right: 16,
-                top: "25%",
+                position: "absolute",
+                right: "0%", // 사진의 오른쪽 끝에 배치
+                top: "50%",
                 transform: "translateY(-50%)",
                 zIndex: 1,
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
                 color: "white",
+                height: "50px",
+                width: "50px",
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                },
               }}
             >
               <ChevronRight />
@@ -70,7 +80,7 @@ const RealEstateImages = ({ images, user }) => {
           component="img"
           image={images[currentIndex]}
           alt={`Image ${currentIndex + 1}`}
-          sx={{ height: "300px" }}
+          sx={{ height: "300px", width: "100%", objectFit: "cover" }}
         />
 
         <CardContent
