@@ -139,7 +139,7 @@ export default function MainPage() {
                 <CardMedia
                   component="img"
                   height="360"
-                  image="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA0MTZfMjYz%2FMDAxNjgxNjI0NDU2OTc4.QB426iKZQVIeAbkpBUuLygz8ouzLtElqqRdDblYpIk0g.42_Ef4d4hiRqIcA6E_my_7x2oMUYER78Fe1VHPjfImIg.JPEG.miiiiij%2F%25B8%25DB.JPG&type=sc960_832"
+                  image="https://cdn.pixabay.com/photo/2015/08/28/12/46/checklist-911840_960_720.png"
                   alt="체크 리스트"
                 />
               </CardContent>
@@ -157,7 +157,7 @@ export default function MainPage() {
                 <CardMedia
                   component="img"
                   height="360"
-                  image="https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net%2Fimage%2F5646%2F2021%2F11%2F02%2F0000028034_001_20220318181605686.jpeg&type=a340"
+                  image="https://cdn.pixabay.com/photo/2020/09/30/09/36/phone-5615121_1280.png"
                   alt="중개인과 화상통화"
                 />
               </CardContent>
@@ -175,7 +175,7 @@ export default function MainPage() {
                 <CardMedia
                   component="img"
                   height="360"
-                  image="https://mblogthumb-phinf.pstatic.net/MjAxNzA2MTZfMjY5/MDAxNDk3NTY5NzU5MjAz.1Y2vcmi5t2sndtAVA-CNIMnOFuGWC-kF7Ns2DEIscJcg.X765XjvAG1424W3IKIiGVcXyjPTwWPeThTsOYkGn_T4g.JPEG.threenitro/%EB%B0%A9%EA%B5%AC%EA%B2%BD%ED%95%98%EA%B8%B0_%281%29.JPG?type=w800"
+                  image="https://img.freepik.com/free-vector/home-interior_23-2148000675.jpg?size=338&ext=jpg&ga=GA1.1.1788614524.1719446400&semt=ais_user"
                   alt="녹화 다시보기"
                 />
               </CardContent>
