@@ -50,22 +50,38 @@ public class ChecklistController {
     }
 
 
+//    /**
+//     * checklistId와 동일한 체크리스트를 반환합니다.<br/>
+//     * 체크리스트 템플릿 또는 객체를 반환할 수 있습니다.<br/>
+//     * 마이페이지에서 템플릿 수정 또는 다시보기에서 객체 확인용으로 사용됩니다.
+//     * @param userId
+//     * @param checklistId 체크리스트 아이디
+//     * @return ChecklistSearchResponse
+//     */
+//    @GetMapping("/{checklistId}")
+//    public ResponseEntity<Response<ChecklistSearchResponse>> getChecklist(
+//            @AuthenticationPrincipal Long userId,
+//            @PathVariable @Positive @Valid Long checklistId) {
+//        SuccessResponse<ChecklistSearchResponse> response = checklistService.getChecklist(userId, checklistId);
+//        return Response.success(response);
+//    }
+
+
     /**
-     * checklistId와 동일한 체크리스트를 반환합니다.<br/>
+     * reservationId에 맞는 체크리스트를 반환합니다.<br/>
      * 체크리스트 템플릿 또는 객체를 반환할 수 있습니다.<br/>
      * 마이페이지에서 템플릿 수정 또는 다시보기에서 객체 확인용으로 사용됩니다.
      * @param userId
-     * @param checklistId 체크리스트 아이디
+     * @param reservationId 체크리스트 아이디
      * @return ChecklistSearchResponse
      */
-    @GetMapping("/{checklistId}")
-    public ResponseEntity<Response<ChecklistSearchResponse>> getChecklist(
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<Response<ChecklistSearchResponse>> getChecklistByReservationId(
             @AuthenticationPrincipal Long userId,
-            @PathVariable @Positive @Valid Long checklistId) {
-        SuccessResponse<ChecklistSearchResponse> response = checklistService.getChecklist(userId, checklistId);
+            @PathVariable @Positive @Valid Long reservationId) {
+        SuccessResponse<ChecklistSearchResponse> response = checklistService.getChecklistByReservationId(userId, reservationId);
         return Response.success(response);
     }
-
 
     /**
      * 체크리스트 템플릿 목록을 반환합니다.<br/>
@@ -81,22 +97,41 @@ public class ChecklistController {
     }
 
 
+//    /**
+//     * checklistId와 동일한 체크리스트 템플릿을 수정합니다.<br/>
+//     * request의 내용으로 제목과 항목을 수정합니다.
+//     * @param userId
+//     * @param checklistId
+//     * @param request 제목, 항목
+//     * @return NoneResponse
+//     */
+//    @PatchMapping("/{checklistId}")
+//    public ResponseEntity<Response<NoneResponse>> modifyChecklistTemplate(
+//            @AuthenticationPrincipal Long userId,
+//            @PathVariable @Positive @Valid Long checklistId,
+//            @RequestBody ChecklistUpdateRequest request) {
+//        SuccessResponse<NoneResponse> response = checklistService.modifyChecklistTemplate(userId, checklistId, request);
+//        return Response.success(response);
+//    }
+
+
     /**
-     * checklistId와 동일한 체크리스트 템플릿을 수정합니다.<br/>
+     * reservaionId에 맞는 체크리스트 템플릿을 수정합니다.<br/>
      * request의 내용으로 제목과 항목을 수정합니다.
      * @param userId
-     * @param checklistId
+     * @param reservationId
      * @param request 제목, 항목
      * @return NoneResponse
      */
-    @PatchMapping("/{checklistId}")
-    public ResponseEntity<Response<NoneResponse>> modifyChecklistTemplate(
+    @PatchMapping("/{reservationId}")
+    public ResponseEntity<Response<NoneResponse>> modifyChecklistByReservationId(
             @AuthenticationPrincipal Long userId,
-            @PathVariable @Positive @Valid Long checklistId,
+            @PathVariable @Positive @Valid Long reservationId,
             @RequestBody ChecklistUpdateRequest request) {
-        SuccessResponse<NoneResponse> response = checklistService.modifyChecklistTemplate(userId, checklistId, request);
+        SuccessResponse<NoneResponse> response = checklistService.modifyChecklistByReservationId(userId, reservationId, request);
         return Response.success(response);
     }
+
 
 
     /**
