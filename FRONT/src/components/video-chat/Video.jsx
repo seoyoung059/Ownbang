@@ -3,7 +3,6 @@ import React, { Component } from "react";
 import UserVideoComponent from "./UserVideoComponent";
 import VideoLoading from "./VideoLoading";
 import withNavigation from "./withNavigation";
-
 import {
   Container,
   Grid,
@@ -16,6 +15,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 
 import {
@@ -52,6 +55,8 @@ class Video extends Component {
       token: undefined,
       loading: true,
       isScreenSmall: window.innerWidth < 1024,
+      videoDevices: [],
+      selectedVideoDevice: "",
     };
 
     this.joinSession = this.joinSession.bind(this);
@@ -69,6 +74,7 @@ class Video extends Component {
       this.handleCloseEndSessionDialog.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
     this.updateScreenSize = this.updateScreenSize.bind(this);
+    this.handleVideoDeviceChange = this.handleVideoDeviceChange.bind(this);
   }
 
   async componentDidMount() {
@@ -89,14 +95,6 @@ class Video extends Component {
     } catch (error) {
       console.error("Failed to fetch user info:", error);
     }
-
-    if (this.state.session) {
-      this.state.session.on("sessionDisconnected", (event) => {
-        if (!this.props.user.isAgent) {
-          this.handleOpenEndSessionDialog();
-        }
-      });
-    }
   }
 
   componentWillUnmount() {
@@ -105,7 +103,7 @@ class Video extends Component {
     window.onpopstate = null;
 
     if (this.state.session) {
-      this.state.session.off("sessionDisconnected"); // 이벤트 핸들러 제거
+      this.state.session.off("sessionDisconnected");
     }
   }
 
@@ -154,15 +152,21 @@ class Video extends Component {
     }
   }
 
-  joinSession() {
+  async joinSession() {
     this.OV = new OpenVidu();
 
     this.setState(
       {
         session: this.OV.initSession(),
       },
-      () => {
+      async () => {
         var mySession = this.state.session;
+
+        this.state.session.on("sessionDisconnected", (event) => {
+          if (!this.props.user.isAgent) {
+            this.handleOpenEndSessionDialog();
+          }
+        });
 
         mySession.on("streamCreated", (event) => {
           var subscriber = mySession.subscribe(event.stream, undefined);
@@ -197,7 +201,8 @@ class Video extends Component {
             this.handleOpenEndSessionDialog();
           }
         });
-        this.props.enterVideoRoom(this.state.mySessionId).then((res) => {
+
+        this.props.enterVideoRoom(this.state.mySessionId).then(async (res) => {
           this.setState({ token: res.token });
           if (res.createdAt) {
             localStorage.setItem("createdAt", res.createdAt);
@@ -222,16 +227,11 @@ class Video extends Component {
               var videoDevices = devices.filter(
                 (device) => device.kind === "videoinput"
               );
-              var currentVideoDeviceId = publisher.stream
-                .getMediaStream()
-                .getVideoTracks()[0]
-                .getSettings().deviceId;
-              var currentVideoDevice = videoDevices.find(
-                (device) => device.deviceId === currentVideoDeviceId
-              );
-
               this.setState({
-                currentVideoDevice: currentVideoDevice,
+                videoDevices,
+                selectedVideoDevice:
+                  videoDevices.length > 0 ? videoDevices[0].deviceId : "",
+                currentVideoDevice: videoDevices[0],
                 publisher: publisher,
                 mainStreamManager: this.state.mainStreamManager || publisher,
                 loading: false,
@@ -304,6 +304,7 @@ class Video extends Component {
       this.cleanupSessionState();
     }
   }
+
   cleanupSessionState = () => {
     localStorage.removeItem("createdAt");
 
@@ -335,50 +336,36 @@ class Video extends Component {
   }
 
   async switchCamera() {
+    const { selectedVideoDevice, publisher } = this.state;
+
     try {
-      const devices = await this.OV.getDevices();
-      const videoDevices = devices.filter(
-        (device) => device.kind === "videoinput"
-      );
-
-      if (videoDevices.length > 1) {
-        const currentVideoDeviceIndex = videoDevices.findIndex(
-          (device) => device.deviceId === this.state.currentVideoDevice.deviceId
-        );
-
-        const newVideoDevice =
-          videoDevices[(currentVideoDeviceIndex + 1) % videoDevices.length];
-
-        // 기존 퍼블리셔의 스트림을 안전하게 중지
-        if (this.state.publisher) {
-          this.state.publisher.stream
-            .getTracks()
-            .forEach((track) => track.stop());
-        }
-
-        const newPublisher = await this.OV.initPublisherAsync(undefined, {
-          videoSource: newVideoDevice.deviceId,
-          publishAudio: true,
-          publishVideo: true,
-          mirror: false,
-        });
-
-        // 기존 퍼블리셔를 비동기적으로 언퍼블리시
-        await this.state.session.unpublish(this.state.publisher);
-
-        // 새 퍼블리셔를 비동기적으로 퍼블리시
-        await this.state.session.publish(newPublisher);
-
-        this.setState({
-          currentVideoDevice: newVideoDevice,
-          publisher: newPublisher,
-          mainStreamManager: newPublisher,
-        });
-      } else {
-        console.log(
-          "Alternative video devices not found or only one device available."
-        );
+      // 기존 퍼블리셔의 스트림을 안전하게 중지
+      if (publisher) {
+        publisher.stream.getTracks().forEach((track) => track.stop());
       }
+
+      // 새로 선택된 비디오 디바이스로 퍼블리셔 생성
+      const newPublisher = await this.OV.initPublisherAsync(undefined, {
+        videoSource: selectedVideoDevice, // 이 부분에서 선택된 비디오 디바이스를 사용합니다.
+        publishAudio: true,
+        publishVideo: true,
+        mirror: false,
+      });
+
+      // 기존 퍼블리셔 언퍼블리시
+      await this.state.session.unpublish(this.state.publisher);
+
+      // 새 퍼블리셔 퍼블리시
+      await this.state.session.publish(newPublisher);
+
+      // 상태 업데이트: 새로운 퍼블리셔와 현재 사용 중인 비디오 디바이스 업데이트
+      this.setState({
+        publisher: newPublisher,
+        mainStreamManager: newPublisher,
+        currentVideoDevice: this.state.videoDevices.find(
+          (device) => device.deviceId === selectedVideoDevice
+        ),
+      });
     } catch (error) {
       console.error("Error switching camera:", error);
 
@@ -387,6 +374,13 @@ class Video extends Component {
         await this.state.session.publish(this.state.publisher);
       }
     }
+  }
+
+  handleVideoDeviceChange(event) {
+    console.log(event);
+    this.setState({ selectedVideoDevice: event.target.value }, () => {
+      this.switchCamera();
+    });
   }
 
   toggleAudio() {
@@ -420,6 +414,8 @@ class Video extends Component {
       endSessionDialogOpen,
       loading,
       isScreenSmall,
+      videoDevices,
+      selectedVideoDevice,
     } = this.state;
 
     const isAgent = this.props.user.isAgent;
@@ -487,7 +483,7 @@ class Video extends Component {
                       />
                     </Box>
                   )}
-                  {mainStreamManager && isAgent && isScreenSmall && (
+                  {mainStreamManager && isAgent && (
                     <Box
                       style={{
                         position: "absolute",
@@ -495,13 +491,45 @@ class Video extends Component {
                         right: 16,
                       }}
                     >
-                      <IconButton
-                        color="primary"
-                        onClick={this.switchCamera}
-                        disabled={!mainStreamManager}
+                      <FormControl
+                        variant="outlined"
+                        size="small"
+                        sx={{ minWidth: 120, backgroundColor: "white" }}
                       >
-                        <SwitchCamera />
-                      </IconButton>
+                        <InputLabel
+                          id="camera-select-label"
+                          sx={{
+                            color: "#ffffff",
+                            textShadow: "1px 1px 2px rgba(0, 0, 0, 0.7)",
+                          }}
+                        >
+                          카메라 선택
+                        </InputLabel>
+                        <Select
+                          labelId="camera-select-label"
+                          id="camera-select"
+                          value={selectedVideoDevice}
+                          onChange={this.handleVideoDeviceChange}
+                          label="카메라 선택"
+                          sx={{
+                            backgroundColor: "white",
+                            color: "black",
+                          }}
+                        >
+                          {videoDevices.map((device) => (
+                            <MenuItem
+                              key={device.deviceId}
+                              value={device.deviceId}
+                              sx={{
+                                backgroundColor: "white",
+                                color: "black",
+                              }}
+                            >
+                              {device.label || `Camera ${device.deviceId}`}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </Box>
                   )}
                 </>

@@ -12,7 +12,7 @@ import {
   CircularProgress,
   Box,
 } from "@mui/material";
-import { useTheme } from "@mui/material";
+import { useTheme, useMediaQuery } from "@mui/material";
 import { useBoundStore } from "../../store/store";
 
 const MyRealEstate = () => {
@@ -22,6 +22,7 @@ const MyRealEstate = () => {
   }));
 
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
@@ -75,10 +76,12 @@ const MyRealEstate = () => {
       <Table sx={{ minWidth: 500 }}>
         <TableHead>
           <TableRow>
-            <TableCell align="center" sx={{ minWidth: 90 }}>
-              매물 사진
-            </TableCell>
-            <TableCell align="center" sx={{ minWidth: 200 }}>
+            {!isMobile && (
+              <TableCell align="center" sx={{ minWidth: 90 }}>
+                매물 사진
+              </TableCell>
+            )}
+            <TableCell align="center" sx={{ minWidth: 240 }}>
               매물 주소지
             </TableCell>
             <TableCell align="center" sx={{ minWidth: 60 }}>
@@ -118,18 +121,21 @@ const MyRealEstate = () => {
                 key={row.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell align="center">
-                  {row.profileImageUrl ? (
-                    <img
-                      src={row.profileImageUrl}
-                      width="150px"
-                      height="100px"
-                      style={{ borderRadius: "5px" }}
-                    />
-                  ) : (
-                    "No Image"
-                  )}
-                </TableCell>
+                {!isMobile && (
+                  <TableCell align="center">
+                    {row.profileImageUrl ? (
+                      <img
+                        src={row.profileImageUrl}
+                        width="150px"
+                        height="100px"
+                        style={{ borderRadius: "5px" }}
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </TableCell>
+                )}
+
                 <TableCell align="center">
                   {row.road ? row.road : "없음"}
                 </TableCell>

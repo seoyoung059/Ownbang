@@ -70,9 +70,6 @@ export default function MainPage() {
         </Typography>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
             mb: 48,
           }}
         >
@@ -109,10 +106,16 @@ export default function MainPage() {
           <Typography
             variant="h5"
             component="div"
-            sx={{ fontWeight: "bold", mb: 6, ml: 2 }}
+            sx={{
+              fontWeight: "bold",
+              mb: 6,
+              ml: 2,
+              wordBreak: "keep-all",
+              whiteSpace: "normal",
+            }}
           >
             <span style={{ color: theme.palette.primary.main }}>온방</span>이
-            제공하는 서비스를 확인해보세요! 🔎
+            제공하는 서비스를 확인해보세요!🔎
           </Typography>
           <Box
             sx={{
@@ -210,11 +213,17 @@ export default function MainPage() {
           <Typography
             variant="h5"
             component="div"
-            sx={{ fontWeight: "bold", mb: 6, mr: 2 }}
+            sx={{
+              fontWeight: "bold",
+              mb: 6,
+              mr: 2,
+              wordBreak: "keep-all",
+              whiteSpace: "normal",
+            }}
           >
             검색하고 근처{" "}
             <span style={{ color: theme.palette.primary.main }}>원룸</span>을
-            확인해보세요! 📷
+            확인해보세요!📷
           </Typography>
           <Box
             sx={{

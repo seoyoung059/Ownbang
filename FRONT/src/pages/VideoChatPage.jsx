@@ -11,10 +11,15 @@ import {
   Divider,
   useMediaQuery,
   Typography,
-  useTheme, // 이 부분 추가
+  useTheme,
+  Dialog,
+  DialogContent,
+  DialogContentText,
 } from "@mui/material";
 
 export default function VideoChatPage() {
+  const [openDialog, setOpenDialog] = useState(false);
+
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       event.preventDefault();
@@ -66,12 +71,31 @@ export default function VideoChatPage() {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
   const isMdScreen = useMediaQuery(theme.breakpoints.up("md"));
 
+  useEffect(() => {
+    if (user.isAgent && isSmallScreen) {
+      setOpenDialog(true);
+      const timer = setTimeout(() => {
+        setOpenDialog(false);
+      }, 2000); // 2초 후에 다이얼로그 닫기
+
+      return () => clearTimeout(timer);
+    }
+  }, [user.isAgent, isSmallScreen]);
+
   const handleLeaveSession = () => {
     navigate("/");
   };
 
   return (
     <Container sx={{ mt: 12 }}>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogContent>
+          <DialogContentText>
+            가로 모드에 최적화된 화면입니다.
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
+
       {!user.isAgent ? (
         <Grid
           container

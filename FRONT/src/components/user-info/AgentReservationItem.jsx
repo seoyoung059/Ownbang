@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   TableRow,
@@ -7,12 +7,19 @@ import {
   Typography,
   Box,
   Button,
+  Backdrop,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import {
   CheckCircleOutlined,
   CancelOutlined,
   PendingOutlined,
   HistoryOutlined,
+  FiberManualRecord,
 } from "@mui/icons-material";
 import { useMediaQuery, useTheme } from "@mui/material";
 
@@ -27,6 +34,8 @@ export default function AgentReservationItem({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
+
+  const [openBackdrop, setOpenBackdrop] = useState(false);
 
   const userInfo = reservation.userReservationInfoResponse;
 
@@ -79,6 +88,20 @@ export default function AgentReservationItem({
           ),
           text: "통화 완료",
         };
+      case "ENCODING":
+        return {
+          icon: (
+            <HistoryOutlined style={{ color: theme.palette.primary.dark }} />
+          ),
+          text: "통화 완료",
+        };
+      case "RECORDING":
+        return {
+          icon: (
+            <FiberManualRecord style={{ color: theme.palette.error.main }} />
+          ),
+          text: "녹화 중",
+        };
       default:
         return {
           icon: null,
@@ -122,9 +145,24 @@ export default function AgentReservationItem({
   };
 
   const onStartVideo = async () => {
+    if (isMobile) {
+      setOpenBackdrop(true);
+    } else {
+      navigate(`/video-chat/${reservation.id}`, {
+        state: { reservationId: reservation.id },
+      });
+    }
+  };
+
+  const handleConfirm = () => {
+    setOpenBackdrop(false);
     navigate(`/video-chat/${reservation.id}`, {
       state: { reservationId: reservation.id },
     });
+  };
+
+  const handleCloseBackdrop = () => {
+    setOpenBackdrop(false);
   };
 
   const onViewDetail = () => {
@@ -134,93 +172,113 @@ export default function AgentReservationItem({
   };
 
   return (
-    <TableRow>
-      {!isMobile && (
-        <TableCell sx={{ padding: "4px 8px" }}>
-          <Avatar
-            src={reservation.roomProfileImage}
-            variant="rounded"
-            sx={{ width: "150px", height: "90px", cursor: "pointer" }}
-            onClick={onViewDetail}
-          />
-        </TableCell>
-      )}
-      <TableCell>
-        <Typography variant={isMobile ? "body2" : "body1"}>
-          {reservationDate}
-        </Typography>
-      </TableCell>
-      <TableCell>
-        <Typography variant={isMobile ? "body2" : "body1"}>
-          {reservationTime}
-        </Typography>
-      </TableCell>
-      {!isMobile && (
-        <TableCell>
-          <Typography variant={"body1"}>{userInfo.userName}</Typography>
-        </TableCell>
-      )}
-      <TableCell>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {icon}
-          <Typography sx={{ ml: 1, whiteSpace: "nowrap" }} variant={"body1"}>
-            {text}
-          </Typography>
-        </Box>
-      </TableCell>
-      <TableCell>
-        <Button
-          color="primary"
-          onClick={onConfirm}
-          disabled={reservation.status !== "APPLYED"}
-          sx={{
-            px: 0,
-            py: 0,
-            minWidth: "auto",
-            fontSize: "0.875rem",
-            color: theme.palette.success.main,
-          }}
-        >
-          확정
-        </Button>
-        {" / "}
-        <Button
-          color="primary"
-          onClick={onDeny}
-          disabled={reservation.status !== "APPLYED"}
-          sx={{
-            px: 0,
-            py: 0,
-            minWidth: "auto",
-            fontSize: "0.875rem",
-            color: theme.palette.warning.main,
-          }}
-        >
-          거절
-        </Button>
-      </TableCell>
-      <TableCell>
-        <Typography variant={"body1"}>
-          {formatPhoneNumber(userInfo.phoneNumber)}
-        </Typography>
-      </TableCell>
-      <TableCell>
-        {reservation.status !== "COMPLETED" && (
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: theme.palette.success.main,
-              "&:hover": {
-                backgroundColor: theme.palette.success.main,
-              },
-            }}
-            disabled={!reservation.enstance}
-            onClick={onStartVideo}
-          >
-            입장하기
-          </Button>
+    <>
+      <TableRow>
+        {!isMobile && (
+          <TableCell sx={{ padding: "4px 8px" }}>
+            <Avatar
+              src={reservation.roomProfileImage}
+              variant="rounded"
+              sx={{ width: "150px", height: "90px", cursor: "pointer" }}
+              onClick={onViewDetail}
+            />
+          </TableCell>
         )}
-      </TableCell>
-    </TableRow>
+        <TableCell>
+          <Typography variant={isMobile ? "body2" : "body1"}>
+            {reservationDate}
+          </Typography>
+        </TableCell>
+        <TableCell>
+          <Typography variant={isMobile ? "body2" : "body1"}>
+            {reservationTime}
+          </Typography>
+        </TableCell>
+        {!isMobile && (
+          <TableCell>
+            <Typography variant={"body1"}>{userInfo.userName}</Typography>
+          </TableCell>
+        )}
+        <TableCell>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {icon}
+            <Typography sx={{ ml: 1, whiteSpace: "nowrap" }} variant={"body1"}>
+              {text}
+            </Typography>
+          </Box>
+        </TableCell>
+        <TableCell>
+          <Button
+            color="primary"
+            onClick={onConfirm}
+            disabled={reservation.status !== "APPLYED"}
+            sx={{
+              px: 0,
+              py: 0,
+              minWidth: "auto",
+              fontSize: "0.875rem",
+              color: theme.palette.success.main,
+            }}
+          >
+            확정
+          </Button>
+          {" / "}
+          <Button
+            color="primary"
+            onClick={onDeny}
+            disabled={reservation.status !== "APPLYED"}
+            sx={{
+              px: 0,
+              py: 0,
+              minWidth: "auto",
+              fontSize: "0.875rem",
+              color: theme.palette.warning.main,
+            }}
+          >
+            거절
+          </Button>
+        </TableCell>
+        <TableCell>
+          <Typography variant={"body1"}>
+            {formatPhoneNumber(userInfo.phoneNumber)}
+          </Typography>
+        </TableCell>
+        <TableCell>
+          {reservation.status !== "COMPLETED" && (
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: theme.palette.success.main,
+                "&:hover": {
+                  backgroundColor: theme.palette.success.main,
+                },
+              }}
+              disabled={!reservation.enstance}
+              onClick={onStartVideo}
+            >
+              입장하기
+            </Button>
+          )}
+        </TableCell>
+      </TableRow>
+      <Backdrop open={openBackdrop} sx={{ zIndex: theme.zIndex.drawer + 1 }}>
+        <Dialog open={openBackdrop} onClose={handleCloseBackdrop}>
+          <DialogTitle>입장 알림</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              화상 화면은 가로 모드로 입장해주세요.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseBackdrop} color="secondary">
+              취소
+            </Button>
+            <Button onClick={handleConfirm} color="primary">
+              확인
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Backdrop>
+    </>
   );
 }
