@@ -270,7 +270,7 @@ class Video extends Component {
   }
 
   async leaveSession() {
-    const { session, token, mySessionId } = this.state;
+    const { session, token, mySessionId, publisher } = this.state;
 
     if (session) {
       try {
@@ -338,48 +338,70 @@ class Video extends Component {
     navigate("/", { replace: true });
   }
 
+  // async switchCamera() {
+  //   const { selectedVideoDevice, publisher, session } = this.state;
+
+  //   try {
+  //     if (publisher && publisher.stream) {
+  //       publisher.stream
+  //         .getMediaStream()
+  //         .getTracks()
+  //         .forEach((track) => track.stop());
+  //     }
+
+  //     const newPublisher = await this.OV.initPublisherAsync(undefined, {
+  //       videoSource: selectedVideoDevice,
+  //       publishAudio: true,
+  //       publishVideo: true,
+  //       mirror: false,
+  //     });
+
+  //     if (session) {
+  //       await session.unpublish(publisher);
+  //     }
+
+  //     if (session) {
+  //       await session.publish(newPublisher);
+  //     }
+
+  //     this.setState({
+  //       publisher: newPublisher,
+  //       mainStreamManager: newPublisher,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error switching camera:", error);
+
+  //     if (publisher) {
+  //       try {
+  //         if (session) {
+  //           await session.publish(publisher);
+  //         }
+  //       } catch (recoveryError) {
+  //         console.error("Error during recovery:", recoveryError);
+  //       }
+  //     }
+  //   }
+  // }
+
   async switchCamera() {
-    const { selectedVideoDevice, publisher, session } = this.state;
+    const { selectedVideoDevice, publisher } = this.state;
 
     try {
-      if (publisher && publisher.stream) {
-        publisher.stream
-          .getMediaStream()
-          .getTracks()
-          .forEach((track) => track.stop());
-      }
-
-      const newPublisher = await this.OV.initPublisherAsync(undefined, {
+      // 새로운 비디오 트랙 생성
+      const newVideoTrack = await this.OV.getUserMedia({
         videoSource: selectedVideoDevice,
-        publishAudio: true,
-        publishVideo: true,
-        mirror: false,
       });
 
-      if (session) {
-        await session.unpublish(publisher);
-      }
+      // 기존 비디오 트랙을 새로운 트랙으로 교체
+      const videoTrack = newVideoTrack.getVideoTracks()[0];
+      await publisher.replaceTrack(videoTrack);
 
-      if (session) {
-        await session.publish(newPublisher);
-      }
-
+      // 상태 업데이트
       this.setState({
-        publisher: newPublisher,
-        mainStreamManager: newPublisher,
+        selectedVideoDevice: selectedVideoDevice,
       });
     } catch (error) {
       console.error("Error switching camera:", error);
-
-      if (publisher) {
-        try {
-          if (session) {
-            await session.publish(publisher);
-          }
-        } catch (recoveryError) {
-          console.error("Error during recovery:", recoveryError);
-        }
-      }
     }
   }
 
