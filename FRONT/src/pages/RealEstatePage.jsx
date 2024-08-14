@@ -4,7 +4,7 @@ import RealEstateSearchBar from "../components/real-estate/RealEstateSearchBar";
 import RealEstateList from "../components/real-estate/RealEstateList";
 import RealEstateDetail from "../components/real-estate/RealEstateDetail";
 import Reservation from "../components/real-estate/Reservation";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, CircularProgress } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material";
 import { useBoundStore } from "../store/store";
@@ -45,10 +45,12 @@ const RealEstatePage = () => {
   const [showReservation, setShowReservation] = React.useState(false);
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
 
+  const [loading, setLoading] = React.useState(false);
 
   useEffect(() => {
     if (selectedItem) {
-      getRoom(selectedItem.id);
+      setLoading(true);
+      getRoom(selectedItem.id).finally(() => setLoading(false));
     }
   }, [selectedItem, getRoom]);
 
@@ -155,86 +157,82 @@ const RealEstatePage = () => {
         <Box
           sx={{
             position: "fixed",
-            top: 0,
-            right: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0)", // 배경 색 투명
-            zIndex: 1000,
+            top: "12%",
+            right: "50%",
+            backgroundColor: theme.palette.background.default,
+            padding: 3,
+            borderRadius: 1,
+            boxShadow: 3,
+            width: "350px",
+            height: "80%",
+            overflow: "auto",
+            zIndex: 50,
           }}
-          onClick={onCloseDetailCard}
         >
-          <Box
+          <IconButton
+            onClick={onCloseDetailCard}
             sx={{
-              position: "fixed",
-              top: "12%",
-              right: "78.2%",
-              transform: "translateX(101%)",
-              backgroundColor: theme.palette.background.default,
-              padding: 3,
-              borderRadius: 1,
-              boxShadow: 3,
-              width: "350px",
-              height: "80%",
-              overflow: "auto",
-              zIndex: 50,
+              position: "absolute",
+              top: 8,
+              right: 8, // X 아이콘을 카드의 우측 상단으로 이동
             }}
-            onClick={(e) => e.stopPropagation()} // 디테일 창 닫기에서 제외
           >
-            <IconButton
-              onClick={onCloseDetailCard}
+            <CloseIcon />
+          </IconButton>
+          {loading ? (
+            <Box
               sx={{
-                position: "absolute",
-                top: 8,
-                right: 8, // X 아이콘을 카드의 우측 상단으로 이동
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
               }}
             >
-              <CloseIcon />
-            </IconButton>
+              <CircularProgress />
+            </Box>
+          ) : (
             <RealEstateDetail
               item={room}
               onOpenReservationCard={onOpenReservationCard}
               isAuthenticated={isAuthenticated}
               user={user}
             />
-          </Box>
-
-          {showReservation && (
-            <Box
-              sx={{
-                position: "absolute",
-                top: "12%",
-                right: "53%",
-                transform: "translateX(101%)",
-                backgroundColor: theme.palette.background.default,
-                padding: 3,
-                borderRadius: 1,
-                boxShadow: 3,
-                width: "350px",
-                height: "80%",
-                overflow: "auto",
-                zIndex: 50,
-              }}
-              onClick={(e) => e.stopPropagation()} // 예약 창 닫기에서 제외
-            >
-              <IconButton
-                onClick={onCloseReservationCard} // 예약 카드 닫기 핸들러
-                sx={{
-                  position: "absolute",
-                  top: 8,
-                  right: 8, // X 아이콘을 카드의 우측 상단으로 이동
-                }}
-              >
-                <CloseIcon />
-              </IconButton>
-              <Reservation
-                makeReservation={makeReservation}
-                item={selectedItem}
-                getAvailableTime={getAvailableTime}
-                getAgentAvailable={getAgentAvailable}
-              />
-            </Box>
           )}
+        </Box>
+      )}
+
+      {showReservation && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: "12%",
+            right: "22%",
+            backgroundColor: theme.palette.background.default,
+            padding: 3,
+            borderRadius: 1,
+            boxShadow: 3,
+            width: "350px",
+            height: "80%",
+            overflow: "auto",
+            zIndex: 999,
+          }}
+        >
+          <IconButton
+            onClick={onCloseReservationCard} // 예약 카드 닫기 핸들러
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8, // X 아이콘을 카드의 우측 상단으로 이동
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <Reservation
+            makeReservation={makeReservation}
+            item={selectedItem}
+            getAvailableTime={getAvailableTime}
+            getAgentAvailable={getAgentAvailable}
+          />
         </Box>
       )}
     </Box>

@@ -11,7 +11,7 @@ import { useTheme, useMediaQuery } from "@mui/material";
 import { Bookmark } from "@mui/icons-material";
 import { useBoundStore } from "../../store/store";
 
-export default function MyBookmarkItem({ bookmark }) {
+export default function MyBookmarkItem({ bookmark, onSelect }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -20,9 +20,10 @@ export default function MyBookmarkItem({ bookmark }) {
     getBookmarks: state.getBookmarks,
   }));
 
-  const handleToggleBookmark = async () => {
+  const handleToggleBookmark = async (event) => {
+    event.stopPropagation(); // 클릭 이벤트가 카드 클릭으로 전달되지 않게 함
     try {
-      await toggleBookmarks(bookmark.roomInfoSearchResponse.id); // 북마크를 토글
+      await toggleBookmarks(bookmark.roomInfoSearchResponse.id); // 북마크 토글
       await getBookmarks();
     } catch (error) {
       console.error("북마크 토글 실패:", error);
@@ -38,7 +39,9 @@ export default function MyBookmarkItem({ bookmark }) {
         height: 140,
         bgcolor: theme.palette.common.white,
         gap: 2,
+        cursor: "pointer", // 카드가 클릭 가능하다는 시각적 표시
       }}
+      onClick={() => onSelect(bookmark)} // 카드 클릭 시 onSelect 호출
     >
       <CardMedia
         component="img"
