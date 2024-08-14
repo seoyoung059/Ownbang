@@ -12,6 +12,7 @@ import {
   CancelOutlined,
   PendingOutlined,
   HistoryOutlined,
+  FiberManualRecord,
 } from "@mui/icons-material";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -58,6 +59,13 @@ export default function MyReservationItem({
             <HistoryOutlined style={{ color: theme.palette.primary.dark }} />
           ),
           text: "완료",
+        };
+      case "ENCODING":
+        return {
+          icon: (
+            <FiberManualRecord style={{ color: theme.palette.error.main }} />
+          ),
+          text: "처리 중",
         };
       default:
         return { icon: null, text: "알 수 없음" };
@@ -176,7 +184,7 @@ export default function MyReservationItem({
       <TableCell>
         {reservation.status === "ENCODING" ? (
           <Typography variant="body1" color="textSecondary">
-            녹화중
+            처리 중
           </Typography>
         ) : reservation.status !== "COMPLETED" ? (
           <Button
