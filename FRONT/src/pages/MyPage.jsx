@@ -76,15 +76,6 @@ export default function Mypage() {
         >
           찜한 목록
         </Button>
-        <Divider orientation="vertical" flexItem />
-        <Button
-          variant={tabValue === 2 ? "contained" : "outlined"}
-          size="large"
-          onClick={() => handleChange(2)}
-          sx={{ mx: 1 }}
-        >
-          체크리스트
-        </Button>
       </Box>
       <Box
         sx={{
@@ -103,9 +94,6 @@ export default function Mypage() {
           </TabPanel>
           <TabPanel value={tabValue} index={1}>
             <MyBookmarkList />
-          </TabPanel>
-          <TabPanel value={tabValue} index={2}>
-            <CheckList canEdit={false} />
           </TabPanel>
         </Box>
       </Box>

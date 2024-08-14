@@ -402,8 +402,8 @@ export default function RealEstateRegisterPage() {
                       label="공급 면적"
                       name="supplyArea"
                       value={basicInfo.supplyArea}
-                      onInput={handleNumberInput}
-                      onChange={handleDecimalInput}
+                      onChange={handleBasicInfoChange}
+                      onInput={handleDecimalInput}
                       placeholder="000.00㎡"
                     />
                   </Grid>
@@ -467,7 +467,7 @@ export default function RealEstateRegisterPage() {
                   name="exclusiveArea"
                   value={basicInfo.exclusiveArea}
                   onChange={handleBasicInfoChange}
-                  onInput={handleNumberInput}
+                  onInput={handleDecimalInput}
                   placeholder="000.00㎡"
                 />
               </Grid>
@@ -491,7 +491,7 @@ export default function RealEstateRegisterPage() {
               name="deposit"
               value={basicInfo.deposit}
               onChange={handleBasicInfoChange}
-              onInput={handleDecimalInput}
+              onInput={handleNumberInput}
               InputProps={{
                 endAdornment: (
                   <Typography sx={{ whiteSpace: "nowrap" }}>만원</Typography>
@@ -672,11 +672,10 @@ export default function RealEstateRegisterPage() {
             <TextField
               fullWidth
               label="주차 가능 비율"
-              type="number"
               name="parking"
               value={roomDetails.parking}
               onChange={handleRoomDetailChange}
-              onInput={handleNumberInput}
+              onInput={handleDecimalInput}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
