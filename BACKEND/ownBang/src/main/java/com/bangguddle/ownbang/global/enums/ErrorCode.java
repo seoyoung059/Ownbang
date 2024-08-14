@@ -36,6 +36,14 @@ public enum ErrorCode implements ResponseCode {
     RECORDING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "화상 통화 녹화 중 문제가 발생했습니다."),
     HLS_CONVERTING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "영상 변환 중 문제가 발생했습니다."),
 
+    // Room Create Argument Error
+    INVALID_DEALTYPE(HttpStatus.BAD_REQUEST, "적절하지 않은 거래 종류가 입력되었습니다."),
+    INVALID_ROOMTYPE(HttpStatus.BAD_REQUEST, "적절하지 않은 매물 종류가 입력되었습니다."),
+    INVALID_STRUCTURE(HttpStatus.BAD_REQUEST, "적절하지 않은 구조가 입력되었습니다."),
+    INVALID_HEATINGTYPE(HttpStatus.BAD_REQUEST, "적절하지 않은 난방 방식이 입력되었습니다."),
+    INVALID_FACING(HttpStatus.BAD_REQUEST, "적절하지 않은 방향이 입력되었습니다."),
+    INVALID_PURPOSE(HttpStatus.BAD_REQUEST, "적절하지 않은 용도가 입력되었습니다."),
+
     // Room API
     IMAGE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패하였습니다."),
     IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장에 실패하였습니다."),
