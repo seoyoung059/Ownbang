@@ -78,12 +78,14 @@ const RealEstateSearchBar = ({ isMain }) => {
         }}
       >
         <Grid container spacing={1}>
-          <Grid item xs={11}>
+          <Grid item xs={isSm ? 9.5 : 11}>
             <Input
               type="text"
               placeholder={
                 isMain
-                  ? "원하시는 원룸의 지역명, 지하철역, 학교명을 입력해주세요"
+                  ? !isSm
+                    ? "원하시는 원룸의 지역명, 학교명, 지하철역을 입력해주세요"
+                    : "지역명, 학교명, 지하철역"
                   : "지역명, 학교명, 역명으로 검색하세요"
               }
               value={inputValue}
@@ -101,7 +103,7 @@ const RealEstateSearchBar = ({ isMain }) => {
               }}
             />
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={isSm ? 2.5 : 1}>
             <Button
               variant="contained"
               onClick={onSearchInputValue}

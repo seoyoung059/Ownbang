@@ -147,6 +147,28 @@ export default function RealEstateRegisterPage() {
     });
   };
 
+  const handleNumberInput = (event) => {
+    const value = event.target.value;
+    event.target.value = value.replace(/[^0-9]/g, "");
+  };
+
+  const handleDecimalInput = (event) => {
+    let value = event.target.value;
+    value = value.replace(/[^0-9.]/g, "");
+    if ((value.match(/\./g) || []).length > 1) {
+      value = value.substring(0, value.length - 1);
+    }
+    const parts = value.split(".");
+    if (parts[1] && parts[1].length > 3) {
+      parts[1] = parts[1].substring(0, 3);
+      value = parts.join(".");
+    }
+    if (parseFloat(value) > 1000) {
+      value = "999";
+    }
+    event.target.value = value;
+  };
+
   const onBoundsChange = (markers) => {
     setVisibleMarkers(markers);
   };
@@ -207,7 +229,7 @@ export default function RealEstateRegisterPage() {
       if (error.response.data.status === 413) {
         setErrMsg("이미지 용량 초과입니다.");
       } else if (error.response.data.status === 400) {
-        setErrMsg("잘못된 입력이 있습니다. 수정하고 다시 시도하세요.");
+        setErrMsg(error.response.data.data);
       }
       setIsSubmitting(false); // 실패 시 버튼 활성화
     }
@@ -334,6 +356,7 @@ export default function RealEstateRegisterPage() {
                       name="buildingFloor"
                       value={roomDetails.buildingFloor}
                       onChange={handleRoomDetailChange}
+                      onInput={handleNumberInput}
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -343,6 +366,7 @@ export default function RealEstateRegisterPage() {
                       name="roomFloor"
                       value={basicInfo.roomFloor}
                       onChange={handleBasicInfoChange}
+                      onInput={handleNumberInput}
                     />
                   </Grid>
                   <Grid
@@ -368,6 +392,7 @@ export default function RealEstateRegisterPage() {
                       name="exclusiveArea"
                       value={basicInfo.exclusiveArea}
                       onChange={handleBasicInfoChange}
+                      onInput={handleDecimalInput}
                       placeholder="000.00㎡"
                     />
                   </Grid>
@@ -377,7 +402,8 @@ export default function RealEstateRegisterPage() {
                       label="공급 면적"
                       name="supplyArea"
                       value={basicInfo.supplyArea}
-                      onChange={handleBasicInfoChange}
+                      onInput={handleNumberInput}
+                      onChange={handleDecimalInput}
                       placeholder="000.00㎡"
                     />
                   </Grid>
@@ -403,6 +429,7 @@ export default function RealEstateRegisterPage() {
                   label="건물 층"
                   name="buildingFloor"
                   value={roomDetails.buildingFloor}
+                  onInput={handleNumberInput}
                   onChange={handleRoomDetailChange}
                 />
               </Grid>
@@ -413,6 +440,7 @@ export default function RealEstateRegisterPage() {
                   name="roomFloor"
                   value={basicInfo.roomFloor}
                   onChange={handleBasicInfoChange}
+                  onInput={handleNumberInput}
                 />
               </Grid>
               <Grid
@@ -439,6 +467,7 @@ export default function RealEstateRegisterPage() {
                   name="exclusiveArea"
                   value={basicInfo.exclusiveArea}
                   onChange={handleBasicInfoChange}
+                  onInput={handleNumberInput}
                   placeholder="000.00㎡"
                 />
               </Grid>
@@ -449,6 +478,7 @@ export default function RealEstateRegisterPage() {
                   name="supplyArea"
                   value={basicInfo.supplyArea}
                   onChange={handleBasicInfoChange}
+                  onInput={handleDecimalInput}
                   placeholder="000.00㎡"
                 />
               </Grid>
@@ -461,6 +491,7 @@ export default function RealEstateRegisterPage() {
               name="deposit"
               value={basicInfo.deposit}
               onChange={handleBasicInfoChange}
+              onInput={handleDecimalInput}
               InputProps={{
                 endAdornment: (
                   <Typography sx={{ whiteSpace: "nowrap" }}>만원</Typography>
@@ -475,6 +506,7 @@ export default function RealEstateRegisterPage() {
               name="monthlyRent"
               value={basicInfo.monthlyRent}
               onChange={handleBasicInfoChange}
+              onInput={handleNumberInput}
               InputProps={{
                 endAdornment: (
                   <Typography sx={{ whiteSpace: "nowrap" }}>만원</Typography>
@@ -489,6 +521,7 @@ export default function RealEstateRegisterPage() {
               name="maintenanceFee"
               value={basicInfo.maintenanceFee}
               onChange={handleBasicInfoChange}
+              onInput={handleNumberInput}
               InputProps={{
                 endAdornment: (
                   <Typography sx={{ whiteSpace: "nowrap" }}>만원</Typography>
@@ -566,6 +599,7 @@ export default function RealEstateRegisterPage() {
               name="roomCount"
               value={roomDetails.roomCount}
               onChange={handleRoomDetailChange}
+              onInput={handleNumberInput}
               placeholder=""
             />
           </Grid>
@@ -577,6 +611,7 @@ export default function RealEstateRegisterPage() {
               name="bathroomCount"
               value={roomDetails.bathroomCount}
               onChange={handleRoomDetailChange}
+              onInput={handleNumberInput}
             />
           </Grid>
           <Grid item xs={12} sm={3}>
@@ -630,6 +665,7 @@ export default function RealEstateRegisterPage() {
               name="totalParking"
               value={roomDetails.totalParking}
               onChange={handleRoomDetailChange}
+              onInput={handleNumberInput}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -640,6 +676,7 @@ export default function RealEstateRegisterPage() {
               name="parking"
               value={roomDetails.parking}
               onChange={handleRoomDetailChange}
+              onInput={handleNumberInput}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
