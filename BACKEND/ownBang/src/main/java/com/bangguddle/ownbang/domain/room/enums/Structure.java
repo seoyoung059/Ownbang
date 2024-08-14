@@ -1,5 +1,7 @@
 package com.bangguddle.ownbang.domain.room.enums;
 
+import com.bangguddle.ownbang.global.enums.ErrorCode;
+import com.bangguddle.ownbang.global.handler.AppException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
@@ -25,7 +27,7 @@ public enum Structure {
     public static Structure fromValue(String value) {
         Structure result = STRUCTURE_MAP.get(value);
         if (result == null) {
-            throw new IllegalArgumentException("Invalid value '" + value + "'");
+            throw new AppException(ErrorCode.INVALID_STRUCTURE);
         }
         return result;
     }
