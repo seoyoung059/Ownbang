@@ -48,11 +48,14 @@ const CheckListItem = ({
           gap: "10px",
         }}
       >
-        {canEdit && !forReplay ? (
+        {
+        /* canEdit(chat, replay)에서 replay가 아니면 => chat*/
+        canEdit && !forReplay ? (
           <IconButton
             onClick={onToggleCheck}
             sx={{ width: "20px", height: "20px" }}
           >
+            {/* 체크 여부에 따라 */}
             {isDone ? (
               <AccessTimeIcon sx={{ color: theme.palette.success.main }} />
             ) : (
@@ -78,7 +81,9 @@ const CheckListItem = ({
           gap: "10px",
         }}
       >
-        {canEdit &&
+        {
+        /* chat, replay에서 isDone(체크됨)이면 타임스탬프 표시 */
+        canEdit &&
           isDone && ( // isDone이 true일 때만 타임스탬프 표시
             <Button
               onClick={onClickTimestamp}
