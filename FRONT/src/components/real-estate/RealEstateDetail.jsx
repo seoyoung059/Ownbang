@@ -13,10 +13,10 @@ import { useTheme } from "@mui/material/styles";
 
 const RealEstateDetail = ({
   item,
-  loading, // 로딩 상태 추가
   onOpenReservationCard,
   isAuthenticated,
   user,
+  loading,
   showReservationButton = true,
 }) => {
   const theme = useTheme();
@@ -56,17 +56,19 @@ const RealEstateDetail = ({
 
   return (
     <Box sx={styles.container}>
-      <Box sx={{ marginTop: 2 }}>
-        <RealEstateImages images={images} user={user} />
-        <Typography variant="h5" sx={styles.title}>
-          {item.dealType} {item.deposit}/{item.monthlyRent}
-          <Typography variant="subtitle2" color="text.secondary">
-            Location: {item.parcel}
+      {item && (
+        <Box sx={{ marginTop: 2 }}>
+          <RealEstateImages images={images} user={user} />
+          <Typography variant="h5" sx={styles.title}>
+            {item.dealType} {item.deposit}/{item.monthlyRent}
+            <Typography variant="subtitle2" color="text.secondary">
+              Location: {item.parcel}
+            </Typography>
+            <Divider variant="middle" sx={{ margin: 2 }} />
           </Typography>
-          <Divider variant="middle" sx={{ margin: 2 }} />
-        </Typography>
-        <RealEstateDescription item={item} />
-      </Box>
+          <RealEstateDescription item={item} />
+        </Box>
+      )}
 
       {!user.isAgent && (
         <Box>
