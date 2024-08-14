@@ -91,16 +91,9 @@ export default function AgentReservationItem({
       case "ENCODING":
         return {
           icon: (
-            <HistoryOutlined style={{ color: theme.palette.primary.dark }} />
-          ),
-          text: "통화 완료",
-        };
-      case "RECORDING":
-        return {
-          icon: (
             <FiberManualRecord style={{ color: theme.palette.error.main }} />
           ),
-          text: "녹화 중",
+          text: "처리 중",
         };
       default:
         return {
