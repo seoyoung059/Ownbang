@@ -4,7 +4,7 @@ import RealEstateSearchBar from "../components/real-estate/RealEstateSearchBar";
 import RealEstateList from "../components/real-estate/RealEstateList";
 import RealEstateDetail from "../components/real-estate/RealEstateDetail";
 import Reservation from "../components/real-estate/Reservation";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, CircularProgress } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material";
 import { useBoundStore } from "../store/store";
@@ -45,9 +45,12 @@ const RealEstatePage = () => {
   const [showReservation, setShowReservation] = React.useState(false);
   const [visibleMarkers, setVisibleMarkers] = React.useState([]);
 
+  const [loading, setLoading] = React.useState(false);
+
   useEffect(() => {
     if (selectedItem) {
-      getRoom(selectedItem.id);
+      setLoading(true);
+      getRoom(selectedItem.id).finally(() => setLoading(false));
     }
   }, [selectedItem, getRoom]);
 
@@ -176,12 +179,25 @@ const RealEstatePage = () => {
           >
             <CloseIcon />
           </IconButton>
-          <RealEstateDetail
-            item={room}
-            onOpenReservationCard={onOpenReservationCard}
-            isAuthenticated={isAuthenticated}
-            user={user}
-          />
+          {loading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : (
+            <RealEstateDetail
+              item={room}
+              onOpenReservationCard={onOpenReservationCard}
+              isAuthenticated={isAuthenticated}
+              user={user}
+            />
+          )}
         </Box>
       )}
 
