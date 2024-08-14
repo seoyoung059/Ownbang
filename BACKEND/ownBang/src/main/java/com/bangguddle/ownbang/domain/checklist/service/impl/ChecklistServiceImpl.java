@@ -104,6 +104,27 @@ public class ChecklistServiceImpl implements ChecklistService {
         return new SuccessResponse<>(CHECKLIST_FIND_SUCCESS, response);
     }
 
+    /**
+     * reservationId에 맞는 체크리스트 객체를 반환합니다.
+     * @param userId
+     * @param reservationId
+     * @return ChecklistSearchResponse
+     */
+    @Override
+    public SuccessResponse<ChecklistSearchResponse> getChecklistByReservationId(final Long userId,
+                                                                 final Long reservationId) {
+        // userid 유효성 검사
+        User user = userRepository.getById(userId);
+        Reservation reservation = reservationRepository.getById(reservationId);
+
+        // checklist 조회 - checklist & user 이용
+        Checklist checklist = checklistRepository.findByUserAndReservation(user, reservation)
+                .orElseThrow(() -> new AppException(BAD_REQUEST));
+
+        // 반환
+        ChecklistSearchResponse response = ChecklistSearchResponse.from(checklist);
+        return new SuccessResponse<>(CHECKLIST_FIND_SUCCESS, response);
+    }
 
     /**
      * 체크리스트 템플릿 목록을 반환합니다.
@@ -142,6 +163,34 @@ public class ChecklistServiceImpl implements ChecklistService {
 
         // checklistId 유효성 검사 - checklist & user 이용
         Checklist checklist = validateTemplateByIdAndUser(checklistId, userId);
+
+        // update
+        checklist.update(request.title(), request.contentsToString());
+        checklistRepository.save(checklist);
+
+        return new SuccessResponse<>(CHECKLIST_UPDATE_SUCCESS, NoneResponse.NONE);
+    }
+
+    /**
+     * checklistId에 해당하는 체크리스트 템플릿을 수정합니다. <br/>
+     * 제목과 항목들이 덮어쓰기 됩니다.
+     * @param userId
+     * @param reservationId
+     * @param request 제목, 항목
+    public SuccessResponse<NoneResponse> modifyChecklistTemplate(final Long userId,
+     * @return
+     */
+    @Override
+    public SuccessResponse<NoneResponse> modifyChecklistByReservationId(final Long userId,
+                                                                 final Long reservationId,
+                                                                 final ChecklistUpdateRequest request) {
+        // userid 유효성 검사
+        User user = userRepository.getById(userId);
+        Reservation reservation = reservationRepository.getById(reservationId);
+
+        // checklistId 유효성 검사 - checklist & user 이용
+        Checklist checklist = checklistRepository.findByUserAndReservation(user, reservation)
+                .orElseThrow(() -> new AppException(BAD_REQUEST));
 
         // update
         checklist.update(request.title(), request.contentsToString());
