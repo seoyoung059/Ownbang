@@ -8,41 +8,37 @@ import { useTheme } from "@emotion/react";
 
 export default function TimePicker({ handleInputChange, userInfo }) {
   const theme = useTheme();
-  const [weekdayStart, setWeekdayStart] = React.useState(
-    dayjs().hour(9).minute(0)
-  );
-  const [weekdayClose, setWeekdayClose] = React.useState(
-    dayjs().hour(18).minute(0)
-  );
-  const [weekendStart, setWeekendStart] = React.useState(
-    dayjs().hour(9).minute(0)
-  );
-  const [weekendClose, setWeekendClose] = React.useState(
-    dayjs().hour(18).minute(0)
-  );
 
-  // userInfo가 변경될 때마다 초기값 설정
+  // 기본값을 09:00 ~ 18:00으로 설정
+  const defaultStartTime = dayjs().hour(9).minute(0);
+  const defaultEndTime = dayjs().hour(18).minute(0);
+
+  const [weekdayStart, setWeekdayStart] = React.useState(defaultStartTime);
+  const [weekdayClose, setWeekdayClose] = React.useState(defaultEndTime);
+  const [weekendStart, setWeekendStart] = React.useState(defaultStartTime);
+  const [weekendClose, setWeekendClose] = React.useState(defaultEndTime);
+
   useEffect(() => {
     if (userInfo) {
       setWeekdayStart(
         userInfo.weekdayStartTime
           ? dayjs(userInfo.weekdayStartTime, "HH:mm")
-          : dayjs().hour(9).minute(0)
+          : defaultStartTime
       );
       setWeekdayClose(
         userInfo.weekdayEndTime
           ? dayjs(userInfo.weekdayEndTime, "HH:mm")
-          : dayjs().hour(18).minute(0)
+          : defaultEndTime
       );
       setWeekendStart(
         userInfo.weekendStartTime
           ? dayjs(userInfo.weekendStartTime, "HH:mm")
-          : dayjs().hour(9).minute(0)
+          : defaultStartTime
       );
       setWeekendClose(
         userInfo.weekendEndTime
           ? dayjs(userInfo.weekendEndTime, "HH:mm")
-          : dayjs().hour(18).minute(0)
+          : defaultEndTime
       );
     }
   }, [userInfo]);
