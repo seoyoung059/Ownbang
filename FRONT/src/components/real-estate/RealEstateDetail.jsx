@@ -2,7 +2,13 @@ import React from "react";
 import RealEstateImages from "./RealEstateImages";
 import RealEstateDescription from "./RealEstateDescription";
 import AgentInfo from "./AgentInfo";
-import { Button, Typography, Box, Divider } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Box,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 const RealEstateDetail = ({
@@ -10,9 +16,25 @@ const RealEstateDetail = ({
   onOpenReservationCard,
   isAuthenticated,
   user,
+  loading,
   showReservationButton = true,
 }) => {
   const theme = useTheme();
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   // item과 item.roomImageResponses가 존재하는지 확인 후, 이미지 URL 배열 생성
   const images =
@@ -34,18 +56,19 @@ const RealEstateDetail = ({
 
   return (
     <Box sx={styles.container}>
-      <Box sx={{ marginTop: 2 }}>
-        {/* RealEstateImages에 이미지 배열 전달 */}
-        <RealEstateImages images={images} user={user} />
-        <Typography variant="h5" sx={styles.title}>
-          {item.dealType} {item.deposit}/{item.monthlyRent}
-          <Typography variant="subtitle2" color="text.secondary">
-            Location: {item.parcel}
+      {item && (
+        <Box sx={{ marginTop: 2 }}>
+          <RealEstateImages images={images} user={user} />
+          <Typography variant="h5" sx={styles.title}>
+            {item.dealType} {item.deposit}/{item.monthlyRent}
+            <Typography variant="subtitle2" color="text.secondary">
+              Location: {item.parcel}
+            </Typography>
+            <Divider variant="middle" sx={{ margin: 2 }} />
           </Typography>
-          <Divider variant="middle" sx={{ margin: 2 }} />
-        </Typography>
-        <RealEstateDescription item={item} />
-      </Box>
+          <RealEstateDescription item={item} />
+        </Box>
+      )}
 
       {!user.isAgent && (
         <Box>

@@ -15,12 +15,13 @@ import {
   IconButton,
 } from "@mui/material";
 import AgentReservationItem from "./AgentReservationItem";
-import { useMediaQuery, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import RealEstateDetail from "../real-estate/RealEstateDetail";
+import Reservation from "../real-estate/Reservation";
+import { useTheme, useMediaQuery } from "@mui/material";
 import { useBoundStore } from "../../store/store";
 
-function AgentReservationList() {
+const AgentReservationList = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -31,6 +32,8 @@ function AgentReservationList() {
     denyReservation,
     getRoom,
     room,
+    makeReservation,
+    getAgentAvailable,
   } = useBoundStore((state) => ({
     getAgentReservationList: state.getAgentReservationList,
     agentReservations: state.agentReservations,
@@ -38,6 +41,8 @@ function AgentReservationList() {
     denyReservation: state.denyReservation,
     getRoom: state.getRoom,
     room: state.room,
+    makeReservation: state.makeReservation,
+    getAgentAvailable: state.getAgentAvailable,
   }));
 
   const [loading, setLoading] = useState(true);
@@ -81,6 +86,11 @@ function AgentReservationList() {
   const handleCloseDetail = () => {
     setSelectedItem(null);
     setShowDetail(false);
+    setShowReservation(false);
+  };
+
+  const handleOpenReservationCard = () => {
+    setShowReservation(true);
   };
 
   if (loading) {
@@ -112,109 +122,97 @@ function AgentReservationList() {
       : 0;
 
   return (
-    <Box sx={{ width: "100%", height: "100%" }}>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {!isMobile && (
-                <TableCell sx={{ minWidth: 150 }}>매물 사진</TableCell>
-              )}
-              <TableCell sx={{ minWidth: 100 }}>예약 날짜</TableCell>
-              <TableCell sx={{ minWidth: 90 }}>예약 시간</TableCell>
-              {!isMobile && (
-                <TableCell sx={{ minWidth: 80 }}>예약자명</TableCell>
-              )}
-              <TableCell sx={{ minWidth: 100 }}>예약 상태</TableCell>
-              <TableCell sx={{ minWidth: 80 }}>상태 변경</TableCell>
-              <TableCell sx={{ minWidth: 130 }}>전화번호</TableCell>
-              <TableCell sx={{ minWidth: 100 }}>통화</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody sx={{ bgcolor: theme.palette.background.default }}>
-            {agentReservations
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((reservation) => (
-                <AgentReservationItem
-                  key={reservation.id}
-                  reservation={reservation}
-                  confirmReservation={confirmReservation}
-                  denyReservation={denyReservation}
-                  getAgentReservationList={getAgentReservationList}
-                  onSelectItem={handleSelectItem}
-                />
-              ))}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: `calc(53px * ${emptyRows})` }}>
-                <TableCell colSpan={8} />
+    <Box>
+      <Box sx={{ width: "100%", height: "100%" }}>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {!isMobile && (
+                  <TableCell sx={{ minWidth: 150 }}>매물 사진</TableCell>
+                )}
+                <TableCell sx={{ minWidth: 100 }}>예약 날짜</TableCell>
+                <TableCell sx={{ minWidth: 90 }}>예약 시간</TableCell>
+                {!isMobile && (
+                  <TableCell sx={{ minWidth: 80 }}>예약자명</TableCell>
+                )}
+                <TableCell sx={{ minWidth: 100 }}>예약 상태</TableCell>
+                <TableCell sx={{ minWidth: 80 }}>상태 변경</TableCell>
+                <TableCell sx={{ minWidth: 130 }}>전화번호</TableCell>
+                <TableCell sx={{ minWidth: 100 }}>통화</TableCell>
               </TableRow>
-            )}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[10, 25, 50]}
-                count={agentReservations.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </TableContainer>
-
-      {showDetail && selectedItem && (
+            </TableHead>
+            <TableBody sx={{ bgcolor: theme.palette.background.default }}>
+              {agentReservations
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((reservation) => (
+                  <AgentReservationItem
+                    key={reservation.id}
+                    reservation={reservation}
+                    confirmReservation={confirmReservation}
+                    denyReservation={denyReservation}
+                    getAgentReservationList={getAgentReservationList}
+                    onSelectItem={handleSelectItem}
+                  />
+                ))}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: `calc(53px * ${emptyRows})` }}>
+                  <TableCell colSpan={8} />
+                </TableRow>
+              )}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[10, 25, 50]}
+                  count={agentReservations.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </TableContainer>
+      </Box>
+      {selectedItem && (
         <Box
           sx={{
             position: "fixed",
-            top: 0,
-            right: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            zIndex: 1000,
+            top: "55%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: theme.palette.background.default,
+            padding: 3,
+            borderRadius: 1,
+            boxShadow: 3,
+            width: "800px",
+            height: "80%",
+            overflow: "auto",
+            zIndex: 50,
           }}
-          onClick={handleCloseDetail}
         >
-          <Box
+          <IconButton
+            onClick={handleCloseDetail}
             sx={{
-              position: "fixed",
-              top: "10%",
-              right: "10%",
-              backgroundColor: theme.palette.background.default,
-              padding: 3,
-              borderRadius: 1,
-              boxShadow: 3,
-              width: "60%",
-              height: "80%",
-              overflow: "auto",
-              zIndex: 1001,
+              position: "absolute",
+              top: 8,
+              right: 8,
             }}
-            onClick={(e) => e.stopPropagation()}
           >
-            <IconButton
-              onClick={handleCloseDetail}
-              sx={{
-                position: "absolute",
-                top: 8,
-                right: 8,
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-            <RealEstateDetail
-              item={room}
-              onOpenReservationCard={() => {}}
-              isAuthenticated={true}
-              user={{ isAgent: true }}
-            />
-          </Box>
+            <CloseIcon />
+          </IconButton>
+          <RealEstateDetail
+            item={room}
+            onOpenReservationCard={handleOpenReservationCard}
+            isAuthenticated={true}
+            user={{ isAgent: true }}
+          />
         </Box>
       )}
     </Box>
   );
-}
+};
 
 export default AgentReservationList;
