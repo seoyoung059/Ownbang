@@ -18,18 +18,19 @@ public record RoomCreateRequest(
         Float latitude,
         @NotNull(message = "주소를 다시 검색하여 입력해 주세요.")
         Float longitude,
-        @NotNull(message = "거래 종류를 선택해주세요.")
-        DealType dealType,
-        @NotNull(message = "매물 종류를 선택해주세요.")
-        RoomType roomType,
-        @NotNull(message = "구조를 선택해주세요.")
-        Structure structure,
+        @NotBlank(message = "거래 종류를 선택해주세요.")
+        String dealType,
+        @NotBlank(message = "매물 종류를 선택해주세요.")
+        String roomType,
+        @NotBlank(message = "구조를 선택해주세요.")
+        String structure,
+        @NotNull
         Boolean isLoft,
         @NotNull(message = "전용 면적을 입력해주세요.")
         @Digits(integer = 3, fraction = 2, message = "적절한 값을 입력해 주세요. (1000 미만, 소숫점 두자리 수 까지 가능)")
         @Positive(message = "양수만 입력 가능합니다.")
         Float exclusiveArea,
-        @NotNull(message = "전용 면적을 입력해주세요.")
+        @NotNull(message = "공급 면적을 입력해주세요.")
         @Digits(integer = 3, fraction = 2, message = "적절한 값을 입력해 주세요. (1000 미만, 소숫점 두자리 수 까지 가능)")
         @Positive(message = "양수만 입력 가능합니다.")
         Float supplyArea,
@@ -77,9 +78,9 @@ public record RoomCreateRequest(
         return RoomCreateRequest.builder()
                 .latitude(latitude)
                 .longitude(longitude)
-                .dealType(dealType)
-                .roomType(roomType)
-                .structure(structure)
+                .dealType(dealType.getValue())
+                .roomType(roomType.getValue())
+                .structure(structure.getValue())
                 .isLoft(isLoft)
                 .exclusiveArea(exclusiveArea)
                 .supplyArea(supplyArea)
@@ -100,9 +101,9 @@ public record RoomCreateRequest(
                 .agent(agent)
                 .latitude(latitude)
                 .longitude(longitude)
-                .dealType(dealType)
-                .roomType(roomType)
-                .structure(structure)
+                .dealType(DealType.fromValue(dealType))
+                .roomType(RoomType.fromValue(roomType))
+                .structure(Structure.fromValue(structure))
                 .isLoft(isLoft)
                 .exclusiveArea(exclusiveArea)
                 .supplyArea(supplyArea)
