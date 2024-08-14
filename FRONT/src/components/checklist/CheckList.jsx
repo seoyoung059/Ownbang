@@ -5,7 +5,7 @@ import CheckListList from "./CheckListList";
 import CheckListAddInput from "./CheckListAddInput";
 import { useBoundStore } from "../../store/store";
 
-const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
+const CheckList = ({ reservationId, canEdit, onTimestampClick, forReplay }) => {
   const {
     checklist,
     fetchCheckLists,
@@ -27,16 +27,16 @@ const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchChecklists = async () => {
+    const fetchChecklists = async (id) => {
       setLoading(true);
       try {
-        await fetchCheckLists();
+        await fetchCheckLists(id);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchChecklists();
+    fetchChecklists(reservationId);
   }, [fetchCheckLists]);
 
   useEffect(() => {
@@ -50,13 +50,13 @@ const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
     }
   }, [selectedTitle, checklist]);
 
-  const updateChecklistAndFetch = async (updatedChecklist) => {
+  const updateChecklistAndFetch = async (reservationId, updatedChecklist) => {
     setSelectedChecklist(updatedChecklist);
-    await modifyCheckLists(updatedChecklist.checklistId, {
+    await modifyCheckLists(reservationId, {
       title: updatedChecklist.title,
       contents: updatedChecklist.contents,
     });
-    fetchCheckLists();
+    fetchCheckLists(reservationId);
   };
 
   const formatTimeDiff = (timeDiffMinutes) => {
@@ -77,7 +77,7 @@ const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
     // contents를 업데이트하면서 새 항목을 마지막에 추가하도록 함
     setSelectedChecklist(updatedChecklist);
 
-    await modifyCheckLists(updatedChecklist.checklistId, {
+    await modifyCheckLists(reservationId, {
       title: updatedChecklist.title,
       contents: updatedChecklist.contents,
     });
@@ -104,7 +104,7 @@ const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
 
     console.log(formatTimeDiff(timeDiffSeconds));
 
-    await updateChecklistAndFetch(updatedChecklist);
+    await updateChecklistAndFetch(reservationId, updatedChecklist);
   };
 
   const onDelete = async (key) => {
@@ -113,7 +113,7 @@ const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
       ...selectedChecklist,
       contents: rest,
     };
-    await updateChecklistAndFetch(updatedChecklist);
+    await updateChecklistAndFetch(reservationId, updatedChecklist);
   };
 
   const addTemplate = async (title) => {
@@ -126,7 +126,7 @@ const CheckList = ({ canEdit, onTimestampClick, forReplay }) => {
   };
 
   const modifyTemplateTitle = async (newTitle) => {
-    await modifyCheckLists(selectedChecklist.id, {
+    await modifyCheckLists(reservationId, {
       title: newTitle,
       contents: selectedChecklist.contents,
     });

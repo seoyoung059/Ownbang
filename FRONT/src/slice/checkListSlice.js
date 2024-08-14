@@ -1,6 +1,7 @@
 import {
   getChecklists,
-  pathChecklists,
+  getChecklist,
+  patchChecklists,
   addChecklist,
   deleteChecklist,
   addChecklist_video,
@@ -9,14 +10,19 @@ import {
 export const createCheckListSlice = (set) => ({
   checklist: [],
 
-  fetchCheckLists: async () => {
-    const result = await getChecklists();
-    set({ checklist: result.data.data });
-    console.log(result.data.data);
+  fetchCheckLists: async (id) => {
+    // const result = await getChecklists();
+    // set({ checklist: result.data.data });
+    // console.log(result.data.data);
+
+    // id에 맞는 체크리스트 하나만 가져와서 목록에 넣음
+    const result = await getChecklist(id);
+    set({checklist: [result.data]});
+    console.log(result.data);
   },
 
   modifyCheckLists: async (id, data) => {
-    const result = await pathChecklists(id, data);
+    const result = await patchChecklists(id, data);
     console.log(result);
   },
 

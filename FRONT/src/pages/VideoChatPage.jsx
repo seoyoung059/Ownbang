@@ -88,7 +88,7 @@ export default function VideoChatPage() {
             />
           </Grid>
           <Grid item xs={12} md={4} sx={{ mt: isMdScreen ? 6 : 8 }}>
-            <CheckList canEdit={true} />
+            <CheckList reservationId={reservationId} canEdit={true} />
           </Grid>
         </Grid>
       ) : (
