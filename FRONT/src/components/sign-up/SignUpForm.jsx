@@ -373,6 +373,9 @@ const SignUp = () => {
                 fullWidth
                 value={userData.userName}
                 onChange={handleChange}
+                inputProps={{
+                  maxLength: 5,
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -384,6 +387,9 @@ const SignUp = () => {
                 fullWidth
                 value={userData.nickName}
                 onChange={handleChange}
+                inputProps={{
+                  maxLength: 20,
+                }}
               />
             </Grid>
             <Grid item xs={12}>

@@ -228,7 +228,7 @@ export default function RealEstateRegisterPage() {
       console.log(error);
       if (error.response.data.status === 413) {
         setErrMsg("이미지 용량 초과입니다.");
-      } else if (error.response.data.status === 400) {
+      } else if (error.response.status === 400) {
         setErrMsg(error.response.data.data);
       }
       setIsSubmitting(false); // 실패 시 버튼 활성화
