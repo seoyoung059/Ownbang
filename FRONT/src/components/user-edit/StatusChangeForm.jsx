@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useBoundStore } from "../../store/store";
 import TimePicker from "./TimePicker";
+import dayjs from "dayjs";
 
 export default function StatusChangeForm({ toggleEdit, isAgent }) {
   const theme = useTheme();
@@ -36,15 +37,16 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
     officeAddress: "",
     detailOfficeAddress: "",
     officeName: "",
-    weekendStartTime: "",
-    weekendEndTime: "",
-    weekdayStartTime: "",
-    weekdayEndTime: "",
+    weekendStartTime: dayjs().hour(9).minute(0).format("HH:mm"),
+    weekendEndTime: dayjs().hour(18).minute(0).format("HH:mm"),
+    weekdayStartTime: dayjs().hour(9).minute(0).format("HH:mm"),
+    weekdayEndTime: dayjs().hour(18).minute(0).format("HH:mm"),
   });
 
   const [open, setOpen] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [greetings, setGreetings] = useState("");
+  const [isFormValid, setIsFormValid] = useState(false); // 폼 유효성 상태
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -112,6 +114,41 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
     }
   }, [getMyAgentInfo, isAgent]);
 
+  useEffect(() => {
+    const checkFormValidity = () => {
+      const {
+        officeNumber,
+        licenseNumber,
+        officeAddress,
+        detailOfficeAddress,
+        officeName,
+        weekendStartTime,
+        weekendEndTime,
+        weekdayStartTime,
+        weekdayEndTime,
+      } = userInfo;
+
+      // 필수 입력 필드가 모두 채워졌는지 확인
+      if (
+        officeNumber &&
+        licenseNumber &&
+        officeAddress &&
+        detailOfficeAddress &&
+        officeName &&
+        weekendStartTime &&
+        weekendEndTime &&
+        weekdayStartTime &&
+        weekdayEndTime
+      ) {
+        setIsFormValid(true);
+      } else {
+        setIsFormValid(false);
+      }
+    };
+
+    checkFormValidity();
+  }, [userInfo]);
+
   // 입력창에 있는 정보들을 userInfo에 반영
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -152,6 +189,15 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
           ...userInfo,
           greetings: greetings, // 이 부분 수정
           officeNumber: userInfo.officeNumber.split("-").join(""),
+          weekdayStartTime:
+            userInfo.weekdayStartTime || weekdayStart.format("HH:mm"),
+          weekdayEndTime:
+            userInfo.weekdayEndTime || weekdayClose.format("HH:mm"),
+          weekendStartTime:
+            userInfo.weekendStartTime || weekendStart.format("HH:mm"),
+          weekendEndTime:
+            userInfo.weekendEndTime || weekendClose.format("HH:mm"),
+          officeNumber: userInfo.officeNumber.split("-").join(""),
         };
 
         console.log(req);
@@ -185,7 +231,7 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
         navigate("/");
       }
     } catch (err) {
-      setErrMsg(err.response?.data?.message || "An error occurred");
+      setErrMsg(err.response?.data?.data || "서버에 문제가 발생했습니다.");
     }
   };
 
@@ -219,7 +265,7 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
                   onChange={(handleInputChange, handleCallNumberChange)}
                   fullWidth
                   inputProps={{
-                    maxLength: 13, // 최대 입력 길이 설정 (예: 02-1234-5678 또는 043-1234-5678)
+                    maxLength: 13,
                   }}
                   placeholder="02-1234-5678"
                 />
@@ -233,6 +279,9 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
                   name="licenseNumber"
                   value={userInfo.licenseNumber}
                   onChange={(handleInputChange, handleNumberChange)}
+                  inputProps={{
+                    maxLength: 20,
+                  }}
                 />
               </Grid>
 
@@ -281,6 +330,9 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
                   value={userInfo.detailOfficeAddress}
                   onChange={handleInputChange}
                   fullWidth
+                  inputProps={{
+                    maxLength: 30,
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -290,6 +342,9 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
                   value={userInfo.officeName}
                   onChange={handleInputChange}
                   fullWidth
+                  inputProps={{
+                    maxLength: 30,
+                  }}
                 />
               </Grid>
               <Grid item alignItems="center" xs={12} sx={{ display: "flex" }}>
@@ -306,6 +361,9 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
                     value={greetings}
                     onChange={handleGreetingsChange} // 이 부분 수정
                     fullWidth
+                    inputProps={{
+                      maxLength: 60,
+                    }}
                   />
                 </Grid>
               )}
@@ -350,6 +408,7 @@ export default function StatusChangeForm({ toggleEdit, isAgent }) {
                   width: "25%",
                   backgroundColor: theme.palette.primary.main,
                 }}
+                disabled={!isFormValid} // 폼이 유효하지 않으면 비활성화
               >
                 {isAgent ? "수정" : "확인"}
               </Button>
