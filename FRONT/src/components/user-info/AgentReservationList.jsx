@@ -164,12 +164,18 @@ const AgentReservationList = () => {
             <TableFooter>
               <TableRow>
                 <TablePagination
-                  rowsPerPageOptions={[10, 25, 50]}
+                  rowsPerPageOptions={[5, 10, 25]}
                   count={agentReservations.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   onPageChange={handleChangePage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
+                  labelRowsPerPage="페이지당 행 수:"
+                  labelDisplayedRows={({ from, to, count }) =>
+                    `${from}-${to} / ${
+                      count !== -1 ? count : `more than ${to}`
+                    }`
+                  }
                 />
               </TableRow>
             </TableFooter>
