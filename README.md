@@ -226,7 +226,7 @@ Openvidu로만 할 수 있는 기능 뿐만이 아니라 백엔드를 함께 이
 
 ---
 
-![alt text](/ReadMeImages/ERD.png)
+![alt text](/ReadMeImages/ERD.PNG)
 
 ### ✨ EC2 포트 정리
 
