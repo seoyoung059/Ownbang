@@ -42,8 +42,8 @@
 
 ### 회원가입 및 로그인
 
-![회원가입](/ReadMeImages/회원가입.PNG)
-![로그인](/ReadMeImages/로그인.png)
+![회원가입](/ReadMeImages/회원가입.png)
+![로그인](/ReadMeImages/로그인.PNG)
 
 ### 화상통화 페이지
 
