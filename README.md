@@ -45,8 +45,6 @@
 ![회원가입](/ReadMeImages/회원가입.png)
 ![로그인](/ReadMeImages/로그인.PNG)
 
-### 화상통화 페이지
-
 ### 녹화 다시보기 페이지
 
 ![다시보기](/ReadMeImages/다시보기.gif)
